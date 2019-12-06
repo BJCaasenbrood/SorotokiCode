@@ -36,6 +36,7 @@ end
 end
 
 function setupToolkit  
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 clc; clear; close all; warning off; beep off;
 
 addpath('src');
@@ -45,6 +46,7 @@ addpath('src/__base__');
 Path = getPath;
 DisplayLogo
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 fprintf(['* Thank you for installing SOROTOKI, we will',...
     ' start the installation shortly \n']); pause(1.0);
 
@@ -53,11 +55,12 @@ verFolder = 'config';
 if ~exist(verFolder, 'dir')
 mkdir(verFolder);
 fprintf(['* Created directory ',verFolder, ' \n']);
-fprintf(['* Directory ',verFolder, 'added to path \n']);
+fprintf(['* Directory ',verFolder, ' added to path \n']);
 else
-fprintf(['* Directory ',verFolder, 'added to path \n']);
+fprintf(['* Directory ',verFolder, ' added to path \n']);
 end
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 addpath([Path,verFolder]);
 
 if exist([Path,'/config/vernum.m'], 'file')
@@ -75,8 +78,7 @@ websave(filename,url);
 fprintf(['* Succesfully downloaded contents', filename, '\n']);
 %fprintf(['* Creating installation log file', filename, '\n']);
 
-libs = zeros(10,1);
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 libs(1) = IncludeBase(Path,0);
 
 if min(libs) == 1
@@ -98,46 +100,37 @@ end
 
 end
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 global FID;
-
 StartUpFile = [userpath,'/startup.m'];
 delete(StartUpFile);
 FID = fopen(StartUpFile,'w');
 
 fprintf('* Assigning fixed search paths to MATLAB: \n');
 if libs(1), IncludeEssentials(Path,1); end
-if libs(2), IncludePreview(Path,1); end
-if libs(3), IncludeBlender(Path,1); end
-if libs(4), IncludeMesher(Path,1); end
-if libs(5), IncludeFiniteElements(Path,1); end
-if libs(6), IncludeTopologyOptimzation(Path,1); end
-if libs(7), IncludeFormer(Path,1); end
-if libs(8), IncludeBalloonDog(Path,1); end
-if libs(9), IncludeMagnetics(Path,1); end
-if libs(10), IncludeClasses(Path,1); end
 
 fclose('all');
 
-% loading full sorotoki libary 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 startup;
 
-cprintf('green','* INSTALLATION DONE! \n');
-cprintf('Text', '\n');
-CallDisplay('SOROTOKI toolkit is succesfully installed and ready-to-use!');
+cout('green','* INSTALLATION DONE! \n');
+cout('Text', '\n');
+cout('SOROTOKI toolkit is succesfully installed and ready-to-use!');
 
 pause(.01);
-cprintf(['The documentation can be found in doc/SorotokiManual.pdf',...
+cout(['The documentation can be found in doc/SorotokiManual.pdf',...
     '. For more in-\nformation on the Soft Robotics Toolkit, visit',...
     ' the GitHub repository at: \n\n']) 
-cprintf('Text',['\t <a href="https://github.com/BJCaasenbrood/Sorotoki">',...
+cout('Text',['\t <a href="https://github.com/BJCaasenbrood/Sorotoki">',...
     'https://github.com/BJCaasenbrood/SorotokiCode</a>\n']);
-cprintf('Text', '\n');
-cprintf('Text', '* To get started with demonstrations, type ');
-cprintf('String', 'sorotoki ');
-cprintf('Text', 'or '); 
-cprintf('String', 'sorotoki(''demo'') \n');
+cout('Text', '\n');
+cout('Text', '* To get started with demonstrations, type ');
+cout('String', 'sorotoki ');
+cout('Text', 'or '); 
+cout('String', 'sorotoki(''demo'') \n');
 warning on;
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 end
 
 function Path = getPath(print)
@@ -150,18 +143,26 @@ end
 function x = IncludeBase(Path,Request)
 global FID
 
-CallDisplay(['Adding SOROTOKI libraries to path,',...
+cout(['* Adding SOROTOKI libraries to path,',...
     'this might take a minute...\n']);
 
 if Request == 1
 fprintf(FID,'%% base.lib \n');
+WriteToFile([Path,'/config/']);
 WriteToFile([Path,'/src/__version__']);
 WriteToFile([Path,'/src/__base__']);
+WriteToFile([Path,'/data/colors']);
+WriteToFile([Path,'/data/matcap']);
+WriteToFile([Path,'/data/matcap/img']);
 else
+addpath([Path,'/config/']);
 addpath([Path,'/src/__version__']);
 addpath([Path,'/src/__base__']);
+addpath([Path,'/data/colors']);
+addpath([Path,'/data/matcap']);
+addpath([Path,'/data/matcap/img']);
 pause(.3);
-x = interfacePathConfirm;
+x = basePathConfirm;
 end
 end
 
