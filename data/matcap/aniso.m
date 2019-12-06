@@ -1,4 +1,4 @@
 function mcap = aniso
-mcap = imread('aniso.jpg');
+mcap = imread('img/aniso.jpg');
 end
 
