@@ -80,6 +80,7 @@ fprintf(['* Succesfully downloaded contents', filename, '\n']);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 libs(1) = IncludeBase(Path,0);
+libs(2) = IncludeObject(Path,0);
 
 if min(libs) == 1
 fprintf('\n* Libary check completed - all libaries are up-to-date \n');
@@ -108,6 +109,7 @@ FID = fopen(StartUpFile,'w');
 
 fprintf('* Assigning fixed search paths to MATLAB: \n');
 if libs(1), IncludeEssentials(Path,1); end
+if libs(2), IncludeBase(Path,1); end
 
 fclose('all');
 
@@ -167,13 +169,29 @@ end
 end
 
 % -------------------------------------------------------------- ESSENTIALS
+function x = IncludeObject(Path,Request)
+global FID
+
+if Request == 1
+fprintf(FID,'%% object.lib \n');
+WriteToFile([Path,'/src/object']);
+WriteToFile([Path,'/src/object/tools']);
+else
+addpath([Path,'/src/object']);
+addpath([Path,'/src/object/tools']);
+pause(.3);
+x = objectPathConfirm;
+end
+end
+
+% -------------------------------------------------------------- ESSENTIALS
 function x = IncludeEssentials(Path,Request)
 global FID
 if Request == 1
-fprintf(FID,'%% interface.lib \n');
-WriteToFile([Path,'\src\interface']);
+fprintf(FID,'%% output.lib \n');
+WriteToFile([Path,'\src\output']);
 else
-addpath([Path,'\interface']);
+addpath([Path,'\src\output']);
 pause(.3);
 x = interfacePathConfirm;
 end
