@@ -60,7 +60,9 @@ end
 
 addpath([Path,verFolder]);
 
-if ~exist('vernum.m', 'file'), delete vernum.m; end
+if exist([Path,'/config/vernum.m'], 'file'), 
+    delete([Path,'/config/vernum.m']); 
+end
 
 if ~PingInternet, error('Enable your internet connection!'); end
 
@@ -167,7 +169,8 @@ WriteToFile([Path,'\examples\resources\sounds'])
 WriteToFile([Path,'\_version'])
 else
 addpath([Path,'\sorotoki_interface_matlab_master']);
-addpath([Path,'\_version']);
+addpath([Path,'\__version__']);
+addpath([Path,'\__base__']);
 CallDisplay(['Adding SOROTOKI libraries to path,',...
     'this might take a minute...\n']);
 pause(.3);
