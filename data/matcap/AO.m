@@ -1,4 +1,4 @@
 function mcap = AO
-mcap = imread('AO.jpg');
+mcap = imread('img/AO.jpg');
 end
 
