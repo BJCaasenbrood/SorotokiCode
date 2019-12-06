@@ -73,10 +73,7 @@ filename = [verFolder,'/vernum.m'];
 websave(filename,url);
 
 fprintf(['* Succesfully downloaded contents', filename, '\n']);
-fprintf(['* Creating installation log file', filename, '\n']);
-
-global FID;
-LogFile = [userpath,'/LOG.txt'];
+fprintf(['* Creating inst', filename, '\n']);
 
 libs = zeros(10,1);
 
