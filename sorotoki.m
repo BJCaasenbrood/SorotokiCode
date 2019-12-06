@@ -44,7 +44,6 @@ addpath('src/__base__');
 
 Path = getPath;
 DisplayLogo
-ShowInfo
 
 fprintf(['* Thank you for installing SOROTOKI, we will',...
     ' start the installation shortly \n']); pause(1.0);
@@ -67,7 +66,7 @@ if ~PingInternet, error('Enable your internet connection!'); end
 
 fprintf('* getting version_file_check from repository config/vernum.m \n');
 url = ['https://raw.githubusercontent.com/BJCaasenbrood/',...
-    'SorotokiCode/master/config/VersionNumber.m'];
+    'SorotokiCode/master/config/vernum.m'];
 filename = [verFolder,'/vernum.m'];
 websave(filename,url);
 
@@ -127,8 +126,8 @@ fclose('all');
 
 % loading full sorotoki libary 
 startup;
-cprintf('green','* INSTALLATION DONE! \n');
 
+cprintf('green','* INSTALLATION DONE! \n');
 cprintf('Text', '\n');
 CallDisplay('SOROTOKI toolkit is succesfully installed and ready-to-use!');
 
@@ -142,7 +141,6 @@ cprintf('Text', '\n');
 cprintf('Text', '* To get started with demonstrations, type ');
 cprintf('String', 'sorotoki ');
 cprintf('Text', 'or '); 
-%cprintf('Text', '\n');
 cprintf('String', 'sorotoki(''demo'') \n');
 warning on;
 
@@ -320,10 +318,4 @@ pause(0.01);
 cprintf('Keyword',[str,'\n']);
 end
 
-function x= PingInternet
-[~,b]=dos('ping -n 1 www.google.com');
-n=strfind(b,'Lost');
-n1=b(n+7);
-if(n1=='0'), x=1; else, x=0; end
-end
 
