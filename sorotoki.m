@@ -1,0 +1,329 @@
+function sorotoki(arg)
+% -------------------------------------------------------------------------
+if nargin < 1, clc; clear; arg = 'demo'; end
+if ~exist('config/__init__.txt','file'), arg = 'install'; end
+% ------------------------------------------------------------------------
+
+switch(arg)
+    case('install');  setupToolkit;
+    case('demo');     showDemo;
+end
+
+end
+
+function showDemo
+ccc;
+set = {'bunny preview demo',...
+       'dragon preview demo',...
+       'advanced FV-mesh preview demo',...
+       'implicit meshing demo',...
+       'linear fem demo',...
+       'nonlinear fem demo',...
+       'topology design demo'};
+
+request = CallAction(set);
+switch(request)
+    case(1); preview_bunny;
+    case(2); preview_dragon;
+    case(3); preview_demo;
+    case(4); mesh_demo;
+    case(5); fem_demo;
+    case(6); nlfem_demo;
+    case(7); design_demo;
+    otherwise; CallWarning('please select demo from the list above.');
+end
+
+end
+
+function setupToolkit  
+clc; clear; close all; warning off; beep off;
+
+addpath('src');
+addpath('src/__version__');
+addpath('src/__base__');
+
+Path = getPath;
+DisplayLogo
+ShowInfo
+
+fprintf(['* Thank you for installing SOROTOKI, we will',...
+    ' start the installation shortly \n']); pause(1.0);
+
+fprintf('* Starting installation - SOROTOKI');
+verFolder = 'config';
+if ~exist(verFolder, 'dir')
+mkdir(verFolder);
+fprintf(['* Created directory ',verFolder, ' \n']);
+fprintf(['* Directory ',verFolder, 'added to path \n']);
+else
+fprintf(['* Directory ',verFolder, 'added to path \n']);
+end
+
+addpath([Path,verFolder]);
+
+if ~exist('vernum.m', 'file'), delete vernum.m; end
+
+if ~PingInternet, error('Enable your internet connection!'); end
+
+fprintf('* getting version_file_check from repository config/vernum.m \n');
+url = ['https://raw.githubusercontent.com/BJCaasenbrood/',...
+    'SorotokiCode/master/config/VersionNumber.m'];
+filename = [verFolder,'/vernum.m'];
+websave(filename,url);
+
+fprintf(['* Succesfully downloaded contents', filename, '\n']);
+
+libs = zeros(10,1);
+
+libs(1) = IncludeEssentials(Path,0);
+libs(2) = IncludePreview(Path,0);
+libs(3) = IncludeBlender(Path,0);
+libs(4) = IncludeMesher(Path,0);
+libs(5) = IncludeFiniteElements(Path,0);
+libs(6) = IncludeTopologyOptimzation(Path,0);
+libs(7) = IncludeFormer(Path,0);
+libs(8) = IncludeBalloonDog(Path,0);
+libs(9) = IncludeMagnetics(Path,0);
+libs(10) = IncludeClasses(Path,0);
+
+if min(libs) == 1
+fprintf('\n* Libary check completed - all libaries are up-to-date \n');
+else
+cprintf('err','\n* Libary check completed - some libaries are outdated!\n');
+fprintf('* Get the latest version at: ');
+
+fprintf(['<a href="https://github.com/BJCaasenbrood/SorotokiCode">',...
+    'https://github.com/BJCaasenbrood/Sorotoki</a> \n'])
+
+Request = input('  Do you want to continue the installation? (y/n) ','s');
+
+switch(Request)
+    case('y'); fprintf('* Proceeding toolkit installation... \n');pause(1);
+    case('n'); error('installation aborted!');
+    otherwise; error('installation aborted!');
+end
+
+end
+
+global FID;
+
+StartUpFile = [userpath,'/startup.m'];
+delete(StartUpFile);
+FID = fopen(StartUpFile,'w');
+
+fprintf('* Assigning fixed search paths to MATLAB: \n');
+if libs(1), IncludeEssentials(Path,1); end
+if libs(2), IncludePreview(Path,1); end
+if libs(3), IncludeBlender(Path,1); end
+if libs(4), IncludeMesher(Path,1); end
+if libs(5), IncludeFiniteElements(Path,1); end
+if libs(6), IncludeTopologyOptimzation(Path,1); end
+if libs(7), IncludeFormer(Path,1); end
+if libs(8), IncludeBalloonDog(Path,1); end
+if libs(9), IncludeMagnetics(Path,1); end
+if libs(10), IncludeClasses(Path,1); end
+
+fclose('all');
+
+% loading full sorotoki libary 
+startup;
+cprintf('green','* INSTALLATION DONE! \n');
+
+cprintf('Text', '\n');
+CallDisplay('SOROTOKI toolkit is succesfully installed and ready-to-use!');
+
+pause(.01);
+cprintf(['The documentation can be found in doc/SorotokiManual.pdf',...
+    '. For more in-\nformation on the Soft Robotics Toolkit, visit',...
+    ' the GitHub repository at: \n\n']) 
+cprintf('Text',['\t <a href="https://github.com/BJCaasenbrood/Sorotoki">',...
+    'https://github.com/BJCaasenbrood/SorotokiCode</a>\n']);
+cprintf('Text', '\n');
+cprintf('Text', '* To get started with demonstrations, type ');
+cprintf('String', 'sorotoki ');
+cprintf('Text', 'or '); 
+%cprintf('Text', '\n');
+cprintf('String', 'sorotoki(''demo'') \n');
+warning on;
+
+end
+
+function Path = getPath(print)
+if nargin < 1; print = false;end
+Path = cd;
+if print, disp(['* cd: ',Path]); end
+end
+
+% -------------------------------------------------------------- ESSENTIALS
+function x = IncludeEssentials(Path,Request)
+global FID
+if Request == 1
+fprintf(FID,'%% interface.lib \n');
+WriteToFile([Path,'\sorotoki_interface_matlab_master']);
+WriteToFile([Path,'\examples'])
+WriteToFile([Path,'\examples\demos'])
+WriteToFile([Path,'\examples\resources'])
+WriteToFile([Path,'\examples\resources\colormaps'])
+WriteToFile([Path,'\examples\resources\images'])
+WriteToFile([Path,'\examples\resources\sounds'])
+WriteToFile([Path,'\_version'])
+else
+addpath([Path,'\sorotoki_interface_matlab_master']);
+addpath([Path,'\_version']);
+CallDisplay(['Adding SOROTOKI libraries to path,',...
+    'this might take a minute...\n']);
+pause(.3);
+x = interfacePathConfirm;
+end
+end
+
+% ----------------------------------------------------------------- MESHING
+function x = IncludePreview(Path,Request)
+global FID;
+if Request == 1
+fprintf(FID,'%% preview.lib \n');
+WriteToFile([Path,'\sorotoki_preview_master']);
+WriteToFile([Path,'\sorotoki_preview_master\tools']);
+WriteToFile([Path,'\sorotoki_preview_master\tools\colors']);
+WriteToFile([Path,'\examples\resources\models'])
+WriteToFile([Path,'\examples\resources\cubemaps'])
+WriteToFile([Path,'\examples\resources\matcaps'])
+x = 1;
+else
+addpath([Path,'\sorotoki_preview_master']);
+x = previewPathConfirm;
+end
+end
+
+% ---------------------------------------------------------- PHYSICS ENGINE
+function x = IncludeBlender(Path,Request)
+global FID;
+if Request == 1
+fprintf(FID,'%% blender.lib \n');
+WriteToFile([Path,'\sorotoki_blender_master']);
+x = 1;
+else
+addpath([Path,'\sorotoki_blender_master']);
+x = blenderPathConfirm;
+end
+end
+
+% ----------------------------------------------------------------- MESHING
+function x = IncludeMesher(Path,Request)
+global FID;
+if Request == 1
+fprintf(FID,'%% mesher.lib \n');
+WriteToFile([Path,'\sorotoki_mesher_master']);
+WriteToFile([Path,'\sorotoki_mesher_master\tools']);
+WriteToFile([Path,'\sorotoki_mesher_master\tools\shapes']);
+WriteToFile([Path,'\sorotoki_mesher_master\tools\operators']);
+WriteToFile([Path,'\examples\resources\implicit'])
+else
+addpath([Path,'\sorotoki_mesher_master']);
+x = mesherPathConfirm;
+end
+end
+
+% --------------------------------------------------------- FINITE ELEMENTS
+function x = IncludeFiniteElements(Path,Request)
+global FID;
+if Request == 1
+fprintf(FID,'%% fem.lib \n');
+WriteToFile([Path,'\sorotoki_finite_elements_master']);
+WriteToFile([Path,'\sorotoki_finite_elements_master\tools']);
+WriteToFile([Path,'\sorotoki_finite_elements_master\materials']);
+else
+addpath([Path,'\sorotoki_finite_elements_master']);
+x = fePathConfirm;
+end
+end
+
+% --------------------------------------------------- TOPOLOGY OPTIMIZATION
+function x = IncludeTopologyOptimzation(Path,Request)
+global FID;
+if Request == 1
+fprintf(FID,'%% topology.lib \n');   
+WriteToFile([Path,'\sorotoki_topology_master']);
+WriteToFile([Path,'\sorotoki_topology_master\tools']);
+else
+addpath([Path,'\sorotoki_topology_master']);
+x = topologyOptPathConfirm;
+end
+end
+
+% ------------------------------------------------------------------ FORMER
+function x = IncludeFormer(Path,Request)
+global FID;
+if Request == 1
+fprintf(FID,'%% former.lib \n');
+WriteToFile([Path,'\sorotoki_former_master']);
+WriteToFile([Path,'\sorotoki_former_master\tools']);
+else
+addpath([Path,'\sorotoki_former_master']);
+x = formerPathConfirm;
+end
+end
+
+% -------------------------------------------------------- BALLOONDOG BOARD
+function x = IncludeBalloonDog(Path,Request)
+global FID;
+if Request == 1
+fprintf(FID,'%% balloondog.lib \n');
+WriteToFile([Path,'\sorotoki_balloondogPi_master']);
+WriteToFile([Path,'\sorotoki_balloondogPi_master\SSH']);
+else
+addpath([Path,'\sorotoki_balloondogPi_master']);
+addpath([Path,'\sorotoki_balloondogPi_master\SSH']);
+x = balloondogPathConfirm;
+end
+end
+
+% -------------------------------------------------- ADDITIVE MANUFACTURING
+function x = IncludePrinter(Path)
+addpath([Path,'\sorotoki_printer_master']);
+printerPathConfirm;
+end
+
+% ----------------------------------------------------------- MAGNETICS FEM
+function x= IncludeMagnetics(Path,Request)
+global FID;
+if Request == 1
+fprintf(FID,'%% balloondog.lib \n');
+WriteToFile([Path,'\sorotoki_magnetics_master']);
+WriteToFile([Path,'\sorotoki_magnetics_master\tools']);
+WriteToFile([Path,'\src\examples\domains\magnet']);
+else
+addpath([Path,'\sorotoki_magnetics_master']);
+addpath([Path,'\sorotoki_magnetics_master\tools']);
+addpath([Path,'\src\examples\domains\magnet']);
+x = magneticsPathConfirm;
+end
+end
+
+% ----------------------------------------------------------- MAGNETICS FEM
+function x= IncludeClasses(Path,Request)
+global FID;
+if Request == 1
+fprintf(FID,'%% balloondog.lib \n');
+WriteToFile([Path,'\sorotoki_classes_master']);
+else
+addpath([Path,'\sorotoki_classes_master']);
+x = classesPathConfirm;
+end
+end
+
+function WriteToFile(str)
+global FID;
+str = strrep(str,'\','\\');
+fprintf(FID, ['addpath(genpath(''',str, '''))\n']);
+pause(0.01);
+cprintf('Keyword',[str,'\n']);
+end
+
+function x= PingInternet
+[~,b]=dos('ping -n 1 www.google.com');
+n=strfind(b,'Lost');
+n1=b(n+7);
+if(n1=='0'), x=1; else, x=0; end
+end
+
