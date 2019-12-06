@@ -1,5 +1,5 @@
-function LatestRelease = interfacePathConfirm
-lib = 'interface.lib';
+function LatestRelease = outputPathConfirm
+lib = 'output.lib';
 ver = '2.1';
 LatestRelease = CheckLibary(lib,ver);
 end
