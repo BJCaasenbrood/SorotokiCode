@@ -60,7 +60,7 @@ end
 
 addpath([Path,verFolder]);
 
-if exist([Path,'/config/vernum.m'], 'file'), 
+if exist([Path,'/config/vernum.m'], 'file')
     delete([Path,'/config/vernum.m']); 
 end
 
@@ -73,23 +73,11 @@ filename = [verFolder,'/vernum.m'];
 websave(filename,url);
 
 fprintf(['* Succesfully downloaded contents', filename, '\n']);
-fprintf(['* Creating installation log file', filename, '\n']);
-
-global FID;
-LogFile = [userpath,'/LOG.txt'];
+%fprintf(['* Creating installation log file', filename, '\n']);
 
 libs = zeros(10,1);
 
-libs(1) = IncludeEssentials(Path,0);
-libs(2) = IncludePreview(Path,0);
-libs(3) = IncludeBlender(Path,0);
-libs(4) = IncludeMesher(Path,0);
-libs(5) = IncludeFiniteElements(Path,0);
-libs(6) = IncludeTopologyOptimzation(Path,0);
-libs(7) = IncludeFormer(Path,0);
-libs(8) = IncludeBalloonDog(Path,0);
-libs(9) = IncludeMagnetics(Path,0);
-libs(10) = IncludeClasses(Path,0);
+libs(1) = IncludeBase(Path,0);
 
 if min(libs) == 1
 fprintf('\n* Libary check completed - all libaries are up-to-date \n');
@@ -159,24 +147,32 @@ if print, disp(['* cd: ',Path]); end
 end
 
 % -------------------------------------------------------------- ESSENTIALS
+function x = IncludeBase(Path,Request)
+global FID
+
+CallDisplay(['Adding SOROTOKI libraries to path,',...
+    'this might take a minute...\n']);
+
+if Request == 1
+fprintf(FID,'%% base.lib \n');
+WriteToFile([Path,'/src/__version__']);
+WriteToFile([Path,'/src/__base__']);
+else
+addpath([Path,'/src/__version__']);
+addpath([Path,'/src/__base__']);
+pause(.3);
+x = interfacePathConfirm;
+end
+end
+
+% -------------------------------------------------------------- ESSENTIALS
 function x = IncludeEssentials(Path,Request)
 global FID
 if Request == 1
 fprintf(FID,'%% interface.lib \n');
-WriteToFile([Path,'\sorotoki_interface_matlab_master']);
-WriteToFile([Path,'\examples'])
-WriteToFile([Path,'\examples\demos'])
-WriteToFile([Path,'\examples\resources'])
-WriteToFile([Path,'\examples\resources\colormaps'])
-WriteToFile([Path,'\examples\resources\images'])
-WriteToFile([Path,'\examples\resources\sounds'])
-WriteToFile([Path,'\_version'])
+WriteToFile([Path,'\src\interface']);
 else
-addpath([Path,'\sorotoki_interface_matlab_master']);
-addpath([Path,'\__version__']);
-addpath([Path,'\__base__']);
-CallDisplay(['Adding SOROTOKI libraries to path,',...
-    'this might take a minute...\n']);
+addpath([Path,'\interface']);
 pause(.3);
 x = interfacePathConfirm;
 end
@@ -315,14 +311,6 @@ else
 addpath([Path,'\sorotoki_classes_master']);
 x = classesPathConfirm;
 end
-end
-
-function WriteToFile(str)
-global FID;
-str = strrep(str,'\','\\');
-fprintf(FID, ['addpath(genpath(''',str, '''))\n']);
-pause(0.01);
-cprintf('Keyword',[str,'\n']);
 end
 
 
