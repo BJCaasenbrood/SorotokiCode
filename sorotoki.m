@@ -81,6 +81,9 @@ fprintf(['* Succesfully downloaded contents', filename, '\n']);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 libs(1) = IncludeBase(Path,0);
 libs(2) = IncludeGraphicsModel(Path,0);
+libs(3) = IncludeMesh(Path,0);
+libs(4) = IncludeFiniteElement(Path,0);
+libs(5) = IncludeDynamicModel(Path,0);
 
 if min(libs) == 1
 fprintf('\n* Libary check completed - all libaries are up-to-date \n');
@@ -110,6 +113,9 @@ FID = fopen(StartUpFile,'w');
 fprintf('* Assigning fixed search paths to MATLAB: \n');
 if libs(1), IncludeBase(Path,1); end
 if libs(2), IncludeGraphicsModel(Path,1); end
+if libs(3), IncludeMesh(Path,1); end
+if libs(4), IncludeFiniteElement(Path,1); end
+if libs(5), IncludeDynamicModel(Path,1); end
 
 fclose('all');
 
@@ -155,7 +161,8 @@ WriteToFile([Path,'\src\__version__']);
 WriteToFile([Path,'\src\__base__']);
 WriteToFile([Path,'\src\__base__\fnc']);
 WriteToFile([Path,'\scripts\']);
-WriteToFile([Path,'\data\colors']);
+WriteToFile([Path,'\data\color']);
+WriteToFile([Path,'\data\colormap']);
 WriteToFile([Path,'\data\matcap']);
 WriteToFile([Path,'\data\matcap\img']);
 WriteToFile([Path,'\data\stl']);
@@ -165,7 +172,8 @@ addpath([Path,'\src\__version__']);
 addpath([Path,'\src\__base__']);
 addpath([Path,'\src\__base__\fnc']);
 addpath([Path,'\scripts\']);
-addpath([Path,'\data\colors']);
+addpath([Path,'\data\color']);
+addpath([Path,'\data\colormap']);
 addpath([Path,'\data\matcap']);
 addpath([Path,'\data\matcap\img']);
 addpath([Path,'\data\stl']);
@@ -189,3 +197,59 @@ pause(.3);
 x = graphicsmodelPathConfirm;
 end
 end
+
+% -------------------------------------------------------------- ESSENTIALS
+function x = IncludeMesh(Path,Request)
+global FID
+
+if Request == 1
+fprintf(FID,'%% mesh.lib \n');
+WriteToFile([Path,'\src\mesh']);
+WriteToFile([Path,'\src\mesh\tools\']);
+WriteToFile([Path,'\src\mesh\shapes\']);
+WriteToFile([Path,'\src\mesh\operators\']);
+else
+addpath([Path,'\src\mesh']);
+addpath([Path,'\src\mesh\tools\']);
+addpath([Path,'\src\mesh\shapes\']);
+addpath([Path,'\src\mesh\operators\']);
+pause(.3);
+x = meshPathConfirm;
+end
+end
+
+% -------------------------------------------------------------- ESSENTIALS
+function x = IncludeFiniteElement(Path,Request)
+global FID
+
+if Request == 1
+fprintf(FID,'%% fem.lib \n');
+WriteToFile([Path,'\src\fem']);
+WriteToFile([Path,'\src\fem\tools\']);
+WriteToFile([Path,'\src\fem\materials\']);
+else
+addpath([Path,'\src\fem']);
+addpath([Path,'\src\fem\tools\']);
+addpath([Path,'\src\fem\materials\']);
+pause(.3);
+x = meshPathConfirm;
+end
+end
+
+% -------------------------------------------------------------- ESSENTIALS
+function x = IncludeDynamicModel(Path,Request)
+global FID
+
+if Request == 1
+fprintf(FID,'%% mdl.lib \n');
+WriteToFile([Path,'\src\model']);
+WriteToFile([Path,'\src\model\tools']);
+else
+addpath([Path,'\src\model']);
+addpath([Path,'\src\model\tools']);
+pause(.3);
+x = mdlPathConfirm;
+end
+end
+
+

@@ -1,0 +1,334 @@
+# NetScript
+# 
+# Exported from BalloonDogV3.sch at 08/01/2020 17:15
+# 
+# EAGLE Version 9.3.2 Copyright (c) 1988-2019 Autodesk, Inc.
+# 
+Change Class 0;
+Signal '+3V3'     'C1'       '1' \
+                  'C10'      '2' \
+                  'C6'       '1' \
+                  'C7'       '1' \
+                  'K1'       '1' \
+                  'K1'       '17' \
+                  'U13'      '5' \
+                  'U3'       '19' \
+                  'U3'       '20' \
+                  'U4'       '19' \
+                  'U4'       '20' \
+                  ;
+Change Class 0;
+Signal '+5V'      'C3'       '1' \
+                  'C5'       '1' \
+                  'C8'       '2' \
+                  'K1'       '2' \
+                  'K1'       '4' \
+                  'L1'       '1' \
+                  'R6'       '1' \
+                  'U13'      '1' \
+                  'U13'      '3' \
+                  ;
+Change Class 0;
+Signal '+12V'     'R3'       '2' \
+                  'U2'       '7' \
+                  'U3'       '13' \
+                  'U3'       '14' \
+                  'U3'       '24' \
+                  'U4'       '13' \
+                  'U4'       '14' \
+                  'U4'       '24' \
+                  ;
+Change Class 0;
+Signal 'CE0'      'K1'       '24' \
+                  ;
+Change Class 0;
+Signal 'CE1'      'K1'       '26' \
+                  ;
+Change Class 0;
+Signal 'EP'       'U2'       '9' \
+                  ;
+Change Class 0;
+Signal 'GND'      'C1'       '2' \
+                  'C10'      '1' \
+                  'C3'       '2' \
+                  'C5'       '2' \
+                  'C6'       '2' \
+                  'C7'       '2' \
+                  'C8'       '1' \
+                  'C9'       '1' \
+                  'D1'       '1' \
+                  'K1'       '14' \
+                  'K1'       '20' \
+                  'K1'       '30' \
+                  'K1'       '34' \
+                  'K1'       '39' \
+                  'K1'       '6' \
+                  'K1'       '9' \
+                  'R1'       '1' \
+                  'R2'       '1' \
+                  'R4'       '1' \
+                  'R5'       '2' \
+                  'U1'       '14' \
+                  'U1'       '23' \
+                  'U1'       '25' \
+                  'U13'      '2' \
+                  'U14'      '10' \
+                  'U15'      '10' \
+                  'U16'      '10' \
+                  'U17'      '10' \
+                  'U18'      '12' \
+                  'U2'       '5' \
+                  'U3'       '10' \
+                  'U3'       '18' \
+                  'U3'       '3' \
+                  'U3'       '4' \
+                  'U3'       '9' \
+                  'U4'       '10' \
+                  'U4'       '18' \
+                  'U4'       '3' \
+                  'U4'       '4' \
+                  'U4'       '9' \
+                  ;
+Change Class 0;
+Signal 'IDSC'     'K1'       '28' \
+                  ;
+Change Class 0;
+Signal 'MISO'     'K1'       '21' \
+                  ;
+Change Class 0;
+Signal 'MOSI'     'K1'       '19' \
+                  ;
+Change Class 0;
+Signal 'N$1'      'R1'       '2' \
+                  'U2'       '6' \
+                  ;
+Change Class 0;
+Signal 'N$2'      'K1'       '25' \
+                  ;
+Change Class 0;
+Signal 'N$3'      'R2'       '2' \
+                  'R3'       '1' \
+                  'U2'       '2' \
+                  ;
+Change Class 0;
+Signal 'N$4'      'R5'       '1' \
+                  'R6'       '2' \
+                  'U2'       '4' \
+                  ;
+Change Class 0;
+Signal 'N$5'      'C4'       '2' \
+                  'D1'       '2' \
+                  'L1'       '2' \
+                  'U2'       '1' \
+                  ;
+Change Class 0;
+Signal 'N$6'      'C2'       '1' \
+                  'U2'       '3' \
+                  ;
+Change Class 0;
+Signal 'N$7'      'C2'       '2' \
+                  'R4'       '2' \
+                  ;
+Change Class 0;
+Signal 'N$8'      'C4'       '1' \
+                  'U2'       '8' \
+                  ;
+Change Class 0;
+Signal 'N$9'      'K1'       '23' \
+                  ;
+Change Class 0;
+Signal 'N$10'     'K1'       '27' \
+                  ;
+Change Class 0;
+Signal 'N$11'     'K1'       '29' \
+                  ;
+Change Class 0;
+Signal 'N$12'     'K1'       '31' \
+                  ;
+Change Class 0;
+Signal 'N$13'     'K1'       '33' \
+                  ;
+Change Class 0;
+Signal 'N$14'     'K1'       '35' \
+                  ;
+Change Class 0;
+Signal 'N$15'     'K1'       '37' \
+                  ;
+Change Class 0;
+Signal 'N$22'     'U3'       '1' \
+                  'U3'       '2' \
+                  ;
+Change Class 0;
+Signal 'N$23'     'U3'       '5' \
+                  'U3'       '6' \
+                  ;
+Change Class 0;
+Signal 'N$24'     'U3'       '11' \
+                  'U3'       '12' \
+                  ;
+Change Class 0;
+Signal 'N$25'     'U3'       '7' \
+                  'U3'       '8' \
+                  ;
+Change Class 0;
+Signal 'N$32'     'U4'       '1' \
+                  'U4'       '2' \
+                  ;
+Change Class 0;
+Signal 'N$33'     'U4'       '5' \
+                  'U4'       '6' \
+                  ;
+Change Class 0;
+Signal 'N$34'     'U4'       '11' \
+                  'U4'       '12' \
+                  ;
+Change Class 0;
+Signal 'N$35'     'U4'       '7' \
+                  'U4'       '8' \
+                  ;
+Change Class 0;
+Signal 'N$36'     'U1'       '27' \
+                  ;
+Change Class 0;
+Signal 'N$37'     'U1'       '26' \
+                  ;
+Change Class 0;
+Signal 'N$42'     'U1'       '1' \
+                  ;
+Change Class 0;
+Signal 'N$43'     'U1'       '2' \
+                  ;
+Change Class 0;
+Signal 'N$44'     'U1'       '3' \
+                  ;
+Change Class 0;
+Signal 'N$45'     'U1'       '4' \
+                  ;
+Change Class 0;
+Signal 'N$46'     'U1'       '5' \
+                  ;
+Change Class 0;
+Signal 'N$47'     'U1'       '24' \
+                  ;
+Change Class 0;
+Signal 'N$58'     'C9'       '2' \
+                  'U13'      '4' \
+                  ;
+Change Class 0;
+Signal 'P4'       'K1'       '7' \
+                  ;
+Change Class 0;
+Signal 'P12'      'K1'       '32' \
+                  ;
+Change Class 0;
+Signal 'P16'      'K1'       '36' \
+                  ;
+Change Class 0;
+Signal 'P17'      'K1'       '11' \
+                  ;
+Change Class 0;
+Signal 'P18'      'K1'       '12' \
+                  ;
+Change Class 0;
+Signal 'P20'      'K1'       '38' \
+                  ;
+Change Class 0;
+Signal 'P21'      'K1'       '40' \
+                  ;
+Change Class 0;
+Signal 'P22'      'K1'       '15' \
+                  ;
+Change Class 0;
+Signal 'P23'      'K1'       '16' \
+                  ;
+Change Class 0;
+Signal 'P24'      'K1'       '18' \
+                  ;
+Change Class 0;
+Signal 'P25'      'K1'       '22' \
+                  ;
+Change Class 0;
+Signal 'P27'      'K1'       '13' \
+                  ;
+Change Class 0;
+Signal 'PWM0'     'U1'       '6' \
+                  ;
+Change Class 0;
+Signal 'PWM1'     'U1'       '7' \
+                  ;
+Change Class 0;
+Signal 'PWM2'     'U1'       '8' \
+                  'U3'       '23' \
+                  ;
+Change Class 0;
+Signal 'PWM3'     'U1'       '9' \
+                  'U3'       '22' \
+                  ;
+Change Class 0;
+Signal 'PWM4'     'U1'       '10' \
+                  'U3'       '21' \
+                  ;
+Change Class 0;
+Signal 'PWM5'     'U1'       '11' \
+                  'U3'       '17' \
+                  ;
+Change Class 0;
+Signal 'PWM6'     'U1'       '12' \
+                  'U3'       '16' \
+                  ;
+Change Class 0;
+Signal 'PWM7'     'U1'       '13' \
+                  'U3'       '15' \
+                  ;
+Change Class 0;
+Signal 'PWM8'     'U1'       '15' \
+                  'U4'       '23' \
+                  ;
+Change Class 0;
+Signal 'PWM9'     'U1'       '16' \
+                  'U4'       '22' \
+                  ;
+Change Class 0;
+Signal 'PWM10'    'U1'       '17' \
+                  'U4'       '21' \
+                  ;
+Change Class 0;
+Signal 'PWM11'    'U1'       '18' \
+                  'U4'       '17' \
+                  ;
+Change Class 0;
+Signal 'PWM12'    'U1'       '19' \
+                  'U4'       '16' \
+                  ;
+Change Class 0;
+Signal 'PWM13'    'U1'       '20' \
+                  'U4'       '15' \
+                  ;
+Change Class 0;
+Signal 'PWM14'    'U1'       '21' \
+                  ;
+Change Class 0;
+Signal 'PWM15'    'U1'       '22' \
+                  ;
+Change Class 0;
+Signal 'RX'       'K1'       '10' \
+                  ;
+Change Class 0;
+Signal 'SCL'      'K1'       '5' \
+                  ;
+Change Class 0;
+Signal 'SDA'      'K1'       '3' \
+                  ;
+Change Class 0;
+Signal 'TX'       'K1'       '8' \
+                  ;
+Change Class 0;
+Signal 'VCC'      'U18'      '24' \
+                  ;
+Change Class 0;
+Signal 'VDD'      'U1'       '28' \
+                  'U14'      '12' \
+                  'U15'      '12' \
+                  'U16'      '12' \
+                  'U17'      '12' \
+                  ;

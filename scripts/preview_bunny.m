@@ -1,11 +1,16 @@
 clc; clear; close all;
 
-%% load model
-obj = Gmodel('Bunny.stl');
+%% model
+obj = Gmodel('David.stl');
 
 %% set texture
-obj.Texture = jade;
+obj.Texture = virtual;
+obj.Emission = lime;
+
+obj.set('AOPower',1.5,...
+        'AORadius',0.25);
+
 obj = obj.bake();
 
 %% show
-obj.show();
+obj = obj.render();

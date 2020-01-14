@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE eagle SYSTEM "eagle.dtd">
+<eagle version="9.5.0">
+<drawing>
+<settings>
+<setting alwaysvectorfont="no"/>
+<setting verticaltext="up"/>
+</settings>
+<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
+<layers>
+<layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
+<layer number="2" name="Route2" color="16" fill="1" visible="no" active="yes"/>
+<layer number="3" name="Route3" color="17" fill="1" visible="no" active="yes"/>
+<layer number="4" name="Route4" color="18" fill="1" visible="no" active="yes"/>
+<layer number="5" name="Route5" color="19" fill="1" visible="no" active="yes"/>
+<layer number="6" name="Route6" color="25" fill="1" visible="no" active="yes"/>
+<layer number="7" name="Route7" color="26" fill="1" visible="no" active="yes"/>
+<layer number="8" name="Route8" color="27" fill="1" visible="no" active="yes"/>
+<layer number="9" name="Route9" color="28" fill="1" visible="no" active="yes"/>
+<layer number="10" name="Route10" color="29" fill="1" visible="no" active="yes"/>
+<layer number="11" name="Route11" color="30" fill="1" visible="no" active="yes"/>
+<layer number="12" name="Route12" color="20" fill="1" visible="no" active="yes"/>
+<layer number="13" name="Route13" color="21" fill="1" visible="no" active="yes"/>
+<layer number="14" name="Route14" color="22" fill="1" visible="no" active="yes"/>
+<layer number="15" name="Route15" color="23" fill="1" visible="no" active="yes"/>
+<layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="yes"/>
+<layer number="17" name="Pads" color="2" fill="1" visible="yes" active="yes"/>
+<layer number="18" name="Vias" color="2" fill="1" visible="yes" active="yes"/>
+<layer number="19" name="Unrouted" color="6" fill="1" visible="yes" active="yes"/>
+<layer number="20" name="Dimension" color="24" fill="1" visible="yes" active="yes"/>
+<layer number="21" name="tPlace" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="22" name="bPlace" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="23" name="tOrigins" color="15" fill="1" visible="yes" active="yes"/>
+<layer number="24" name="bOrigins" color="15" fill="1" visible="yes" active="yes"/>
+<layer number="25" name="tNames" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="26" name="bNames" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="27" name="tValues" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="28" name="bValues" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="29" name="tStop" color="7" fill="3" visible="no" active="yes"/>
+<layer number="30" name="bStop" color="7" fill="6" visible="no" active="yes"/>
+<layer number="31" name="tCream" color="7" fill="4" visible="no" active="yes"/>
+<layer number="32" name="bCream" color="7" fill="5" visible="no" active="yes"/>
+<layer number="33" name="tFinish" color="6" fill="3" visible="no" active="yes"/>
+<layer number="34" name="bFinish" color="6" fill="6" visible="no" active="yes"/>
+<layer number="35" name="tGlue" color="7" fill="4" visible="no" active="yes"/>
+<layer number="36" name="bGlue" color="7" fill="5" visible="no" active="yes"/>
+<layer number="37" name="tTest" color="7" fill="1" visible="no" active="yes"/>
+<layer number="38" name="bTest" color="7" fill="1" visible="no" active="yes"/>
+<layer number="39" name="tKeepout" color="4" fill="11" visible="yes" active="yes"/>
+<layer number="40" name="bKeepout" color="1" fill="11" visible="yes" active="yes"/>
+<layer number="41" name="tRestrict" color="4" fill="10" visible="yes" active="yes"/>
+<layer number="42" name="bRestrict" color="1" fill="10" visible="yes" active="yes"/>
+<layer number="43" name="vRestrict" color="2" fill="10" visible="yes" active="yes"/>
+<layer number="44" name="Drills" color="7" fill="1" visible="no" active="yes"/>
+<layer number="45" name="Holes" color="7" fill="1" visible="no" active="yes"/>
+<layer number="46" name="Milling" color="3" fill="1" visible="no" active="yes"/>
+<layer number="47" name="Measures" color="7" fill="1" visible="no" active="yes"/>
+<layer number="48" name="Document" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="49" name="Reference" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="51" name="tDocu" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="52" name="bDocu" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="88" name="SimResults" color="9" fill="1" visible="yes" active="yes"/>
+<layer number="89" name="SimProbes" color="9" fill="1" visible="yes" active="yes"/>
+<layer number="90" name="Modules" color="5" fill="1" visible="yes" active="yes"/>
+<layer number="91" name="Nets" color="2" fill="1" visible="yes" active="yes"/>
+<layer number="92" name="Busses" color="1" fill="1" visible="yes" active="yes"/>
+<layer number="93" name="Pins" color="2" fill="1" visible="yes" active="yes"/>
+<layer number="94" name="Symbols" color="4" fill="1" visible="yes" active="yes"/>
+<layer number="95" name="Names" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="96" name="Values" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="97" name="Info" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="98" name="Guide" color="6" fill="1" visible="yes" active="yes"/>
+</layers>
+<library>
+<packages>
+<package name="TEENSY4.0">
+<pad name="GND@1" x="-7.62" y="15.24" drill="0.8"/>
+<pad name="D0" x="-7.62" y="12.7" drill="0.8"/>
+<pad name="D1" x="-7.62" y="10.16" drill="0.8"/>
+<pad name="D2" x="-7.62" y="7.62" drill="0.8"/>
+<pad name="D3" x="-7.62" y="5.08" drill="0.8"/>
+<pad name="D4" x="-7.62" y="2.54" drill="0.8"/>
+<pad name="D5" x="-7.62" y="0" drill="0.8"/>
+<pad name="D6" x="-7.62" y="-2.54" drill="0.8"/>
+<pad name="D7" x="-7.62" y="-5.08" drill="0.8"/>
+<pad name="D8" x="-7.62" y="-7.62" drill="0.8"/>
+<pad name="D9" x="-7.62" y="-10.16" drill="0.8"/>
+<pad name="D10" x="-7.62" y="-12.7" drill="0.8"/>
+<pad name="D11" x="-7.62" y="-15.24" drill="0.8"/>
+<pad name="D12" x="-7.62" y="-17.78" drill="0.8"/>
+<pad name="VBAT" x="-5.08" y="-17.78" drill="0.8"/>
+<pad name="3.3V@2" x="-2.54" y="-17.78" drill="0.8"/>
+<pad name="GND@2" x="0" y="-17.78" drill="0.8"/>
+<pad name="ON/OFF" x="5.08" y="-17.78" drill="0.8"/>
+<pad name="D13/LED" x="7.62" y="-17.78" drill="0.8"/>
+<pad name="D14/A0" x="7.62" y="-15.24" drill="0.8"/>
+<pad name="D15/A1" x="7.62" y="-12.7" drill="0.8"/>
+<pad name="D16/A2" x="7.62" y="-10.16" drill="0.8"/>
+<pad name="D17/A3" x="7.62" y="-7.62" drill="0.8"/>
+<pad name="D18/A4" x="7.62" y="-5.08" drill="0.8"/>
+<pad name="D19/A5" x="7.62" y="-2.54" drill="0.8"/>
+<pad name="D20/A6" x="7.62" y="0" drill="0.8"/>
+<pad name="D21/A7" x="7.62" y="2.54" drill="0.8"/>
+<pad name="D22/A8" x="7.62" y="5.08" drill="0.8"/>
+<pad name="D23/A9" x="7.62" y="7.62" drill="0.8"/>
+<pad name="3.3V@1" x="7.62" y="10.16" drill="0.8"/>
+<pad name="AGND" x="7.62" y="12.7" drill="0.8"/>
+<pad name="VIN" x="7.62" y="15.24" drill="0.8"/>
+<pad name="VUSB" x="5.08" y="12.7" drill="0.8"/>
+<wire x1="8.89" y1="16.51" x2="8.89" y2="-19.05" width="0.127" layer="21"/>
+<wire x1="8.89" y1="-19.05" x2="-8.89" y2="-19.05" width="0.127" layer="21"/>
+<wire x1="-8.89" y1="-19.05" x2="-8.89" y2="16.51" width="0.127" layer="21"/>
+<wire x1="-2.54" y1="15.24" x2="-2.54" y2="16.51" width="0.127" layer="21"/>
+<wire x1="-2.54" y1="16.51" x2="-2.54" y2="17.78" width="0.127" layer="21"/>
+<wire x1="-2.54" y1="17.78" x2="2.54" y2="17.78" width="0.127" layer="21"/>
+<wire x1="2.54" y1="17.78" x2="2.54" y2="16.51" width="0.127" layer="21"/>
+<wire x1="2.54" y1="16.51" x2="2.54" y2="15.24" width="0.127" layer="21"/>
+<wire x1="2.54" y1="15.24" x2="-2.54" y2="15.24" width="0.127" layer="21"/>
+<wire x1="8.89" y1="16.51" x2="2.54" y2="16.51" width="0.127" layer="21"/>
+<wire x1="-2.54" y1="16.51" x2="-8.89" y2="16.51" width="0.127" layer="21"/>
+<wire x1="5.08" y1="5.08" x2="-5.08" y2="5.08" width="0.127" layer="21"/>
+<wire x1="-5.08" y1="5.08" x2="-5.08" y2="-5.08" width="0.127" layer="21"/>
+<wire x1="-5.08" y1="-5.08" x2="5.08" y2="-5.08" width="0.127" layer="21"/>
+<wire x1="5.08" y1="5.08" x2="5.08" y2="-5.08" width="0.127" layer="21"/>
+<wire x1="-1.27" y1="-16.51" x2="-1.27" y2="-12.7" width="0.127" layer="21"/>
+<wire x1="-1.27" y1="-12.7" x2="1.27" y2="-12.7" width="0.127" layer="21"/>
+<wire x1="1.27" y1="-12.7" x2="1.27" y2="-16.51" width="0.127" layer="21"/>
+<wire x1="1.27" y1="-16.51" x2="-1.27" y2="-16.51" width="0.127" layer="21"/>
+<text x="-3.81" y="-3.81" size="1.27" layer="25" font="fixed">Teensy 4</text>
+<pad name="PROGRAM" x="2.54" y="-17.78" drill="0.8"/>
+</package>
+</packages>
+<symbols>
+<symbol name="TEENSY4.0">
+<description>PJRC Teensy 4.0</description>
+<pin name="D0" x="10.16" y="57.15" length="middle"/>
+<pin name="D1" x="10.16" y="53.34" length="middle"/>
+<pin name="D2" x="10.16" y="49.53" length="middle"/>
+<pin name="D3" x="10.16" y="45.72" length="middle"/>
+<pin name="D4" x="10.16" y="41.91" length="middle"/>
+<pin name="D5" x="10.16" y="38.1" length="middle"/>
+<pin name="D10" x="10.16" y="19.05" length="middle"/>
+<pin name="D11" x="10.16" y="15.24" length="middle"/>
+<pin name="D12" x="10.16" y="11.43" length="middle"/>
+<pin name="D6" x="10.16" y="34.29" length="middle"/>
+<pin name="D7" x="10.16" y="30.48" length="middle"/>
+<pin name="D8" x="10.16" y="26.67" length="middle"/>
+<pin name="D9" x="10.16" y="22.86" length="middle"/>
+<pin name="D13/LED" x="50.8" y="11.43" length="middle" rot="R180"/>
+<pin name="D15/A1" x="50.8" y="19.05" length="middle" rot="R180"/>
+<pin name="D14/A0" x="50.8" y="15.24" length="middle" rot="R180"/>
+<pin name="D16/A2" x="50.8" y="22.86" length="middle" rot="R180"/>
+<pin name="D17/A3" x="50.8" y="26.67" length="middle" rot="R180"/>
+<pin name="D18/A4" x="50.8" y="30.48" length="middle" rot="R180"/>
+<pin name="D19/A5" x="50.8" y="34.29" length="middle" rot="R180"/>
+<pin name="D20/A6" x="50.8" y="38.1" length="middle" rot="R180"/>
+<pin name="D21/A7" x="50.8" y="41.91" length="middle" rot="R180"/>
+<pin name="D22/A8" x="50.8" y="45.72" length="middle" rot="R180"/>
+<pin name="D23/A9" x="50.8" y="49.53" length="middle" rot="R180"/>
+<pin name="VBAT" x="10.16" y="68.58" length="middle"/>
+<pin name="GND" x="10.16" y="78.74" length="middle"/>
+<pin name="VIN" x="10.16" y="76.2" length="middle"/>
+<pin name="AGND" x="10.16" y="73.66" length="middle"/>
+<pin name="3.3V" x="10.16" y="71.12" length="middle"/>
+<wire x1="12.7" y1="7.62" x2="48.26" y2="7.62" width="0.254" layer="94"/>
+<wire x1="48.26" y1="7.62" x2="48.26" y2="81.28" width="0.254" layer="94"/>
+<wire x1="12.7" y1="81.28" x2="12.7" y2="7.62" width="0.254" layer="94"/>
+<text x="25.4" y="54.61" size="1.4224" layer="94">TEENSY 4.0</text>
+<wire x1="12.7" y1="81.28" x2="48.26" y2="81.28" width="0.254" layer="94"/>
+<pin name="VUSB" x="10.16" y="66.04" length="middle"/>
+<pin name="PROGRAM" x="10.16" y="63.5" length="middle"/>
+</symbol>
+</symbols>
+<devicesets>
+<deviceset name="TEENSY4.0">
+<gates>
+<gate name="G$1" symbol="TEENSY4.0" x="2.54" y="2.54"/>
+</gates>
+<devices>
+<device name="" package="TEENSY4.0">
+<connects>
+<connect gate="G$1" pin="3.3V" pad="3.3V@1 3.3V@2 ON/OFF"/>
+<connect gate="G$1" pin="AGND" pad="AGND"/>
+<connect gate="G$1" pin="D0" pad="D0"/>
+<connect gate="G$1" pin="D1" pad="D1"/>
+<connect gate="G$1" pin="D10" pad="D10"/>
+<connect gate="G$1" pin="D11" pad="D11"/>
+<connect gate="G$1" pin="D12" pad="D12"/>
+<connect gate="G$1" pin="D13/LED" pad="D13/LED"/>
+<connect gate="G$1" pin="D14/A0" pad="D14/A0"/>
+<connect gate="G$1" pin="D15/A1" pad="D15/A1"/>
+<connect gate="G$1" pin="D16/A2" pad="D16/A2"/>
+<connect gate="G$1" pin="D17/A3" pad="D17/A3"/>
+<connect gate="G$1" pin="D18/A4" pad="D18/A4"/>
+<connect gate="G$1" pin="D19/A5" pad="D19/A5"/>
+<connect gate="G$1" pin="D2" pad="D2"/>
+<connect gate="G$1" pin="D20/A6" pad="D20/A6"/>
+<connect gate="G$1" pin="D21/A7" pad="D21/A7"/>
+<connect gate="G$1" pin="D22/A8" pad="D22/A8"/>
+<connect gate="G$1" pin="D23/A9" pad="D23/A9"/>
+<connect gate="G$1" pin="D3" pad="D3"/>
+<connect gate="G$1" pin="D4" pad="D4"/>
+<connect gate="G$1" pin="D5" pad="D5"/>
+<connect gate="G$1" pin="D6" pad="D6"/>
+<connect gate="G$1" pin="D7" pad="D7"/>
+<connect gate="G$1" pin="D8" pad="D8"/>
+<connect gate="G$1" pin="D9" pad="D9"/>
+<connect gate="G$1" pin="GND" pad="GND@1 GND@2"/>
+<connect gate="G$1" pin="PROGRAM" pad="PROGRAM"/>
+<connect gate="G$1" pin="VBAT" pad="VBAT"/>
+<connect gate="G$1" pin="VIN" pad="VIN"/>
+<connect gate="G$1" pin="VUSB" pad="VUSB"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+</devicesets>
+</library>
+</drawing>
+</eagle>

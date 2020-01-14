@@ -1,28 +1,45 @@
-function [Normal, Center] = TriangleNormal(Node,Element)
-N = zeros(length(Element),3);
-C = zeros(length(Element),3);
-
-for i = 1:length(Element)
-    v1 = Node(Element(i,2),:) - Node(Element(i,1),:);
-    v2 = Node(Element(i,3),:) - Node(Element(i,1),:);
-    
-    tmp = cross(v1,v2); 
-    tmp = tmp/sqrt(tmp(1)^2 + tmp(2)^2 + tmp(3)^2);
-    for j = 1:3
-       if isnan(tmp(1)), tmp(1) = 0; end
-       if isnan(tmp(2)), tmp(2) = 0; end
-       if isnan(tmp(3)), tmp(3) = 1; end
+function [normal,normalf] = TriangleNormal(vertex,face)
+%   Copyright (c) 2004 Gabriel Peyr?
+%[vertex,face] = check_face_vertex(vertex,face);
+face = face.';
+vertex = vertex.';
+nface = size(face,2);
+nvert = size(vertex,2);
+%normal = zeros(3, nvert);
+% unit normals to the faces
+normalf = crossp( vertex(:,face(2,:))-vertex(:,face(1,:)), ...
+                  vertex(:,face(3,:))-vertex(:,face(1,:)) );
+d = sqrt( sum(normalf.^2,1) ); d(d<eps)=1;
+normalf = normalf ./ repmat( d, 3,1 );
+% unit normal to the vertex
+normal = zeros(3,nvert);
+for i=1:nface
+    f = face(:,i);
+    for j=1:3
+        normal(:,f(j)) = normal(:,f(j)) + normalf(:,i);
     end
-    
-    N(i,:) = tmp;
-
-    p1 = Node(Element(i,1),:);
-    p2 = Node(Element(i,2),:);
-    p3 = Node(Element(i,3),:);
-    
-    C(i,:) = (1/3).*(p1 + p2 + p3);
+end
+% normalize
+d = sqrt( sum(normal.^2,1) ); d(d<eps)=1;
+normal = normal ./ repmat( d, 3,1 );
+% enforce that the normal are outward
+v = vertex - repmat(mean(vertex,1), 3,1);
+s = sum( v.*normal, 2 );
+if sum(s>0)<sum(s<0)
+    % flip
+    normal = -normal;
+    normalf = -normalf;
 end
 
-Normal = N;
-Center = C;
+normal = normal.';
+normalf = normalf.';
+
+end
+
+function z = crossp(x,y)
+% x and y are (m,3) dimensional
+z = x;
+z(1,:) = x(2,:).*y(3,:) - x(3,:).*y(2,:);
+z(2,:) = x(3,:).*y(1,:) - x(1,:).*y(3,:);
+z(3,:) = x(1,:).*y(2,:) - x(2,:).*y(1,:);
 end

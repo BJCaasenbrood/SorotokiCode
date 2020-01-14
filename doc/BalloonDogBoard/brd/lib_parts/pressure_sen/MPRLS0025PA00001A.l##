@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE eagle SYSTEM "eagle.dtd">
+<eagle version="9.3.2">
+<drawing>
+<settings>
+<setting alwaysvectorfont="no"/>
+<setting keepoldvectorfont="yes"/>
+<setting verticaltext="up"/>
+</settings>
+<grid distance="2" unitdist="mil" unit="mil" style="lines" multiple="1" display="yes" altdistance="5" altunitdist="mil" altunit="mil"/>
+<layers>
+<layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
+<layer number="16" name="Bottom" color="1" fill="1" visible="no" active="yes"/>
+<layer number="17" name="Pads" color="2" fill="1" visible="no" active="yes"/>
+<layer number="18" name="Vias" color="2" fill="1" visible="no" active="yes"/>
+<layer number="19" name="Unrouted" color="6" fill="1" visible="no" active="yes"/>
+<layer number="20" name="Dimension" color="15" fill="1" visible="no" active="yes"/>
+<layer number="21" name="tPlace" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="22" name="bPlace" color="7" fill="1" visible="no" active="yes"/>
+<layer number="23" name="tOrigins" color="15" fill="1" visible="no" active="yes"/>
+<layer number="24" name="bOrigins" color="15" fill="1" visible="no" active="yes"/>
+<layer number="25" name="tNames" color="7" fill="1" visible="no" active="yes"/>
+<layer number="26" name="bNames" color="7" fill="1" visible="no" active="yes"/>
+<layer number="27" name="tValues" color="7" fill="1" visible="no" active="yes"/>
+<layer number="28" name="bValues" color="7" fill="1" visible="no" active="yes"/>
+<layer number="29" name="tStop" color="7" fill="3" visible="no" active="yes"/>
+<layer number="30" name="bStop" color="7" fill="6" visible="no" active="yes"/>
+<layer number="31" name="tCream" color="7" fill="4" visible="no" active="yes"/>
+<layer number="32" name="bCream" color="7" fill="5" visible="no" active="yes"/>
+<layer number="33" name="tFinish" color="6" fill="3" visible="no" active="yes"/>
+<layer number="34" name="bFinish" color="6" fill="6" visible="no" active="yes"/>
+<layer number="35" name="tGlue" color="7" fill="4" visible="no" active="yes"/>
+<layer number="36" name="bGlue" color="7" fill="5" visible="no" active="yes"/>
+<layer number="37" name="tTest" color="7" fill="1" visible="no" active="yes"/>
+<layer number="38" name="bTest" color="7" fill="1" visible="no" active="yes"/>
+<layer number="39" name="tKeepout" color="4" fill="11" visible="no" active="yes"/>
+<layer number="40" name="bKeepout" color="1" fill="11" visible="no" active="yes"/>
+<layer number="41" name="tRestrict" color="4" fill="10" visible="no" active="yes"/>
+<layer number="42" name="bRestrict" color="1" fill="10" visible="no" active="yes"/>
+<layer number="43" name="vRestrict" color="2" fill="10" visible="no" active="yes"/>
+<layer number="44" name="Drills" color="7" fill="1" visible="no" active="yes"/>
+<layer number="45" name="Holes" color="7" fill="1" visible="no" active="yes"/>
+<layer number="46" name="Milling" color="3" fill="1" visible="no" active="yes"/>
+<layer number="47" name="Measures" color="7" fill="1" visible="no" active="yes"/>
+<layer number="48" name="Document" color="7" fill="1" visible="no" active="yes"/>
+<layer number="49" name="Reference" color="7" fill="1" visible="no" active="yes"/>
+<layer number="51" name="tDocu" color="7" fill="1" visible="no" active="yes"/>
+<layer number="52" name="bDocu" color="7" fill="1" visible="no" active="yes"/>
+<layer number="90" name="Modules" color="5" fill="1" visible="yes" active="yes"/>
+<layer number="91" name="Nets" color="2" fill="1" visible="yes" active="yes"/>
+<layer number="92" name="Busses" color="1" fill="1" visible="yes" active="yes"/>
+<layer number="93" name="Pins" color="2" fill="1" visible="yes" active="yes"/>
+<layer number="94" name="Symbols" color="4" fill="1" visible="yes" active="yes"/>
+<layer number="95" name="Names" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="96" name="Values" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="97" name="Info" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="98" name="Guide" color="6" fill="1" visible="yes" active="yes"/>
+</layers>
+<library>
+<packages>
+<package name="XDCR_MPRLS0025PA00001A">
+<wire x1="2.5" y1="-2.5" x2="-2.5" y2="-2.5" width="0.127" layer="51"/>
+<wire x1="-2.5" y1="-2.5" x2="-2.5" y2="2.5" width="0.127" layer="51"/>
+<wire x1="-2.5" y1="2.5" x2="2.5" y2="2.5" width="0.127" layer="51"/>
+<wire x1="2.5" y1="2.5" x2="2.5" y2="-2.5" width="0.127" layer="51"/>
+<wire x1="1.875" y1="2.5" x2="2.5" y2="2.5" width="0.127" layer="21"/>
+<wire x1="2.5" y1="2.5" x2="2.5" y2="1.875" width="0.127" layer="21"/>
+<wire x1="-2.5" y1="2.5" x2="-1.875" y2="2.5" width="0.127" layer="21"/>
+<wire x1="-2.5" y1="2.5" x2="-2.5" y2="1.875" width="0.127" layer="21"/>
+<wire x1="-2.5" y1="-2.5" x2="-1.875" y2="-2.5" width="0.127" layer="21"/>
+<wire x1="-2.5" y1="-2.5" x2="-2.5" y2="-1.875" width="0.127" layer="21"/>
+<wire x1="2.5" y1="-2.5" x2="1.875" y2="-2.5" width="0.127" layer="21"/>
+<wire x1="2.5" y1="-2.5" x2="2.5" y2="-1.875" width="0.127" layer="21"/>
+<circle x="-1.4" y="2.9" radius="0.1" width="0.2" layer="21"/>
+<circle x="-1.2" y="2.1" radius="0.1" width="0.2" layer="51"/>
+<wire x1="-2.75" y1="2.75" x2="2.75" y2="2.75" width="0.05" layer="39"/>
+<wire x1="2.75" y1="2.75" x2="2.75" y2="-2.75" width="0.05" layer="39"/>
+<wire x1="2.75" y1="-2.75" x2="-2.75" y2="-2.75" width="0.05" layer="39"/>
+<wire x1="-2.75" y1="-2.75" x2="-2.75" y2="2.75" width="0.05" layer="39"/>
+<text x="-2.702390625" y="3.202840625" size="1.000890625" layer="25">&gt;NAME</text>
+<text x="-2.90355" y="-3.90478125" size="1.00121875" layer="27">&gt;VALUE</text>
+<smd name="1" x="-1.27" y="2.1" dx="0.7" dy="0.65" layer="1" rot="R180"/>
+<smd name="2" x="0" y="2.1" dx="0.7" dy="0.65" layer="1" rot="R180"/>
+<smd name="3" x="1.27" y="2.1" dx="0.7" dy="0.65" layer="1" rot="R180"/>
+<smd name="4" x="2.1" y="1.27" dx="0.65" dy="0.7" layer="1" rot="R180"/>
+<smd name="5" x="2.1" y="0" dx="0.65" dy="0.7" layer="1" rot="R180"/>
+<smd name="6" x="2.1" y="-1.27" dx="0.65" dy="0.7" layer="1" rot="R180"/>
+<smd name="7" x="1.27" y="-2.1" dx="0.7" dy="0.65" layer="1" rot="R180"/>
+<smd name="8" x="0" y="-2.1" dx="0.7" dy="0.65" layer="1" rot="R180"/>
+<smd name="9" x="-1.27" y="-2.1" dx="0.7" dy="0.65" layer="1" rot="R180"/>
+<smd name="10" x="-2.1" y="-1.27" dx="0.65" dy="0.7" layer="1" rot="R180"/>
+<smd name="11" x="-2.1" y="0" dx="0.65" dy="0.7" layer="1" rot="R180"/>
+<smd name="12" x="-2.1" y="1.27" dx="0.65" dy="0.7" layer="1" rot="R180"/>
+<rectangle x1="-1.6256" y1="2.3876" x2="-0.9144" y2="2.8956" layer="1"/>
+<circle x="-0.946" y="2.6588" radius="0.1" width="0.2" layer="51"/>
+<rectangle x1="-0.3556" y1="2.3876" x2="0.3556" y2="2.8956" layer="1"/>
+<rectangle x1="-0.3556" y1="2.3876" x2="0.3556" y2="2.8956" layer="1"/>
+<rectangle x1="0.9144" y1="2.3876" x2="1.6256" y2="2.8956" layer="1"/>
+<rectangle x1="-3.048" y1="1.016" x2="-2.3368" y2="1.524" layer="1" rot="R90"/>
+<rectangle x1="-3.048" y1="-0.254" x2="-2.3368" y2="0.254" layer="1" rot="R90"/>
+</package>
+</packages>
+<symbols>
+<symbol name="MPRLS0025PA00001A">
+<wire x1="-15.24" y1="17.78" x2="15.24" y2="17.78" width="0.254" layer="94"/>
+<wire x1="15.24" y1="17.78" x2="15.24" y2="-17.78" width="0.254" layer="94"/>
+<wire x1="15.24" y1="-17.78" x2="-15.24" y2="-17.78" width="0.254" layer="94"/>
+<wire x1="-15.24" y1="-17.78" x2="-15.24" y2="17.78" width="0.254" layer="94"/>
+<text x="-15.2568" y="17.7996" size="2.5428" layer="95">&gt;NAME</text>
+<text x="-15.2501" y="-20.3335" size="2.54168125" layer="96">&gt;VALUE</text>
+<pin name="SS" x="-20.32" y="-2.54" length="middle" direction="in"/>
+<pin name="MOSI/SDA" x="-20.32" y="-7.62" length="middle"/>
+<pin name="SCLK/SCL" x="-20.32" y="-5.08" length="middle" direction="in" function="clk"/>
+<pin name="MISO" x="-20.32" y="-10.16" length="middle" direction="out"/>
+<pin name="VO+" x="20.32" y="10.16" length="middle" direction="out" rot="R180"/>
+<pin name="VO-" x="20.32" y="7.62" length="middle" direction="out" rot="R180"/>
+<pin name="RES" x="-20.32" y="2.54" length="middle" direction="in"/>
+<pin name="VDD" x="20.32" y="15.24" length="middle" direction="pwr" rot="R180"/>
+<pin name="VSS" x="20.32" y="-15.24" length="middle" direction="pwr" rot="R180"/>
+<pin name="EOC" x="20.32" y="2.54" length="middle" direction="out" rot="R180"/>
+</symbol>
+</symbols>
+<devicesets>
+<deviceset name="MPRLS0025PA00001A" prefix="U">
+<description>Pressure Sensor 0psi to 25psi Absolute 12-Pin T/R</description>
+<gates>
+<gate name="G$1" symbol="MPRLS0025PA00001A" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="XDCR_MPRLS0025PA00001A">
+<connects>
+<connect gate="G$1" pin="EOC" pad="8"/>
+<connect gate="G$1" pin="MISO" pad="7"/>
+<connect gate="G$1" pin="MOSI/SDA" pad="2"/>
+<connect gate="G$1" pin="RES" pad="9"/>
+<connect gate="G$1" pin="SCLK/SCL" pad="3"/>
+<connect gate="G$1" pin="SS" pad="1"/>
+<connect gate="G$1" pin="VDD" pad="12"/>
+<connect gate="G$1" pin="VO+" pad="4"/>
+<connect gate="G$1" pin="VO-" pad="6"/>
+<connect gate="G$1" pin="VSS" pad="10"/>
+</connects>
+<technologies>
+<technology name="">
+<attribute name="AVAILABILITY" value="Unavailable"/>
+<attribute name="DESCRIPTION" value=" Pressure Sensor 0psi to 25psi Absolute 12-Pin T/R "/>
+<attribute name="MF" value="Honeywell Sensing"/>
+<attribute name="MP" value="MPRLS0025PA00001A"/>
+<attribute name="PACKAGE" value="SMD-10 Honeywell"/>
+<attribute name="PRICE" value="None"/>
+</technology>
+</technologies>
+</device>
+</devices>
+</deviceset>
+</devicesets>
+</library>
+</drawing>
+</eagle>
