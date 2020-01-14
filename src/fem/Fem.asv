@@ -164,7 +164,9 @@ switch(Request)
     case('Un'), [~,~,Z] = DisplacementField(Fem,Fem.Utmp);
     case('Ux'), [Z,~,~] = DisplacementField(Fem,Fem.Utmp);
     case('Uy'), [~,Z,~] = DisplacementField(Fem,Fem.Utmp);
-    case('E'), [~,~,Z] = MaterialField(Fem); Shading = 'flat'; V=Fem.Node0;
+    case('E'), [~,~,Z] = MaterialField(Fem); %Z = 1-Z.^0.75;
+        Shading = 'flat'; V = Fem.Node0; colormap(bluesea(-1)); 
+        figure(101); background('w');
     otherwise; Z = Fem.VonMisesNodal;
 end
 
@@ -185,7 +187,8 @@ h{3} = patch('Faces',Fem.Mesh.get('Boundary'),'Vertices',V,...
 if Fem.VolumetricPressure
     id = FindElements(Fem,'FloodFill',Fem,Fem.Density); 
     Pc = Fem.Mesh.get('Center');
-    h{4} = plot(Pc(id,1),Pc(id,2),'r.');
+    h{4} = plot(Pc(id,1),Pc(id,2),'o','Color',lightblue);
+    h{5} = plot(Pc(id,1),Pc(id,2),'.','Color',lightblue);
 end
 
 end
@@ -287,21 +290,24 @@ while true
         [flag,Fem] = CheckConvergence(Fem,B,Singular); 
         
         Fem.Utmp = Delta;
-        Fem.Center = ComputeCentroid(Fem);
-        Fem.Normal = ComputeNormal(Fem);
+        
+        %Fem.Center = ComputeCentroid(Fem);
+        %Fem.Normal = ComputeNormal(Fem);
         Fem.Iteration = Fem.Iteration + 1;
 
     end 
     
-    Fem.VonMisesNodal = full(sparse(Fem.l,1,Fem.s(:,1))./sparse(Fem.l,1,Fem.v));
-    Fem.sxxNodal = full(sparse(Fem.l,1,Fem.s(:,2))./sparse(Fem.l,1,Fem.v));
-    Fem.syyNodal = full(sparse(Fem.l,1,Fem.s(:,3))./sparse(Fem.l,1,Fem.v));
-    Fem.sxyNodal = full(sparse(Fem.l,1,Fem.s(:,4))./sparse(Fem.l,1,Fem.v));
-    force = full(sparse(Fem.i,1,Fem.fi));
-    Fem.fxNodal = force(2*(1:Fem.NNode)-1);
-    Fem.fyNodal = force(2*(1:Fem.NNode));
+    if ~Fem.SolverStartMMA
+        Fem.VonMisesNodal = full(sparse(Fem.l,1,Fem.s(:,1))./sparse(Fem.l,1,Fem.v));
+        Fem.sxxNodal = full(sparse(Fem.l,1,Fem.s(:,2))./sparse(Fem.l,1,Fem.v));
+        Fem.syyNodal = full(sparse(Fem.l,1,Fem.s(:,3))./sparse(Fem.l,1,Fem.v));
+        Fem.sxyNodal = full(sparse(Fem.l,1,Fem.s(:,4))./sparse(Fem.l,1,Fem.v));
+        force = full(sparse(Fem.i,1,Fem.fi));
+        Fem.fxNodal = force(2*(1:Fem.NNode)-1);
+        Fem.fyNodal = force(2*(1:Fem.NNode));
+    end
     
-    if Fem.SolverPlot, figure(101); Fem.show('Svm'); end
+    if Fem.SolverPlot || ~Fem.SolverStartMMA, figure(101); Fem.show('Svm'); end
     
     if ~Fem.Nonlinear, break; end
 end
@@ -320,6 +326,9 @@ Fem.SolverStartMMA = true;
 flag = true;
 
 fig = Fem.show('E');
+filename = string(['topo_', char(datetime(now,'ConvertFrom','datenum')),'.gif']);
+filename = erase(filename,[":"," "]);
+gif(char(filename));
 
 while flag
 
@@ -362,11 +371,14 @@ while flag
     id = FindElements(Fem,'FloodFill',Fem,Fem.Density);    
     Pc = Fem.Mesh.get('Center');   
     set(fig{4},'XData',Pc(id,1),'YData',Pc(id,2)); 
+    set(fig{5},'XData',Pc(id,1),'YData',Pc(id,2)); 
     end
     
     drawnow;
+    gif;
 end
 
+gif('close'); 
 Fem.SolverStartMMA = false;
 
 end
@@ -374,19 +386,26 @@ end
 %----------------------------------------------------- reconstruct topology
 function Fem = former(Fem)
 
-Res = 250;    
+Res = 200;    
     
-verts = Fem.Center; x = verts(:,1); y = verts(:,2);
-DBX = (Fem.BdBox(2) - Fem.BdBox(1))
+verts = Fem.Node0; 
+V = Fem.Mesh.get('NodeToFace')*Fem.SpatialFilter*Fem.Density;
+
+
+x = verts(:,1); y = verts(:,2);
 xq = linspace(Fem.BdBox(1),Fem.BdBox(2),Res); 
 yq = linspace(Fem.BdBox(3),Fem.BdBox(4),Res);
 
 [xq,yq] = meshgrid(xq,yq);
-V = Fem.SpatialFilter*Fem.Density;
+
+% [xq,yq] = ndgrid(xq,yq);
+% F = griddedInterpolant(xq,yq,V);
+% [a,b] = ndgrid(m,n);
+% c = F(a,b);
 
 P = griddata(x,y,V,xq,yq);
 Dist = Fem.Mesh.SDF([xq(:),yq(:)]); Dist = Dist(:,end);
-P = P(:); P(Dist > 1e-6) = 0; 
+P = P(:); P(Dist > 1e-3) = 0; 
 P = (reshape(P,Res,Res));
 
 Fem.Topology = cat(3,xq,yq,P);
@@ -401,7 +420,7 @@ f = figure;
 ax = axes('Parent',f,'position',[0.13 0.39  0.77 0.54]); 
 
 b = uicontrol('Parent',f,'Style','slider','Position',[81,54,419,23],...
-              'value',0.5, 'min',0, 'max',1);
+              'value',0.5, 'min',Fem.Ersatz, 'max',1-Fem.Ersatz);
           
 bgcolor = f.Color;
 
@@ -409,23 +428,29 @@ bl1 = uicontrol('Parent',f,'Style','text','Position',[50,54,23,23],...
                 'String','0','BackgroundColor',bgcolor);
 bl2 = uicontrol('Parent',f,'Style','text','Position',[500,54,23,23],...
                 'String','1','BackgroundColor',bgcolor);
-bl3 = uicontrol('Parent',f,'Style','text','Position',[240,25,100,23],...
-                'String','Damping Ratio','BackgroundColor',bgcolor);
+bl3 = uicontrol('Parent',f,'Style','text','Position',[240,30,100,20],...
+                'String','Dilation factor','BackgroundColor',bgcolor,...
+                'FontWeight','bold');
             
 V = Fem.Topology;
             
 b.Callback = @(es,ed) cb(es,ed,Fem);
 
     function cb(es,ed,Fem)
-        vert = Fem.Node;
+        vert = Fem.Node0;
+
+%         contour(V(:,:,1),V(:,:,2),V(:,:,3),[es.Value es.Value],...
+%             'linestyle','','EdgeColor','k','Linewidth',2), 
         
-        contour(V(:,:,1),V(:,:,2),V(:,:,3),[es.Value es.Value],...
-            'linestyle','-','EdgeColor','k','Linewidth',2), 
+        contourf(V(:,:,1),V(:,:,2),V(:,:,3),[es.Value es.Value],...
+            'linestyle','none','EdgeColor','k','Linewidth',2), 
+        
         patch('Faces',Fem.Mesh.get('Boundary'),'Vertices',vert,...
          'LineStyle','-','Linewidth',2,'EdgeColor','k');
-
+     
         axis equal 
         axis off;
+        
     end
 
 end
@@ -1413,3 +1438,32 @@ fprintf('==============================================================\n');
     
 end
 
+%--------------------------------------------------------------------------
+function Rp = Reflection(Fem,P)
+BdBox = Fem.BdBox;
+
+Domain = @(x) dRectangle(x,BdBox(1),BdBox(2),BdBox(3),BdBox(4));
+Area = (BdBox(2)-BdBox(1))*(BdBox(4)-BdBox(3));
+d = Domain(P);
+
+eps = 1e-8; 
+eta = 0.95;
+
+Alpha = 4*sqrt(Area/length(d));
+
+NBdrySegs = size(d,2)-1;       
+n1 = (Domain(P+repmat([eps,0],length(d),1))-d)/eps;
+n2 = (Domain(P+repmat([0,eps],length(d),1))-d)/eps;
+
+I  = abs(d(:,1:NBdrySegs))<Alpha; 
+
+P1 = repmat(P(:,1),1,NBdrySegs);  
+P2 = repmat(P(:,2),1,NBdrySegs); 
+Rp(:,1) = P1(I)-2*n1(I).*d(I);  
+Rp(:,2) = P2(I)-2*n2(I).*d(I);
+
+d_R_P = Domain(Rp);
+J    = abs(d_R_P(:,end))>=eta*abs(d(I)) & d_R_P(:,end)>0;
+Rp   = Rp(J,:); 
+Rp   = unique(Rp,'rows');
+end

@@ -164,8 +164,9 @@ switch(Request)
     case('Un'), [~,~,Z] = DisplacementField(Fem,Fem.Utmp);
     case('Ux'), [Z,~,~] = DisplacementField(Fem,Fem.Utmp);
     case('Uy'), [~,Z,~] = DisplacementField(Fem,Fem.Utmp);
-    case('E'), [~,~,Z] = MaterialField(Fem); Z = 1-Z^.52;
-        Shading = 'flat'; V = Fem.Node0; colormap(bluesea);
+    case('E'), [~,~,Z] = MaterialField(Fem); %Z = 1-Z.^0.75;
+        Shading = 'flat'; V = Fem.Node0; colormap(bluesea(-1)); 
+        figure(101); background('w');
     otherwise; Z = Fem.VonMisesNodal;
 end
 
@@ -186,7 +187,8 @@ h{3} = patch('Faces',Fem.Mesh.get('Boundary'),'Vertices',V,...
 if Fem.VolumetricPressure
     id = FindElements(Fem,'FloodFill',Fem,Fem.Density); 
     Pc = Fem.Mesh.get('Center');
-    h{4} = plot(Pc(id,1),Pc(id,2),'r.');
+    h{4} = plot(Pc(id,1),Pc(id,2),'o','Color',lightblue);
+    h{5} = plot(Pc(id,1),Pc(id,2),'.','Color',lightblue);
 end
 
 end
@@ -324,6 +326,9 @@ Fem.SolverStartMMA = true;
 flag = true;
 
 fig = Fem.show('E');
+filename = string(['topo_', char(datetime(now,'ConvertFrom','datenum')),'.gif']);
+filename = erase(filename,[":"," "]);
+gif(char(filename));
 
 while flag
 
@@ -366,11 +371,14 @@ while flag
     id = FindElements(Fem,'FloodFill',Fem,Fem.Density);    
     Pc = Fem.Mesh.get('Center');   
     set(fig{4},'XData',Pc(id,1),'YData',Pc(id,2)); 
+    set(fig{5},'XData',Pc(id,1),'YData',Pc(id,2)); 
     end
     
     drawnow;
+    gif;
 end
 
+gif('close'); 
 Fem.SolverStartMMA = false;
 
 end
@@ -382,13 +390,11 @@ Res = 200;
     
 verts = Fem.Node0; 
 V = Fem.Mesh.get('NodeToFace')*Fem.SpatialFilter*Fem.Density;
-%Rp = Reflection(Fem,verts);
+
 
 x = verts(:,1); y = verts(:,2);
-DBX = (Fem.BdBox(2) - Fem.BdBox(1))*0.0;
-DBY = (Fem.BdBox(4) - Fem.BdBox(3))*0.0;
-xq = linspace(Fem.BdBox(1)-DBX,Fem.BdBox(2)+DBX,Res); 
-yq = linspace(Fem.BdBox(3)-DBY,Fem.BdBox(4)+DBY,Res);
+xq = linspace(Fem.BdBox(1),Fem.BdBox(2),Res); 
+yq = linspace(Fem.BdBox(3),Fem.BdBox(4),Res);
 
 [xq,yq] = meshgrid(xq,yq);
 
@@ -422,8 +428,9 @@ bl1 = uicontrol('Parent',f,'Style','text','Position',[50,54,23,23],...
                 'String','0','BackgroundColor',bgcolor);
 bl2 = uicontrol('Parent',f,'Style','text','Position',[500,54,23,23],...
                 'String','1','BackgroundColor',bgcolor);
-bl3 = uicontrol('Parent',f,'Style','text','Position',[240,25,100,23],...
-                'String','Damping Ratio','BackgroundColor',bgcolor);
+bl3 = uicontrol('Parent',f,'Style','text','Position',[240,30,100,20],...
+                'String','Dilation factor','BackgroundColor',bgcolor,...
+                'FontWeight','bold');
             
 V = Fem.Topology;
             
@@ -432,10 +439,12 @@ b.Callback = @(es,ed) cb(es,ed,Fem);
     function cb(es,ed,Fem)
         vert = Fem.Node0;
 
-        contour(V(:,:,1),V(:,:,2),V(:,:,3),[es.Value es.Value],...
-            'linestyle','-','EdgeColor','k','Linewidth',2), 
+%         contour(V(:,:,1),V(:,:,2),V(:,:,3),[es.Value es.Value],...
+%              'linestyle','-','EdgeColor','k','Linewidth',2), 
         
-        contourf(V(:,:,1),V(:,:,2),V(:,:,3),[es.Value es.Value],...
+        Z = GaussianFilter(V(:,:,3),5);
+
+        contourf(V(:,:,1),V(:,:,2),Z,[es.Value es.Value],...
             'linestyle','-','EdgeColor','k','Linewidth',2), 
         
         patch('Faces',Fem.Mesh.get('Boundary'),'Vertices',vert,...
@@ -443,6 +452,8 @@ b.Callback = @(es,ed) cb(es,ed,Fem);
      
         axis equal 
         axis off;
+        colormap(inferno);
+        caxis([0 1]);
     end
 
 end
