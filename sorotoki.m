@@ -44,7 +44,7 @@ addpath('src/__version__');
 addpath('src/__base__');
 
 Path = getPath;
-DisplayLogo
+DisplayLogo;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 fprintf(['* Thank you for installing SOROTOKI, we will',...
@@ -69,7 +69,7 @@ end
 
 if ~PingInternet, error('Enable your internet connection!'); end
 
-fprintf('* getting version_file_check from repository config/vernum.m \n');
+fprintf('* getting version_file_check from Git repository config/vernum.m \n');
 url = ['https://raw.githubusercontent.com/BJCaasenbrood/',...
     'SorotokiCode/master/config/vernum.m'];
 filename = [verFolder,'/vernum.m'];
@@ -104,27 +104,36 @@ end
 
 end
 
+Request = input(' Do you want to create a startup file? (y/n) ','s');
+bool = 1;
+switch(Request)
+    case('y'); fprintf('* Proceeding generation startup.m file... \n'); pause(1);
+    case('n'); bool = 0;
+    otherwise; bool = 0;
+end
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-global FID;
-StartUpFile = [userpath,'/startup.m'];
-delete(StartUpFile);
-FID = fopen(StartUpFile,'w');
-
-fprintf('* Assigning fixed search paths to MATLAB: \n');
-if libs(1), IncludeBase(Path,1); end
-if libs(2), IncludeGraphicsModel(Path,1); end
-if libs(3), IncludeMesh(Path,1); end
-if libs(4), IncludeFiniteElement(Path,1); end
-if libs(5), IncludeDynamicModel(Path,1); end
-
-fclose('all');
-
+if bool == 1
+    global FID;
+    StartUpFile = [userpath,'/startup.m'];
+    delete(StartUpFile);
+    FID = fopen(StartUpFile,'w');
+    
+    fprintf('* Assigning fixed search paths to MATLAB: \n');
+    if libs(1), IncludeBase(Path,1); end
+    if libs(2), IncludeGraphicsModel(Path,1); end
+    if libs(3), IncludeMesh(Path,1); end
+    if libs(4), IncludeFiniteElement(Path,1); end
+    if libs(5), IncludeDynamicModel(Path,1); end
+    
+    fclose('all');
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 startup;
-
+cout('Text', '\n');
 cout('green','* INSTALLATION DONE! \n');
 cout('Text', '\n');
-cout('SOROTOKI toolkit is succesfully installed and ready-to-use!');
+cout('SOROTOKI toolkit is succesfully installed and ready-to-use! ');
 
 pause(.01);
 cout(['The documentation can be found in doc/SorotokiManual.pdf',...
@@ -151,7 +160,7 @@ end
 function x = IncludeBase(Path,Request)
 global FID
 
-cout(['* Adding SOROTOKI libraries to path,',...
+cout(['* Adding SOROTOKI libraries to path, ',...
     'this might take a minute...\n']);
 
 if Request == 1
@@ -232,7 +241,7 @@ addpath([Path,'\src\fem']);
 addpath([Path,'\src\fem\tools\']);
 addpath([Path,'\src\fem\materials\']);
 pause(.3);
-x = meshPathConfirm;
+x = femPathConfirm;
 end
 end
 
@@ -248,7 +257,7 @@ else
 addpath([Path,'\src\model']);
 addpath([Path,'\src\model\tools']);
 pause(.3);
-x = mdlPathConfirm;
+x = modelPathConfirm;
 end
 end
 
