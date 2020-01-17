@@ -37,7 +37,7 @@ fem = fem.AddConstraint('Load',id,[1,0]);
 fem = fem.AddConstraint('Spring',id,[.1,0]);
 
 id = fem.FindNodes('Location',[5,2],1);
-fem = fem.AddConstraint('Output',id,[1,0]);
+fem = fem.AddConstraint('Output',id,[-1,0]);
 fem = fem.AddConstraint('Spring',id,[.1,0]);
 
 %% set density
@@ -60,5 +60,9 @@ fem.show('E');
 
 %% solving
 fem.optimize();
+
+%% former
+fem.former();
+fem.showTopo(0.15);
 
 

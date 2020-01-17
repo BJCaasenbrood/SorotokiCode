@@ -4,7 +4,7 @@ clc; clear; close all;
 obj = Gmodel('David.stl');
 
 %% set texture
-obj.Texture = virtual;
+obj.Texture = highway;
 obj.Emission = lime;
 
 obj.set('AOPower',1.5,...

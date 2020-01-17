@@ -57,7 +57,7 @@ function obj = Gmodel(varargin)
     obj.AORadius = 0.3;
     obj.AOInvert = true;
             
-    obj.AmbientOcclusion = true;
+    obj.AmbientOcclusion = false;
     obj.SubSurfaceScattering = false;
     obj.SSSPower = 2.2;
     obj.AOPower = 1;

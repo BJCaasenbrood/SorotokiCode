@@ -63,11 +63,10 @@ classdef Fem < handle
         Convergence = false; 
         Nonlinear = true;
         AssembledSystem = false;
-        
         PrescribedDisplacement = false;
         VolumetricPressure = false;
         PressureLoad = 0;
-        Type = 'PlaneStrain'
+        Type = 'PlaneStress'
         LineStyle = 'none';
         I3 = eye(3); O3 = zeros(3);
         i; j; m; fi; t; e; c; s; v; l; k; fb; ed; fb0;
@@ -85,10 +84,8 @@ classdef Fem < handle
         OptimizationProblem = 'Compliance';
         xold1; xold2; upp; low;
         fnorm;
-        zMin = 0;
-        zMax = 1;
-        OutputVector;
-        Change;
+        zMin = 0; zMax = 1;
+        OutputVector; Change;
         dFdE;
         Periodic;
                
@@ -99,14 +96,18 @@ classdef Fem < handle
         GaussianWeight = 10;
         GaussianRadius = .45;
         Reflect;
-        NumGridX; NumGridY
+        NumGridX; NumGridY;
         Grid; Grideval;
         Obj = rand(1)*1e-8;
         Con = rand(1)*1e-8;
         
-        
-        Colorbar = false;
-        ColorbarLoc = 'southoutside';
+        TopologyGridX; 
+        TopologyGridY; 
+        TopologyGridZ;
+        TopologyGapFill;
+        Repeat;
+        ReflectionPlane;
+        CellRepetion;
     end
     
 %--------------------------------------------------------------------------
@@ -164,9 +165,8 @@ switch(Request)
     case('Un'), [~,~,Z] = DisplacementField(Fem,Fem.Utmp);
     case('Ux'), [Z,~,~] = DisplacementField(Fem,Fem.Utmp);
     case('Uy'), [~,Z,~] = DisplacementField(Fem,Fem.Utmp);
-    case('E'), [~,~,Z] = MaterialField(Fem); %Z = 1-Z.^0.75;
-        Shading = 'flat'; V = Fem.Node0; colormap(bluesea(-1)); 
-        figure(101); background('w');
+    case('E'), [~,~,Z] = MaterialField(Fem); Shading = 'flat'; 
+    V = Fem.Node0; colormap(bluesea(-1)); background('w');
     otherwise; Z = Fem.VonMisesNodal;
 end
 
@@ -192,6 +192,7 @@ if Fem.VolumetricPressure
 end
 
 end
+
 %-------------------------------------------------------------------- solve
 function showBC(Fem)
     
@@ -326,9 +327,13 @@ Fem.SolverStartMMA = true;
 flag = true;
 
 fig = Fem.show('E');
-filename = string(['topo_', char(datetime(now,'ConvertFrom','datenum')),'.gif']);
-filename = erase(filename,[":"," "]);
-gif(char(filename));
+%cla;
+% ISOVALUE = 0.15;
+% former(Fem,10);
+% showISO(Fem,ISOVALUE,0.5);
+%  filename = string(['topo_', char(datetime(now,'ConvertFrom','datenum')),'.gif']);
+%  filename = erase(filename,[":"," "]);
+%  gif(char(filename));
 
 while flag
 
@@ -366,6 +371,8 @@ while flag
     Fem.Obj = f; Fem.Con = g;
     
     set(fig{2},'FaceVertexCData',Fem.SpatialFilter*Fem.Density); 
+    %former(Fem,10);
+    %showISO(Fem,lerp(ISOVALUE,0.285,Fem.IterationMMA/80),0.5);
     
     if Fem.VolumetricPressure
     id = FindElements(Fem,'FloodFill',Fem,Fem.Density);    
@@ -373,88 +380,250 @@ while flag
     set(fig{4},'XData',Pc(id,1),'YData',Pc(id,2)); 
     set(fig{5},'XData',Pc(id,1),'YData',Pc(id,2)); 
     end
-    
+    %gif;
     drawnow;
-    gif;
 end
 
-gif('close'); 
+%gif('close'); 
 Fem.SolverStartMMA = false;
 
 end
 
 %----------------------------------------------------- reconstruct topology
-function Fem = former(Fem)
+function Fem = formerSDF(Fem, Threshold, Weight, Radius)
+Res = 100;    
+Layers = 40;
+Patch = 5;
 
-Res = 200;    
-    
-verts = Fem.Node0; 
-V = Fem.Mesh.get('NodeToFace')*Fem.SpatialFilter*Fem.Density;
+SDF = Fem.SpatialFilter*Fem.Density;
+P0 = Fem.Center(SDF>=Threshold,:);
+Rp = Reflection(Fem,P0); P = [P0;Rp];
 
+if Fem.VolumetricPressure
+    id = FindElements(Fem,'FloodFill',Fem,Fem.Density);
+    SDFFill = zeros(Fem.NElem,1); SDFFill(id) = 1;
+    SDFFill = clamp((SDFFill + Fem.SpatialFilter*Fem.Density),0,1);
+    P0Fill = Fem.Center(SDFFill>=Threshold,:);
+    RpFill = Reflection(Fem,P0Fill); P0Fill = [P0Fill;RpFill];
+end
 
-x = verts(:,1); y = verts(:,2);
-xq = linspace(Fem.BdBox(1),Fem.BdBox(2),Res); 
-yq = linspace(Fem.BdBox(3),Fem.BdBox(4),Res);
+dx = 0.01*(Fem.BdBox(2) - Fem.BdBox(1));
+dy = 0.01*(Fem.BdBox(4) - Fem.BdBox(3));
+xq = linspace(Fem.BdBox(1)+dx,Fem.BdBox(2)-dx,Res); 
+yq = linspace(Fem.BdBox(3)+dy,Fem.BdBox(4)-dy,Res);
 
-[xq,yq] = meshgrid(xq,yq);
+[xxq,yyq] = meshgrid(xq,yq);
+GridPoints = [xxq(:),yyq(:)];
 
-% [xq,yq] = ndgrid(xq,yq);
-% F = griddedInterpolant(xq,yq,V);
-% [a,b] = ndgrid(m,n);
-% c = F(a,b);
+for ii = 1:length(P)
+    r = (xq-P(ii,1)).^2+(yq-P(ii,2)).^2;
+    a = Weight;
+    b = Radius;
+    d{ii} = (-a*(1-3*(b^-2)*r.^2)).*((r<=b/3) & (r>=0)) + ...
+    (-(3*a/2)*(1-r/b).^2).*((r<=b) & (r>b/3)) + 0;
+end
 
-P = griddata(x,y,V,xq,yq);
-Dist = Fem.Mesh.SDF([xq(:),yq(:)]); Dist = Dist(:,end);
-P = P(:); P(Dist > 1e-3) = 0; 
-P = (reshape(P,Res,Res));
+dist = sum(cat(3,d{:}),3); V = dist(:);
 
-Fem.Topology = cat(3,xq,yq,P);
+xg = GridPoints(:,1); yg = GridPoints(:,2); 
+id = find((xg>=Fem.BdBox(1)-eps) & (xg<=Fem.BdBox(2)+eps) & ...
+    (yg>=Fem.BdBox(3)-eps) & (yg<=Fem.BdBox(4)+eps));
+
+GridPoints = GridPoints(id,:);
+dist = dist(id,:);
+
+%P = griddata(xq,yq,V,xxq,yyq);
+
 
 end
 
 %----------------------------------------------------- reconstruct topology
-function Fem = showTopo(Fem)
+function Fem = former(Fem, Thickness)
+
+Res = 200;    
+Layers = 40;
+Patch = 5;
+
+if nargin < 2, Thickness = 0.2*(Fem.BdBox(2)-Fem.BdBox(1)); end
+verts = Fem.Node0; 
+
+V = Fem.Mesh.get('NodeToFace')*Fem.SpatialFilter*Fem.Density;
+
+if Fem.VolumetricPressure
+    id = FindElements(Fem,'FloodFill',Fem,Fem.Density);
+    Fill = zeros(Fem.NElem,1); Fill(id) = 1;
+    V2 = clamp(Fem.Mesh.get('NodeToFace')*...
+        (Fill + Fem.SpatialFilter*Fem.Density),0,1);
+end
+
+x = verts(:,1); y = verts(:,2);
+dx = 0.0*(Fem.BdBox(2) - Fem.BdBox(1));
+dy = 0.0*(Fem.BdBox(4) - Fem.BdBox(3));
+xq = linspace(Fem.BdBox(1)+dx,Fem.BdBox(2)-dx,Res); 
+yq = linspace(Fem.BdBox(3)+dy,Fem.BdBox(4)-dy,Res);
+
+[xxq,yyq] = meshgrid(xq,yq);
+
+P = griddata(x,y,V,xxq,yyq);
+vrt = [xxq(:),yyq(:)];
+Dist = Fem.Mesh.SDF(vrt); Dist = Dist(:,end);
+tol = 0.1*sqrt((Fem.BdBox(2)-Fem.BdBox(1))*...
+    (Fem.BdBox(4)-Fem.BdBox(3))/length(vrt));
+P = P(:); P(Dist > tol) = 0; %P(isnan(P))=0;
+P = (reshape(P,Res,Res)); 
+V = cat(3,xxq,yyq,P);
+
+if Fem.VolumetricPressure
+    P = griddata(x,y,V2,xxq,yyq);
+    Dist = Fem.Mesh.SDF([xxq(:),yyq(:)]); Dist = Dist(:,end);
+    P = P(:); P(Dist > tol) = 0; P(isnan(P))=0;
+    P = (reshape(P,Res,Res));
     
-f = figure;
+    GapFill = cat(3,xxq,yyq,P);
+end
 
-ax = axes('Parent',f,'position',[0.13 0.39  0.77 0.54]); 
+SDF = V(:,:,3);
+SDF = GaussianFilter(SDF,3);
+SDF = repmat(SDF,[1 1 Layers]);
 
-b = uicontrol('Parent',f,'Style','slider','Position',[81,54,419,23],...
-              'value',0.5, 'min',Fem.Ersatz, 'max',1-Fem.Ersatz);
-          
-bgcolor = f.Color;
+if Fem.VolumetricPressure
+    V = GapFill;
+    SDF2 = V(:,:,3);
+    SDF2 = GaussianFilter(SDF2,5);
+    ZFiller = repmat(SDF2,[1 1 Patch]);
+    SDF(:,:,2:Patch+1) = ZFiller;
+    %SDF(:,:,Patch+1) = 0.25*SDF(:,:,Patch+1) + 0.75*SDF(:,:,Patch+2);
+    %SDF(:,:,end-8:end-1) = ZFiller;
+end
 
-bl1 = uicontrol('Parent',f,'Style','text','Position',[50,54,23,23],...
-                'String','0','BackgroundColor',bgcolor);
-bl2 = uicontrol('Parent',f,'Style','text','Position',[500,54,23,23],...
-                'String','1','BackgroundColor',bgcolor);
-bl3 = uicontrol('Parent',f,'Style','text','Position',[240,30,100,20],...
-                'String','Dilation factor','BackgroundColor',bgcolor,...
-                'FontWeight','bold');
-            
+if ~isempty(Fem.Repeat)
+instr = Fem.Repeat;
+SDF0 = SDF;
+xq0 = xq; yq0 = yq;
+for ii = 1:length(instr)
+    if instr(ii) == 1
+      xq = [xq,xq0+max(xq)];
+      tmp = SDF0; 
+      tmp(:,1,:) = SDF(:,end,:);
+      SDF = cat(2,SDF,SDF0);
+    end
+end
+end
+
+% zero padding
+SDF(:,:,1) = 0; SDF(:,:,end) = 0;
+SDF(1,:,:) = 0; SDF(end,:,:) = 0;
+SDF(:,1,:) = 0; SDF(:,end,:) = 0;
+
+Fem.Topology = SDF;
+
+zq = linspace(0,Thickness,Layers);
+[X,Y,Z] = meshgrid(xq,yq,zq);
+
+Fem.TopologyGridX = X; 
+Fem.TopologyGridY = Y; 
+Fem.TopologyGridZ = Z; 
+
+end
+
+%----------------------------------------------------- reconstruct topology
+function Fem = showISO(Fem,varargin)
+
 V = Fem.Topology;
-            
-b.Callback = @(es,ed) cb(es,ed,Fem);
+X = Fem.TopologyGridX; 
+Y = Fem.TopologyGridY; 
+a = size(V);
 
-    function cb(es,ed,Fem)
-        vert = Fem.Node0;
+if nargin < 3, depth = floor(a(3)/2);
+else, depth = a(3)*varargin{2}; end
+
+X = X(:,:,depth);
+Y = Y(:,:,depth);
+SDF0 = V(:,:,depth);
+
+SDF = GenerateCell(Fem,SDF0);
+if ~isempty(Fem.CellRepetion)
+    Rpt = Fem.CellRepetion;
+    SDF = repmat(SDF,Rpt(2),Rpt(1));
+else, Rpt = [1,1];
+end
+
+if ~isempty(Fem.ReflectionPlane)
+Rp = Fem.ReflectionPlane;
+if Rp(1) == -1
+    Xf = flip(X) - (max(max(max(X))) - min(min(min(X))));
+    X = horzcat(Xf,X);
+end
+end
+
+cla;
+image(Rpt(1)*[min(min(min(X))) max(max(max(X)))],...
+      Rpt(2)*[min(min(min(Y))) max(max(max(Y)))],...
+    flipud(GaussianFilter((SDF >= varargin{1})*255,2)));
+
+axis equal; axis off; colormap(bluesea(-1)); caxis([0 1]);
+background('w');
+
+end
+
+%----------------------------------------------------- reconstruct topology
+function Fem = showSTL(Fem,value)
+    
+% ax = axes('Parent',f,'position',[0.13 0.39  0.77 0.54]); 
+% 
+% b = uicontrol('Parent',f,'Style','slider','Position',[81,54,419,23],...
+%               'value',0.5, 'min',Fem.Ersatz, 'max',1-Fem.Ersatz);
+%           
+% bgcolor = f.Color;
+% 
+% bl1 = uicontrol('Parent',f,'Style','text','Position',[50,54,23,23],...
+%                 'String','0','BackgroundColor',bgcolor);
+% bl2 = uicontrol('Parent',f,'Style','text','Position',[500,54,23,23],...
+%                 'String','1','BackgroundColor',bgcolor);
+% bl3 = uicontrol('Parent',f,'Style','text','Position',[240,30,100,20],...
+%                 'String','Dilation factor','BackgroundColor',bgcolor,...
+%                 'FontWeight','bold');
+%             
+
+V = Fem.Topology;
+X = Fem.TopologyGridX; 
+Y = Fem.TopologyGridY; 
+Z = Fem.TopologyGridZ; 
+
+%             
+% b.Callback = @(es,ed) cb(es,ed,Fem);
+% 
+%     function cb(es,ed,Fem)
+%         vert = Fem.Node0;
 
 %         contour(V(:,:,1),V(:,:,2),V(:,:,3),[es.Value es.Value],...
 %              'linestyle','-','EdgeColor','k','Linewidth',2), 
-        
-        Z = GaussianFilter(V(:,:,3),5);
 
-        contourf(V(:,:,1),V(:,:,2),Z,[es.Value es.Value],...
-            'linestyle','-','EdgeColor','k','Linewidth',2), 
-        
-        patch('Faces',Fem.Mesh.get('Boundary'),'Vertices',vert,...
-         'LineStyle','-','Linewidth',2,'EdgeColor','k');
-     
-        axis equal 
-        axis off;
-        colormap(inferno);
-        caxis([0 1]);
-    end
+[faces,vertices] = MarchingCubes(X,Y,Z,V,value);
+%nfv = reducepatch(faces,vertices,0.5);
+
+%stlwriter('voxel.stl',nfv.faces,nfv.vertices);
+
+figure(101);
+cla;
+obj = Gmodel(vertices,faces);
+obj.Texture = skin;
+
+obj = obj.bake();
+obj = Blender(obj,'Rotate',{'x',90});
+obj.render();
+%
+%         contourf(Z,[value value],...
+%             'linestyle','-','EdgeColor','k','Linewidth',2), 
+%         
+%         patch('Faces',Fem.Mesh.get('Boundary'),'Vertices',vert,...
+%          'LineStyle','-','Linewidth',2,'EdgeColor','k');
+%      
+axis equal
+axis off;
+%colormap(inferno);
+%caxis([-1 1.5]);
+%     end
 
 end
 
@@ -514,7 +683,7 @@ Fem.NNode = Mesh.get('NNode');
 Fem.Element = Mesh.get('Element');
 Fem.NElem = Mesh.get('NElem');
 Fem.BdBox = Mesh.get('BdBox');
-Fem.Density = ones(Fem.NElem,1);
+Fem.Density = ones(Fem.NElem,1)+random(0,0.1,Fem.NElem).';
 Fem.SpatialFilter = GenerateRadialFilter(Fem,Fem.FilterRadius);
 Fem.TimeStep0 = Fem.TimeStep;
 Fem.Center = Fem.Mesh.get('Center');
@@ -544,9 +713,7 @@ end
 if Fem.VolumetricPressure
    [E,~,~,~] = MaterialField(Fem);
    E = Fem.Mesh.get('NodeToFace')*E;
-   %dE = Fem.Mesh.get('NodeToFace')*dE;
    Ev = kron(E,[1;1]);
-   %dEv = kron(dE,[1;1]);
 end
 
 index = 0; subindex = 0;
@@ -693,7 +860,6 @@ if Fem.VolumetricPressure
         for ii = idmax
             ze = z0; ze(ii) = ze(ii) + dz;
             Fem.Density = ze;
-            %[E,~,~,~] = MaterialField(Fem);
             id = FindElements(Fem,'FloodFill',Fem,ze);
             Fb = beta*sparse(Fem.i,Fem.e,Fem.fb0);
             CV = zeros(Fem.NElem,1);
@@ -775,9 +941,6 @@ for q = 1:length(W)
     % reduced isotropic matrices
     [Se, De, Ge] = IsotropicReduction(Fem,D0,S);
     
-    % linear strain-displacement operator
-    [B,~,~] = LinearStrainOperator(Fem,N,dNdx);
-    
     % nonlinear strain-displacement operator
     [Bnl,Bg,NN,tau] = NonlinearStrainOperator(Fem,N,dNdx,F);
     
@@ -806,7 +969,8 @@ for q = 1:length(W)
 end
 
 SS = NNe.'*SGP;
-[Svm, ~] = VonMises(SS(:,1),SS(:,2),SS(:,3),SS(:,4),SS(:,5),SS(:,6));
+[Svm, ~] = VonMises(SS(:,1),SS(:,2),SS(:,3),...
+                    SS(:,4),SS(:,5),SS(:,6));
 Svme = Svm(:); 
 end
 
@@ -817,10 +981,8 @@ F = zeros(3);
 UU = zeros(nn,2);
 UU(:,1) = U(1:2:2*nn);
 UU(:,2) = U(2:2:2*nn);
-%F(1:2,1:2) = UU.'*dNdx;
 F(1:2,1:2) = (dNdx'*UU)';
 F = F + eye(3);
-%if Fem.Nonlinear, F = F + eye(3); else, F = eye(3); end
 end
 
 %----------------------------------------------- TRIANGULAR SHAPE FUNCTIONS
@@ -939,7 +1101,7 @@ function [B,NN,tau] = LinearStrainOperator(Fem,N,dNdx)
 
 nn = length(N);
 
-NN = zeros(2,2*nn); %XX = NN;
+NN = zeros(2,2*nn);
 NN(1,1:2:2*nn) = N(:)';
 NN(2,2:2:2*nn) = N(:)';
 % XX(1,1:2:2*nn) = Xe(:,1);
@@ -968,28 +1130,24 @@ end
 
 %------------------------------------------------------ isotropic reduction
 function [S, D, G] = IsotropicReduction(Fem,D0,S0)
-D = zeros(3,3); S = zeros(3,1);
+
+D = zeros(3,3); 
+S = zeros(3,1);
 
 if strcmp(Fem.Type,'PlaneStrain')
 D(1:2,1:2) = D0(1:2,1:2); D(3,3) = D0(4,4);
 SIG = [S0(1),S0(4);
        S0(4),S0(2)];
 G = kron(eye(2),SIG);
-% G(1:2,1:2) = SIG;
-% G(3:4,3:4) = SIG;
 S(1) = S0(1); 
 S(2) = S0(2); 
 S(3) = S0(4); 
 
 elseif strcmp(Fem.Type,'PlaneStress')
-%D0 = inv(D0); 
 D(1:2,1:2) = D0(1:2,1:2); D(3,3) = D0(4,4);
-%D = inv(D);
 SIG = [S0(1),S0(4);
        S0(4),S0(2)];
 G = kron(eye(2),SIG);
-% G(1:2,1:2) = SIG;
-% G(3:4,3:4) = SIG;
 S(1) = S0(1); 
 S(2) = S0(2); 
 S(3) = S0(4); 
@@ -1022,8 +1180,7 @@ function [flag,Fem] = CheckConvergence(Fem,R,SingularKt)
 R = full(R);
 
 if ((norm(R) > Fem.ResidualNorm) && (Fem.Iteration <= Fem.MaxIteration)  ...
-        && ~SingularKt )
-    %ProcessMonitor(Fem);
+        && ~SingularKt )    
     flag = 0;
 else
     
@@ -1138,7 +1295,6 @@ f = Fem.fExternal.'*u;
 lam = 0*u(:,1);
 lam(fDof) = K(fDof,fDof)\Fem.fExternal(fDof);
 temp = cumsum(-u(Fem.i).*Fem.k.*lam(Fem.j));
-%temp = cumsum(-Fem.fi(Fem.i).*lam(Fem.j));
 temp = temp(cumsum(Fem.ElemNDof.^2));
 dfdE = [temp(1);temp(2:end)-temp(1:end-1)];
 elseif strcmp(Fem.OptimizationProblem,'Compliant') && ~Fem.Nonlinear
@@ -1157,31 +1313,16 @@ K = sparse(Fem.i,Fem.j,E(Fem.e).*Fem.t);
 lam = 0*u(:,1);
 lam(fDof) = K(fDof,fDof)\Fem.OutputVector(fDof);
 temp = cumsum(-u(Fem.i).*Fem.k.*lam(Fem.j));
-%temp = cumsum(-Fem.fi(Fem.i).*lam(Fem.j));
 temp = temp(cumsum(Fem.ElemNDof.^2));
 dfdE = [temp(1);temp(2:end)-temp(1:end-1)];
 end
 
 if Fem.VolumetricPressure && Fem.Nonlinear
-% K = sparse(Fem.i,Fem.j,E(Fem.e).*Fem.k);
-% lam = 0*u(:,1);
-% lam(fDof) = K(fDof,fDof)\Fem.OutputVector(fDof);
-% K = sparse(Fem.i,Fem.j,E(Fem.e).*Fem.k);
-% lam = 0*u(:,1);
-% lam(fDof) = K(fDof,fDof)\Fem.OutputVector(fDof);
 dfdE = dfdE(:) + (lam(:)'*Fem.dFdE)';
-% temp = cumsum(Fem.dFdE(Fem.e).*lam(Fem.j));
-% temp = temp(cumsum(Fem.ElemNDof.^2));
-% dfdE = dfdE + [temp(1);temp(2:end)-temp(1:end-1)];
-% elseif isfield(fem,'dFdE') && Fem.Nonlinear
-%     dfdE = dfdE(:) + (u(:,2)'*fem.dFdE)';
-elseif Fem.VolumetricPressure && ~Fem.Nonlinear
-%     
+elseif Fem.VolumetricPressure && ~Fem.Nonlinear  
 temp = cumsum(Fem.dFdE(Fem.e).*lam(Fem.j));
 temp = temp(cumsum(Fem.ElemNDof.^2));
 dfdE = dfdE + [temp(1);temp(2:end)-temp(1:end-1)];
-%     
-%dfdE = dfdE(:) + (lam(:)'*Fem.dFdE)';
 end
 
 dfdV = zeros(size(Fem.NElem));
@@ -1381,6 +1522,62 @@ end
 d = cell2mat(d); 
 end
 
+%--------------------------------------------------------------------------
+function Rp = Reflection(Fem,P)
+    
+Domain = @(x) dRectangle(x,Fem.BdBox(1),Fem.BdBox(2),...
+    Fem.BdBox(3),Fem.BdBox(4));
+Area = (Fem.BdBox(2)-Fem.BdBox(1))*(Fem.BdBox(4)-Fem.BdBox(3));
+d = Domain(P);
+
+eps = 1e-8; 
+eta = 0.95;
+
+Alpha = 4*sqrt(Area/length(d));
+
+NBdrySegs = size(d,2)-1;       
+n1 = (Domain(P+repmat([eps,0],length(d),1))-d)/eps;
+n2 = (Domain(P+repmat([0,eps],length(d),1))-d)/eps;
+
+I  = abs(d(:,1:NBdrySegs))<Alpha; 
+
+P1 = repmat(P(:,1),1,NBdrySegs);  
+P2 = repmat(P(:,2),1,NBdrySegs); 
+Rp(:,1) = P1(I)-2*n1(I).*d(I);  
+Rp(:,2) = P2(I)-2*n2(I).*d(I);
+
+d_R_P = Domain(Rp);
+J    = abs(d_R_P(:,end))>=eta*abs(d(I)) & d_R_P(:,end)>0;
+Rp   = Rp(J,:); 
+Rp   = unique(Rp,'rows');
+end
+
+%-------------------------------------------------------------- GEN MESH
+function SDF = GenerateCell(Fem,SDF0)
+vq = SDF0;
+    
+if ~isempty(Fem.ReflectionPlane)
+    RP = Fem.ReflectionPlane;
+    if RP(1) == 1 && RP(2) == 1
+        V = flip(vq,2); V = horzcat(V,vq);
+        VV = flip(V,1); SDF = vertcat(VV,V);
+    elseif RP(1) == 1 && RP(2) ~= 1
+        V = flip(vq,2); V = horzcat(vq,V);
+        SDF = V;
+    elseif RP(1) == -1 && RP(2) ~= 1
+        V = flip(vq,2); V = horzcat(V,vq);
+        SDF = flip(V);
+    elseif RP(1) ~= 1 && RP(2) == 1
+        V = flip(vq,1); SDF = vertcat(V,vq);
+    elseif RP(1) ~= 1 && RP(2) == -1
+        V = flip(vq,1); SDF = vertcat(vq,V);
+    end
+else
+    SDF = flip(vq);
+end
+
+end
+
 end
 end
 
@@ -1439,34 +1636,4 @@ end
 
 fprintf('==============================================================\n');
     
-end
-
-%--------------------------------------------------------------------------
-function Rp = Reflection(Fem,P)
-BdBox = Fem.BdBox;
-
-Domain = @(x) dRectangle(x,BdBox(1),BdBox(2),BdBox(3),BdBox(4));
-Area = (BdBox(2)-BdBox(1))*(BdBox(4)-BdBox(3));
-d = Domain(P);
-
-eps = 1e-8; 
-eta = 0.95;
-
-Alpha = 4*sqrt(Area/length(d));
-
-NBdrySegs = size(d,2)-1;       
-n1 = (Domain(P+repmat([eps,0],length(d),1))-d)/eps;
-n2 = (Domain(P+repmat([0,eps],length(d),1))-d)/eps;
-
-I  = abs(d(:,1:NBdrySegs))<Alpha; 
-
-P1 = repmat(P(:,1),1,NBdrySegs);  
-P2 = repmat(P(:,2),1,NBdrySegs); 
-Rp(:,1) = P1(I)-2*n1(I).*d(I);  
-Rp(:,2) = P2(I)-2*n2(I).*d(I);
-
-d_R_P = Domain(Rp);
-J    = abs(d_R_P(:,end))>=eta*abs(d(I)) & d_R_P(:,end)>0;
-Rp   = Rp(J,:); 
-Rp   = unique(Rp,'rows');
 end

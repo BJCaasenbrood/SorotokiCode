@@ -97,7 +97,7 @@ fprintf(['<a href="https://github.com/BJCaasenbrood/SorotokiCode">',...
 Request = input('  Do you want to continue the installation? (y/n) ','s');
 
 switch(Request)
-    case('y'); fprintf('* Proceeding toolkit installation... \n');pause(1);
+    case('y'); fprintf('* Proceeding toolkit installation... \n'); pause(1);
     case('n'); error('installation aborted!');
     otherwise; error('installation aborted!');
 end

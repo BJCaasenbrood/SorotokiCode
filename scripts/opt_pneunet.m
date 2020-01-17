@@ -6,12 +6,14 @@ sdf = @(x) PneuNet(x);
 %% generate mesh
 msh = Mesh(sdf);
 msh = msh.set('BdBox',[0,20,0,20],...
-              'NElem',750,...
-              'MaxIteration',150,...
+              'NElem',2000,...
+              'MaxIteration',100,...
               'ShowMeshing',false,...
               'Triangulate',false);
       
 msh = msh.generateMesh;
+
+%msh.show;
 
 %% show generated mesh
 fem = Fem(msh);
@@ -25,6 +27,8 @@ fem = fem.set('TimeStep',1/3,...
               'FilterRadius',1.5,...
               'Periodic',[20, 0],...
               'Nonlinear',false,...
+              'MaxIterationMMA',80,...
+              'Repeat',[1,1,1,1],...
               'OptimizationProblem','Compliant');
 
 %% add constraint
@@ -32,17 +36,17 @@ id = fem.FindNodes('Left');
 fem = fem.AddConstraint('Support',id,[1,1]);
 
 id = fem.FindNodes('Right'); 
-fem = fem.AddConstraint('Output',id,[0,-1]);
-fem = fem.AddConstraint('Spring',id,[0,1]);
-
-id = fem.FindNodes('Bottom'); 
+fem = fem.AddConstraint('Output',id,[1,0]);
 fem = fem.AddConstraint('Spring',id,[1,0]);
+% 
+% id = fem.FindNodes('Bottom'); 
+% fem = fem.AddConstraint('Spring',id,[1,0]);
 
 id = fem.FindElements('Location',[10,10],1);
 fem = fem.AddConstraint('PressureCell',id,[-0.01e-3,0]);
 
 %% set density
-fem = fem.initialTopology([1,1],5);
+fem = fem.initialTopology([1,1],8);
 
 %% material
 % fem.Material = YeohMaterial('C1',17e-3,'C2',-0.2e-3,'C3',0.023e-3,...
@@ -51,15 +55,14 @@ fem = fem.initialTopology([1,1],5);
 fem.Material = MooneyMaterial('C10',3,'K',50);
 
 %fem.Material = LinearMaterial('E',3,'Nu',0.49);
-
-%fem.show('E');
-%colormap(bluesea);
 %% solving
 figure(101);
 fem.optimize();
 
 %% former
-fem.former();
+
+fem.former(10);
+fem.showISO(0.285,.5);
 
 
 function Dist = PneuNet(P)

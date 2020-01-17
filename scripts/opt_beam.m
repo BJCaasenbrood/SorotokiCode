@@ -4,7 +4,7 @@ sdf = @(x) dRectangle(x,0,8,0,2);
 %% generate mesh
 msh = Mesh(sdf);
 msh = msh.set('BdBox',[0,8,0,2],...
-              'NElem',1500,...
+              'NElem',500,...
               'MaxIteration',150,...
               'ShowMeshing',false);
       
@@ -41,6 +41,10 @@ fem = fem.initialTopology('Equidistance',[3,1],.4);
 
 %% solving
 fem.optimize();
+
+%% former
+fem.former();
+fem.showTopo(0.15);
 
 % fem = fem.AddConstraint('Load',id,[0,-3e-3]);
 % fem = fem.set('TimeStep',1/15);

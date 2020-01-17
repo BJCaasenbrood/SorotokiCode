@@ -6,7 +6,7 @@ sdf = @(x) PneuRot(x);
 %% generate mesh
 msh = Mesh(sdf);
 msh = msh.set('BdBox',[0,5,0,5],...
-              'NElem',500,...
+              'NElem',900,...
               'MaxIteration',150,...
               'ShowMeshing',false,...
               'Triangulate',false);
@@ -26,6 +26,7 @@ fem = fem.set('TimeStep',1/3,...
               'VolumetricPressure',true,...
               'FilterRadius',0.4,...
               'Nonlinear',false,...
+              'ReflectionPlane',[1,1],...
               'OptimizationProblem','Compliant');
 
 %% add constraint
@@ -66,21 +67,8 @@ fem.show('E');
 %% solving
 fem.optimize();
 
-% %% reconstruct
-% id = (fem.Density >= 1e-3);
-% verts = fem.Center(id,:); 
-% 
-% Dist = @(P)dMetasphere2D(P,verts(:,1),verts(:,2),0.75,10);
-% BdBox = msh.BdBox;
-% x = linspace(BdBox(1),BdBox(2),100); y = linspace(BdBox(3),BdBox(4),100);
-% [X,Y] = meshgrid(x,y); P = [X(:),Y(:)];
-% d = Dist(P);
-% 
-% cla;
-% D = reshape(d(:,end),[100 100]);
-% hold on;
-% surf(X,Y,D);
-%contour(X,Y,D,[0 0])
+fem.former(3);
+fem.showSTL(0.15);
 
 function Dist = PneuRot(P)
   R1 = dRectangle(P,0,5,0,5);
