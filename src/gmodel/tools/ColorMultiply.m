@@ -7,5 +7,4 @@ for i = 1:length(N)
     N(2) = N1(2)*N2(2);
     N(3) = N1(3)*N2(3);
 end
-
 end

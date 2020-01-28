@@ -236,10 +236,12 @@ fprintf(FID,'%% fem.lib \n');
 WriteToFile([Path,'\src\fem']);
 WriteToFile([Path,'\src\fem\tools\']);
 WriteToFile([Path,'\src\fem\materials\']);
+WriteToFile([Path,'\src\fem\materials\samples']);
 else
 addpath([Path,'\src\fem']);
 addpath([Path,'\src\fem\tools\']);
 addpath([Path,'\src\fem\materials\']);
+addpath([Path,'\src\fem\materials\samples']);
 pause(.3);
 x = femPathConfirm;
 end

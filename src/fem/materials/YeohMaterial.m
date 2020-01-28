@@ -49,7 +49,7 @@ function YeohMaterial = set(YeohMaterial,varargin)
 end
     
 %------------------------------ 2ND PIOLLA STRESSAND STIFFNESS FOR YEOH
-function [S, D] = PiollaStress(YeohMaterial,C)
+function [S, D] = PiollaStress(YeohMaterial,C,Robustness)
 %Se = 2nd PK stress [S11, S22, S33, S12, S23, S13];
 
 S = zeros(3,3);
@@ -59,6 +59,11 @@ YeohC = [YeohMaterial.C1,YeohMaterial.C2,YeohMaterial.C3];
 YeohD = [YeohMaterial.D1,YeohMaterial.D2,YeohMaterial.D3];
 %Fvol = J^(1/3)*eye(3);
 %Fiso = J^(-1/3)*F;
+
+if nargin > 2
+YeohC(2) = YeohC(2)*Robustness^3;
+end
+
 I = eye(3,3);
 Cinv = C\I;
 C11=C(1,1); C22=C(2,2); C33=C(3,3);

@@ -98,7 +98,7 @@ end
 %---------------------------------------------------- TRIANGULAR QUADRATURE
 function [weight,point] = TriQuad
 
-precision = 1;
+precision = 0;
 
 if (precision == 0)
     xw=...
@@ -159,13 +159,9 @@ end
 
 %----------------------------------------------- TRIANGULAR SHAPE FUNCTIONS
 function [N,dNds] = TriShapeFnc(s)
-N = [1-s(1)-s(2);
-    s(1);
-    s(2)];
+N = [1-s(1)-s(2); s(1); s(2)];
 
-dNds=[-1,-1;
-    1, 0;
-    0, 1];
+dNds=[-1,-1; 1, 0; 0, 1];
 end
 
 

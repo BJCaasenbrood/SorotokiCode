@@ -9,6 +9,7 @@ switch(Request)
     case('SW');         x = SouthWest(Node,BdBox,tol);
     case('SE');         x = SouthEast(Node,BdBox,tol);
     case('NW');         x = NorthWest(Node,BdBox,tol);
+    case('NE');         x = NorthEast(Node,BdBox,tol);
     case('Top');        x = Top(Node,BdBox,tol);
     case('Bottom');     x = Bottom(Node,BdBox,tol);
     case('Left');       x = Left(Node,BdBox,tol);
@@ -43,6 +44,10 @@ end
 
 function id = NorthWest(Node,BdBox,tol)
 id = find(abs(Node(:,1)-BdBox(1)) < tol & abs(Node(:,2)-BdBox(4)) < tol );
+end
+
+function id = NorthEast(Node,BdBox,tol)
+id = find(abs(Node(:,1)-BdBox(2)) < tol & abs(Node(:,2)-BdBox(4)) < tol );
 end
 
 function id = Top(Node,BdBox,tol)

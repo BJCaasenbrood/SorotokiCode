@@ -23,12 +23,10 @@ classdef Fem < handle
         FixedDensity;
         ElemNDof;
         Normal;
-        VonMisesNodal;
-        sxxNodal; 
-        syyNodal;
-        sxyNodal;
-        fxNodal;
-        fyNodal;
+        VonMisesNodal; 
+        sxxNodal; syyNodal; sxyNodal;
+        exxNodal; eyyNodal; exyNodal;
+        fxNodal;  fyNodal;
         SPxyNodal;
         ElemMat;
         Rho = 1e12;
@@ -66,10 +64,20 @@ classdef Fem < handle
         PrescribedDisplacement = false;
         VolumetricPressure = false;
         PressureLoad = 0;
-        Type = 'PlaneStress'
+        Type = 'PlaneStrain'
         LineStyle = 'none';
         I3 = eye(3); O3 = zeros(3);
-        i; j; m; fi; t; e; c; s; v; l; k; fb; ed; fb0;
+        i; j; m; fi; t; e; c; s; p; v; l; k; fb; ed; fb0;
+        
+        SolverResidual = 1e7;
+        SolverVonMises = 1e7;
+        
+        InformationBoolean = false;
+        
+        Movie = false;
+        MovieStart = false;
+        MovieAxis; MovieCAxis;
+        
         VolumeInfill = 0.3;
         Ersatz = 1e-3; 
         Penal = 1;
@@ -82,11 +90,9 @@ classdef Fem < handle
         OptFactor = 1;
         MaterialInterpolation = 'SIMP';
         OptimizationProblem = 'Compliance';
-        xold1; xold2; upp; low;
-        fnorm;
+        xold1; xold2; upp; low; fnorm;
         zMin = 0; zMax = 1;
-        OutputVector; Change;
-        dFdE;
+        OutputVector; Change; dFdE;
         Periodic;
                
         VoidTolerance = 0.05; 
@@ -101,13 +107,9 @@ classdef Fem < handle
         Obj = rand(1)*1e-8;
         Con = rand(1)*1e-8;
         
-        TopologyGridX; 
-        TopologyGridY; 
-        TopologyGridZ;
+        TopologyGridX; TopologyGridY; TopologyGridZ;
         TopologyGapFill;
-        Repeat;
-        ReflectionPlane;
-        CellRepetion;
+        Repeat; ReflectionPlane; CellRepetion;
     end
     
 %--------------------------------------------------------------------------
@@ -152,33 +154,43 @@ function h = show(Fem,varargin)
 if nargin<2, Request = -1; 
 else, Request = varargin{1}; end
 
-Shading = 'interp'; V = Fem.Node;
+S = 'interp'; 
+V = Fem.Node;
+flag = 0;
+colormap(turbo);
 
 switch(Request)
     case('Svm'), Z = Fem.VonMisesNodal;
     case('Sxx'), Z = Fem.sxxNodal;
     case('Syy'), Z = Fem.syyNodal;
     case('Sxy'), Z = Fem.sxyNodal;
+    case('Exx'), Z = Fem.exxNodal;
+    case('Eyy'), Z = Fem.eyyNodal;
+    case('Exy'), Z = Fem.exyNodal;
     case('Fx'), Z = Fem.fxNodal;
     case('Fy'), Z = Fem.fyNodal;
     case('Fi'), [~,~,Z] = DisplacementField(Fem,Fem.fInternal);
     case('Un'), [~,~,Z] = DisplacementField(Fem,Fem.Utmp);
     case('Ux'), [Z,~,~] = DisplacementField(Fem,Fem.Utmp);
     case('Uy'), [~,Z,~] = DisplacementField(Fem,Fem.Utmp);
-    case('E'), [~,~,Z] = MaterialField(Fem); Shading = 'flat'; 
+    case('E'), [~,~,Z] = MaterialField(Fem); S = 'flat'; 
     V = Fem.Node0; colormap(bluesea(-1)); background('w');
-    otherwise; Z = Fem.VonMisesNodal;
+    otherwise; flag = 1; Z = 0;
 end
 
-cla; axis equal; axis off; hold on; h{3} = [];
+cla; axis equal; 
 
+if length(Z) == Fem.NNode, Z = Smoothing(Fem,Z,1); end
+
+if flag == 0
+axis off; hold on; h{3} = [];
 if length(Z) ~= Fem.NNode, T=Fem.Mesh.get('NodeToFace'); Z=T*Z; end
 
 h{1} = patch('Faces',Fem.Mesh.get('Boundary'),'Vertices',Fem.Node0,...
     'LineStyle','-','Linewidth',1,'EdgeColor','k');
 
 h{2} = patch('Faces',Fem.Mesh.get('ElemMat'),'Vertices',V,...
-    'FaceVertexCData',Z,'Facecolor',Shading,'LineStyle',Fem.LineStyle,...
+    'FaceVertexCData',Z,'Facecolor',S,'LineStyle',Fem.LineStyle,...
     'Linewidth',1.0,'FaceAlpha',1.0,'EdgeColor','k');
 
 h{3} = patch('Faces',Fem.Mesh.get('Boundary'),'Vertices',V,...
@@ -193,11 +205,32 @@ end
 
 end
 
+if flag == 1
+clf;
+switch(Request)
+case('Residual'), semilogy(Fem.SolverResidual);
+case('Stress'), semilogy(Fem.SolverVonMises);
+end
+end
+
+if Fem.Movie
+    if Fem.MovieStart == false
+       Fem.MovieStart = true;
+       if ~Fem.SolverStartMMA, Name = 'fem'; else, Name = 'topo'; end
+       MovieMaker(Fem,Name,'Start');
+    else
+       MovieMaker(Fem);
+    end
+end
+
+end
+
 %-------------------------------------------------------------------- solve
 function showBC(Fem)
     
 vert = Fem.Node;
 Supp = Fem.Support(:,1);
+
 if ~isempty(Fem.Load), Forc = Fem.Load(:,1); else, Forc = []; end
 if ~isempty(Fem.Spring), Sprg = Fem.Spring(:,1); else, Sprg = []; end
 if ~isempty(Fem.Output), Out = Fem.Output(:,1); else, Out = []; end
@@ -223,7 +256,6 @@ for ii = 1:length(Sprg)
     plot(vert(id,1),vert(id,2),'>','markersize',10,'Color','g');
 end
 
-
 end
 
 %-------------------------------------------------------------------- solve
@@ -241,7 +273,11 @@ Fem.TimeStep = Fem.TimeStep0 + 1e-6;
 Fem.Node = Fem.Node0;
 Fem.Utmp = zeros(2*Fem.NNode,1);
 
-if ~Fem.SolverStartMMA, showInformation(Fem); end
+showInformation(Fem,'NonlinearFem');
+
+if Fem.SolverPlot || ~Fem.SolverStartMMA
+    figure(101); Fem.show('Un');
+end
 
 while true
     
@@ -284,31 +320,45 @@ while true
         if Fem.Nonlinear, Delta(FreeDofs,1)=Delta(FreeDofs,1)-DeltaU(:,1);
         else, Delta(FreeDofs,1) = DeltaU(:,1); B = Fem.ResidualNorm; end
         
-        % update node
-        [Fem.Node,~] = UpdateNode(Fem,Delta);
-        
         % check convergence
-        [flag,Fem] = CheckConvergence(Fem,B,Singular); 
+        [flag,Fem] = CheckConvergence(Fem,Singular); 
         
-        Fem.Utmp = Delta;
+        % update nodes
+        if flag == 0 && Fem.Nonlinear 
+            Fem.Utmp = Delta;
+        elseif flag == 1 && ~Fem.Nonlinear
+            Fem.Utmp = Delta;
+        elseif flag == 1 && Fem.Nonlinear
+            Fem.Node = UpdateNode(Fem,Delta);
+            [Fem.Center,~,Fem.Normal] = ComputeCentroid(Fem);
+        end
         
-        %Fem.Center = ComputeCentroid(Fem);
-        %Fem.Normal = ComputeNormal(Fem);
+        % add iteration
         Fem.Iteration = Fem.Iteration + 1;
-
     end 
+    
+%     if flag == 1 && Fem.Nonlinear
+%         %Fem.Center = ComputeCentroid(Fem);
+%         %Fem.Normal = ComputeNormal(Fem);
+%         
+%     end
     
     if ~Fem.SolverStartMMA
         Fem.VonMisesNodal = full(sparse(Fem.l,1,Fem.s(:,1))./sparse(Fem.l,1,Fem.v));
         Fem.sxxNodal = full(sparse(Fem.l,1,Fem.s(:,2))./sparse(Fem.l,1,Fem.v));
         Fem.syyNodal = full(sparse(Fem.l,1,Fem.s(:,3))./sparse(Fem.l,1,Fem.v));
         Fem.sxyNodal = full(sparse(Fem.l,1,Fem.s(:,4))./sparse(Fem.l,1,Fem.v));
+        Fem.exxNodal = full(sparse(Fem.l,1,Fem.p(:,1))./sparse(Fem.l,1,Fem.v));
+        Fem.eyyNodal = full(sparse(Fem.l,1,Fem.p(:,2))./sparse(Fem.l,1,Fem.v));
+        Fem.exyNodal = full(sparse(Fem.l,1,Fem.p(:,3))./sparse(Fem.l,1,Fem.v));
         force = full(sparse(Fem.i,1,Fem.fi));
         Fem.fxNodal = force(2*(1:Fem.NNode)-1);
         Fem.fyNodal = force(2*(1:Fem.NNode));
     end
     
-    if Fem.SolverPlot || ~Fem.SolverStartMMA, figure(101); Fem.show('Svm'); end
+    if Fem.SolverPlot || ~Fem.SolverStartMMA
+        figure(101); Fem.show('Exx');
+    end
     
     if ~Fem.Nonlinear, break; end
 end
@@ -327,13 +377,6 @@ Fem.SolverStartMMA = true;
 flag = true;
 
 fig = Fem.show('E');
-%cla;
-% ISOVALUE = 0.15;
-% former(Fem,10);
-% showISO(Fem,ISOVALUE,0.5);
-%  filename = string(['topo_', char(datetime(now,'ConvertFrom','datenum')),'.gif']);
-%  filename = erase(filename,[":"," "]);
-%  gif(char(filename));
 
 while flag
 
@@ -358,9 +401,8 @@ while flag
     dgdz = Fem.SpatialFilter'*(dEdy.*dgdE + dVdy.*dgdV);
     
     % compute design variable
-    
-    %[Fem,ZNew] = UpdateSchemeMMA(Fem,f,dfdz,g,dgdz);
-    [Fem,ZNew] = UpdateSchemeOC(Fem,dfdz,g,dgdz);
+    [Fem,ZNew] = UpdateSchemeMMA(Fem,f,dfdz,g,dgdz);
+    %[Fem,ZNew] = UpdateSchemeOC(Fem,dfdz,g,dgdz);
     
     % determine material change
     Fem.Change = clamp(ZNew - Fem.Density,-Fem.ChangeMax,Fem.ChangeMax);
@@ -376,7 +418,7 @@ while flag
     
     if Fem.VolumetricPressure
     id = FindElements(Fem,'FloodFill',Fem,Fem.Density);    
-    Pc = Fem.Mesh.get('Center');   
+    Pc = Fem.Center;
     set(fig{4},'XData',Pc(id,1),'YData',Pc(id,2)); 
     set(fig{5},'XData',Pc(id,1),'YData',Pc(id,2)); 
     end
@@ -569,40 +611,13 @@ end
 %----------------------------------------------------- reconstruct topology
 function Fem = showSTL(Fem,value)
     
-% ax = axes('Parent',f,'position',[0.13 0.39  0.77 0.54]); 
-% 
-% b = uicontrol('Parent',f,'Style','slider','Position',[81,54,419,23],...
-%               'value',0.5, 'min',Fem.Ersatz, 'max',1-Fem.Ersatz);
-%           
-% bgcolor = f.Color;
-% 
-% bl1 = uicontrol('Parent',f,'Style','text','Position',[50,54,23,23],...
-%                 'String','0','BackgroundColor',bgcolor);
-% bl2 = uicontrol('Parent',f,'Style','text','Position',[500,54,23,23],...
-%                 'String','1','BackgroundColor',bgcolor);
-% bl3 = uicontrol('Parent',f,'Style','text','Position',[240,30,100,20],...
-%                 'String','Dilation factor','BackgroundColor',bgcolor,...
-%                 'FontWeight','bold');
-%             
-
 V = Fem.Topology;
 X = Fem.TopologyGridX; 
 Y = Fem.TopologyGridY; 
 Z = Fem.TopologyGridZ; 
 
-%             
-% b.Callback = @(es,ed) cb(es,ed,Fem);
-% 
-%     function cb(es,ed,Fem)
-%         vert = Fem.Node0;
-
-%         contour(V(:,:,1),V(:,:,2),V(:,:,3),[es.Value es.Value],...
-%              'linestyle','-','EdgeColor','k','Linewidth',2), 
-
 [faces,vertices] = MarchingCubes(X,Y,Z,V,value);
-%nfv = reducepatch(faces,vertices,0.5);
 
-%stlwriter('voxel.stl',nfv.faces,nfv.vertices);
 
 figure(101);
 cla;
@@ -687,7 +702,8 @@ Fem.Density = ones(Fem.NElem,1)+random(0,0.1,Fem.NElem).';
 Fem.SpatialFilter = GenerateRadialFilter(Fem,Fem.FilterRadius);
 Fem.TimeStep0 = Fem.TimeStep;
 Fem.Center = Fem.Mesh.get('Center');
-Fem.Normal = ComputeNormal(Fem);
+%Fem.Normal = ComputeNormal(Fem);
+[~,~,Fem.Normal] = ComputeCentroid(Fem);
 Fem.Residual = zeros(2*Fem.NNode,1);
 end
 
@@ -700,7 +716,7 @@ Fem.i = zeros(sum(Fem.ElemNDof.^2),1);
 Fem.j = Fem.i; Fem.e = Fem.i; Fem.fi = Fem.i; Fem.k = Fem.i; 
 Fem.m = Fem.i; Fem.c = Fem.i; Fem.t = Fem.i; Fem.fb = Fem.i; 
 Fem.fb0 = Fem.i;
-Fem.s = zeros(Fem.NNode,7);
+Fem.s = zeros(Fem.NNode,6); Fem.s = zeros(Fem.NNode,3);
 Fem.l = zeros(Fem.NNode,1); Fem.v = Fem.l;
 end
 
@@ -726,7 +742,7 @@ for el = 1:Fem.NElem
     eDof = reshape([2*Fem.Element{el}-1;
         2*Fem.Element{el}],NDof,1);
     
-    [Fe,Qe,~,~,Ke,Kte,Svme,SS] = ...
+    [Fe,Qe,~,~,Ke,Kte,Svme,SS,EE] = ...
     Locals(Fem,Fem.Element{el},eDof);
 
     Ve = ElemCellVolumeForce(Fem,Fem.Element{el},el);   
@@ -752,6 +768,9 @@ for el = 1:Fem.NElem
     Fem.s(subindex+1:subindex+NDof/2,2) = SS(:,1);
     Fem.s(subindex+1:subindex+NDof/2,3) = SS(:,2);
     Fem.s(subindex+1:subindex+NDof/2,4) = SS(:,4);
+    Fem.p(subindex+1:subindex+NDof/2,1) = EE(:,1);
+    Fem.p(subindex+1:subindex+NDof/2,2) = EE(:,2);
+    Fem.p(subindex+1:subindex+NDof/2,3) = EE(:,4);
     Fem.v(subindex+1:subindex+NDof/2) = Qe(:);
     Fem.l(subindex+1:subindex+NDof/2) = Fem.Element{el}(:);
     index = index + NDof^2;
@@ -811,6 +830,7 @@ if Fem.PrescribedDisplacement
     if strcmp(Fem.Material.Type,'Mooney'), EMod = Fem.Material.C10;
     elseif strcmp(Fem.Material.Type,'Yeoh'), EMod = 6*Fem.Material.C1;
     elseif strcmp(Fem.Material.Type,'Linear'), EMod = Fem.Material.E;
+    elseif strcmp(Fem.Material.Type,'NeoHookean'), EMod = Fem.Material.E;
     end
    
     if Fem.Nonlinear
@@ -893,7 +913,7 @@ FreeDofs = setdiff(AllDofs,FixedDofs);
 end
 
 %--------------------------------------------------- local element matrices
-function [Fe,Qe,Me,Ce,Ke,Kte,Svme,SS] = ...
+function [Fe,Qe,Me,Ce,Ke,Kte,Svme,SS,EE] = ...
     Locals(Fem,eNode,eDof)
 
 nn = length(eNode);
@@ -907,6 +927,7 @@ W = Fem.ShapeFnc{nn}.W;
 Q = Fem.ShapeFnc{nn}.Q;
 
 SGP = zeros(length(W),6);
+EGP = zeros(length(W),6);
 Nshp = length(Fem.ShapeFnc{nn}.N(:,:,1));
 NNe = zeros(length(W),Nshp);
 
@@ -917,7 +938,7 @@ for q = 1:length(W)
     J0 = Fem.Node0(eNode,:).'*dNdxi;
     %Xe = Fem.Node(eNode,:);
     dNdx = dNdxi/J0;
-    dJ = abs(det(J0));
+    dJ = (det(J0));
        
     % get displacement field
     Delta = Fem.Utmp(eDof,:);
@@ -959,16 +980,21 @@ for q = 1:length(W)
     % dampings matrix
     Ce = Ce + tau*W(q)*Fem.Zeta*(NN.')*NN*dJ;
     
+    % lagrangian strain
+    Elagran = 0.5*(C -eye(3));
+    
     % true stress
     Scauchy = (1/det(F))*F*S0*(F.');
     
     SGP(q,:) = VoightNotation(Scauchy);
+    EGP(q,:) = VoightNotation(Elagran);
     
     % construct shaping
     NNe(((q-1)*Nshp + 1):(q*Nshp)) = N(:).';
 end
 
 SS = NNe.'*SGP;
+EE = NNe.'*EGP;
 [Svm, ~] = VonMises(SS(:,1),SS(:,2),SS(:,3),...
                     SS(:,4),SS(:,5),SS(:,6));
 Svme = Svm(:); 
@@ -1028,26 +1054,44 @@ end
 end
 
 %---------------------------------------------- COMPUTE CENTROID OF POLYGON
-function [Pc,A] = ComputeCentroid(Fem)
-
-Pc = zeros(Fem.NElem,2);
-A  = zeros(Fem.NElem,1);
+function [Pc,A,Nv] = ComputeCentroid(Fem)
+    
+f = Fem.Element;
+ver = Fem.Node;
+Pc = zeros(Fem.NElem,2); 
+A = zeros(Fem.NElem,1);
+Nv = cell(Fem.NElem,1);
 
 for el = 1:Fem.NElem
-    
-    % get nodal positions
-    vx = Fem.Node(Fem.Element{el},1);
-    vy = Fem.Node(Fem.Element{el},2);
-    nv = length(Fem.Element{el});
-    
-    % shift the vertices by (+1)
-    vxS = vx([2:nv 1]); vyS = vy([2:nv 1]);
-    
-    % compute volume of area
-    tmp = vx.*vyS - vy.*vxS;
-    A(el) = 0.5*sum(tmp);
-    Pc(el,:) = 1/(6*A(el,1))*[sum((vx+vxS).*tmp),...
-        sum((vy+vyS).*tmp)];
+
+  vx = ver(f{el},1); 
+  vy = ver(f{el},2); 
+  nv = length(f{el}); 
+  
+  vxS = vx([2:nv 1]); 
+  vyS = vy([2:nv 1]); 
+
+  n = ([vx,vy] - [vxS,vyS]);
+  
+  for ii = 1:length(n)
+      Nullspace = transpose(null(n(ii,:)));
+      if size(Nullspace,1) == 2, n(ii,:) = Nullspace(1,:);
+      else, n(ii,:) = Nullspace;
+      end
+      a = [vxS(ii)-vx(ii),vyS(ii)-vy(ii)]; 
+      a = a/norm(a);
+      b = [n(ii,1),n(ii,2)];
+      d = b(1)*a(2) - b(2)*a(1);
+      n(ii,:) = -sign(d)*n(ii,:);
+  end
+  
+  nS = n([nv 1:nv-1],:); n = nS+n;
+  Nv{el} = (n./sqrt(n(:,1).^2 + n(:,2).^2));
+  
+  tmp = vx.*vyS - vy.*vxS;
+  A(el) = 0.5*sum(tmp);
+  Pc(el,:) = 1/(6*A(el,1))*[sum((vx+vxS).*tmp),...
+                            sum((vy+vyS).*tmp)];
 end
 
 end
@@ -1175,15 +1219,29 @@ end
 end
 
 %------------------------------------------------------ isotropic reduction
-function [flag,Fem] = CheckConvergence(Fem,R,SingularKt)
+function [flag,Fem] = CheckConvergence(Fem,SingularKt)
 
-R = full(R);
+FreeDofs = GetFreeDofs(Fem);
 
-if ((norm(R) > Fem.ResidualNorm) && (Fem.Iteration <= Fem.MaxIteration)  ...
-        && ~SingularKt )    
+Fem.SolverResidual = append(Fem.SolverResidual,...
+    norm(Fem.Residual(FreeDofs)));
+
+Fem.SolverVonMises = append(Fem.SolverVonMises,...
+    max(Fem.s(:,1)));
+
+Criteria = (Fem.SolverResidual(end) > Fem.ResidualNorm);
+
+%DiffSVM = abs(Fem.SolverVonMises(end) - Fem.SolverVonMises(end-1));
+if strcmp(Fem.Material.Type,'Mooney'), EMod = Fem.Material.C10;
+elseif strcmp(Fem.Material.Type,'Yeoh'), EMod = 6*Fem.Material.C1;
+elseif strcmp(Fem.Material.Type,'Linear'), EMod = Fem.Material.E;
+elseif strcmp(Fem.Material.Type,'NeoHookean'), EMod = Fem.Material.E;
+end
+%Criteria = (DiffSVM/(EMod) > Fem.ResidualNorm);
+
+if (Criteria && (Fem.Iteration <= Fem.MaxIteration) && ~SingularKt )    
     flag = 0;
 else
-    
     if (Fem.Iteration > Fem.MaxIteration) || SingularKt
         flag = 2;
         Fem.Convergence = false;
@@ -1251,29 +1309,6 @@ for ii=1:naver
     f = W*f(:);
 end
 
-end
-
-%----------------------------------------------------------- node adjecency
-function A = NodeAdjecency(face)
-n = max(cellfun(@max,face));      
-A = sparse(n,n);
-null = sparse(n,n);
-
-for ii = 1:length(face)
-    poly = double(face{ii});
-    [a,b] = PermutationSet(numel(poly));
-    B = null;
-    B(poly(a),poly(b)) = 1;
-    A = A + B;
-end
-
-A = double(A>0);
-end
-
-%----------------------------------------------------------- permuation set
-function [i,j] = PermutationSet(n)
-i = transpose(kron(1:n,ones(1,n)));
-j = transpose(kron(ones(1,n),1:n));
 end
 
 %%/////////////////////////////////////////////////// TOPOLOGY OPTIMIZATION
@@ -1418,7 +1453,6 @@ zNew = (1-alpha)*zNew + alpha*z0;
 
 %Change = max(abs(zNew-z0))/(zMax-zMin);
 end
-
 
 %------------------------------------------------------ isotropic reduction
 function [bool,Fem] = CheckConvergenceOpt(Fem)
@@ -1605,25 +1639,53 @@ end
 fprintf(' %1.0f\t  | %1.0f\t | %1.3e | %1.3e | %0.3f | %0.3f  | %0.2f \n',...
     Fem.Iteration,Fem.Increment,norm(Fem.Residual(FreeDofs)),...
     max(Fem.s(:,1)),Fem.Con+1,norm(Fem.Change),Fem.Penal);   
-    
-end
-    
-    
+
+end 
 
 end
 
 %------------------------------------------------------ optimization solver
-function showInformation(Fem)
+function showInformation(Fem,Request)
+
+if nargin < 2, Request = ''; end
     
+if ~Fem.InformationBoolean
+NodeNum = Fem.NElem/1e3;
+MaxNVer = max(cellfun(@numel,Fem.Element));      
+MinNVer = min(cellfun(@numel,Fem.Element));      
+
+switch(Request)
+case('NonlinearFem')
+fprintf('==============================================================\n');    
+fprintf('Number of elem: %1.2fk \n',NodeNum);
+fprintf('Element type: P%1.0f-P%1.0f \n',MinNVer,MaxNVer);
+fprintf('Max. iterations: %1.0f \n', Fem.MaxIteration);
+if Fem.Nonlinear, fprintf('Nonlinear geom: true\n');
+else, fprintf('Nonlinear geom: false \n'); end
+showMaterialInfo(Fem)
 fprintf('==============================================================\n');
-fprintf('Number of elem: %1.2fk \n',Fem.NElem/1e3);
-fprintf('Element type: P4-P8 \n');
+    
+case('TopologyOptimization')
+fprintf('==============================================================\n');    
+fprintf('Number of elem: %1.2fk \n',NodeNum);
+fprintf('Element type: P%1.0f-P%1.0f \n',MinNVer,MaxNVer);
 fprintf('Filter radius: %1.2f \n', Fem.FilterRadius);
 fprintf('Max. iterations: %1.0f \n', Fem.MaxIterationMMA);
 fprintf('Optimization: %s \n', Fem.OptimizationProblem);
 fprintf('Material scheme: %s \n', Fem.MaterialInterpolation);
 if Fem.Nonlinear, fprintf('Nonlinear geom: true\n');
 else, fprintf('Nonlinear geom: false \n'); end
+showMaterialInfo(Fem)
+fprintf('==============================================================\n');
+end
+
+Fem.InformationBoolean = true;
+end
+
+end
+
+%------------------------------------------------------ optimization solver
+function showMaterialInfo(Fem)
 if strcmp(Fem.Material.Type,'Mooney'), fprintf('Material: Mooney \n');
 c1 = Fem.Material.C10; c2 = Fem.Material.C01; d = Fem.Material.K;
 fprintf('C10 = %1.e, C01 = %1.3e, K = %1.3e \n', c1,c2,d);
@@ -1632,8 +1694,37 @@ c1 = Fem.Material.C1*1e3;
 c2 = Fem.Material.C2*1e3; 
 c3 = Fem.Material.C3*1e3;
 fprintf('C1 = %1.1e kPa, C2 = %1.1e kPa, C3 = %1.1e kPa\n', c1,c2,c3);
+elseif strcmp(Fem.Material.Type,'NeoHookean')
+fprintf('Material = Neo-Hookean \n');
+E = Fem.Material.E*1e3; 
+Nu = Fem.Material.Nu; 
+fprintf('E = %1.1e kPa, Nu = %1.1e [-] \n', E,Nu);
+end
 end
 
-fprintf('==============================================================\n');
-    
+%-------------------------------------------------------------- movie maker
+function MovieMaker(Fem,Name,Request)
+
+if nargin < 2, Request = ''; end
+
+if Fem.Movie
+switch(Request)
+    case('Start')
+        filename = string([Name,'_', char(datetime(now,'ConvertFrom',...
+            'datenum')),'.gif']);
+        
+        filename = erase(filename,[":"," "]);
+        background('w');
+        if ~isempty(Fem.MovieAxis), axis(Fem.MovieAxis); end
+        if ~isempty(Fem.MovieCAxis), caxis(Fem.MovieCAxis); end
+        drawnow;
+        gif(char(filename),'frame',gcf,'nodither');
+    otherwise
+        if ~isempty(Fem.MovieAxis), axis(Fem.MovieAxis); end
+        if ~isempty(Fem.MovieCAxis), caxis(Fem.MovieCAxis); end
+        drawnow;
+        gif;
+end
+end
+
 end

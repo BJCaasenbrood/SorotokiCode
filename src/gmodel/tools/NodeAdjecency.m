@@ -12,7 +12,7 @@ for ii = 1:length(face)
     A = A + B;
 end
 
-A = uint16(A>0);
+A = double(A>0);
 end
 
 %---------------------------------------------------------- PERMUTATION SET

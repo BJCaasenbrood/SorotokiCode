@@ -130,8 +130,7 @@ if Mesh.Triangulate
     Mesh.NNode = length(v);
 end
 
-[Pc,A] = computeCentroid(Mesh,f,v); 
-normal = computeNormalVector(Mesh,f,v,Pc);
+[Pc,A,Nv] = computeCentroid(Mesh,f,v); 
 
 Mesh.Center = Pc;
 Mesh.Node = v;
@@ -139,7 +138,7 @@ Mesh.Element = f;
 Mesh.NNode = length(v);
 Mesh.NElem = length(f);
 Mesh.Area = A;
-Mesh.Normal = normal;
+Mesh.Normal = Nv;
 
 Mesh = ElementAdjecency(Mesh);
 end
@@ -271,10 +270,11 @@ Rb = [X(:),Y(:)];
 end
 
 %------------------------------------------------ compute centroid polygons
-function [Pc,A] = computeCentroid(Mesh,f,v)
+function [Pc,A,Nv] = computeCentroid(Mesh,f,v)
 
 Pc = zeros(Mesh.NElem,2); 
-A  = zeros(Mesh.NElem,1);
+A = zeros(Mesh.NElem,1);
+Nv = cell(Mesh.NElem,1);
 
 for el = 1:Mesh.NElem
 
@@ -284,7 +284,26 @@ for el = 1:Mesh.NElem
   
   vxS = vx([2:nv 1]); 
   vyS = vy([2:nv 1]); 
-
+  
+  if nargout > 2
+      n = ([vx,vy] - [vxS,vyS]);
+      
+      for ii = 1:length(n)
+          Nullspace = transpose(null(n(ii,:)));
+          if size(Nullspace,1) == 2, n(ii,:) = Nullspace(1,:);
+          else, n(ii,:) = Nullspace;
+          end
+          a = [vxS(ii)-vx(ii),vyS(ii)-vy(ii)];
+          a = a/norm(a);
+          b = [n(ii,1),n(ii,2)];
+          d = b(1)*a(2) - b(2)*a(1);
+          n(ii,:) = -sign(d)*n(ii,:);
+      end
+      
+      nS = n([nv 1:nv-1],:); n = 0.5*nS+0.5*n;
+      Nv{el} = (n./sqrt(n(:,1).^2 + n(:,2).^2));
+  end
+  
   tmp = vx.*vyS - vy.*vxS;
   A(el) = 0.5*sum(tmp);
   Pc(el,:) = 1/(6*A(el,1))*[sum((vx+vxS).*tmp),...

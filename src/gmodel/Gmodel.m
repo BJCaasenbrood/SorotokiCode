@@ -13,6 +13,9 @@ classdef Gmodel < handle
     end
     
     properties (Access = private)
+        SDF;
+        BdBox;
+        
         Figure;
         FigHandle;
         TextureMap;
@@ -27,7 +30,7 @@ classdef Gmodel < handle
         AOTextureMap;
         
         SSSPower;
-        
+                
         AmbientOcclusion;
         SubSurfaceScattering;
         
@@ -43,25 +46,28 @@ methods
 %---------------------------------------------------------------- Fem Class
 function obj = Gmodel(varargin) 
     
-    obj = GenerateObject(obj,varargin);
-
-    for ii = 3:2:length(varargin)
-        obj.(varargin{ii}) = varargin{ii+1};
-    end
-
     obj.TextureStretch = 1;
-    obj.Quality = 20;
+    obj.Quality = 80;
     obj.FlipNormals = false;
     obj.AOBias = 0.01;
     obj.AOBit = 3;
     obj.AORadius = 0.3;
-    obj.AOInvert = true;
+    obj.AOInvert = false;
             
     obj.AmbientOcclusion = false;
     obj.SubSurfaceScattering = false;
     obj.SSSPower = 2.2;
     obj.AOPower = 1;
     obj.Occlusion = [.2,.2,.2];
+    
+    obj = GenerateObject(obj,varargin);
+
+    for ii = 3:2:length(varargin)
+        obj.(varargin{ii}) = varargin{ii+1};
+    end
+
+    
+    
 end
 
 %---------------------------------------------------------------------- get     
@@ -97,6 +103,7 @@ function Gmodel = render(Gmodel,varargin)
     material dull;
     %camproj('perspective');
     axis equal;
+    axis(Gmodel.BdBox);
     axis off;
     daspect([1,1,1]);
     
@@ -162,7 +169,7 @@ function Gmodel = updateTexture(Gmodel)
     end
     
     p = Gmodel.SSSPower;
-    CC = ((Gmodel.AOTextureMap).^p);
+    CC = ((1-Gmodel.SSSTextureMap).^p);
     
     for ii = 1:length(Gmodel.Element)
         N(ii,:) = ColorMultiply(N(ii,:),repmat(CC(ii)+(1-CC(ii)),1,3));
@@ -198,7 +205,7 @@ end
 function Gmodel = bake(Gmodel)
     
     Gmodel = BakeCubemap(Gmodel,Gmodel.Texture);
-    
+    if Gmodel.SubSurfaceScattering, Gmodel.AOInvert = true; end
     if Gmodel.AmbientOcclusion || Gmodel.SubSurfaceScattering
     Gmodel = BakeAmbientOcclusion(Gmodel);
     end
@@ -219,9 +226,25 @@ function Gmodel = GenerateObject(Gmodel,varargin)
        elseif strcmp(ext,'.obj'), [f,v] = objreader(msh{1});
        else, cout('err','* extension not recognized');
        end
+    elseif isa(msh{1},'function_handle')
+       if length(msh{2}) ~= 6
+           cout('err','* specify a correct bounding box of size 6 x 1');
+       end
+              
+       Gmodel.SDF = msh{1};
+       Gmodel.BdBox = msh{2};
+       [X,Y,Z,P] = MeshGridding(Gmodel.BdBox ,Gmodel.Quality);
+       P = single(P);
+       D = Gmodel.SDF(single(P));
+       D = reshape(D(:,end),size(X));
+       
+       [f,v,~] = MarchingCubes(single(X),single(Y),...
+           single(Z),single(D),-1e-6);
+       
+       %f = fliplr(f);
     elseif length(msh) == 2
        v = msh{1};
-       f = msh{2};
+       f = msh{2};        
     end
     
     [vn,fn] = TriangleNormal(v,f);
@@ -233,6 +256,7 @@ function Gmodel = GenerateObject(Gmodel,varargin)
     Gmodel.Normal = fn;  
     Gmodel.TextureMap = Normal2RGB(Gmodel.Normal);
     Gmodel.RMatrix = eye(4);
+    Gmodel.BdBox = BoundingBox(Gmodel.Node); 
     
     fcell = num2cell(Gmodel.Element,2);
     [~,Gmodel.V2F,Gmodel.F2V] = ElementAdjecency(fcell);
@@ -264,17 +288,10 @@ function Gmodel = BakeCubemap(Gmodel,Cubemap)
     y = (clamp(round(Nx*real(UV(:,1))),1,Nx));
     x = (clamp(round(Ny*real(UV(:,2))),1,Ny));
     
-%     for ii = 1:length(Gmodel.Node)
-%         EnviromentReflect(ii,1) = double(rgbImage(y(ii), x(ii), 1))/255;
-%         EnviromentReflect(ii,2) = double(rgbImage(y(ii), x(ii), 2))/255;
-%         EnviromentReflect(ii,3) = double(rgbImage(y(ii), x(ii), 3))/255;
-%     end
     ind = sub2ind([Nx Ny],y(:),x(:));
     EnviromentReflect(:,1) = double(R(ind))/255;
     EnviromentReflect(:,2) = double(G(ind))/255;
     EnviromentReflect(:,3) = double(B(ind))/255;
-    %EnviromentReflect(I,2) = double(rgbImage(y(I), x(I), 2))/255;
-    %EnviromentReflect(I,3) = double(rgbImage(y(I), x(I), 3))/255;
     
     RGB = zeros(length(Gmodel.Element),3);
 %     
@@ -283,7 +300,6 @@ function Gmodel = BakeCubemap(Gmodel,Cubemap)
     end
         
     Gmodel.TextureMap = RGB;    
-%    Gmodel.TextureMap = EnviromentReflect;    
 end
 
 %-------------------------------------------------- generate graphics model
@@ -291,15 +307,17 @@ function Gmodel = BakeAmbientOcclusion(Gmodel)
 
 Bias = Gmodel.AOBias;
 Res = round(2.^Gmodel.AOBit);
-BdBox = BoundingBox(Gmodel.Node); 
-R = Gmodel.AORadius*mean([abs(BdBox(2)-BdBox(1)),abs(BdBox(4)-BdBox(3)),...
-    abs(BdBox(6)-BdBox(5))]);
+BB = BoundingBox(Gmodel.Node); 
+R = Gmodel.AORadius*mean([abs(BB(2)-BB(1)),abs(BB(4)-BB(3)),...
+    abs(BB(6)-BB(5))]);
+
+Gmodel.BdBox = BB;
 
 Normals = Gmodel.VNormal;
 Centers = Gmodel.Node;
 AO = zeros(length(Centers),1);
         
-if ~Gmodel.AOInvert, dir = -1; else, dir = 1; end
+if Gmodel.AOInvert, dir = -1; else, dir = 1; end
 
 npts = Res*length(Centers);
 pts = zeros(npts,3);
@@ -314,7 +332,6 @@ end
 
 [Cpts,~,ic] = uniquetol(pts,R*0.5e-3,'ByRows',true);
 
-%Cpts = pts;
 
 fv = struct; 
 fv.faces =  Gmodel.Element; 
