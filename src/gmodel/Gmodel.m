@@ -98,24 +98,16 @@ function Gmodel = render(Gmodel,varargin)
     hp = patch('Vertices',Gmodel.Node,'Faces',Gmodel.Element,'linestyle',...
         'none','FaceVertexCData',Gmodel.TextureMap,'FaceColor','interp');
     
-    %hp.FaceColor = 'interp';
-    set(gcf,'color',[255, 255, 255]/255);
-    material dull;
-    %camproj('perspective');
-    axis equal;
-    axis(Gmodel.BdBox);
-    axis off;
+    set(gcf,'color',[255, 255, 255]/255); material dull;
+    axis equal; axis(Gmodel.BdBox); axis off;
     daspect([1,1,1]);
     
-    ax = gca;               
-    ax.Clipping = 'off';    
+    ax = gca; ax.Clipping = 'off';    
    
     Gmodel.FigHandle = hp;
     Gmodel.Figure = H;
     
-    %set(h,'ButtonDownFilter',@myprecallback);
     h.ActionPostCallback  = @myprecallback;
-    %h.ButtonDownFilter = @mypostcallback;
     Gmodel.Figure.UserData = Gmodel;
     
     function myprecallback(src,evnt)
@@ -140,22 +132,19 @@ end
 
 %--------------------------------------------------------------------- show
 function Gmodel = resetNode(Gmodel)
-    
-    %if sum(Gmodel.CameraPos) ~= sum(campos)
     Gmodel.Node = Gmodel.Node0;
- 
 end
 
 %--------------------------------------------------------------------- show
-function Gmodel = updateNode(Gmodel)
+function Gmodel = updateNode(Gmodel,varargin)
     
-    [vn,fn] = TriangleNormal(Gmodel.Node,Gmodel.Element);
+    if ~isempty(varargin), V = varargin{1};
+    else, V = Gmodel.Node; end
+    
+    [Gmodel.VNormal,Gmodel.Normal] = TriangleNormal(V,...
+        Gmodel.Element);
 
-    Gmodel.VNormal = vn;
-    Gmodel.Normal = fn;  
-        
     set(Gmodel.FigHandle,'Vertices',Gmodel.Node);
-    %update(Gmodel);
 end
 
 %--------------------------------------------------------------------- show
@@ -336,7 +325,6 @@ end
 
 [Cpts,~,ic] = uniquetol(pts,R*0.5e-3,'ByRows',true);
 
-
 fv = struct; 
 fv.faces =  Gmodel.Element; 
 fv.vertices =  Gmodel.Node;
@@ -354,7 +342,6 @@ for ii = 1:length(Centers)
     idx = idx + Res;
 end
 
-%AO = MeshSmoothing(Mesh,AO,5);
 f = fv.faces;
 Gmodel.AOTextureMap = TextureSmoothing(f,AO,5);
 end
