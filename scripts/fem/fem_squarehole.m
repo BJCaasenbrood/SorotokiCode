@@ -15,7 +15,7 @@ msh = msh.generateMesh;
 msh.show();
 
 fem = Fem(msh);
-fem = fem.set('TimeStep',1/15,...
+fem = fem.set('TimeStep',.5,...
               'ResidualNorm',1e-3,...
               'Nonlinear',true,...
               'Type','PlaneStress',...
@@ -29,17 +29,11 @@ fem = fem.AddConstraint('Support',fem.FindNodes('Top'),[1,0]);
 fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[1,1]);
 fem = fem.AddConstraint('Load',fem.FindNodes('Top'),[0,3]);
 
-%fem.Material = Ecoflex0030;
-fem.Material = NeoHookeanMaterial('E',91250,'Nu',0.25); 
+%% material
+fem.Material = NeoHookeanMaterial('E',2,'Nu',0.4); 
 
 %% solving
-fem.solve();
-
-%% plotting
-figure(101); clf;
-fem.show('Svm');
-
-colormap(turbo);
+fem.dampedsolve();
 
 function D = SquareHole(P,H,R)
 R1 = dRectangle(P,0,H,0,H);

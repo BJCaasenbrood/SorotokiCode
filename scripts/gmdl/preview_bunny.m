@@ -7,14 +7,14 @@ obj = Gmodel('Bunny.stl');
 obj.Texture = mateplastic;
 obj.Emission = [0.65 0.65 0.65];
 
-obj.set('AOPower',1.0,...
+obj.set('SSSPower',1.2,...
         'AORadius',0.3,...
+        'AOPower',1.0,...
         'SubSurfaceScattering',true);
 
 obj.bake();
-
-%% show
-obj.render(); 
-
+    
 %% set view
-view(260,20); obj.update();
+obj.render(); 
+view(260,20); 
+obj.update();

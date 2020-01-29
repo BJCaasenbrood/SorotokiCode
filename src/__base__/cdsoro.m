@@ -1,4 +1,4 @@
-function path = cd_sorotoki
+function path = cdsoro
 path = erase(cd,'\src\__base__');    
 end
 

@@ -60,13 +60,12 @@ function obj = Gmodel(varargin)
     obj.AOPower = 1;
     obj.Occlusion = [.2,.2,.2];
     
-    obj = GenerateObject(obj,varargin);
-
     for ii = 3:2:length(varargin)
         obj.(varargin{ii}) = varargin{ii+1};
     end
 
     
+    obj = GenerateObject(obj,varargin);   
     
 end
 
@@ -96,7 +95,7 @@ function Gmodel = render(Gmodel,varargin)
     h = rotate3d;
     h.Enable = 'on';
     hp = patch('Vertices',Gmodel.Node,'Faces',Gmodel.Element,'linestyle',...
-        'none','FaceVertexCData',Gmodel.TextureMap,'FaceColor','flat');
+        'none','FaceVertexCData',Gmodel.TextureMap,'FaceColor','interp');
 
     %hp.FaceColor = 'interp';
     set(gcf,'color',[255, 255, 255]/255);
@@ -127,10 +126,11 @@ end
 %--------------------------------------------------------------------- show
 function update(Gmodel,varargin)
     
-    %if sum(Gmodel.CameraPos) ~= sum(campos)
+    Gmodel = updateNode(Gmodel);
+    
     Gmodel = BakeCubemap(Gmodel,Gmodel.Texture);
     Gmodel.CameraPos = campos;
-    %end
+    
     Gmodel = updateTexture(Gmodel);
     
     set(Gmodel.FigHandle,'FaceVertexCData',Gmodel.TextureMap);
@@ -146,19 +146,20 @@ function Gmodel = resetNode(Gmodel)
 end
 
 %--------------------------------------------------------------------- show
-function updateNode(Gmodel,varargin)
+function Gmodel = updateNode(Gmodel)
     
-    [vn,fn] = TriangleNormal(varargin{1},Gmodel.Element);
+    [vn,fn] = TriangleNormal(Gmodel.Node,Gmodel.Element);
 
     Gmodel.VNormal = vn;
     Gmodel.Normal = fn;  
         
-    set(Gmodel.FigHandle,'Vertices',varargin{1});
+    set(Gmodel.FigHandle,'Vertices',Gmodel.Node);
     %update(Gmodel);
 end
 
 %--------------------------------------------------------------------- show
 function Gmodel = updateTexture(Gmodel)
+    
     N = Gmodel.TextureMap;
     
     if Gmodel.SubSurfaceScattering
@@ -169,9 +170,9 @@ function Gmodel = updateTexture(Gmodel)
     end
     
     p = Gmodel.SSSPower;
-    CC = ((1-Gmodel.SSSTextureMap).^p);
+    CC = ((1-Gmodel.AOTextureMap).^p);
     
-    for ii = 1:length(Gmodel.Element)
+    for ii = 1:length(Gmodel.Node)
         N(ii,:) = ColorMultiply(N(ii,:),repmat(CC(ii)+(1-CC(ii)),1,3));
         N(ii,:) = AffineColorMix(N(ii,:),E,...
             [0,0,0],[(CC(ii)),1-CC(ii),0]);
@@ -183,7 +184,7 @@ function Gmodel = updateTexture(Gmodel)
     p = Gmodel.AOPower;
     CC = ((Gmodel.AOTextureMap).^p);
     
-    for ii = 1:length(Gmodel.Element)
+    for ii = 1:length(Gmodel.Node)
         N(ii,:) = ColorMultiply(N(ii,:),repmat(CC(ii)+(1-CC(ii)),1,3));
         N(ii,:) = AffineColorMix(N(ii,:),E,...
             [0,0,0],[(CC(ii)),1-CC(ii),0]);
@@ -212,7 +213,6 @@ function Gmodel = bake(Gmodel)
 end
 end
 
-
 methods (Access = private)
     
 %-------------------------------------------------- generate graphics model
@@ -233,7 +233,7 @@ function Gmodel = GenerateObject(Gmodel,varargin)
               
        Gmodel.SDF = msh{1};
        Gmodel.BdBox = msh{2};
-       [X,Y,Z,P] = MeshGridding(Gmodel.BdBox ,Gmodel.Quality);
+       [X,Y,Z,P] = MeshGridding(Gmodel.BdBox,Gmodel.Quality);
        P = single(P);
        D = Gmodel.SDF(single(P));
        D = reshape(D(:,end),size(X));
@@ -293,10 +293,10 @@ function Gmodel = BakeCubemap(Gmodel,Cubemap)
     EnviromentReflect(:,2) = double(G(ind))/255;
     EnviromentReflect(:,3) = double(B(ind))/255;
     
-    RGB = zeros(length(Gmodel.Element),3);
+    RGB = zeros(length(Gmodel.Node),3);
 %     
     for ii = 1:3
-        RGB(:,ii) = Gmodel.V2F*(EnviromentReflect(:,ii));
+        RGB(:,ii) = (EnviromentReflect(:,ii));
     end
         
     Gmodel.TextureMap = RGB;    
@@ -352,7 +352,7 @@ end
 
 %AO = MeshSmoothing(Mesh,AO,5);
 f = fv.faces;
-Gmodel.AOTextureMap = Gmodel.V2F*TextureSmoothing(f,AO,5);
+Gmodel.AOTextureMap = TextureSmoothing(f,AO,5);
 end
     
 end

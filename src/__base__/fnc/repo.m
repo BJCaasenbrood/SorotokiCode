@@ -2,6 +2,8 @@ function repo(Request)
 
 if nargin < 1, Request = ''; end
 
+fprintf('=====================================================\n')
+
 switch(Request)
     case('demo');      DirectoryDemos;
     case('demos');     DirectoryDemos;
@@ -20,6 +22,7 @@ switch(Request)
     case('colormaps'); DirectoryColormap;
     otherwise;         BaseRepo;
 end
+fprintf('=====================================================\n')
 end
 
 function BaseRepo
@@ -45,7 +48,6 @@ function DirectoryMaterials
 dir('.\data\matcap\**\*.m');
 end
 
-
 function DirectoryDemos
-dir('.\examples\demos\**\*.m');
+dir('.\scripts\**\*.m');
 end

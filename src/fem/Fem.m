@@ -66,6 +66,7 @@ classdef Fem < handle
         PressureLoad = 0;
         Type = 'PlaneStrain'
         LineStyle = 'none';
+        CMap = viridis;
         I3 = eye(3); O3 = zeros(3);
         i; j; m; fi; t; e; c; s; p; v; l; k; fb; ed; fb0;
         
@@ -157,7 +158,7 @@ else, Request = varargin{1}; end
 S = 'interp'; 
 V = Fem.Node;
 flag = 0;
-colormap(turbo);
+colormap(Fem.CMap);
 
 switch(Request)
     case('Svm'), Z = Fem.VonMisesNodal;
@@ -169,7 +170,8 @@ switch(Request)
     case('Exy'), Z = Fem.exyNodal;
     case('Fx'), Z = Fem.fxNodal;
     case('Fy'), Z = Fem.fyNodal;
-    case('Fi'), [~,~,Z] = DisplacementField(Fem,Fem.fInternal);
+    case('Fin'), [~,~,Z] = DisplacementField(Fem,Fem.fInternal);
+    case('Fex'), [~,~,Z] = DisplacementField(Fem,Fem.fExternal);
     case('Un'), [~,~,Z] = DisplacementField(Fem,Fem.Utmp);
     case('Ux'), [Z,~,~] = DisplacementField(Fem,Fem.Utmp);
     case('Uy'), [~,Z,~] = DisplacementField(Fem,Fem.Utmp);
@@ -316,6 +318,8 @@ while true
         if rcond(full(A)) >= 1e-20, DeltaU = A\B;
         else, Singular = true; DeltaU = Fem.Utmp(FreeDofs)*0;
         end
+        
+        %if max(Fem.s(:,1))> Fem.M
             
         if Fem.Nonlinear, Delta(FreeDofs,1)=Delta(FreeDofs,1)-DeltaU(:,1);
         else, Delta(FreeDofs,1) = DeltaU(:,1); B = Fem.ResidualNorm; end
@@ -337,12 +341,6 @@ while true
         Fem.Iteration = Fem.Iteration + 1;
     end 
     
-%     if flag == 1 && Fem.Nonlinear
-%         %Fem.Center = ComputeCentroid(Fem);
-%         %Fem.Normal = ComputeNormal(Fem);
-%         
-%     end
-    
     if ~Fem.SolverStartMMA
         Fem.VonMisesNodal = full(sparse(Fem.l,1,Fem.s(:,1))./sparse(Fem.l,1,Fem.v));
         Fem.sxxNodal = full(sparse(Fem.l,1,Fem.s(:,2))./sparse(Fem.l,1,Fem.v));
@@ -357,7 +355,7 @@ while true
     end
     
     if Fem.SolverPlot || ~Fem.SolverStartMMA
-        figure(101); Fem.show('Exx');
+        figure(101); Fem.show('Svm');
     end
     
     if ~Fem.Nonlinear, break; end
@@ -938,7 +936,7 @@ for q = 1:length(W)
     J0 = Fem.Node0(eNode,:).'*dNdxi;
     %Xe = Fem.Node(eNode,:);
     dNdx = dNdxi/J0;
-    dJ = (det(J0));
+    dJ = abs(det(J0));
        
     % get displacement field
     Delta = Fem.Utmp(eDof,:);
