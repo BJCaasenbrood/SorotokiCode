@@ -1,14 +1,8 @@
 title: SOROTOKI
 subtitle: A soft robotics toolkit for MATLAB
 email: b.j.caasenbrood@tue.nl
-description: >- # this means to ignore newlines until "baseurl:"
-  Write an awesome description for your new site here.
- 
-baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
 github_username:  BJCaasenbrood
 
-# Build settings
 theme: jekyll-theme-cayman
 plugins:
   - jekyll-feed
