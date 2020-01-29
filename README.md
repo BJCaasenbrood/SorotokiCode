@@ -3,7 +3,7 @@ A soft robotics toolkit for MATLAB
 
 
 # Citation
-If you've used Sorotoki in your research work, please consider to cite:
+If you use SOROTOKI in your research, please consider to cite:
 ```
 @misc{Caasenbrood2018,
   author = {Caasenbrood, Brandon},
