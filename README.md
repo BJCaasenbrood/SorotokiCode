@@ -11,6 +11,6 @@ If you've used Sorotoki in your research work, please consider to cite:
   year = {2018},
   publisher = {GitHub},
   journal = {GitHub repository},
-  howpublished = {\url{https://github.com/williamhunter/topy}},
+  howpublished = {\url{https://github.com/BJCaasenbrood/SorotokiCode}},
   }
 ```
