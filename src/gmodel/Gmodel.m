@@ -94,9 +94,10 @@ function Gmodel = render(Gmodel,varargin)
     H = figure(101);
     h = rotate3d;
     h.Enable = 'on';
+    
     hp = patch('Vertices',Gmodel.Node,'Faces',Gmodel.Element,'linestyle',...
         'none','FaceVertexCData',Gmodel.TextureMap,'FaceColor','interp');
-
+    
     %hp.FaceColor = 'interp';
     set(gcf,'color',[255, 255, 255]/255);
     material dull;
@@ -206,6 +207,7 @@ end
 function Gmodel = bake(Gmodel)
     
     Gmodel = BakeCubemap(Gmodel,Gmodel.Texture);
+    
     if Gmodel.SubSurfaceScattering, Gmodel.AOInvert = true; end
     if Gmodel.AmbientOcclusion || Gmodel.SubSurfaceScattering
     Gmodel = BakeAmbientOcclusion(Gmodel);
@@ -269,7 +271,9 @@ function Gmodel = BakeCubemap(Gmodel,Cubemap)
     Ny = size(Cubemap,1); 
     Nx = size(Cubemap,2);
     
-    Phi = view;
+    if ishandle(101), Phi = view;
+    else, Phi = eye(4); end
+    
     Phi = transpose(Phi(1:3,1:3));
     
     if Gmodel.FlipNormals, Normals = -Gmodel.VNormal*Phi;
