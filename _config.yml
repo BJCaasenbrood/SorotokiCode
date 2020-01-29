@@ -1,8 +1,8 @@
 title: SOROTOKI
 subtitle: A soft robotics toolkit for MATLAB
 email: b.j.caasenbrood@tue.nl
-github_username:  BJCaasenbrood
-
+github_username: BJCaasenbrood
+show_downloads: true
 theme: jekyll-theme-cayman
 plugins:
   - jekyll-feed
