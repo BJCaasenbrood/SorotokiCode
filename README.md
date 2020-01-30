@@ -1,6 +1,7 @@
 <div align="center">
-	<img src="./bin/src/softrobot.png" width="750">
+	<img src="./bin/src/softrobot.png" width="700">
 </div>
+
 
 Sorotoki is an open-source toolkit for Soft Robotics. 
 
