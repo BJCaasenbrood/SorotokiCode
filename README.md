@@ -12,7 +12,7 @@ Download the latest stable version ([.zip](https://github.com/BJCaasenbrood/Soro
 sorotoki
 ```
 
-# Getting started with SOROTOKI
+# Getting started
 The main class of **ToPy** is 'Topology'. It defines the main constraints, grid and parameters of optimization -- but you don't really have to bother yourself with this if you just want to get some results.
 ```matlab
 % list of classes
