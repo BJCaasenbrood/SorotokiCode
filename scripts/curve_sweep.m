@@ -1,11 +1,11 @@
-clc; clear; %close all;
+clc; clear; 
 
 global Phi NModal NDof Ba Bc q
 
-NModal = 3;
+NModal = 1;
 I6 = eye(6);
 set = 1:6;
-xa =  set(logical([1,1,0,1,0,0]));
+xa =  set(logical([0,1,1,1,0,0]));
 xc = setdiff(set,xa);
 Ba = I6(:,xa);
 Bc = I6(:,xc);
@@ -15,8 +15,11 @@ NDof = size(Ba,2);
 X = 0:0.01:1;
 % q [t1,t2,t3,k4,k5,k6,e7,e8,e9]
 q = zeros(NModal*NDof,1);
-q(4) = 3;
-q(1) = 10;
+%q(3) = 3;
+q(1) = 2; 
+q(2) = 2; 
+q(3) = .5;
+
 
 % forward integration
 g0 = [1,0,0,0,0,0,0];
@@ -26,7 +29,8 @@ g0 = [1,0,0,0,0,0,0];
 hold on;
 plot3(yf(:,7),yf(:,6),yf(:,5),'linewidth',1);
 axis equal
-view(30,30)
+view(30,30);
+axis tight;
 
 function dg = ForwardODE(t,g)
 global Phi Ba q
@@ -42,21 +46,6 @@ A = StrainMap(R*Kappa(:));
 dg = 0*g;
 dg(1:4) = ((2*norm(Q))^(-1))*A*Q;
 dg(5:7) = R*Gamma(:);
-end
-
-function x = isoSE3(X)
-k = ee(1:3);
-t = ee(4:6);
-
-x = zeros(4,4);
-x(1:3,1:3) = HatOperator(k);
-x(1:3,4) = t;
-
-end
-
-%---------------------------------------------------------------------- set
-function C = HatOperator(a)
-C = [0, -a(3), a(2); a(3), 0, -a(1); -a(2), a(1), 0];
 end
 
 %---------------------------------------------------------------------- set

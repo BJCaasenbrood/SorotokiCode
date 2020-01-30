@@ -1,4 +1,4 @@
-function mcap = resin
-mcap = imread('orange_resin.png');
+function mcap = orangeresin
+mcap = imread('orangeresin.png');
 end
 

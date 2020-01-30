@@ -248,6 +248,7 @@ function Gmodel = GenerateObject(Gmodel,varargin)
     Gmodel.TextureMap = Normal2RGB(Gmodel.Normal);
     Gmodel.RMatrix = eye(4);
     Gmodel.BdBox = BoundingBox(Gmodel.Node); 
+    Gmodel.TextureStretch = 0.75;
     
     fcell = num2cell(Gmodel.Element,2);
     [~,Gmodel.V2F,Gmodel.F2V] = ElementAdjecency(fcell);
@@ -272,7 +273,7 @@ function Gmodel = BakeCubemap(Gmodel,Cubemap)
     UV = SphereMapping(Normals,alpha);
        
     EnviromentReflect = zeros(length(Gmodel.Node),3);
-    rgbImage = ((Cubemap));
+    rgbImage = fliplr((Cubemap));
       
     R = rgbImage(:,:,1);
     G = rgbImage(:,:,2);
