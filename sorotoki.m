@@ -67,7 +67,7 @@ if exist([Path,'/config/vernum.m'], 'file')
     delete([Path,'/config/vernum.m']); 
 end
 
-if ~PingInternet, error('Enable your internet connection!'); end
+if ~pingserver, error('Enable your internet connection!'); end
 
 fprintf('* getting version_file_check from Git repository config/vernum.m \n');
 url = ['https://raw.githubusercontent.com/BJCaasenbrood/',...

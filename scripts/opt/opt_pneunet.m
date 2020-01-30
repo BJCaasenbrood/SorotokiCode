@@ -6,8 +6,8 @@ sdf = @(x) PneuNet(x);
 %% generate mesh
 msh = Mesh(sdf);
 msh = msh.set('BdBox',[0,20,0,20],...
-              'NElem',500,...
-              'MaxIteration',500,...
+              'NElem',750,...
+              'MaxIteration',50,...
               'ShowMeshing',false,...
               'Triangulate',false);
       
@@ -15,7 +15,7 @@ msh = msh.generateMesh;
 
 %% show generated mesh
 fem = Fem(msh);
-fem = fem.set('TimeStep',1/30,...
+fem = fem.set('TimeStep',1/10,...
               'ResidualNorm',1e-3,...
               'VolumeInfill',0.3,...
               'Penal',1,...
@@ -33,8 +33,8 @@ id = fem.FindNodes('Left');
 fem = fem.AddConstraint('Support',id,[1,1]);
 
 id = fem.FindNodes('Right'); 
-fem = fem.AddConstraint('Output',id,[0,-1]);
-fem = fem.AddConstraint('Spring',id,[0,1]);
+fem = fem.AddConstraint('Output',id,[1,0]);
+fem = fem.AddConstraint('Spring',id,[1,0]);
 
 % id = fem.FindNodes('Bottom'); 
 % fem = fem.AddConstraint('Spring',id,[0,1]);
@@ -43,7 +43,7 @@ id = fem.FindElements('Location',[10,10],1);
 fem = fem.AddConstraint('PressureCell',id,[0.02e-3,0]);
 
 %% set density
-fem = fem.initialTopology([1,1],8);
+fem = fem.initialTopology([1,1],3);
 
 %% material
 fem.Material = Ecoflex0030('Yeoh');
@@ -56,9 +56,8 @@ fem.Material = Ecoflex0030('Yeoh');
 
 %fem.Material = MooneyMaterial('C10',1,'K',50);
 % 
-%fem.Material = NeoHookeanMaterial('E',5,'Nu',0.3);
+%fem.Material = NeoHookeanMaterial('E',.17,'Nu',0.499);
 %% solving
-figure(101);
 fem.optimize();
 
 %% former

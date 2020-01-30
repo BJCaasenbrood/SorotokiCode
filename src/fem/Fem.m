@@ -315,7 +315,7 @@ while true
             Delta = Fem.Utmp;
         end
            
-        if rcond(full(A)) >= 1e-20, DeltaU = A\B;
+        if rcond(full(A)) >= 1e-10, DeltaU = A\B;
         else, Singular = true; DeltaU = Fem.Utmp(FreeDofs)*0;
         end
         
@@ -333,6 +333,7 @@ while true
         elseif flag == 1 && ~Fem.Nonlinear
             Fem.Utmp = Delta;
         elseif flag == 1 && Fem.Nonlinear
+            Fem.Utmp = Delta;
             Fem.Node = UpdateNode(Fem,Delta);
             [Fem.Center,~,Fem.Normal] = ComputeCentroid(Fem);
         end
@@ -374,7 +375,10 @@ Fem.IterationMMA = 0;
 Fem.SolverStartMMA = true;
 flag = true;
 
-fig = Fem.show('E');
+%fig = Fem.show('E');
+former(Fem,10);
+ISOVALUE = 0.1;
+showISO(Fem,ISOVALUE,0.5);
 
 while flag
 
@@ -399,8 +403,11 @@ while flag
     dgdz = Fem.SpatialFilter'*(dEdy.*dgdE + dVdy.*dgdV);
     
     % compute design variable
-    [Fem,ZNew] = UpdateSchemeMMA(Fem,f,dfdz,g,dgdz);
-    %[Fem,ZNew] = UpdateSchemeOC(Fem,dfdz,g,dgdz);
+    %if ~Fem.Nonlinear
+    %    [Fem,ZNew] = UpdateSchemeMMA(Fem,f,dfdz,g,dgdz);
+    %else
+        [Fem,ZNew] = UpdateSchemeOC(Fem,dfdz,g,dgdz);
+    %end
     
     % determine material change
     Fem.Change = clamp(ZNew - Fem.Density,-Fem.ChangeMax,Fem.ChangeMax);
@@ -410,15 +417,15 @@ while flag
     
     Fem.Obj = f; Fem.Con = g;
     
-    set(fig{2},'FaceVertexCData',Fem.SpatialFilter*Fem.Density); 
-    %former(Fem,10);
-    %showISO(Fem,lerp(ISOVALUE,0.285,Fem.IterationMMA/80),0.5);
+    %set(fig{2},'FaceVertexCData',Fem.SpatialFilter*Fem.Density); 
+    former(Fem,10);
+    showISO(Fem,lerp(ISOVALUE,0.285,Fem.IterationMMA/80),0.5);
     
     if Fem.VolumetricPressure
     id = FindElements(Fem,'FloodFill',Fem,Fem.Density);    
     Pc = Fem.Center;
-    set(fig{4},'XData',Pc(id,1),'YData',Pc(id,2)); 
-    set(fig{5},'XData',Pc(id,1),'YData',Pc(id,2)); 
+    %set(fig{4},'XData',Pc(id,1),'YData',Pc(id,2)); 
+    %set(fig{5},'XData',Pc(id,1),'YData',Pc(id,2)); 
     end
     %gif;
     drawnow;
@@ -592,14 +599,18 @@ if ~isempty(Fem.ReflectionPlane)
 Rp = Fem.ReflectionPlane;
 if Rp(1) == -1
     Xf = flip(X) - (max(max(max(X))) - min(min(min(X))));
-    X = horzcat(Xf,X);
+    X = horzcat(X,Xf);
+end
+if Rp(2) == -1
+    Yf = flip(Y) - (max(max(max(Y))) - min(min(min(Y))));
+    Y = horzcat(Y,Yf);
 end
 end
 
 cla;
 image(Rpt(1)*[min(min(min(X))) max(max(max(X)))],...
       Rpt(2)*[min(min(min(Y))) max(max(max(Y)))],...
-    flipud(GaussianFilter((SDF >= varargin{1})*255,2)));
+    (GaussianFilter((SDF >= varargin{1})*255,2)));
 
 axis equal; axis off; colormap(bluesea(-1)); caxis([0 1]);
 background('w');
@@ -726,7 +737,8 @@ end
 
 if Fem.VolumetricPressure
    [E,~,~,~] = MaterialField(Fem);
-   E = Fem.Mesh.get('NodeToFace')*E;
+   %E = Fem.Mesh.get('NodeToFace')*E;
+   E = Fem.Mesh.get('NodeToFace')*ones(Fem.NElem,1)*1;
    Ev = kron(E,[1;1]);
 end
 

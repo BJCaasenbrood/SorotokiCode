@@ -109,7 +109,7 @@ while Mesh.Iteration < Mesh.MaxIteration
      Mesh.Center = Pc;
      Mesh.Node = v;
      Mesh.Element = f(1:Mesh.NElem);
-     show(Mesh,'Velocity');
+     show(Mesh,'SDF');
   end
 end
 
@@ -165,6 +165,7 @@ else, Request = varargin{1}; end
 Mesh = ElementAdjecency(Mesh);
 
 switch(Request)
+    case('SDF'),      Z = Mesh.SDF(Mesh.Node); Z = Z(:,end);
     case('Velocity'), Z = (Mesh.Velocity')';  caxis([0 0.01]);
     case('Gradient'), Z = GradientField(Mesh,Mesh.Node);
     case('Node'), Z = varargin{2};
@@ -191,6 +192,7 @@ end
 
 axis(Mesh.BdBox);
 axis tight;
+colormap(turbo);
 drawnow;
 end
 
