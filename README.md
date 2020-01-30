@@ -12,10 +12,15 @@ Download the latest stable version ([.zip](https://github.com/BJCaasenbrood/Soro
 sorotoki
 ```
 
-## Getting started
-The main class of **ToPy** is 'Topology'. It defines the main constraints, grid and parameters of optimization -- but you don't really have to bother
-yourself with this if you just want to get some results.
-
+# Getting started with SOROTOKI
+The main class of **ToPy** is 'Topology'. It defines the main constraints, grid and parameters of optimization -- but you don't really have to bother yourself with this if you just want to get some results.
+```matlab
+% list of classes
+msh = Mesh();	 % meshing class
+fem = Fem();   	 % finite elements class
+obj = Gmodel();  % graphics model class
+mdl = Model();   % dynamical model class
+```
 
 # Citation
 If you use SOROTOKI in your research, please consider to cite:
