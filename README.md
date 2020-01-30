@@ -1,9 +1,15 @@
-#
 <div align="center">
 	<img src="./bin/src/softrobot.png" width="600">
 </div>
 
-A soft robotics toolkit for MATLAB 
+Sorotoki is an open-source toolkit for Soft Robotics. 
+
+# Installation
+Download the latest stable release (.zip/.tar), unpack the compressed folder at the desired directory, and execute the following line in the Matlab command window:
+
+```
+sorotoki
+```
 
 # Citation
 If you use SOROTOKI in your research, please consider to cite:
