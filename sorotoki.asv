@@ -76,6 +76,7 @@ filename = [verFolder,'/vernum.m'];
 websave(filename,url);
 
 fprintf(['* Succesfully downloaded contents', filename, '\n']);
+%fprintf(['* Creating installation log file', filename, '\n']);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 libs(1) = IncludeBase(Path,0);
@@ -85,27 +86,28 @@ libs(4) = IncludeFiniteElement(Path,0);
 libs(5) = IncludeDynamicModel(Path,0);
 
 if min(libs) == 1
-fprintf('\n* Libary check completed - all libaries are up-to-date - \n');
+fprintf('\n* Libary check completed - all libaries are up-to-date \n');
 else
 cprintf('err','\n* Libary check completed - some libaries are outdated!\n');
 fprintf('* Get the latest version at: ');
 
 fprintf(['<a href="https://github.com/BJCaasenbrood/SorotokiCode">',...
-    'https://github.com/BJCaasenbrood/SorotokiCode</a> \n'])
+    'https://github.com/BJCaasenbrood/Sorotoki</a> \n'])
 
 Request = input('* Do you want to continue the installation? (y/n) ','s');
 
 switch(Request)
-    case('y'); cout('green','* Proceeding toolkit installation... \n'); pause(.1);
+    case('y'); cout('green','* Proceeding toolkit installation... \n'); pause(1);
     case('n'); cout('error','* Installation aborted... \n');
     otherwise; error('Key not recognized...');
 end
 
 end
-Request = input(['* Do you want to create a startup file? (y/n)'],'s');
+cout('\n')
+Request = input('* Do you want to create a startup file ? (y/n) ','s');
 bool = 1;
 switch(Request)
-    case('y'); fprintf('* Proceeding generation startup.m file... \n'); pause(.1);
+    case('y'); fprintf('* Proceeding generation startup.m file... \n'); pause(1);
     case('n'); bool = 0;
     otherwise; bool = 0;
 end
@@ -137,8 +139,8 @@ pause(.01);
 cout(['The documentation can be found in doc/SorotokiManual.pdf',...
     '. For more in-\nformation on the Soft Robotics Toolkit, visit',...
     ' the GitHub repository at: \n\n']) 
-fprintf(['<a href="https://github.com/BJCaasenbrood/SorotokiCode">',...
-    'https://github.com/BJCaasenbrood/SorotokiCode</a> \n'])
+cout('Text',['\t <a href="https://github.com/BJCaasenbrood/Sorotoki">',...
+    'https://github.com/BJCaasenbrood/SorotokiCode</a>\n']);
 cout('Text', '\n');
 cout('Text', '* To get started with demonstrations, type ');
 cout('String', 'sorotoki ');
@@ -157,6 +159,7 @@ end
 % -------------------------------------------------------------- ESSENTIALS
 function x = IncludeBase(Path,Request)
 global FID
+
 cout(['* Adding SOROTOKI libraries to path, ',...
     'this might take a minute...\n']);
 
