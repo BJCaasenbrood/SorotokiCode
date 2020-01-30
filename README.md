@@ -10,6 +10,10 @@ Download the latest stable release (.zip/.tar), unpack the compressed folder at 
 ```bash
 >> sorotoki
 ```
+or
+```bash
+>> sorotoki('install')
+```
 
 # Citation
 If you use SOROTOKI in your research, please consider to cite:
