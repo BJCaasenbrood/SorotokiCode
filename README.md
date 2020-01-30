@@ -31,13 +31,5 @@ If you use SOROTOKI in your research, please consider to cite:
 ```
 
 # References
-```
-@article{Caasenbrood2020,
-	author = {Caasenbrood, Brandon and Pogromsky, Alexander and Nijmeijer, Henk},	
-	title = {A Computational Design Framework for Pressure-driven Soft Robots through Nonlinear Topology Optimization},
-	journal = {RoboSoft 2019 - 2019 IEEE International Conference on Soft Robotics},
-	pages = {512 - 518},
-	year = {2020}
-}
-```
+[1] Caasenbrood B., Pogromsky A., and Nijmeijer, H. 'A Computational Design Framework for Pressure-driven Soft Robots through Nonlinear Topology Optimization', RoboSoft 2019 - 2019 IEEE International Conference on Soft Robotics, 2020.
 
