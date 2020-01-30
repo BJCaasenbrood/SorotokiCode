@@ -1,8 +1,8 @@
-# SorotokiCode
+#
 <div align="center">
 	<img src="./bin/src/softrobot.png" width="600">
 </div>
-
+#
 A soft robotics toolkit for MATLAB 
 
 # Citation
