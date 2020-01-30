@@ -5,12 +5,16 @@
 Sorotoki is an open-source toolkit for Soft Robotics. 
 
 # Installation
-Download the latest stable release (.zip/.tar), unpack the compressed folder at the desired directory, and enter the following line below in the Matlab command window, and that's it.
-
+Download the latest stable version ([.zip](https://github.com/williamhunter/topy/wiki/Help))/[.tar](https://github.com/williamhunter/topy/wiki/Help)) ), unpack the compressed folder at your work directory, and execute the following line below in the command window, and that's it.
 ```matlab
 % installation command
 sorotoki
 ```
+
+## Getting started
+The main class of **ToPy** is 'Topology'. It defines the main constraints, grid and parameters of optimization -- but you don't really have to bother
+yourself with this if you just want to get some results.
+
 
 # Citation
 If you use SOROTOKI in your research, please consider to cite:
