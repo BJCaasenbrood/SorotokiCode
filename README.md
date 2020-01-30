@@ -7,8 +7,8 @@ Sorotoki is an open-source toolkit for Soft Robotics.
 # Installation
 Download the latest stable release (.zip/.tar), unpack the compressed folder at the desired directory, and execute the following line in the Matlab command window:
 
-```
-sorotoki
+```ruby
+>> sorotoki
 ```
 
 # Citation
