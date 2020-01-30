@@ -22,9 +22,6 @@ obj = Gmodel();  % graphics model class
 mdl = Model();   % dynamical model class
 ```
 
-# References
-[1] B. Caasenbrood, A. Pogromsky, and H. Nijmeijer. *A Computational Design Framework for Pressure-driven Soft Robots through Nonlinear Topology Optimization*, RoboSoft 2019 - 2019 IEEE International Conference on Soft Robotics, 2020.
-
 # Citation
 If you are using Sorotoki in your academic work, please consider to cite the toolkit:
 ```
@@ -37,4 +34,8 @@ If you are using Sorotoki in your academic work, please consider to cite the too
   howpublished = {\url{https://github.com/BJCaasenbrood/SorotokiCode}},
   }
 ```
+
+# References
+[1] B. Caasenbrood, A. Pogromsky, and H. Nijmeijer. *A Computational Design Framework for Pressure-driven Soft Robots through Nonlinear Topology Optimization*, RoboSoft 2019 - 2019 IEEE International Conference on Soft Robotics, 2020.
+
 
