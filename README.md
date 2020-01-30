@@ -1,5 +1,5 @@
 <div align="center">
-	<img src="./bin/src/softrobot.png" width="700">
+	<img src="./bin/src/softrobot.png" width="600">
 </div>
 
 
