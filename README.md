@@ -46,4 +46,6 @@ If you are using Sorotoki in your academic work, please consider to cite the too
 
 [2] N. Kim, *Introduction Analysis Finite Element to Nonlinear*. 2018.
 
+[3] M. Bendsoe and O. Sigmund, *Topology Optimization. Theory, Methods and Applications*. 2003.
+
 
