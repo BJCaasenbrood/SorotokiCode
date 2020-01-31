@@ -1,6 +1,4 @@
-<p style='color:white'>
 <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script> 
-</p>
 <div align="center"> <img src="./bin/src/softrobot.png" width="650"> </div>
 
 Sorotoki is an open-source toolkit for developing, modeling and controlling soft robots. 
