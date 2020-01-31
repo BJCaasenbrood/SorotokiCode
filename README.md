@@ -23,10 +23,11 @@ mdl = Model();   % dynamical model class
 # Finite Elements for Hyper-elastic Materials
 
 $$\begin{aligned} 
-\Psi = c_1 (J_1 - 3) & (\text{Neo-Hookean})  \\
-\Psi = c_1 (J_1 - 3) + c_2 (J_2 - 3) & (\text{Mooney-Rivlin}) \\
-\Psi = \sum^3_{i=1} c_i (J_1 - 3)^i & (\text{Yeoh}) 
-\end{aligned}$$ 
+\Psi & = c_1 (J_1 - 3) & (\text{Neo-Hookean})  \\
+\Psi & = c_1 (J_1 - 3) + c_2 (J_2 - 3) & (\text{Mooney-Rivlin}) \\
+\Psi & = \sum^3_{i=1} c_i (J_1 - 3)^i & (\text{Yeoh}) 
+\end{aligned}
+$$ 
 
 # Citation
 If you are using Sorotoki in your academic work, please consider to cite the toolkit:
