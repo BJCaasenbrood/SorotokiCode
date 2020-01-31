@@ -22,15 +22,16 @@ mdl = Model();   % dynamical model class
 
 # Finite Elements for Hyper-elastic Materials
 
-### Hyper-elastic material models:
+### Libary of hyper-elastic material models:
 ```matlab
-fem.Material = LinearMaterial('E',-,'Nu',-);
-fem.Material = YeohMaterial('C1',-,'C2',-,'C3',-);   	 
-fem.Material = MooneyMaterial('C10',-,'C01',-,'K',-);   	 
-```
-
-### Material presets:
-```matlab
+% different material models
+fem.Material = LinearMaterial('E',-,'Nu',-);           % linear isotropic
+fem.Material = NeoHookeanMaterial('E',-,'Nu',-);       % neo-hookean model
+fem.Material = MooneyMaterial('C10',-,'C01',-,'K',-);  % mooney-rivlin model
+fem.Material = YeohMaterial('C1',-,'C2',-,'C3',-,...   % yeoh model
+                            'D1',-,'D2',-,'D3',-); 
+                            
+% different preset materials
 fem.Material = Ecoflex0030();
 fem.Material = Dragonskin20A();   	 
 fem.Material = Elastosil();   	 
