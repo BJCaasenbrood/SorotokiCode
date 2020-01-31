@@ -43,6 +43,7 @@ If you are using Sorotoki in your academic work, please consider to cite the too
 
 # References
 [1] B. Caasenbrood, A. Pogromsky, and H. Nijmeijer, *A Computational Design Framework for Pressure-driven Soft Robots through Nonlinear Topology Optimization*, RoboSoft 2019 - 2019 IEEE International Conference on Soft Robotics, 2020.
+
 [2] N. Kim, *Introduction Analysis Finite Element to Nonlinear*. 2018.
 
 
