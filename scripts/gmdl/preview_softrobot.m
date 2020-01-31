@@ -4,7 +4,7 @@ clc; clear; close all;
 obj = Gmodel('SoftRoboticArm.stl');
 
 %% set texture
-obj.Texture = green;
+obj.Texture = base;
 obj = obj.bake();
 
 %% show

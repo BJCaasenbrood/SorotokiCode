@@ -74,14 +74,14 @@ end
 %---------------------------------------------------------------------- set
 function Model = solve(Model)
     
-T = linspace(0,1,1e2);
+T = linspace(0,Model.tspan,1e2);
 q0 = zeros(Model.NModal*Model.NDof,1);
 
 %options = odeset('Events', @myEvent);
-[tsim,ysim] = ode23t(@(t,x) KinematicODE(Model,t,x),T,q0);
+[ts,ys] = ode23t(@(t,x) KinematicODE(Model,t,x),T,q0);
 
-Model.g = ysim;
-Model.t = tsim;
+Model.g = ys;
+Model.t = ts;
 
 end
 
@@ -95,10 +95,10 @@ dq0 = zeros(Model.NModal*Model.NDof,1);
 
 %options = odeset('Events', @myEvent);
 opt = odeset('RelTol',1e-3,'AbsTol',1e-3);
-[tsim,ysim] = ode45(@(t,x) DynamicODE(Model,t,x),T,[q0 dq0],opt);
+[ts,ys] = ode45(@(t,x) DynamicODE(Model,t,x),T,[q0 dq0],opt);
 
-Model.g = ysim;
-Model.t = tsim;
+Model.g = ys;
+Model.t = ts;
 
 end
 
@@ -114,8 +114,8 @@ msh = Gmodel('SoftActuatorRedux.stl');
 mshgr = Gmodel('SoftGripperRedux.stl');
 
 %% set texture
-msh.Texture = dynamic;
-mshgr.Texture = dynamic;
+msh.Texture = grey;
+mshgr.Texture = grey;
 
 msh = msh.bake();
 mshgr = mshgr.bake();
@@ -150,13 +150,15 @@ for ii = 1:FPS:length(Model.t)
 
     SweepSE3 = yf(:,1:7);
     
+    msh = Blender(msh,'Rotate',{'z',30});
+    mshgr = Blender(mshgr,'Rotate',{'z',30});
     msh.Node = Blender(msh,'Sweep', {LinkID,SweepSE3});
-    msh = Blender(msh,'Rotate',{'x',180});
+    msh = Blender(msh,'Rotate',{'x',-180});
     mshgr.Node = Blender(mshgr,'SE3',yf(end,1:7));
-    mshgr = Blender(mshgr,'Rotate',{'x',180});
+    mshgr = Blender(mshgr,'Rotate',{'x',-180});
     
-    mshgr.updateNode(mshgr.Node);
-    msh.updateNode(msh.Node);
+    mshgr.updateNode();
+    msh.updateNode();
     msh.update();
     mshgr.update();
     %axis equal;
@@ -312,12 +314,17 @@ X2 = ndelta(t-1+win,win); X2_ = ndelta(t-1-win,win);
 
 f = 1.5;
 
+% m1x = Model.P1(1)*(X1 - X0_);%*(smoothstep(f*Model.t) - smoothstep(f*Model.t-3));
+% m2x = Model.P2(1)*(X2 - X1_);%*smoothstep(f*Model.t);
+% m1y = Model.P1(2)*(X1 - X0_)*(smoothstep(f*Model.t) - ...
+%     3*smoothstep(f*(Model.t-4.5)) + 2*smoothstep(f*(Model.t-7.5)));
+% m2y = Model.P2(2)*(X2 - X1_)*(smoothstep(f*Model.t) - ...
+%     2*smoothstep(f*(Model.t-4.2)) + smoothstep(f*(Model.t-7.2)));
+
 m1x = Model.P1(1)*(X1 - X0_);%*(smoothstep(f*Model.t) - smoothstep(f*Model.t-3));
 m2x = Model.P2(1)*(X2 - X1_);%*smoothstep(f*Model.t);
-m1y = Model.P1(2)*(X1 - X0_)*(smoothstep(f*Model.t) - ...
-    3*smoothstep(f*(Model.t-4.5)) + 2*smoothstep(f*(Model.t-7.5)));
-m2y = Model.P2(2)*(X2 - X1_)*(smoothstep(f*Model.t) - ...
-    2*smoothstep(f*(Model.t-4.2)) + smoothstep(f*(Model.t-7.2)));
+m1y = Model.P1(2)*(X1 - X0_);
+m2y = Model.P2(2)*(X2 - X1_);
 
 D1 = [0;0;Model.Radius];
 D2 = [0;-Model.Radius;0];

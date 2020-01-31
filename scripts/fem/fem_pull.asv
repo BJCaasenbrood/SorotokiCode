@@ -15,7 +15,7 @@ msh = msh.generateMesh;
 %% show generated mesh
 fem = Fem(msh);
 fem = fem.set('TimeStep',1/50,...
-              'ResidualNorm',1e-3,...
+              'ResidualNorm',1e-6,...
               'Nonlinear',true,...
               'PrescribedDisplacement',true);
 
@@ -24,8 +24,8 @@ fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,0]);
 fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[0,1]);
 fem = fem.AddConstraint('Load',fem.FindNodes('Right'),[5,0]);
 
-fem.Material = Ecoflex0030;
-%fem.Material = MooneyMaterial('C10',2,'K',100);
+%fem.Material = Ecoflex0030;
+fem.Material = MooneyMaterial('C10',2,'K',1e7);
 
 %% solving
 fem.solve();

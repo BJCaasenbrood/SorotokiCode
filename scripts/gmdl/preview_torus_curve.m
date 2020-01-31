@@ -7,7 +7,7 @@ Dist = @(X) dCube(X,-W/2,W/2,-W/2,W/2,0,H);
 obj = Gmodel(Dist,[-W/2,W/2,-W/2,W/2,.1,H-.1]);
 
 %% set texture
-obj.Texture = metal;
+obj.Texture = base;
 obj.render(); 
 
 %% blend shapes
@@ -18,7 +18,7 @@ v1 = .5;
 a0 = 0;
 a1 = 0;
 
-for ii = 0:Frame
+for ii = 0:1
 obj = obj.resetNode();
 deg = polyq5((ii/Frame),0,1,v0,v1,a0,a1);
 obj = Blender(obj,'Rotate',{'z',360*deg});
@@ -31,7 +31,6 @@ obj.update();
 if ii == 1, gif('bla.gif','frame',gcf,'DelayTime',1/24); 
 elseif ii > 1, gif; end
 fprintf('frame number: %1.0f \n',ii);
-pause
 end
 
 

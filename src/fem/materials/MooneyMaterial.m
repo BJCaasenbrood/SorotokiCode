@@ -92,6 +92,10 @@ D = MooneyMaterial.C10*J1EE + MooneyMaterial.C01*J2EE ...
 + MooneyMaterial.K*(J3E*J3E') + MooneyMaterial.K*J3M1*J3EE;
 end
 
+%---------------------------------------------------------------------- set
+function E = Emod(MooneyMaterial),  E = MooneyMaterial.C10; end
+
+
 end
 end
 

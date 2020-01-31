@@ -48,6 +48,7 @@ classdef Fem < handle
         IterationMMA = 1;
         Iteration = 1;
         Increment = 1;
+        Divergence = 0;
         ShapeFnc;
         U = 0;
         Utmp = 0;
@@ -180,11 +181,10 @@ switch(Request)
     otherwise; flag = 1; Z = 0;
 end
 
-cla; axis equal; 
-
 if length(Z) == Fem.NNode, Z = Smoothing(Fem,Z,1); end
 
 if flag == 0
+cla; axis equal;     
 axis off; hold on; h{3} = [];
 if length(Z) ~= Fem.NNode, T=Fem.Mesh.get('NodeToFace'); Z=T*Z; end
 
@@ -208,11 +208,53 @@ end
 end
 
 if flag == 1
-clf;
 switch(Request)
-case('Residual'), semilogy(Fem.SolverResidual);
-case('Stress'), semilogy(Fem.SolverVonMises);
+case('Residual'), clf; semilogy(Fem.SolverResidual);
+case('Stress'), clf; semilogy(Fem.SolverVonMises);
+otherwise, flag = 2;
 end
+end
+
+if flag == 2
+    switch(Request)
+    case('BC')
+    if ~isempty(Fem.Support), Supp = Fem.Support; else, Supp = []; end
+    if ~isempty(Fem.Load), Forc = Fem.Load; else, Forc = []; end
+    if ~isempty(Fem.Spring), Sprg = Fem.Spring(:,1); else, Sprg = []; end
+    if ~isempty(Fem.Output), Out = Fem.Output; else, Out = []; end
+    
+    hold on;
+    %font = 'Myriad Pro';
+    for ii = 1:length(Supp)
+        id = Supp(ii,1);
+        if (Supp(ii,2) && Supp(ii,3)), symbol = '\Delta';
+        else, symbol = '\Delta'; end
+        text(V(id,1)-.1,V(id,2),symbol,'fontsize',10,'Color','r');
+    end
+    
+    for ii = 1:length(Forc)
+        id = Forc(ii,1);
+        if ispos(Forc(ii,2)), symbol = '\bf \rightarrow'; end
+        if isneg(Forc(ii,2)), symbol = '\bf \leftarrow'; end
+        if ispos(Forc(ii,3)), symbol = '\bf \uparrow'; end
+        if isneg(Forc(ii,3)), symbol = '\bf \downarrow'; end
+        text(V(id,1)-.1,V(id,2),symbol,'fontsize',10,'Color','b');
+    end
+    
+    for ii = 1:length(Out)
+        id = Out(ii);
+        if ispos(Out(ii,2)), symbol = '\bf \rightarrow'; end
+        if isneg(Out(ii,2)), symbol = '\bf \leftarrow'; end
+        if ispos(Out(ii,3)), symbol = '\bf \uparrow'; end
+        if isneg(Out(ii,3)), symbol = '\bf \downarrow'; end
+        text(V(id,1)-.1,V(id,2)-.1,symbol,'fontsize',10,'Color','g');
+    end
+    
+    for ii = 1:length(Sprg)
+        id = Sprg(ii);
+        text(V(id,1),V(id,2),symbol,'fontname',font,'fontsize',10,'Color','g');
+    end
+    end
 end
 
 if Fem.Movie
@@ -223,39 +265,6 @@ if Fem.Movie
     else
        MovieMaker(Fem);
     end
-end
-
-end
-
-%-------------------------------------------------------------------- solve
-function showBC(Fem)
-    
-vert = Fem.Node;
-Supp = Fem.Support(:,1);
-
-if ~isempty(Fem.Load), Forc = Fem.Load(:,1); else, Forc = []; end
-if ~isempty(Fem.Spring), Sprg = Fem.Spring(:,1); else, Sprg = []; end
-if ~isempty(Fem.Output), Out = Fem.Output(:,1); else, Out = []; end
-
-hold on;
-for ii = 1:length(Supp)
-    id = Supp(ii);
-    plot(vert(id,1),vert(id,2),'+','markersize',10,'Color','r');
-end
-
-for ii = 1:length(Forc)
-    id = Forc(ii);
-    plot(vert(id,1),vert(id,2),'d','markersize',10,'Color','b');
-end
-
-for ii = 1:length(Out)
-    id = Out(ii);
-    plot(vert(id,1),vert(id,2),'d','markersize',10,'Color','b');
-end
-
-for ii = 1:length(Sprg)
-    id = Sprg(ii);
-    plot(vert(id,1),vert(id,2),'>','markersize',10,'Color','g');
 end
 
 end
@@ -288,6 +297,7 @@ while true
         
     flag = 0;
     Singular = false;
+    Fem.Divergence = 0;
     
     while flag == 0
         
@@ -309,20 +319,21 @@ while true
             B = sparse(Fem.fExternal(FreeDofs));
         end
         
-        if (Fem.Iteration == 1 && Fem.Increment == 1) 
-            Delta = zeros(2*Fem.NNode,1);
-        else
-            Delta = Fem.Utmp;
-        end
-           
+        Delta = Fem.Utmp;
+
         if rcond(full(A)) >= 1e-10, DeltaU = A\B;
         else, Singular = true; DeltaU = Fem.Utmp(FreeDofs)*0;
         end
-        
-        %if max(Fem.s(:,1))> Fem.M
             
         if Fem.Nonlinear, Delta(FreeDofs,1)=Delta(FreeDofs,1)-DeltaU(:,1);
         else, Delta(FreeDofs,1) = DeltaU(:,1); B = Fem.ResidualNorm; end
+        
+        % compute convergence norm       
+        Fem.SolverResidual = append(Fem.SolverResidual,...
+            norm(Fem.Residual(FreeDofs)));
+        
+        Fem.SolverVonMises = append(Fem.SolverVonMises,...
+            max(Fem.s(:,1)));
         
         % check convergence
         [flag,Fem] = CheckConvergence(Fem,Singular); 
@@ -714,6 +725,7 @@ Fem.Center = Fem.Mesh.get('Center');
 %Fem.Normal = ComputeNormal(Fem);
 [~,~,Fem.Normal] = ComputeCentroid(Fem);
 Fem.Residual = zeros(2*Fem.NNode,1);
+Fem.Utmp = zeros(2*Fem.NNode,1);
 end
 
 %------------------------------------ assemble global finite-element system 
@@ -737,8 +749,8 @@ end
 
 if Fem.VolumetricPressure
    [E,~,~,~] = MaterialField(Fem);
-   %E = Fem.Mesh.get('NodeToFace')*E;
-   E = Fem.Mesh.get('NodeToFace')*ones(Fem.NElem,1)*1;
+   E = Fem.Mesh.get('NodeToFace')*E;
+   E = Fem.Mesh.get('NodeToFace')*ones(Fem.NElem,1)*E;
    Ev = kron(E,[1;1]);
 end
 
@@ -837,11 +849,7 @@ if Fem.PrescribedDisplacement
         F(pDof) = Fem.Load(1:NLoad,3); id = 2;
     end
     
-    if strcmp(Fem.Material.Type,'Mooney'), EMod = Fem.Material.C10;
-    elseif strcmp(Fem.Material.Type,'Yeoh'), EMod = 6*Fem.Material.C1;
-    elseif strcmp(Fem.Material.Type,'Linear'), EMod = Fem.Material.E;
-    elseif strcmp(Fem.Material.Type,'NeoHookean'), EMod = Fem.Material.E;
-    end
+    EMod = Fem.Material.Emod();
    
     if Fem.Nonlinear
         KTtmp = full(Ktr);
@@ -1231,15 +1239,7 @@ end
 %------------------------------------------------------ isotropic reduction
 function [flag,Fem] = CheckConvergence(Fem,SingularKt)
 
-FreeDofs = GetFreeDofs(Fem);
-
-Fem.SolverResidual = append(Fem.SolverResidual,...
-    norm(Fem.Residual(FreeDofs)));
-
-Fem.SolverVonMises = append(Fem.SolverVonMises,...
-    max(Fem.s(:,1)));
-
-Criteria = (Fem.SolverResidual(end) > Fem.ResidualNorm);
+CriteriaResidual = (Fem.SolverResidual(end) > Fem.ResidualNorm);
 
 %DiffSVM = abs(Fem.SolverVonMises(end) - Fem.SolverVonMises(end-1));
 if strcmp(Fem.Material.Type,'Mooney'), EMod = Fem.Material.C10;
@@ -1249,11 +1249,13 @@ elseif strcmp(Fem.Material.Type,'NeoHookean'), EMod = Fem.Material.E;
 end
 %Criteria = (DiffSVM/(EMod) > Fem.ResidualNorm);
 
+Criteria = CriteriaResidual;
+
 if (Criteria && (Fem.Iteration <= Fem.MaxIteration) && ~SingularKt )    
     flag = 0;
 else
     if (Fem.Iteration > Fem.MaxIteration) || SingularKt
-        flag = 2;
+        flag = 2; 
         Fem.Convergence = false;
     else
         flag = 1;

@@ -105,6 +105,11 @@ D = (4*J^(-4/3)*alpha)*TOa + ((-4/3)*J^(-2/3)*beta)*(TOb1 + TOb2 - ...
 
 end
 
+%---------------------------------------------------------------------- set
+function E = Emod(YeohMaterial)
+   E = 6*YeohMaterial.C1;
+end
+
 end
 
 methods (Access = private)

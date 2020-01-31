@@ -5,17 +5,14 @@ sdf = @(x) Bellow(x,5,4,6,5,7,5,2);
 msh = Mesh(sdf);
 msh = msh.set('BdBox',[0,25,0,25],...
               'NElem',500,...
-              'MaxIteration',50,...
-              'ShowMeshing',false,...
-              'Triangulate',false);
+              'MaxIteration',50);
       
 msh = msh.generateMesh;
 
-%% generate fem model
+%% generate fem model from mesh
 fem = Fem(msh);
 fem = fem.set('TimeStep',1/8,...
               'ResidualNorm',1e-3,...
-              'Nonlinear',true,...
               'PrescribedDisplacement',true);
 
 %% add constraint
@@ -29,7 +26,6 @@ fem.Material = NeoHookeanMaterial('E',5,'Nu',0.45);
 fem.solve();
 
 function Dist = Bellow(P,r0,r1,r2,r3,r4,x,t)
-  
   C1 = dCircle(P,r2+r0,0,r1);
   C2 = dCircle(P,r2+r0,0,r2);
   R1 = dRectangle(P,r0,r2+r0,0,r2);

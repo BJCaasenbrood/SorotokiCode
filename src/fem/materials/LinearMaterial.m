@@ -48,6 +48,11 @@ D=E0/(1-Nu0^2)*[1 Nu0 Nu0 0;Nu0 1 Nu0 0; Nu0 Nu0 1 0;0 0 0 (1-Nu0)/2];
 S = zeros(3);
 end
 
+%---------------------------------------------------------------------- set
+function E = Emod(LinearMaterial)
+   E = LinearMaterial.E;
+end
+
 end
 
 methods (Access = private)

@@ -1,4 +1,4 @@
 function mcap = wolfram
-mcap = imread('img/wolfram.png');
+mcap = imread('img/wolfram.jpg');
 end
 

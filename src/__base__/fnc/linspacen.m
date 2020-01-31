@@ -1,10 +1,8 @@
 function C = linspacen(A,B,n)
 
-size_A=size(A); %Store size
+N = size(A); %Store size
 
-if ~all(size(A)==size(B))
-    error('A and B should be the same size');
-end
+if ~all(size(A)==size(B)), error('A and B should be the same size'); end
 s
 if n==1 %Same behaviour as linspace
     C=B;
@@ -12,8 +10,8 @@ else
     logicReshape=~isvector(A);
     
     %Make columns
-    A=A(:);
-    B=B(:);
+    A = A(:);
+    B = B(:);
     
     C=repmat(A,[1,n])+((B-A)./(n-1))*(0:1:n-1);
     
@@ -21,6 +19,6 @@ else
     C(:,1)=A; %Overide start
     C(:,end)=B; %Overide end
     if logicReshape
-        C=reshape(C,[size_A n]);
+        C=reshape(C,[N n]);
     end
 end

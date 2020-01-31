@@ -87,6 +87,12 @@ D = C10*J1EE + K*(J3E*J3E') + K*J3M1*J3EE;
 
 end
 
+%---------------------------------------------------------------------- set
+function E = Emod(NeoHookeanMaterial)
+   E = NeoHookeanMaterial.E;
+end
+
+
 end
 end
 

@@ -4,7 +4,7 @@ clc; clear; close all;
 obj = Gmodel('Bunny.stl');
 
 %% set texture
-obj.Texture = mateplastic;
+obj.Texture = base;
 obj.Emission = [0.65 0.65 0.65];
 
 obj.set('SSSPower',1.2,...
