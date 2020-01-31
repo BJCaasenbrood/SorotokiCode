@@ -27,6 +27,13 @@ $$\Psi = \sum^3_{i=1} c_i (J_1 - 3)^i \quad (\text{Yeoh}) $$
 
 $$\Psi = c_1 (J_1 - 3) \quad (\text{Neo-Hookean}) $$
 
+### Material presets:
+```matlab
+fem.Material = Ecoflex0030();
+fem.Material = Dragonskin20A();   	 
+fem.Material = Elastosil();   	 
+```
+
 ### Example: Beam 
 ```matlab
 %% generate mesh from sdf
