@@ -22,8 +22,11 @@ mdl = Model();   % dynamical model class
 
 # Finite Elements for Hyper-elastic Materials
 
-### Material models
+### Yeoh material model
 $$\Psi = \sum^3_{i=1} c_i (J_1 - 3)^i \quad (\text{Yeoh}) $$
+
+### Neo-Hookean material model
+$$\Psi = c_1 (J_1 - 3) \quad (\text{Neo-Hookean}) $$
  
 
 # Citation
