@@ -23,13 +23,11 @@ mdl = Model();   % dynamical model class
 # Finite Elements for Hyper-elastic Materials
 
 ### Hyper-elastic material models:
-$$\Psi =  \frac{1}{2} E : \mathbb{D} : E \quad (\text{Linear}) $$
-
 $$\Psi = \sum^3_{i=1} c_i (J_1 - 3)^i \quad (\text{Yeoh}) $$
 
 $$\Psi = c_1 (J_1 - 3) \quad (\text{Neo-Hookean}) $$
 
-### Example usage
+### Example: Beam 
 ```matlab
 %% generate mesh from sdf
 sdf = @(x) dRectangle(x,0,10,0,2);
