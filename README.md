@@ -34,7 +34,7 @@ mdl = Model();   % dynamical model class
 
 # Finite Elements for Hyper-elastic Materials
 
-$\Phi = \sum^3_{i=1} C_1 (I_1 - \mathbb{I}_3)^î$
+$$\Phi = \sum^3_{i=1} C_1 (I_1 - \mathbb{I}_3)^î$$
 
 # Citation
 If you are using Sorotoki in your academic work, please consider to cite the toolkit:
