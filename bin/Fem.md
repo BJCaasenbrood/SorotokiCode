@@ -4,7 +4,7 @@
 
 [**Homepage**](https://bjcaasenbrood.github.io/SorotokiCode/)
 
-### Libary of material classes:
+### List of material models:
 ```matlab
 % different material models
 fem.Material = LinearMaterial('E',-,'Nu',-);           % linear isotropic
