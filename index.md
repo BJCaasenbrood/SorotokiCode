@@ -22,7 +22,7 @@ mdl = Model();   % dynamical model class
 
 # Finite Elements for Hyper-elastic Materials
 
-## Material models
+### Material models
 $$\Psi = \sum^3_{i=1} c_i (J_1 - 3)^i \quad (\text{Yeoh}) $$
  
 
