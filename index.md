@@ -53,6 +53,8 @@ fem = fem.set('TimeStep',1/15,'ResidualNorm',1e-3);
 %% add boundary conditions 
 fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,1]);
 fem = fem.AddConstraint('Load',fem.FindNodes('Right'),[0,-2e-3]);
+
+%% assign material
 fem.Material = Ecoflex0030;
 
 %% solving
