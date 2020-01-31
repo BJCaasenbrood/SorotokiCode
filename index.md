@@ -20,7 +20,7 @@ obj = Gmodel();  % graphics model class
 mdl = Model();   % dynamical model class
 ```
 
-# Finite Elements for Hyper-elastic Materials
+# Nonlinear Finite Elements
 
 ### Libary of hyper-elastic material models:
 ```matlab
