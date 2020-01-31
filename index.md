@@ -24,9 +24,9 @@ mdl = Model();   % dynamical model class
 
 ### Hyper-elastic material models:
 ```matlab
-fem.Material = LinearMaterial('E',.,'Nu',.);
-fem.Material = YeohMaterial('C1',.,'C2',.,'C3');   	 
-fem.Material = MooneyMaterial('C10',.,'C01',.,'K');   	 
+fem.Material = LinearMaterial('E',...,'Nu',...);
+fem.Material = YeohMaterial('C1',...,'C2',...,'C3');   	 
+fem.Material = MooneyMaterial('C10',...,'C01',...,'K');   	 
 ```
 
 ### Material presets:
