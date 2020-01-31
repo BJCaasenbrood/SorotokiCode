@@ -4,7 +4,7 @@
 Sorotoki is an open-source toolkit for developing, modeling and controlling soft robots. 
 
 # Installation
-Download the latest stable version ([.zip](https://github.com/BJCaasenbrood/SorotokiCode/zipball/master) or [.tar](https://github.com/BJCaasenbrood/SorotokiCode/tarball/master)) and unpack the compressed folder at your desired work directory. To install, simply execute the command below, and that's it, the toolkit is ready to use.
+Download the latest stable version ([zip](https://github.com/BJCaasenbrood/SorotokiCode/zipball/master) or [tar](https://github.com/BJCaasenbrood/SorotokiCode/tarball/master)) and unpack the compressed folder at any desired work directory. To install the toolkit, simply run the command below. That's it, the soft robotics toolkit is now ready-to-use.
 ```matlab
 % installation command
 sorotoki
@@ -23,14 +23,11 @@ mdl = Model();   % dynamical model class
 # Finite Elements for Hyper-elastic Materials
 
 ### Yeoh material model
-```
 $$\Psi = \sum^3_{i=1} c_i (J_1 - 3)^i \quad (\text{Yeoh}) $$
-```
 
 ### Neo-Hookean material model
-```
 $$\Psi = c_1 (J_1 - 3) \quad (\text{Neo-Hookean}) $$
-```
+
  
 
 # Citation
