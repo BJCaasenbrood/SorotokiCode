@@ -22,7 +22,7 @@ mdl = Model();   % dynamical model class
 
 # Nonlinear Finite Elements
 
-### Libary of hyper-elastic material models:
+### Libary of material classes:
 ```matlab
 % different material models
 fem.Material = LinearMaterial('E',-,'Nu',-);           % linear isotropic
