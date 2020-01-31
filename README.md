@@ -1,11 +1,7 @@
 <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script> 
+<div align="center"> <img src="./bin/src/softrobot.png" width="650"> </div>
 
-<div align="center">
-	<img src="./bin/src/softrobot.png" width="650">
-</div>
-
-
-Sorotoki is an open-source toolkit for Soft Robotics. 
+Sorotoki is an open-source toolkit for developing, modeling and controlling soft robots. 
 
 # Installation
 Download the latest stable version ([.zip](https://github.com/BJCaasenbrood/SorotokiCode/zipball/master) or [.tar](https://github.com/BJCaasenbrood/SorotokiCode/tarball/master)) and unpack the compressed folder at your desired work directory. To install, simply execute the command below, and that's it, the toolkit is ready to use.
@@ -26,7 +22,9 @@ mdl = Model();   % dynamical model class
 
 # Finite Elements for Hyper-elastic Materials
 
-$$\Varphi = \sum^3_{i=1} c_i (J_1 - 3)^i \quad (\text{Yeoh})$$ 
+$$\Psi = c_1 (J_1 - 3) \quad \quad (\text{Neo-Hookean})$$ 
+$$\Psi = c_1 (J_1 - 3) + c_2 (J_2 - 3)  \quad (\text{Mooney-Rivlin})$$ 
+$$\Psi = \sum^3_{i=1} c_i (J_1 - 3)^i \quad (\text{Yeoh})$$ 
 
 
 
