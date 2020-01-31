@@ -23,9 +23,11 @@ mdl = Model();   % dynamical model class
 # Finite Elements for Hyper-elastic Materials
 
 ### Hyper-elastic material models:
-$$\Psi = \sum^3_{i=1} c_i (J_1 - 3)^i \quad (\text{Yeoh}) $$
-
-$$\Psi = c_1 (J_1 - 3) \quad (\text{Neo-Hookean}) $$
+```matlab
+fem.Material = LinearMaterial('E',.,'Nu',.);
+fem.Material = YeohMaterial('C1',.,'C2',.,'C3');   	 
+fem.Material = MooneyMaterial('C10',.,'C01',.,'K');   	 
+```
 
 ### Material presets:
 ```matlab
