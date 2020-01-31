@@ -21,6 +21,7 @@ mdl = Model();   % dynamical model class
 ```
 
 # Nonlinear Finite Elements
+[**Nonlinear Finite Elements**](./bin/Fem.md).
 
 ### Libary of material classes:
 ```matlab
