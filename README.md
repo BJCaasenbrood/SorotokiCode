@@ -5,8 +5,8 @@
         inlineMath: [['$','$']]
       }
     });
-  </script>
-  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script> 
+</script>
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script> 
 
 <div align="center">
 	<img src="./bin/src/softrobot.png" width="650">
@@ -31,6 +31,10 @@ fem = Fem();   	 % finite elements class
 obj = Gmodel();  % graphics model class
 mdl = Model();   % dynamical model class
 ```
+
+# Finite Elements for Hyper-elastic Materials
+
+$\Phi = \sum^3_{i=1} C_1 (I_1 - \mathbb{I}_3)^î$
 
 # Citation
 If you are using Sorotoki in your academic work, please consider to cite the toolkit:
