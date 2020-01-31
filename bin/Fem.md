@@ -1,3 +1,6 @@
+<div align="center"> <img src="./bin/src/softrobot.png" width="650"> </div>
+[go back](https://bjcaasenbrood.github.io/SorotokiCode/)
+
 # Nonlinear Finite Elements
 ### Libary of material classes:
 ```matlab
