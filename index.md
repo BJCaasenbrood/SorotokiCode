@@ -22,13 +22,31 @@ mdl = Model();   % dynamical model class
 
 # Finite Elements for Hyper-elastic Materials
 
-### Yeoh material model
+### Hyper-elastic material models:
 $$\Psi = \sum^3_{i=1} c_i (J_1 - 3)^i \quad (\text{Yeoh}) $$
-
-### Neo-Hookean material model
 $$\Psi = c_1 (J_1 - 3) \quad (\text{Neo-Hookean}) $$
 
- 
+### Example usage
+```matlab
+%% generate mesh from sdf
+sdf = @(x) dRectangle(x,0,10,0,2);
+
+msh = Mesh(sdf);
+msh = msh.set('BdBox',[0,10,0,2],'NElem',500);
+msh = msh.generateMesh;
+
+%% generate fem model from mesh
+fem = Fem(msh);
+fem = fem.set('TimeStep',1/15,'ResidualNorm',1e-3);
+
+%% add boundary conditions 
+fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,1]);
+fem = fem.AddConstraint('Load',fem.FindNodes('Right'),[0,-2e-3]);
+fem.Material = Ecoflex0030;
+
+%% solving
+fem.solve();
+```
 
 # Citation
 If you are using Sorotoki in your academic work, please consider to cite the toolkit:
