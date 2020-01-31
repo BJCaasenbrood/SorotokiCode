@@ -1,7 +1,8 @@
+[**Homepage**](https://bjcaasenbrood.github.io/SorotokiCode/)
+
 <div align="center"> <img src="./src/fem.png" width="650"> </div>
 
 # Nonlinear Finite Elements
-[Go back to home page](https://bjcaasenbrood.github.io/SorotokiCode/)
 
 ### Libary of material classes:
 ```matlab
