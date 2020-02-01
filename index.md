@@ -22,8 +22,11 @@ mdl = Model();   % dynamical model class
 
 ### Documentation and libary usage
 [   **Meshing**](./bin/Mesh.md).
+
 [   **Finite Elements**](./bin/Fem.md).
+
 [   **Graphics and Implicit Modeling**](./bin/Gmodel.md).
+
 [   **Dynamical Modeling**](./bin/Model.md).
 
 # Citation
