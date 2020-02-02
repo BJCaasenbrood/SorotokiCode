@@ -36,7 +36,6 @@ classdef Mesh
         ShowMeshing = false;
         CollapseTol = 0.01;
         ConvNorm = 1e-3;
-        ShowProcess = false;
     end
     
 %--------------------------------------------------------------------------
@@ -72,7 +71,6 @@ end
 function Mesh = generateMesh(Mesh)
 Mesh.Iteration = 1; 
 Mesh.Convergence = 1e7;
-flag = 0;
 
 if isempty(Mesh.Center)
     Pc = randomPointSet(Mesh); 
@@ -87,7 +85,8 @@ end
 A_ = (Mesh.BdBox(2)-Mesh.BdBox(1))*...
      (Mesh.BdBox(4)-Mesh.BdBox(3));
 
-while flag == 0
+while (Mesh.Iteration < Mesh.MaxIteration) && ...
+        (Mesh.Convergence(end) > Mesh.ConvNorm)
   
   P = Pc;
   
@@ -105,8 +104,6 @@ while flag == 0
   
   Mesh.Convergence = append(Mesh.Convergence,sqrt(sum((A.^2).*sum((Pc-P)...
       .*(Pc-P),2)))*Mesh.NElem/(A_^1.5));
-  
-  [flag,Mesh] = CheckConvergence(Mesh);
   
   Mesh.Iteration = Mesh.Iteration + 1;
   
@@ -527,22 +524,30 @@ end
 
 %------------------------------------------------------ isotropic reduction
 function [flag,Mesh] = CheckConvergence(Mesh)
-    
-Criteria = (Mesh.Convergence(end) > Mesh.ConvNorm);
 
-if (Criteria && (Mesh.Iteration <= Mesh.MaxIteration))    
+
+Criteria = CriteriaResidual && CriteriaStress && CriteriaDisplace;
+
+if (Criteria && (Fem.Iteration <= Mesh.MaxIteration))    
     flag = 0;
 else
-    if (Mesh.Iteration > Mesh.MaxIteration)
+    if (Fem.Iteration > Mesh.MaxIteration) || SingularKt || ...
+            Fem.SolverResidual(end) > (25*Fem.Material.Emod)
         flag = 2; 
-    elseif (Mesh.Iteration == 1)
+        Fem.Convergence = false;
+    elseif (Fem.Iteration == 1);
         flag = 0;        
     else
         flag = 1;
+        Fem.Convergence = true;
     end
+    if round((100*Fem.Iteration/Fem.MaxIteration)) > 75
+        Fem.MaxIteration = round(Fem.MaxIteration)*1.25;
+    end
+    
 end
 
-if Mesh.ShowProcess; ProcessMonitor(Mesh); end
+if ProcessMonitor(Mesh); end
 
 end
 
@@ -550,12 +555,14 @@ end
 function ProcessMonitor(Mesh)
 
 if Mesh.Iteration == 1
-fprintf(' Iter | Change    | Residual  | Max. Svm  | Time | dt      | p   |\n');
+fprintf(' Inc | Iter  | Residual  | Max. Svm  | Time | dt      | p   |\n');
 fprintf('--------------------------------------------------------------\n');
 end
 
-fprintf(' %1.0f\t  | %1.3e |\n',...
-    Mesh.Iteration,Mesh.Convergence(end));   
+fprintf(' %1.0f\t |\n',...
+    Fem.Iteration);   
+
+end 
 
 end
 

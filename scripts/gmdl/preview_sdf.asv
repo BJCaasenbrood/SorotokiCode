@@ -1,0 +1,21 @@
+clc; clear; close all;
+
+%% model
+Dist = @(x) SDF(x);
+BdBox = [-1,1,-1,1,-1,1];
+
+obj = Gmodel(Dist,BdBox);
+
+%% set texture
+obj.Texture = metal;
+obj.bake();
+
+%% show
+obj.render(); 
+
+function Dist = SDF(x)
+
+C1 = dCube(x,0,1,0,1,0,1);
+Dist = C1;
+
+end
