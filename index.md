@@ -1,5 +1,5 @@
 <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script> 
-<div align="center"> <img src="./bin/src/softrobot.png" width="650"> </div>
+<div align="center"> <img src="./bin/src/softrobot.png" width="650"> </div> <br/>
 
 Sorotoki is an open-source MATLAB toolkit that includes an array of modeling and designing tools for soft robotics. The toolkit aims to bring together the various scientific disciplines within the field of soft robotics, e.g., continuum mechanics, dynamical system- and control theory, and computer graphics. 
 
@@ -21,10 +21,10 @@ mdl = Model();   % dynamical model class
 ```
 
 ### Documentation and libary usage
-* [**Mesh generation**](./bin/Mesh.md).
-* [**Nonlinear Finite Elements**](./bin/Fem.md).
-* [**Graphics and Implicit Modeling**](./bin/Gmodel.md).
-* [**Dynamical Modeling**](./bin/Model.md).
+* ##[**Mesh generation**](./bin/Mesh.md). 
+* ##[**Nonlinear Finite Elements**](./bin/Fem.md).
+* ##[**Graphics and Implicit Modeling**](./bin/Gmodel.md).
+* ##[**Dynamical Modeling**](./bin/Model.md).
 
 # Citation
 If you are using Sorotoki in your academic work, please consider to cite the toolkit:
