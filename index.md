@@ -20,7 +20,11 @@ obj = Gmodel();  % graphics model class
 mdl = Model();   % dynamical model class
 ```
 
-[**Nonlinear Finite Elements**](./bin/Fem.md).
+### Documentation and libary usage
+* [**Mesh generation**](./bin/Mesh.md).
+* [**Nonlinear Finite Elements**](./bin/Fem.md).
+* [**Graphics and Implicit Modeling**](./bin/Gmodel.md).
+* [**Dynamical Modeling**](./bin/Model.md).
 
 # Citation
 If you are using Sorotoki in your academic work, please consider to cite the toolkit:

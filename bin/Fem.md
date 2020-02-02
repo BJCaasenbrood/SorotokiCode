@@ -1,9 +1,10 @@
 <div align="center"> <img src="./src/fem.png" width="650"> </div>
 
 # Nonlinear Finite Elements
-[Go back to home page](https://bjcaasenbrood.github.io/SorotokiCode/)
 
-### Libary of material classes:
+[**Homepage**](https://bjcaasenbrood.github.io/SorotokiCode/)
+
+### List of material models:
 ```matlab
 % different material models
 fem.Material = LinearMaterial('E',-,'Nu',-);           % linear isotropic
