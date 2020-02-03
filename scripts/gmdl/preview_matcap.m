@@ -37,13 +37,12 @@ obj.render;
 background(gitpage);
 zoom(1.4)
 pause;
-gif('matcap.gif','DelayTime',0.33);
+gif('matcap.gif','DelayTime',0.33,'frame',gcf);
 
 [x,y] = view;
 
 for ii = 2:length(mat)
 obj.Texture = mat{ii};
-view(1e-3*ii + x, y);
 obj.update;
 gif
 end
