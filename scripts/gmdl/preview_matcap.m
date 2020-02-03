@@ -1,6 +1,6 @@
 clr;
 %% preview
-obj = Gmodel(@(x) dSphere(x,0,0,0,1),[-1,1,-1,1,-1,1]);
+obj = Gmodel(@(x) dSphere(x,0,0,0,1),[-1,1,-1,1,-1,1],'Quality',150);
 obj.set('TextureStretch',.65);
 
 mat = {...
@@ -30,13 +30,14 @@ mat = {...
     soft, ...
     skin, ...
     studioclay, ...
-    white, ...
 };
+
 obj.Texture = mat{1};
 obj.render;
 background(gitpage);
+zoom(1.4)
 pause;
-gif('preview_matcap.gif','DelayTime',0.25);
+gif('matcap.gif','DelayTime',0.33);
 
 [x,y] = view;
 
@@ -46,5 +47,3 @@ view(1e-3*ii + x, y);
 obj.update;
 gif
 end
-
-% assignin('base','mesh',mesh);
