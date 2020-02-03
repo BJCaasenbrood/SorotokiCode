@@ -2,3 +2,9 @@
 
 # Graphics and Implicit Modeling
 [Go back to home page](https://bjcaasenbrood.github.io/SorotokiCode/)
+
+## Material libary
+Sorotoki is equipped with a wide range of material rendering options. 
+
+<div align="center"> <img src="./src/matcap.gif" width="350"> </div>
+
