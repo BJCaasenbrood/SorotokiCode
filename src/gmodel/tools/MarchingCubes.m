@@ -1,5 +1,5 @@
 function [F,V,col] = MarchingCubes(x,y,z,c,iso,colors)
-
+%#codegen
 % [F,V] = MarchingCubes(X,Y,Z,C,ISO)
 % [F,V,COL] = MarchingCubes(X,Y,Z,C,ISO,COLORS)
 %

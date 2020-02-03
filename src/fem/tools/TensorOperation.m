@@ -1,43 +1,12 @@
 function T = TensorOperation(A,B,Arg)
-% tic
-% [id, set, W] = Tensor4IdSymmetric;
-
-%T = zeros(length(id)^2,1);
-
-if strcmp(Arg,'x') % kronecker product
+%#codegen
+if Arg 
     T = TensorProduct(A,B);
-%     for kk = 1:length(set)
-%         row = set{kk}(1);
-%         col = set{kk}(2);
-%         i = id(row,1);
-%         j = id(row,2);
-%         k = id(col,1);
-%         l = id(col,2);
-%         Aij = A(i,j);
-%         Bkl = B(k,l);
-%         T(kk) = Aij*Bkl;
-%     end
-elseif strcmp(Arg,'xt') % symmetric kronecker product
+else
     T = SymmetricTensorProduct(A,B);
-%     for kk = 1:length(set)
-%         row = set{kk}(1);
-%         col = set{kk}(2);
-%         i = id(row,1);
-%         j = id(row,2);
-%         k = id(col,1);
-%         l = id(col,2);
-%         Aik = A(i,k);
-%         Ail = A(i,l);
-%         Bjk = B(j,k);
-%         Bjl = B(j,l);
-%         
-%         T(kk) = 0.5*(Aik*Bjl + Ail*Bjk);
-%     end
+
 end
-% 
-% T = reshape(T,length(id),length(id));
-% T = T.*W;
-% toc
+
 end
 
 function T = TensorProduct(A,B)

@@ -55,6 +55,7 @@ function [S, D] = PiollaStress(YeohMaterial,C,Robustness)
 S = zeros(3,3);
 %D = zeros(3,3);
 J = sqrt(det(C));
+
 YeohC = [YeohMaterial.C1,YeohMaterial.C2,YeohMaterial.C3];
 YeohD = [YeohMaterial.D1,YeohMaterial.D2,YeohMaterial.D3];
 %Fvol = J^(1/3)*eye(3);
@@ -65,7 +66,7 @@ YeohC(2) = YeohC(2)*Robustness^3;
 end
 
 I = eye(3,3);
-Cinv = C\I;
+Cinv = minv(C);
 C11=C(1,1); C22=C(2,2); C33=C(3,3);
 I1 = C11+C22+C33;
 I1iso = J^(-2/3)*I1;
@@ -85,16 +86,18 @@ for ii = 1:3
     delta = delta + (2*kk/YeohD(kk))*(J-1)^(2*kk-1);
 end
 
-% TOa = TensorOperation(YeohMaterial,I - (I1/3)*Cinv,I - (I1/3)*Cinv,'x');
-% TOb1 = TensorOperation(YeohMaterial,Cinv,I,'x');
-% TOb2 = TensorOperation(YeohMaterial,I,Cinv,'x');
-% TOb3 = TensorOperation(YeohMaterial,Cinv,Cinv,'x');
-% TOb4 = TensorOperation(YeohMaterial,Cinv,Cinv,'xt');
-TOa = TensorOperation(I - (I1/3)*Cinv,I - (I1/3)*Cinv,'x');
-TOb1 = TensorOperation(Cinv,I,'x');
-TOb2 = TensorOperation(I,Cinv,'x');
-TOb3 = TensorOperation(Cinv,Cinv,'x');
-TOb4 = TensorOperation(Cinv,Cinv,'xt');
+II3 = I - (I1/3)*Cinv;
+TOa = TensorOperation(II3,II3,true);
+TOb1 = TensorOperation(Cinv,I,true);
+TOb2 = TensorOperation(I,Cinv,true);
+TOb3 = TensorOperation(Cinv,Cinv,true);
+TOb4 = TensorOperation(Cinv,Cinv,false);
+
+% TOa = TensorOperation_mex(II3,II3,true);
+% TOb1 = TensorOperation_mex(Cinv,I,true);
+% TOb2 = TensorOperation_mex(I,Cinv,true);
+% TOb3 = TensorOperation_mex(Cinv,Cinv,true);
+% TOb4 = TensorOperation_mex(Cinv,Cinv,false);
 
 TOc = TOb3;
 TOd1 = TOb3;
@@ -113,49 +116,5 @@ end
 end
 
 methods (Access = private)
-
-% %-------------------------------------- TENSOR PERMUTATION SETS FOR 3:3/3:3
-% function T = TensorOperation(YeohMat,A,B,Arg)
-% 
-% id = YeohMat.ID; 
-% set = YeohMat.SET; 
-% W = YeohMat.WGT; 
-% 
-% T = zeros(length(id)^2,1);
-% 
-% if strcmp(Arg,'x') % kronecker product
-%     for kk = 1:length(set)
-%         row = set{kk}(1);
-%         col = set{kk}(2);
-%         i = id(row,1);
-%         j = id(row,2);
-%         k = id(col,1);
-%         l = id(col,2);
-%         Aij = A(i,j);
-%         Bkl = B(k,l);
-%         T(kk) = Aij*Bkl;
-%     end
-% elseif strcmp(Arg,'xt') % symmetric kronecker product
-%     for kk = 1:length(set)
-%         row = set{kk}(1);
-%         col = set{kk}(2);
-%         i = id(row,1);
-%         j = id(row,2);
-%         k = id(col,1);
-%         l = id(col,2);
-%         Aik = A(i,k);
-%         Ail = A(i,l);
-%         Bjk = B(j,k);
-%         Bjl = B(j,l);
-%         
-%         T(kk) = 0.5*(Aik*Bjl + Ail*Bjk);
-%     end
-% end
-% 
-% T = reshape(T,length(id),length(id));
-% T = T.*W;
-% end
-
 end
 end
-

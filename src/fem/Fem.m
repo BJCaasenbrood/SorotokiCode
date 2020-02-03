@@ -773,7 +773,7 @@ for el = 1:Fem.NElem
     eDof = reshape([2*Fem.Element{el}-1;
         2*Fem.Element{el}],NDof,1);
     
-    [Fe,Qe,~,~,Ke,Kte,Svme,SS,EE] = ...
+    [Fe,Qe,Me,Ce,Ke,Kte,Svme,SS,EE] = ...
     Locals(Fem,Fem.Element{el},eDof);
 
     Ve = ElemCellVolumeForce(Fem,Fem.Element{el},el);   
@@ -782,8 +782,8 @@ for el = 1:Fem.NElem
     Fem.e(index+1:index+NDof^2) = el;
     Fem.i(index+1:index+NDof^2) = I(:);
     Fem.j(index+1:index+NDof^2) = J(:);
-    %Fem.m(index+1:index+NDof^2) = Me(:);
-    %Fem.c(index+1:index+NDof^2) = Ce(:);
+    Fem.m(index+1:index+NDof^2) = Me(:);
+    Fem.c(index+1:index+NDof^2) = Ce(:);
     Fem.k(index+1:index+NDof^2) = Ke(:);
     Fem.t(index+1:index+NDof^2) = Kte(:);
     Fem.fi(index+1:index+NDof) = Fe(:);
@@ -963,8 +963,9 @@ for q = 1:length(W)
     dNdxi = Fem.ShapeFnc{nn}.dNdxi(:,:,q);
     N = Fem.ShapeFnc{nn}.N(:,:,q);
     J0 = Fem.Node0(eNode,:).'*dNdxi;
-    %Xe = Fem.Node(eNode,:);
+    
     dNdx = dNdxi/J0;
+    
     dJ = abs(det(J0));
        
     % get displacement field

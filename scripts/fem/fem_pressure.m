@@ -30,7 +30,7 @@ fem = fem.AddConstraint('PressureCell',fem.FindElements(...
 %       'D1',10,'D2',10,'D3',10);
 
 %fem.Material = Ecoflex0030;
-fem.Material = NeoHookeanMaterial('E',.1,'Nu',0.35);
+%fem.Material = NeoHookeanMaterial('E',.1,'Nu',0.35);
 
 %% generate void region
 f = @(x) dRectangle(x,2,18,2,8);
