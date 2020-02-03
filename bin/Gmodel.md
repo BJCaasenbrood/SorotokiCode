@@ -6,5 +6,5 @@
 ## Material libary
 Sorotoki is equipped with a wide range of material rendering options. 
 
-<div align="center"> <img src="./src/matcap.gif" width="150"> </div>
+<div align="center"> <img src="./src/matcap.gif" width="250"> </div>
 
