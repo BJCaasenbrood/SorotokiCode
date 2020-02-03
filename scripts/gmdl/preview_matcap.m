@@ -35,7 +35,7 @@ mat = {...
 obj.Texture = mat{1};
 obj.render;
 background(gitpage);
-zoom(1.4)
+zoom(1.6)
 pause;
 gif('matcap.gif','DelayTime',0.33,'frame',gcf);
 
