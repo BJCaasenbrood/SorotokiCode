@@ -12,7 +12,7 @@ sdf = @(x) PneuNet(x);
 %% generate mesh
 msh = Mesh(sdf);
 msh = msh.set('BdBox',[0,20,0,20],...
-              'NElem',500);
+              'NElem',1500);
       
 msh = msh.generateMesh;
 
