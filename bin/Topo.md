@@ -33,11 +33,9 @@ fem = fem.AddConstraint('Support',id,[1,1]);
 id = fem.FindElements('Location',[10,10],1);
 fem = fem.AddConstraint('PressureCell',id,[0.01,0]);
 
-id = [fem.FindNodes('Right'); 
-      fem.FindNodes('Line',[15,20,0,0])]; 
+id = fem.FindNodes('Right'); 
 fem = fem.AddConstraint('Output',id,[0,-1]);
 fem = fem.AddConstraint('Spring',id,[0,2]);
-
 
 %% set density
 fem = fem.initialTopology('Hole',[10,10],2);
