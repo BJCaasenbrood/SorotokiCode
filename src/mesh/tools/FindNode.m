@@ -22,7 +22,7 @@ switch(Request)
     case('TopHalf');    x = TopHalf(Node,BdBox,tol);
     case('BotHalf');    x = BotHalf(Node,BdBox,tol);
     case('Location');   x = Location(Node,varargin{2:end});
-    case('SDF');        x = SignedFunction(Node,varargin{2:end});
+    case('SDF');        x = SignedFunction(Node,varargin{2:end},tol);
     case('Line');       x = Line(Node,varargin{2:end},tol);
     case('FloodFill');  x = FloodFill(Node,varargin{2:end});
 end
@@ -31,7 +31,7 @@ end
 
 function id = SignedFunction(Node,SDF,tol)
 d = SDF(Node); d = d(:,end);
-id = find( d < tol );
+id = find( abs(d) < tol );
 end
 
 function id = SouthEast(Node,BdBox,tol)

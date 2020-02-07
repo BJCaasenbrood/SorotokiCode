@@ -230,7 +230,7 @@ function Gmodel = GenerateObject(Gmodel,varargin)
        D = reshape(D(:,end),size(X));
        
        [f,v,~] = MarchingCubes(single(X),single(Y),...
-           single(Z),single(D),-1e-6);
+           single(Z),single(D),1e-6);
        
        %f = fliplr(f);
     elseif length(msh) == 2

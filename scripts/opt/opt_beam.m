@@ -21,7 +21,7 @@ fem = fem.set('TimeStep',1/3,...
               'Penal',4,...
               'OptimizationProblem','Compliance',...
               'PrescribedDisplacement',false,...
-              'Nonlinear',false);
+              'Nonlinear',true);
 
 %% add constraint
 id = fem.FindNodes('Left'); 
@@ -29,12 +29,13 @@ fem = fem.AddConstraint('Support',id,[1,1]);
 id = fem.FindNodes('Right'); 
 fem = fem.AddConstraint('Support',id,[1,1]);
 
-id = fem.FindNodes('Location',[4,2],4); 
-fem = fem.AddConstraint('Load',id,[0,-1e-4]);
+id = fem.FindNodes('Location',[4,2],3); 
+fem = fem.AddConstraint('Load',id,[0,-2e-4]);
 
 %% material
-fem.Material = YeohMaterial('C1',17e-3,'C2',-0.2e-3,'C3',0.023e-3,...
-    'D1',1.5,'D2',2.0,'D3',1.0);
+fem.Material = Ecoflex0030;
+% fem.Material = YeohMaterial('C1',17e-3,'C2',-0.2e-3,'C3',0.023e-3,...
+%     'D1',1.5,'D2',2.0,'D3',1.0);
 
 %% set density
 fem = fem.initialTopology('Equidistance',[3,1],.4);

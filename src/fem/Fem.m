@@ -18,11 +18,13 @@ classdef Fem < handle
         Load;
         Spring;
         Output;
+        Pressure;
         PressureCell;
         Contraction;
         FixedDensity;
         ElemNDof;
         Normal;
+        Edge;
         VonMisesNodal; 
         sxxNodal; syyNodal; sxyNodal;
         exxNodal; eyyNodal; exyNodal;
@@ -36,6 +38,7 @@ classdef Fem < handle
         Stiffness;
         TangentStiffness;
         Residual = Inf;
+        
         Time = 0;
         TimeEnd = 1.0;
         TimeStep = 0.1;
@@ -48,6 +51,8 @@ classdef Fem < handle
         ResidualNorm = 1e-4;
         StressNorm = 1e-4;
         DisplaceNorm = 1e-4;
+        Objective = 1e-4;
+        Constraint = 1e-4;
         
         IterationMMA = 1;
         Iteration = 1;
@@ -158,7 +163,7 @@ end
 %--------------------------------------------------------------------- show
 function h = show(Fem,varargin)
     
-if nargin<2, Request = -1; 
+if nargin<2, Request = 'SDF'; 
 else, Request = varargin{1}; end
 
 S = 'interp'; 
@@ -167,6 +172,7 @@ flag = 0;
 colormap(Fem.CMap);
 
 switch(Request)
+    case('SDF'), Z = Fem.Mesh.SDF(Fem.Mesh.Node); Z = Z(:,end);
     case('Svm'), Z = Fem.VonMisesNodal;
     case('Sxx'), Z = Fem.sxxNodal;
     case('Syy'), Z = Fem.syyNodal;
@@ -182,7 +188,9 @@ switch(Request)
     case('Ux'), [Z,~,~] = DisplacementField(Fem,Fem.Utmp);
     case('Uy'), [~,Z,~] = DisplacementField(Fem,Fem.Utmp);
     case('E'), [~,~,Z] = MaterialField(Fem); S = 'flat'; 
-    V = Fem.Node0; colormap(bluesea(-1)); background('w');
+    V = Fem.Node0; colormap(noir(-1)); background('w');
+    case('E+'), [~,~,Z] = MaterialField(Fem); S = 'flat'; 
+    colormap(noir(-1)); background('w');
     otherwise; flag = 1; Z = 0;
 end
 
@@ -209,13 +217,12 @@ if Fem.VolumetricPressure
     h{4} = plot(Pc(id,1),Pc(id,2),'o','Color',lightblue);
     h{5} = plot(Pc(id,1),Pc(id,2),'.','Color',lightblue);
 end
-
 end
 
 if flag == 1
 switch(Request)
 case('Residual'), clf; semilogy(Fem.SolverResidual);
-case('Stress'), clf; semilogy(Fem.SolverVonMises);
+case('Stress'),   clf; semilogy(Fem.SolverVonMises);
 case('Displace'), clf; semilogy(Fem.SolverDisplace);
 otherwise, flag = 2;
 end
@@ -228,6 +235,7 @@ if flag == 2
     if ~isempty(Fem.Load), Forc = Fem.Load; else, Forc = []; end
     if ~isempty(Fem.Spring), Sprg = Fem.Spring(:,1); else, Sprg = []; end
     if ~isempty(Fem.Output), Out = Fem.Output; else, Out = []; end
+    if ~isempty(Fem.Pressure), Pres = Fem.Pressure(:,1); else, Pres = []; end
     
     hold on;
     for ii = 1:length(Supp)
@@ -243,8 +251,12 @@ if flag == 2
         if isneg(Forc(ii,2)), symbol = '\bf \leftarrow'; end
         if ispos(Forc(ii,3)), symbol = '\bf \uparrow'; end
         if isneg(Forc(ii,3)), symbol = '\bf \downarrow'; end
-        text(V(id,1)-.1,V(id,2),symbol,'fontsize',10,'Color','b');
+        vecmag = 0.05*sum(abs(Fem.BdBox))/4;
+        %text(V(id,1)-.1,V(id,2),symbol,'fontsize',10,'Color','b');
     end
+    
+    %id = Forc(:,1);
+    %quiver(V(id,1),V(id,2),vecmag*Forc(:,2),vecmag*Forc(:,3),'b');
     
     for ii = 1:length(Out)
         id = Out(ii);
@@ -259,7 +271,27 @@ if flag == 2
         id = Sprg(ii);
         text(V(id,1),V(id,2),symbol,'fontname',font,'fontsize',10,'Color','g');
     end
+    
+        
+    for ii = 1:length(Pres)
+        id = Pres(ii);
+        text(V(id,1),V(id,2)-.1,symbol,'fontsize',10,'Color','g');
     end
+    
+    end
+    
+    flag = 3;
+end
+
+if flag == 3
+    switch(Request)
+    case('ISO')
+    clf;
+    former(Fem,10);
+    ISOVALUE = 0.1;
+    showISO(Fem,lerp(ISOVALUE,.175,Fem.IterationMMA/(...
+        0.5*Fem.MaxIterationMMA)),0.5);
+    end    
 end
 
 if Fem.Movie
@@ -272,6 +304,15 @@ if Fem.Movie
     end
 end
 
+end
+
+%-------------------------------------------------------------------- reset
+function Fem = reset(Fem,Request)
+   switch(Request) 
+       case('fem'), Fem.Iteration = 1; Fem.Increment = 1; 
+           Fem.Node = Fem.Node0; Fem.Utmp = [];
+   end
+    
 end
 
 %-------------------------------------------------------------------- solve
@@ -357,7 +398,10 @@ while true
         elseif flag == 1 && Fem.Nonlinear
             Fem.Utmp = Delta;
             Fem.Node = UpdateNode(Fem,Delta);
-            [Fem.Center,~,Fem.Normal] = ComputeCentroid(Fem);
+            [Pc,~,Nv,Ev] = ComputeCentroid(Fem);
+            Fem.Center = Pc;
+            Fem.Normal = Nv;
+            Fem.Edge = Ev;
         end
         
     end 
@@ -395,10 +439,10 @@ Fem.IterationMMA = 0;
 Fem.SolverStartMMA = true;
 flag = true;
 
-%fig = Fem.show('E');
-former(Fem,10);
-ISOVALUE = 0.1;
-showISO(Fem,ISOVALUE,0.5);
+Fem.show('ISO');
+%former(Fem,10);
+%ISOVALUE = 0.1;
+%showISO(Fem,ISOVALUE,0.5);
 
 while flag
 
@@ -438,8 +482,6 @@ while flag
     Fem.Obj = f; Fem.Con = g;
     
     %set(fig{2},'FaceVertexCData',Fem.SpatialFilter*Fem.Density); 
-    former(Fem,10);
-    showISO(Fem,lerp(ISOVALUE,0.285,Fem.IterationMMA/80),0.5);
     
     if Fem.VolumetricPressure
     id = FindElements(Fem,'FloodFill',Fem,Fem.Density);    
@@ -448,6 +490,7 @@ while flag
     %set(fig{5},'XData',Pc(id,1),'YData',Pc(id,2)); 
     end
     %gif;
+    Fem.show('ISO');
     drawnow;
 end
 
@@ -617,6 +660,10 @@ end
 
 if ~isempty(Fem.ReflectionPlane)
 Rp = Fem.ReflectionPlane;
+if Rp(1) == 1
+    Xf = flip(X) + (max(max(max(X))) - min(min(min(X))));
+    X = vertcat(Xf,X);
+end
 if Rp(1) == -1
     Xf = flip(X) - (max(max(max(X))) - min(min(min(X))));
     X = horzcat(X,Xf);
@@ -625,6 +672,10 @@ if Rp(2) == -1
     Yf = flip(Y) - (max(max(max(Y))) - min(min(min(Y))));
     Y = horzcat(Y,Yf);
 end
+if Rp(2) == 1
+    Yf = flip(Y) + (max(max(max(Y))) - min(min(min(Y))));
+    Y = horzcat(Yf,Y);
+end
 end
 
 cla;
@@ -632,7 +683,10 @@ image(Rpt(1)*[min(min(min(X))) max(max(max(X)))],...
       Rpt(2)*[min(min(min(Y))) max(max(max(Y)))],...
     (GaussianFilter((SDF >= varargin{1})*255,2)));
 
-axis equal; axis off; colormap(bluesea(-1)); caxis([0 1]);
+
+axis equal; axis off; 
+colormap(noir(-1)); 
+caxis([0 1]);
 background('w');
 
 end
@@ -651,7 +705,7 @@ Z = Fem.TopologyGridZ;
 figure(101);
 cla;
 obj = Gmodel(vertices,faces);
-obj.Texture = skin;
+obj.Texture = grey;
 
 obj = obj.bake();
 obj = Blender(obj,'Rotate',{'x',90});
@@ -732,7 +786,7 @@ Fem.SpatialFilter = GenerateRadialFilter(Fem,Fem.FilterRadius);
 Fem.TimeStep0 = Fem.TimeStep;
 Fem.Center = Fem.Mesh.get('Center');
 %Fem.Normal = ComputeNormal(Fem);
-[~,~,Fem.Normal] = ComputeCentroid(Fem);
+[~,~,Fem.Normal,Fem.Edge] = ComputeCentroid(Fem);
 Fem.Residual = zeros(2*Fem.NNode,1);
 Fem.Utmp = zeros(2*Fem.NNode,1);
 end
@@ -886,6 +940,41 @@ if ~isempty(Fem.Contraction)
     F(:,1) = beta*Fb*Fem.Contraction(:);
 end
 
+if ~isempty(Fem.Pressure)
+    IdMat = sign(Fem.Mesh.get('NodeToFace'));
+    N = Fem.Normal;
+    Elem = Fem.Element;
+    PressureForce = zeros(length(Fem.Pressure),2);
+    for ii = 1:length(Fem.Pressure)
+        IdNode = Fem.Pressure(ii,1);
+        Pressmag = max(Fem.Pressure(ii,2),Fem.Pressure(ii,3));
+        el = find(IdMat(IdNode,:) > 1e-12);
+        ntmp = [0,0];
+        etmp = [];
+        kk = 1;
+        for jj = el
+            w = Elem{jj}*0; w(Elem{jj} == IdNode) = 1;
+            ntmp = w(:)'*N{jj};
+            %ntmp = w(:)'*N{jj};
+            ee = Fem.Edge{jj};
+            etmp(kk) = max(ee(Elem{jj} == IdNode));
+            kk = kk+1;
+        end
+        
+        ntmp = 0.5*(ntmp/length(el));
+        
+        PressureForce(ii,:) = ntmp*Pressmag;
+        
+%         F(2*IdNode-1,1) = F(2*IdNode-1,1) + beta*ntmp(1)*Pressmag;
+%         F(2*IdNode,1) = F(2*IdNode,1) + beta*ntmp(2)*Pressmag;
+    end
+    
+    NPLoad = size(Fem.Pressure,1);
+    F(2*Fem.Pressure(1:NPLoad,1)-1,1) = beta*PressureForce(1:NPLoad,1)/NPLoad;
+    F(2*Fem.Pressure(1:NPLoad,1),1) = beta*PressureForce(1:NPLoad,2)/NPLoad;
+
+end
+
 if Fem.VolumetricPressure
     A = Fem.Mesh.get('Area');
     CellVolume = zeros(Fem.NElem,1);
@@ -963,10 +1052,8 @@ for q = 1:length(W)
     dNdxi = Fem.ShapeFnc{nn}.dNdxi(:,:,q);
     N = Fem.ShapeFnc{nn}.N(:,:,q);
     J0 = Fem.Node0(eNode,:).'*dNdxi;
-    
     dNdx = dNdxi/J0;
-    
-    dJ = abs(det(J0));
+    dJ = (det(J0));
        
     % get displacement field
     Delta = Fem.Utmp(eDof,:);
@@ -1082,13 +1169,14 @@ end
 end
 
 %---------------------------------------------- COMPUTE CENTROID OF POLYGON
-function [Pc,A,Nv] = ComputeCentroid(Fem)
+function [Pc,A,Nv,Ev] = ComputeCentroid(Fem)
     
 f = Fem.Element;
 ver = Fem.Node;
 Pc = zeros(Fem.NElem,2); 
 A = zeros(Fem.NElem,1);
 Nv = cell(Fem.NElem,1);
+Ev = cell(Fem.NElem,1);
 
 for el = 1:Fem.NElem
 
@@ -1100,6 +1188,7 @@ for el = 1:Fem.NElem
   vyS = vy([2:nv 1]); 
 
   n = ([vx,vy] - [vxS,vyS]);
+  eG = zeros(length(vx),1);
   
   for ii = 1:length(n)
       Nullspace = transpose(null(n(ii,:)));
@@ -1107,14 +1196,17 @@ for el = 1:Fem.NElem
       else, n(ii,:) = Nullspace;
       end
       a = [vxS(ii)-vx(ii),vyS(ii)-vy(ii)]; 
-      a = a/norm(a);
+      eG(ii,1) = sqrt(a(1)^2 + a(2)^2);
+      a = a/eG(ii,1);
       b = [n(ii,1),n(ii,2)];
       d = b(1)*a(2) - b(2)*a(1);
       n(ii,:) = -sign(d)*n(ii,:);
   end
   
   nS = n([nv 1:nv-1],:); n = nS+n;
+  eS = eG([nv 1:nv-1],:);
   Nv{el} = (n./sqrt(n(:,1).^2 + n(:,2).^2));
+  Ev{el} = 0.5*(eS + eG);
   
   tmp = vx.*vyS - vy.*vxS;
   A(el) = 0.5*sum(tmp);
@@ -1411,10 +1503,10 @@ xmin = zeros(N,1);
 xmax = ones(N,1);
 %f0val = (f/norm(f));
 %df0dx = (dfdz/norm(f));
-%f0val = (f/Fem.fnorm);
-%df0dx = (dfdz/Fem.fnorm);
-f0val = f;
-df0dx = dfdz;
+f0val = (f/Fem.fnorm);
+df0dx = (dfdz/Fem.fnorm);
+% f0val = f;
+% df0dx = dfdz;
 df0dx2 = 0*df0dx;
 fval = g;
 dfdx = dgdz;
@@ -1433,10 +1525,10 @@ if iter > 2, Fem.xold2 = Fem.xold2; else, Fem.xold2 = 0; end
     Fem.xold1,Fem.xold2,f0val,df0dx,df0dx2,fval,dfdx,dfdx2,...
     Fem.low,Fem.upp,A0,A,C,D);
 
-%zNew = xmma;
-
-alpha = max(0.9-iter/180,0);
-zNew = (1-alpha)*xmma + alpha*xval;
+zNew = xmma;
+% 
+% alpha = max(0.9-iter/180,0);
+% zNew = (1-alpha)*xmma + alpha*xval;
 
 if iter >= 1, Fem.xold1 = xval; end
 if iter >= 2, Fem.xold2 = Fem.xold1; end
@@ -1629,6 +1721,8 @@ if ~isempty(Fem.ReflectionPlane)
         V = flip(vq,1); SDF = vertcat(V,vq);
     elseif RP(1) ~= 1 && RP(2) == -1
         V = flip(vq,1); SDF = vertcat(vq,V);
+    elseif RP(1) == 0 && RP(2) == 0
+        SDF = flip(vq);
     end
 else
     SDF = flip(vq);
@@ -1739,6 +1833,7 @@ switch(Request)
         if ~isempty(Fem.MovieAxis), axis(Fem.MovieAxis); end
         if ~isempty(Fem.MovieCAxis), caxis(Fem.MovieCAxis); end
         drawnow;
+        background(gitpage);
         gif(char(filename),'frame',gcf,'nodither');
     otherwise
         if ~isempty(Fem.MovieAxis), axis(Fem.MovieAxis); end

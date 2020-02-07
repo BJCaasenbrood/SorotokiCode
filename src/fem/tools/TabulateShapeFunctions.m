@@ -14,7 +14,6 @@ for nn = min(ElemNNode):max(ElemNNode)
         fem.ShapeFnc{nn}.N(:,:,q) = N;
         fem.ShapeFnc{nn}.dNdxi(:,:,q) = dNdxi;
     end
-    
 end
 
 end

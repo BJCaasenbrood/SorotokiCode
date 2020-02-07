@@ -1,3 +1,4 @@
+clr;
 %% set signed distance function
 sdf = @(x) Bellow(x,5,4,6,5,7,5,2);
 
@@ -6,21 +7,22 @@ msh = Mesh(sdf);
 msh = msh.set('BdBox',[0,25,0,25],...
               'NElem',500,...
               'MaxIteration',50);
-      
+
 msh = msh.generateMesh;
 
 %% generate fem model from mesh
 fem = Fem(msh);
-fem = fem.set('TimeStep',1/8,...
+fem = fem.set('TimeStep',1/5,...
               'ResidualNorm',1e-3,...
-              'PrescribedDisplacement',true);
+              'PrescribedDisplacement',true,...
+              'LineStyle','-');
 
 %% add constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[1,1]);
 fem = fem.AddConstraint('Support',fem.FindNodes('Top'),[1,0]);
-fem = fem.AddConstraint('Load',fem.FindNodes('Top'),[0,-10]);
+fem = fem.AddConstraint('Load',fem.FindNodes('Top'),[0,-5]);
 
-fem.Material = NeoHookeanMaterial('E',5,'Nu',0.45);
+fem.Material = Ecoflex0030;
 
 %% solving
 fem.solve();

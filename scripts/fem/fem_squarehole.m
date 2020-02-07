@@ -1,6 +1,7 @@
 clc;  clear; close all;
 %% set signed distance function
 sdf = @(x) SquareHole(x,2,.5);
+
 %% generate mesh
 msh = Mesh(sdf);
 msh = msh.set('BdBox',[0,5,0,5],...
@@ -10,8 +11,6 @@ msh = msh.set('BdBox',[0,5,0,5],...
 msh = msh.generateMesh;
 
 %% show generated mesh
-msh.show();
-
 fem = Fem(msh);
 fem = fem.set('TimeStep',1/50,...
               'ResidualNorm',1e-4,...

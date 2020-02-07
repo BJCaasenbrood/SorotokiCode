@@ -1,6 +1,6 @@
 clr;
 %% preview
-obj = Gmodel(@(x) dSphere(x,0,0,0,1),[-1,1,-1,1,-1,1],'Quality',150);
+obj = Gmodel(@(x) dCube(x,-1,1,-1,1,-1,1),[-1,1,-1,1,-1,1],'Quality',150);
 obj.set('TextureStretch',.65);
 
 mat = {...
@@ -35,7 +35,7 @@ mat = {...
 obj.Texture = mat{1};
 obj.render;
 background(gitpage);
-zoom(1.6)
+%zoom(1.6);
 pause;
 gif('matcap.gif','DelayTime',0.33,'frame',gcf);
 

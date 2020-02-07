@@ -8,7 +8,7 @@ classdef Mesh
         NNode;
         NElem;
         Center;
-        Dimension = 2;
+        Dimension;
     end
     
     properties (Access = private)
@@ -29,12 +29,12 @@ classdef Mesh
         Normal;
         Iteration = 0;
         ElemMat = -1;
-        eps = 1e-5; 
+        eps = 1e-4; 
         eta = 0.9; 
         Triangulate = false;
         MaxIteration = 100;
         ShowMeshing = false;
-        CollapseTol = 0.01;
+        CollapseTol = 0.2;
         ConvNorm = 1e-3;
         ShowProcess = false;
     end
@@ -44,6 +44,8 @@ methods
 %--------------------------------------------------------------- Mesh Class
 function obj = Mesh(SDF,varargin) 
     obj.SDF = SDF;
+    obj.NElem = 100;
+    obj.Dimension = 2;
     for ii = 1:2:length(varargin)
         obj.(varargin{ii}) = varargin{ii+1};
     end
@@ -114,8 +116,9 @@ while flag == 0
      Mesh.Center = Pc;
      Mesh.Node = v;
      Mesh.Element = f(1:Mesh.NElem);
-     show(Mesh,'SDF');
+     show(Mesh,'Velocity');
   end
+  
 end
 
 f = f(1:Mesh.NElem);
@@ -168,10 +171,11 @@ if nargin<2, Request = -1;
 else, Request = varargin{1}; end
 
 Mesh = ElementAdjecency(Mesh);
+fs = 'interp';
 
 switch(Request)
-    case('SDF'),      Z = Mesh.SDF(Mesh.Node); Z = Z(:,end);
-    case('Velocity'), Z = (Mesh.Velocity')';  caxis([0 0.01]);
+    case('SDF'), Z = Mesh.SDF(Mesh.Node); Z = Z(:,end);
+    case('Velocity'), Z = (Mesh.Velocity')'; caxis([0 0.01]); fs = 'flat';
     case('Gradient'), Z = GradientField(Mesh,Mesh.Node);
     case('Node'), Z = varargin{2};
     case('Element'), Z = varargin{2};
@@ -182,29 +186,62 @@ if ~strcmp(Request,'Node') && ~strcmp(Request,'Element')
 clf; axis equal; axis off; hold on;
     
 patch('Faces',Mesh.ElemMat,'Vertices',Mesh.Node,...
-    'FaceVertexCData',Z,'Facecolor','interp','LineStyle','-',...
-    'Linewidth',1.0,'FaceAlpha',1.0,'EdgeColor','k');
+    'FaceVertexCData',Z,'Facecolor',fs,'LineStyle','-',...
+    'Linewidth',1.5,'FaceAlpha',1.0,'EdgeColor','k');
 
 patch('Faces',Mesh.Boundary,'Vertices',Mesh.Node,...
     'LineStyle','-','Linewidth',2,'EdgeColor','k');
-elseif strcmp(Request,'Node')
+
 hold on;
+
+elseif strcmp(Request,'Node')
 plot(Mesh.Node(Z,1),Mesh.Node(Z,2),'.','Color','r');
 elseif strcmp(Request,'Element')
-hold on;
 plot(Mesh.Center(Z,1),Mesh.Center(Z,2),'.','Color','r');    
 end
 
 axis(Mesh.BdBox);
 axis tight;
-colormap(turbo);
+colormap(bluesea(-1));
 drawnow;
+
+end
+
+%----------------------------------------------------------------- show SDF
+function showSDF(Mesh,varargin)
+Bd = 1.05*Mesh.BdBox; 
+Q = 250;
+xmin = Bd(1); xmax = Bd(2); 
+ymin = Bd(3); ymax = Bd(4); 
+%dl = 0.21*(0.5*((xmax - xmin) + (ymax - ymin))); 
+
+% if xmin == 0, xmin = -Bd(2)/3; end
+% if ymin == 0, ymin = -Bd(4)/3; end
+x = linspace(xmin,xmax,Q);
+y = linspace(ymin,ymax,Q);
+[X,Y] = meshgrid(x,y);
+
+P = [X(:),Y(:)];
+D = Mesh.SDF(P);
+Dist = reshape(D(:,end),[Q, Q]);
+%Ds = reshape(mod(D(:,end),dl),[Q, Q]);
+V = (bluesea(50));
+cla;
+image(x,y,Dist+2); hold on;
+contour(X,Y,Dist*1e-6,7,'-','linewidth',1,'Color',V(7,:)); 
+contour(X,Y,Dist,[0 1e-6],'k-','linewidth',2.5); 
+colormap((bluesea(2)));
+caxis([-1,1 + 1e-6]);
+axis equal;
+axis off;
+plotbox;
+
+view(0,90);
 end
 
 %--------------------------------------------------------------- find nodes
 function NodeList = FindNodes(Mesh,Request)
-    n = Mesh.Node;
-    NodeList = FindNodes(n,Request);
+    NodeList = FindNodes(Mesh.Node,Request);
 end
 
 %--------------------------------------------------------------- find nodes
@@ -212,6 +249,7 @@ function ElementList = FindElements(Mesh,Request)
     n = Mesh.Center;
     ElementList = FindNodes(n,Request);
 end
+
 %-------------------------------------------------------------- END METHODS
 end
 
@@ -223,8 +261,9 @@ B = Mesh.BdBox;
 Ctr = 0;
 while(Ctr < Mesh.NElem)
     Y = zeros(Mesh.NElem,Mesh.Dimension);
-    Y(:,1) = (B(2)-B(1))*rand(Mesh.NElem,1)+B(1);
-    Y(:,2) = (B(4)-B(3))*rand(Mesh.NElem,1)+B(3);
+    for ii = 1:Mesh.Dimension
+    Y(:,ii) = (B(ii+1)-B(ii))*rand(Mesh.NElem,1)+B(ii);
+    end
     d = Mesh.SDF(Y);
     I = find(d(:,end)<0);               
     NumAdded = min(Mesh.NElem-Ctr,length(I));
@@ -239,17 +278,26 @@ Alpha = 1.5*sqrt(A/Mesh.NElem);
 d = Mesh.SDF(P);  
 
 % number of constituent bdry segments
-NBdrySegs = size(d,2)-1;       
+NBdrySegs = size(d,2)-1;   
+if Mesh.Dimension == 2
 n1 = (Mesh.SDF(P+repmat([Mesh.eps,0],Mesh.NElem,1))-d)/Mesh.eps;
 n2 = (Mesh.SDF(P+repmat([0,Mesh.eps],Mesh.NElem,1))-d)/Mesh.eps;
+else
+n1 = (Mesh.SDF(P+repmat([Mesh.eps,0,0],Mesh.NElem,1))-d)/Mesh.eps;
+n2 = (Mesh.SDF(P+repmat([0,Mesh.eps,0],Mesh.NElem,1))-d)/Mesh.eps;
+n3 = (Mesh.SDF(P+repmat([0,0,Mesh.eps],Mesh.NElem,1))-d)/Mesh.eps;
+end
 
 %Logical index of seeds near the boundary
 I  = abs(d(:,1:NBdrySegs))<Alpha; 
-
 P1 = repmat(P(:,1),1,NBdrySegs); 
 P2 = repmat(P(:,2),1,NBdrySegs); 
 Rp(:,1) = P1(I)-2*n1(I).*d(I);  
 Rp(:,2) = P2(I)-2*n2(I).*d(I);
+if Mesh.Dimension == 3
+P3 = repmat(P(:,3),1,NBdrySegs); 
+Rp(:,1) = P3(I)-2*n3(I).*d(I);  
+end
 
 d_R_P = Mesh.SDF(Rp);
 J    = abs(d_R_P(:,end))>=Mesh.eta*abs(d(I)) & d_R_P(:,end)>0;
@@ -315,20 +363,6 @@ for el = 1:Mesh.NElem
   A(el) = 0.5*sum(tmp);
   Pc(el,:) = 1/(6*A(el,1))*[sum((vx+vxS).*tmp),...
                             sum((vy+vyS).*tmp)];
-end
-
-end
-
-%--------------------------------------------- compute normal from centroid
-function n = computeNormalVector(Mesh,f,v,CNode)
-
-N = Mesh.NElem;
-n{N} = [];
-
-for i = 1:length(f)
-    id = f{i};
-    Nd = v(id,:) - repmat(CNode(i,:),length(id),1);
-    n{i} = -Nd;
 end
 
 end
@@ -533,12 +567,9 @@ Criteria = (Mesh.Convergence(end) > Mesh.ConvNorm);
 if (Criteria && (Mesh.Iteration <= Mesh.MaxIteration))    
     flag = 0;
 else
-    if (Mesh.Iteration > Mesh.MaxIteration)
-        flag = 2; 
-    elseif (Mesh.Iteration == 1)
-        flag = 0;        
-    else
-        flag = 1;
+    if (Mesh.Iteration > Mesh.MaxIteration), flag = 2; 
+    elseif (Mesh.Iteration == 1), flag = 0;        
+    else, flag = 1;
     end
 end
 

@@ -6,7 +6,7 @@ sdf = @(x) PneuRot(x);
 %% generate mesh
 msh = Mesh(sdf);
 msh = msh.set('BdBox',[0,5,0,5],...
-              'NElem',900,...
+              'NElem',700,...
               'MaxIteration',150,...
               'ShowMeshing',false,...
               'Triangulate',false);
@@ -59,10 +59,6 @@ fem = fem.initialTopology('Hole',[2.5,2.5],0.25);
 %% material
 fem.Material = YeohMaterial('C1',17e-3,'C2',-0.2e-3,'C3',0.023e-3,...
     'D1',1.5,'D2',2.0,'D3',1.0);
-% 
-%fem.Material = LinearMaterial('E',30,'Nu',0.49);
-
-fem.show('E');
 
 %% solving
 fem.optimize();

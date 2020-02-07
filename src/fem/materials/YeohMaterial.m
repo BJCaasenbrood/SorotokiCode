@@ -61,9 +61,10 @@ YeohD = [YeohMaterial.D1,YeohMaterial.D2,YeohMaterial.D3];
 %Fvol = J^(1/3)*eye(3);
 %Fiso = J^(-1/3)*F;
 
-if nargin > 2
-YeohC(2) = YeohC(2)*Robustness^3;
-end
+% if (nargin > 2) && Robustness
+% YeohD(1) = 100; YeohD(2) = 100; YeohD(3) = 100;
+% YeohC(2) = YeohC(2)*1.5;
+% end
 
 I = eye(3,3);
 Cinv = minv(C);

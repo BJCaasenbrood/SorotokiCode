@@ -97,6 +97,7 @@ offset = sub2ind(size(c), xyz_off(:, 1), xyz_off(:, 2), xyz_off(:, 3)) -1;
 pp = zeros(length(id), lindex, 12);
 ccedge = [cedge(id), id];
 ix_offset=0;
+
 for jj=1:12
     id__ = logical(bitget(ccedge(:, 1), jj)); % used for logical indexing
     id_ = ccedge(id__, 2);
@@ -116,9 +117,10 @@ for jj=1:12
     ix_offset = ix_offset + size(id_, 1);
 end
 
-% calculate the triangulation from the point list
+% calclate the triangulation from the point list
 F = [];
 tri = triTable(cc(id)+1, :);
+
 for jj=1:3:15
     id_ = find(tri(:, jj)>0);
     V = [id_, lindex*ones(size(id_, 1), 1),tri(id_, jj:jj+2) ];

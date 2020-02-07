@@ -37,10 +37,15 @@ function NeoHookeanMaterial = set(NeoHookeanMaterial,varargin)
 end
 
 %------------------------------ 2ND PIOLLA STRESSAND STIFFNESS FOR YEOH
-function [S, D] = PiollaStress(NeoHookeanMaterial,C)
+function [S, D] = PiollaStress(NeoHookeanMaterial,C,Robustness)
 %Se = 2nd PK stress [S11, S22, S33, S12, S23, S13];
 E0 = NeoHookeanMaterial.E;
 Nu0 = NeoHookeanMaterial.Nu;
+
+if (nargin > 2) && Robustness
+%Nu0 = Nu0*0.75;
+end
+
 lambda = (Nu0*E0)/((1+Nu0)*(1-2*Nu0));
 mu = E0/(2*(1+Nu0));
 
