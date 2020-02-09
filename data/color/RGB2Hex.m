@@ -1,4 +1,4 @@
-function hex = RGB2Hex(rgb)
+function hex = rbg2hex(rgb)
 % rgb2hex converts rgb color values to hex color format. 
 % 
 % This function assumes rgb values are in [r g b] format on the 0 to 1

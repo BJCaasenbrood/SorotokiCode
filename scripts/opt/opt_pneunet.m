@@ -5,7 +5,7 @@ sdf = @(x) PneuNet(x);
 %% generate mesh
 msh = Mesh(sdf);
 msh = msh.set('BdBox',[0,20,0,20],...
-              'NElem',900);
+              'NElem',500);
       
 msh = msh.generateMesh;
 
@@ -30,8 +30,8 @@ id = fem.FindNodes('Left');
 fem = fem.AddConstraint('Support',id,[1,1]);
 
 id = fem.FindNodes('Right'); 
-fem = fem.AddConstraint('Output',id,[-1,-1]);
-fem = fem.AddConstraint('Spring',id,[2,2]);
+fem = fem.AddConstraint('Output',id,[0,-1]);
+fem = fem.AddConstraint('Spring',id,[0,2]);
 % 
 % id = fem.FindNodes('Line',[15,20,0,0]); 
 % fem = fem.AddConstraint('Output',id,[0,-1]);

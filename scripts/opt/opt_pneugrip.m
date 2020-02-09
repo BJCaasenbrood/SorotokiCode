@@ -6,8 +6,8 @@ sdf = @(x) PneuGrip(x);
 %% generate mesh
 msh = Mesh(sdf);
 msh = msh.set('BdBox',[-5,13,0,5],...
-              'NElem',750,...
-              'MaxIteration',150,...
+              'NElem',500,...
+              'MaxIteration',500,...
               'ShowMeshing',false,...
               'Triangulate',false);
       
@@ -15,14 +15,14 @@ msh = msh.generateMesh;
 
 %% generate fem model
 fem = Fem(msh);
-fem = fem.set('TimeStep',1/30,...
+fem = fem.set('TimeStep',1/5,...
               'ResidualNorm',1e-3,...
               'VolumeInfill',0.25,...
               'VolumetricPressure',true,...
               'FilterRadius',0.75,...
               'Nonlinear',false,...
               'MaxIterationMMA',80,...
-              'Movie',true,...
+              'Movie',false,...
               'ReflectionPlane',[0 -1],...
               'OptimizationProblem','Compliant');
 
@@ -31,25 +31,26 @@ id = fem.FindNodes('Left'); fem = fem.AddConstraint('Support',id,[1,1]);
 id = fem.FindNodes('Top'); fem = fem.AddConstraint('Support',id,[0,1]);
 
 id = fem.FindNodes('Location',[13,3],1);
-fem = fem.AddConstraint('Output',id,[-.5,1]);
-fem = fem.AddConstraint('Spring',id,[0,5]);
+fem = fem.AddConstraint('Output',id,[-0.25,1]);
+fem = fem.AddConstraint('Spring',id,[1e-3,1e-3]);
 
-id = fem.FindElements('Location',[-5,5],1);
-fem = fem.AddConstraint('PressureCell',id,[1e-2,0]);
+id = fem.FindElements('Location',[-5,5],2);
+fem = fem.AddConstraint('PressureCell',id,[3e-4,0]);
 
 %% set density
-fem = fem.initialTopology('Hole',[-5,5],1);
+fem = fem.initialTopology('Hole',[-5,5],2);
 
 %% material
+%fem.Material = NeoHookeanMaterial('E',1,'Nu',0.4);%Ecoflex0030;
 fem.Material = Ecoflex0030;
 
 %% solving
 fem.optimize();
-
-fem.set('Spring',[],'Nonlinear',true,...
-    'Movie',false,'Iteration',1);
-
-fem.solve();
+% 
+% fem.set('Spring',[],'Nonlinear',true,...
+%     'Movie',false,'Iteration',1);
+% 
+% fem.solve();
 
 function Dist = PneuGrip(P)
   R1 = dRectangle(P,-5,13,0,5);

@@ -100,6 +100,7 @@ classdef Fem < handle
         FilterRadius = 0.5;
         SpatialFilter;
         OptFactor = 1;
+        OptimizationSolver = 'OC';
         MaterialInterpolation = 'SIMP';
         OptimizationProblem = 'Compliance';
         xold1; xold2; upp; low; fnorm;
@@ -221,9 +222,11 @@ end
 
 if flag == 1
 switch(Request)
-case('Residual'), clf; semilogy(Fem.SolverResidual);
-case('Stress'),   clf; semilogy(Fem.SolverVonMises);
-case('Displace'), clf; semilogy(Fem.SolverDisplace);
+case('Residual'), cla; semilogy(Fem.SolverResidual);
+case('Stress'), cla; semilogy(Fem.SolverVonMises);
+case('Displace'), cla; semilogy(Fem.SolverDisplace);
+case('Objective'), cla; plot(Fem.Objective);
+case('Constraint'), cla; plot(Fem.Constraint);
 otherwise, flag = 2;
 end
 end
@@ -395,6 +398,7 @@ while true
             Fem.Utmp = Delta;
         elseif flag == 1 && ~Fem.Nonlinear
             Fem.Utmp = Delta;
+            Fem.Node = UpdateNode(Fem,Delta);
         elseif flag == 1 && Fem.Nonlinear
             Fem.Utmp = Delta;
             Fem.Node = UpdateNode(Fem,Delta);
@@ -403,7 +407,6 @@ while true
             Fem.Normal = Nv;
             Fem.Edge = Ev;
         end
-        
     end 
     
     if ~Fem.SolverStartMMA
@@ -440,9 +443,7 @@ Fem.SolverStartMMA = true;
 flag = true;
 
 Fem.show('ISO');
-%former(Fem,10);
-%ISOVALUE = 0.1;
-%showISO(Fem,ISOVALUE,0.5);
+drawnow;
 
 while flag
 
@@ -466,35 +467,29 @@ while flag
     dfdz = Fem.SpatialFilter'*(dEdy.*dfdE + dVdy.*dfdV);
     dgdz = Fem.SpatialFilter'*(dEdy.*dgdE + dVdy.*dgdV);
     
-    % compute design variable
-    %if ~Fem.Nonlinear
-    %    [Fem,ZNew] = UpdateSchemeMMA(Fem,f,dfdz,g,dgdz);
-    %else
+    %compute design variable
+    if strcmp(Fem.OptimizationSolver,'MMA')
+       [Fem,ZNew] = UpdateSchemeMMA(Fem,f,dfdz,g,dgdz);
+    elseif strcmp(Fem.OptimizationSolver,'OC')
         [Fem,ZNew] = UpdateSchemeOC(Fem,dfdz,g,dgdz);
-    %end
+    end
     
     % determine material change
     Fem.Change = clamp(ZNew - Fem.Density,-Fem.ChangeMax,Fem.ChangeMax);
     Fem.Density =  Fem.Density + Fem.Change;
     
+    % evaluate fitness
+    Fem.Objective = append(Fem.Objective,f);       
+    Fem.Constraint = append(Fem.Constraint,g);
+    
+    % check convergence
     [flag,Fem] = CheckConvergenceOpt(Fem);
     
-    Fem.Obj = f; Fem.Con = g;
-    
-    %set(fig{2},'FaceVertexCData',Fem.SpatialFilter*Fem.Density); 
-    
-    if Fem.VolumetricPressure
-    id = FindElements(Fem,'FloodFill',Fem,Fem.Density);    
-    Pc = Fem.Center;
-    %set(fig{4},'XData',Pc(id,1),'YData',Pc(id,2)); 
-    %set(fig{5},'XData',Pc(id,1),'YData',Pc(id,2)); 
-    end
-    %gif;
+    % draw
     Fem.show('ISO');
     drawnow;
 end
 
-%gif('close'); 
 Fem.SolverStartMMA = false;
 
 end
@@ -579,7 +574,7 @@ vrt = [xxq(:),yyq(:)];
 Dist = Fem.Mesh.SDF(vrt); Dist = Dist(:,end);
 tol = 0.1*sqrt((Fem.BdBox(2)-Fem.BdBox(1))*...
     (Fem.BdBox(4)-Fem.BdBox(3))/length(vrt));
-P = P(:); P(Dist > tol) = 0; %P(isnan(P))=0;
+P = P(:); P(Dist > tol) = 0; 
 P = (reshape(P,Res,Res)); 
 V = cat(3,xxq,yyq,P);
 
@@ -1200,7 +1195,7 @@ for el = 1:Fem.NElem
       a = a/eG(ii,1);
       b = [n(ii,1),n(ii,2)];
       d = b(1)*a(2) - b(2)*a(1);
-      n(ii,:) = -sign(d)*n(ii,:);
+      n(ii,:) = sign(d)*n(ii,:);
   end
   
   nS = n([nv 1:nv-1],:); n = nS+n;
@@ -1431,8 +1426,10 @@ end
 
 %------------------------------------------------------ objective function
 function [f,dfdE,dfdV] = ObjectiveFunction(Fem)
+    
 u(:,1) = Fem.Utmp;
 fDof = GetFreeDofs(Fem);
+E = MaterialField(Fem);
 
 if strcmp(Fem.OptimizationProblem,'Compliance') &&  ~Fem.Nonlinear
 f = Fem.fExternal.'*u;
@@ -1440,30 +1437,31 @@ temp = cumsum(-u(Fem.i).*Fem.k.*u(Fem.j));
 temp = temp(cumsum(Fem.ElemNDof.^2));
 dfdE = [temp(1);temp(2:end)-temp(1:end-1)];
 elseif strcmp(Fem.OptimizationProblem,'Compliance') &&  Fem.Nonlinear
-E = MaterialField(Fem);
 K = sparse(Fem.i,Fem.j,E(Fem.e).*Fem.t);
 f = Fem.fExternal.'*u;
 lam = 0*u(:,1);
 lam(fDof) = K(fDof,fDof)\Fem.fExternal(fDof);
 temp = cumsum(-u(Fem.i).*Fem.k.*lam(Fem.j));
+%temp = cumsum(-Fem.fInternal(Fem.i).*lam(Fem.j));
 temp = temp(cumsum(Fem.ElemNDof.^2));
 dfdE = [temp(1);temp(2:end)-temp(1:end-1)];
 elseif strcmp(Fem.OptimizationProblem,'Compliant') && ~Fem.Nonlinear
 E = MaterialField(Fem);
-f = Fem.OutputVector.'*u(:,1); 
+f = -Fem.OutputVector.'*u(:,1); 
 K = sparse(Fem.i,Fem.j,E(Fem.e).*Fem.k);
 lam = 0*u(:,1);
 lam(fDof) = K(fDof,fDof)\Fem.OutputVector(fDof);
-temp = cumsum(-u(Fem.i,1).*Fem.k.*lam(Fem.j,1));
+temp = cumsum(u(Fem.i,1).*Fem.k.*lam(Fem.j,1));
 temp = temp(cumsum(Fem.ElemNDof.^2));
 dfdE = [temp(1);temp(2:end)-temp(1:end-1)];
 elseif strcmp(Fem.OptimizationProblem,'Compliant') && Fem.Nonlinear
 E = MaterialField(Fem);
-f = Fem.OutputVector.'*u(:,1); 
+f = -Fem.OutputVector.'*u(:,1); 
 K = sparse(Fem.i,Fem.j,E(Fem.e).*Fem.t);
 lam = 0*u(:,1);
 lam(fDof) = K(fDof,fDof)\Fem.OutputVector(fDof);
-temp = cumsum(-u(Fem.i).*Fem.k.*lam(Fem.j));
+temp = cumsum(u(Fem.i).*Fem.k.*lam(Fem.j));
+%temp = cumsum(-Fem.fi(Fem.i)*lam(Fem.j));
 temp = temp(cumsum(Fem.ElemNDof.^2));
 dfdE = [temp(1);temp(2:end)-temp(1:end-1)];
 end
@@ -1492,30 +1490,27 @@ end
 %---------------------------------------------- method of moving asymptotes
 function [Fem,zNew] = UpdateSchemeMMA(Fem,f,dfdz,g,dgdz)  
    
+iter = Fem.IterationMMA; 
 N = length(Fem.Density);
 M = 1;
 
-iter = Fem.IterationMMA; 
-if isempty(Fem.fnorm), Fem.fnorm = abs(norm(f)); end
+if isempty(Fem.fnorm), Fem.fnorm = abs(norm(dfdz)); end
 
 xval = Fem.Density;
 xmin = zeros(N,1);
 xmax = ones(N,1);
 %f0val = (f/norm(f));
 %df0dx = (dfdz/norm(f));
-f0val = (f/Fem.fnorm);
-df0dx = (dfdz/Fem.fnorm);
-% f0val = f;
-% df0dx = dfdz;
+%f0val = (f/Fem.fnorm);
+%df0dx = (dfdz/Fem.fnorm);
+f0val = f;
+df0dx = dfdz;
 df0dx2 = 0*df0dx;
 fval = g;
 dfdx = dgdz;
 dfdx2 = dgdz*0;
 
-A0 = 1;
-A = 0;
-C = 10000*ones(M,1);
-D = 0;
+A0 = 1; A = 0; C = 10000*ones(M,1); D = 0;
 
 if iter == 1, Fem.low = xmin; Fem.upp = xmax; end
 if iter > 1, Fem.xold1 = Fem.xold1; else, Fem.xold1 = 0; end
@@ -1525,10 +1520,9 @@ if iter > 2, Fem.xold2 = Fem.xold2; else, Fem.xold2 = 0; end
     Fem.xold1,Fem.xold2,f0val,df0dx,df0dx2,fval,dfdx,dfdx2,...
     Fem.low,Fem.upp,A0,A,C,D);
 
-zNew = xmma;
-% 
-% alpha = max(0.9-iter/180,0);
-% zNew = (1-alpha)*xmma + alpha*xval;
+alpha = max(0.9-iter/90,0);
+
+zNew = (1-alpha)*xmma + alpha*xval;
 
 if iter >= 1, Fem.xold1 = xval; end
 if iter >= 2, Fem.xold2 = Fem.xold1; end
@@ -1746,7 +1740,7 @@ end
 
 fprintf(' %1.0f\t  | %1.0f\t | %1.3e | %1.3e | %0.3f | %0.3f  | %0.2f \n',...
     Fem.IterationMMA,Fem.Increment,norm(Fem.Residual(FreeDofs)),...
-    abs(Fem.Obj),Fem.Con+1,norm(Fem.Change),Fem.Penal);
+    (Fem.Objective(end)),Fem.Constraint(end)+1,norm(Fem.Change),Fem.Penal);
 
 else
 if Fem.Iteration == 1  && Fem.Increment == 1

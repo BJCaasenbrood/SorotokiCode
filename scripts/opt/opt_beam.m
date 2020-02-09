@@ -4,7 +4,7 @@ sdf = @(x) dRectangle(x,0,8,0,2);
 %% generate mesh
 msh = Mesh(sdf);
 msh = msh.set('BdBox',[0,8,0,2],...
-              'NElem',500,...
+              'NElem',150,...
               'MaxIteration',150,...
               'ShowMeshing',false);
       
@@ -30,7 +30,7 @@ id = fem.FindNodes('Right');
 fem = fem.AddConstraint('Support',id,[1,1]);
 
 id = fem.FindNodes('Location',[4,2],3); 
-fem = fem.AddConstraint('Load',id,[0,-2e-4]);
+fem = fem.AddConstraint('Load',id,[0,-1e-4]);
 
 %% material
 fem.Material = Ecoflex0030;

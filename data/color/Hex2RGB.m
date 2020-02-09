@@ -1,4 +1,4 @@
-function rgb = Hex2RGB(hex,range)
+function rgb = hex2rgb(hex,range)
 % * * * * * * * * * * * * * * * * * * * * 
 % Chad A. Greene, April 2014
 % * * * * * * * * * * * * * * * * * * * * 
