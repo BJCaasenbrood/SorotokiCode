@@ -22,11 +22,8 @@ mat = {aniso, bluered, bump, chroma, chromium, ...
 for ii = 1:length(mat)
   pause(0.1);
   obj.Texture = mat{ii};
-  if ii == 1, 
-    [x,y] = view;
-    obj.render;
-  else, 
-    obj.update();
+  if ii == 1, obj.render;
+  else, obj.update();
   end
 end
 ```
