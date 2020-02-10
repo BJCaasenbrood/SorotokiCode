@@ -4,7 +4,7 @@ sdf = @(x) dRectangle(x,0,8,0,2);
 %% generate mesh
 msh = Mesh(sdf);
 msh = msh.set('BdBox',[0,8,0,2],...
-              'NElem',150,...
+              'NElem',250,...
               'MaxIteration',150,...
               'ShowMeshing',false);
       
@@ -19,9 +19,7 @@ fem = fem.set('TimeStep',1/3,...
               'FilterRadius',0.5,...
               'VolumeInfill',0.3,...
               'Penal',4,...
-              'OptimizationProblem','Compliance',...
-              'PrescribedDisplacement',false,...
-              'Nonlinear',true);
+              'OptimizationProblem','Compliance');
 
 %% add constraint
 id = fem.FindNodes('Left'); 
@@ -29,25 +27,14 @@ fem = fem.AddConstraint('Support',id,[1,1]);
 id = fem.FindNodes('Right'); 
 fem = fem.AddConstraint('Support',id,[1,1]);
 
-id = fem.FindNodes('Location',[4,2],3); 
+id = fem.FindNodes('Location',[4,2],4); 
 fem = fem.AddConstraint('Load',id,[0,-1e-4]);
 
 %% material
-fem.Material = Ecoflex0030;
-% fem.Material = YeohMaterial('C1',17e-3,'C2',-0.2e-3,'C3',0.023e-3,...
-%     'D1',1.5,'D2',2.0,'D3',1.0);
+fem.Material = Dragonskin10A;
 
 %% set density
 fem = fem.initialTopology('Equidistance',[3,1],.4);
 
 %% solving
 fem.optimize();
-
-%% former
-fem.former();
-fem.showTopo(0.15);
-
-% fem = fem.AddConstraint('Load',id,[0,-3e-3]);
-% fem = fem.set('TimeStep',1/15);
-% fem.solve();
-% fem.show('Sxy')

@@ -1,20 +1,19 @@
-clc; clear; close all;
-
+clr;
 %% model
 obj = Gmodel('Bunny.stl');
 
 %% set texture
-obj.Texture = base;
-obj.Emission = [0.65 0.65 0.65];
+obj.Texture = grey;
+obj.Emission = [0.75 0.75 0.75];
 
-obj.set('SSSPower',1.2,...
-        'AORadius',0.3,...
-        'AOPower',1.0,...
-        'SubSurfaceScattering',true);
+obj.set('SSSPower',1.0,...
+        'AORadius',0.2,...
+        'AOPower',5,...
+        'AmbientOcclusion',true);
 
 obj.bake();
     
 %% set view
 obj.render(); 
-view(260,20); 
+view(240,20); 
 obj.update();

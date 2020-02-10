@@ -14,6 +14,7 @@ classdef Fem < handle
     end
     
     properties (Access = private)
+        Node0;
         Support;
         Load;
         Spring;
@@ -21,7 +22,6 @@ classdef Fem < handle
         Pressure;
         PressureCell;
         Contraction;
-        FixedDensity;
         ElemNDof;
         Normal;
         Edge;
@@ -35,8 +35,7 @@ classdef Fem < handle
         Zeta = 0.1;
         fInternal = rand(1)*1e-8;
         fExternal = rand(1)*1e-8;
-        Stiffness;
-        TangentStiffness;
+        Stiffness; TangentStiffness;
         Residual = Inf;
         
         Time = 0;
@@ -61,7 +60,7 @@ classdef Fem < handle
         ShapeFnc;
         U = 0;
         Utmp = 0;
-        Node0;
+        
         MaxIteration = 50;
         MaxIterationMMA = 60;
         SolverStart = false;
@@ -545,7 +544,7 @@ end
 %----------------------------------------------------- reconstruct topology
 function Fem = former(Fem, Thickness)
 
-Res = 200;    
+Res = 400;    
 Layers = 40;
 Patch = 5;
 
@@ -597,8 +596,6 @@ if Fem.VolumetricPressure
     SDF2 = GaussianFilter(SDF2,5);
     ZFiller = repmat(SDF2,[1 1 Patch]);
     SDF(:,:,2:Patch+1) = ZFiller;
-    %SDF(:,:,Patch+1) = 0.25*SDF(:,:,Patch+1) + 0.75*SDF(:,:,Patch+2);
-    %SDF(:,:,end-8:end-1) = ZFiller;
 end
 
 if ~isempty(Fem.Repeat)

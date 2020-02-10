@@ -37,9 +37,9 @@ fem = fem.AddConstraint('Support',id,[0,1]);
 id = fem.FindElements('Location',[1,1],1);
 fem = fem.AddConstraint('PressureCell',id,[-0.01e-3,0]);
 
-id = fem.FindNodes('Line',[0,4,7.5,7.5]); 
+id = fem.FindNodes('Location',[0,7.5],1); 
 fem = fem.AddConstraint('Output',id,[0,-1]);
-fem = fem.AddConstraint('Spring',id,[0,1e-2]);
+fem = fem.AddConstraint('Spring',id,[0,5]);
 
 % id = fem.FindNodes('Location',[10,0],1); 
 % fem = fem.AddConstraint('Output',id,[-0.05,0]);
@@ -63,7 +63,7 @@ fem.optimize();
 
 %% reconstruct
 fem = fem.set('ReflectionPlane',[1,1],...
-        'CellRepetion',[2,4]);
+        'CellRepetion',[3,3]);
 
 fem = fem.former(10);
-fem.showISO(0.15,.5);
+fem.showISO(0.2,.5);

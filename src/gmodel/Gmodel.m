@@ -187,7 +187,9 @@ end
 %--------------------------------------------------------------------- show
 function showAO(Gmodel,varargin)
 
-    set(Gmodel.FigHandle,'FaceVertexCData',Gmodel.AOTextureMap);
+    AO = TextureSmoothing(Gmodel.Element,Gmodel.AOTextureMap,10);
+    
+    set(Gmodel.FigHandle,'FaceVertexCData',AO,'facecolor','interp');
     colormap(gray);
     drawnow;
 end
@@ -337,7 +339,7 @@ idx = 0;
 for ii = 1:length(Centers)
     flag = PolyFlag(1+idx:Res+idx);
     if Gmodel.AOInvert, AO(ii) = 1 - sum(flag)/Res;
-    else, AO(ii) = sum(flag)/Res;
+    else, AO(ii) = 1 - sum(flag)/Res;
     end
     
     idx = idx + Res;

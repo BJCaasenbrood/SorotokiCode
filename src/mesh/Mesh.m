@@ -228,7 +228,7 @@ Dist = reshape(D(:,end),[Q, Q]);
 V = (bluesea(50));
 cla;
 image(x,y,Dist+2); hold on;
-contour(X,Y,Dist*1e-6,7,'-','linewidth',1,'Color',V(7,:)); 
+contour(X,Y,Dist*1e-6,7,'-','linewidth',1,'Color',V(4,:)); 
 contour(X,Y,Dist,[0 1e-6],'k-','linewidth',2.5); 
 colormap((bluesea(2)));
 caxis([-1,1 + 1e-6]);
