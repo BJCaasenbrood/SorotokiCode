@@ -6,6 +6,7 @@
 ## Rendering
 Sorotoki is equipped with a wide range of material rendering options. 
 
+### Material captures
 ```matlab
 %% preview
 obj = Gmodel(@(x) dSphere(x,0,0,0,1),[-1,1,-1,1,-1,1]);
@@ -30,3 +31,9 @@ end
 
 <div align="center"> <img src="./src/matcap.gif" width="250"> </div>
 
+### Ambient occlusion (AO)
+<div align="center"> <img src="./src/bunny_AO.png" width="450"> </div>
+
+
+### Sub-Surface Scattering (SSS)
+<div align="center"> <img src="./src/bunny_AO.png" width="450"> </div>
