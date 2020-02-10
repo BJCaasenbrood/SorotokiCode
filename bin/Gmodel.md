@@ -3,7 +3,7 @@
 # Graphics and Implicit Modeling
 [Go back to home page](https://bjcaasenbrood.github.io/SorotokiCode/)
 
-## Material libary
+## Rendering
 Sorotoki is equipped with a wide range of material rendering options. 
 
 ```matlab
