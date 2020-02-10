@@ -36,4 +36,4 @@ end
 
 
 ### Sub-Surface Scattering (SSS)
-<div align="center"> <img src="./src/bunny_AO.png" width="450"> </div>
+<div align="center"> <img src="./src/bunny_SSS.png" width="450"> </div>
