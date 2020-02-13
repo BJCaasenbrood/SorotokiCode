@@ -22,9 +22,9 @@ mdl = Model();   % dynamical model class
 
 ### Documentation and libary usage
 * [**Mesh generation**](./bin/Mesh.md). 
-* [**Nonlinear Finite Elements**](./bin/Fem.md).
-* [**Computational Design**](./bin/Topo.md).
-* [**Graphics and Implicit Modeling**](./bin/Gmodel.md).
+* [**Finite Element Method**](./bin/Fem.md).
+* [**Topology Optimization**](./bin/Topo.md).
+* [**Graphics and Rendering**](./bin/Gmodel.md).
 * [**Dynamical Modeling**](./bin/Model.md).
 
 # Citation
