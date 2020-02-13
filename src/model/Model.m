@@ -2,6 +2,7 @@ classdef Model
 
     properties (Access = public)
         Links;
+        Dof;
         NDof;
         NLink = 1;
         tspan = 1;
@@ -15,19 +16,17 @@ classdef Model
         dq;
         ddq;
         t;
-        E = 1e3;
-        nu = 0.49;
-        mu = 0.02;
+        E = 1e2;
+        nu = 0.495;
+        mu = 0.5;
         xia0 = [0,0,0,1,0,0].';
         Phi;
         Ba; Bc; 
-        Mee;
-        Kee; 
-        Dee; 
+        Mee; Kee; Dee; 
         NModal = 5;
         Grav = 9.81;
         Radius = 1e-2;
-        Density = 5;
+        Density = 2;
         Length = 1;
         Length0;
         P1; P2; P3;
@@ -78,7 +77,7 @@ T = linspace(0,Model.tspan,1e2);
 q0 = zeros(Model.NModal*Model.NDof,1);
 
 %options = odeset('Events', @myEvent);
-[ts,ys] = ode23t(@(t,x) KinematicODE(Model,t,x),T,q0);
+[ts,ys] = ode45(@(t,x) KinematicODE(Model,t,x),T,q0);
 
 Model.g = ys;
 Model.t = ts;
@@ -88,14 +87,14 @@ end
 %---------------------------------------------------------------------- set
 function Model = simulate(Model)
     
-dt = 1e-3;
-T = 0:dt:1;
+dt = 1e-2;
+T = 0:dt:Model.tspan;
 q0 = zeros(Model.NModal*Model.NDof,1);
 dq0 = zeros(Model.NModal*Model.NDof,1);
 
 %options = odeset('Events', @myEvent);
 opt = odeset('RelTol',1e-3,'AbsTol',1e-3);
-[ts,ys] = ode45(@(t,x) DynamicODE(Model,t,x),T,[q0 dq0],opt);
+[ts,ys] = ode23t(@(t,x) DynamicODE(Model,t,x),T,[q0 dq0],opt);
 
 Model.g = ys;
 Model.t = ts;
@@ -119,7 +118,6 @@ mshgr.Texture = grey;
 
 msh = msh.bake();
 mshgr = mshgr.bake();
-
 msh = msh.render();
 mshgr = mshgr.render();
 
@@ -127,11 +125,11 @@ LinkID = knnsearch(X(:),msh.Node(:,3));
 axis equal;
 drawnow;
 axis([-.5 .5 -.5 .5 -1 0])
-view(80,-5);
+view(40,5);
 msh.update();
 mshgr.update();
 
-FPS = round((1/24)/(mean(diff(Model.t))));
+FPS = round((1/12)/(mean(diff(Model.t))));
 
 for ii = 1:FPS:length(Model.t)
 
@@ -152,9 +150,9 @@ for ii = 1:FPS:length(Model.t)
     
     msh = Blender(msh,'Rotate',{'z',30});
     mshgr = Blender(mshgr,'Rotate',{'z',30});
-    msh.Node = Blender(msh,'Sweep', {LinkID,SweepSE3});
+    msh = Blender(msh,'Sweep', {LinkID,SweepSE3});
     msh = Blender(msh,'Rotate',{'x',-180});
-    mshgr.Node = Blender(mshgr,'SE3',yf(end,1:7));
+    mshgr = Blender(mshgr,'SE3',yf(end,1:7));
     mshgr = Blender(mshgr,'Rotate',{'x',-180});
     
     mshgr.updateNode();
@@ -163,9 +161,9 @@ for ii = 1:FPS:length(Model.t)
     mshgr.update();
     %axis equal;
     axis(1.5*[-.5 .5 -.5 .5 -1 0]);
-    view(80,-5);
+    %view(80,-5);
     drawnow;
-    pause(1/24);
+    %pause(1/24);
     %if ii == 1, gif('srm2.gif','DelayTime',1/24); else, gif; end
 end
     
@@ -212,7 +210,6 @@ Model.ddq = 0*x;
 
 Model.t = t;
 [~,Qc] = InverseDynamicModel(Model);
-
 dx(:,1) = Model.Dee\(-Qc - Model.Kee*x);
 end
 
@@ -308,11 +305,12 @@ M = MassTensor(Model);
 
 win = 0.05;
 
-X0 = ndelta(t+win,win); X0_ = ndelta(t-win,win);
-X1 = ndelta(t-1/2+win,win); X1_ = ndelta(t-1/2-win,win);
-X2 = ndelta(t-1+win,win); X2_ = ndelta(t-1-win,win);
-
-f = 1.5;
+X0 = ndelta(t+win,win); 
+X0_ = ndelta(t-win,win);
+X1 = ndelta(t-1/2+win,win); 
+X1_ = ndelta(t-1/2-win,win);
+X2 = ndelta(t-1+win,win); 
+X2_ = ndelta(t-1-win,win);
 
 % m1x = Model.P1(1)*(X1 - X0_);%*(smoothstep(f*Model.t) - smoothstep(f*Model.t-3));
 % m2x = Model.P2(1)*(X2 - X1_);%*smoothstep(f*Model.t);
@@ -321,8 +319,8 @@ f = 1.5;
 % m2y = Model.P2(2)*(X2 - X1_)*(smoothstep(f*Model.t) - ...
 %     2*smoothstep(f*(Model.t-4.2)) + smoothstep(f*(Model.t-7.2)));
 
-m1x = Model.P1(1)*(X1 - X0_);%*(smoothstep(f*Model.t) - smoothstep(f*Model.t-3));
-m2x = Model.P2(1)*(X2 - X1_);%*smoothstep(f*Model.t);
+m1x = Model.P1(1)*(X1 - X0_);
+m2x = Model.P2(1)*(X2 - X1_);
 m1y = Model.P1(2)*(X1 - X0_);
 m2y = Model.P2(2)*(X2 - X1_);
 

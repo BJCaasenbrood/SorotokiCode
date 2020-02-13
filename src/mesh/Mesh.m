@@ -202,7 +202,7 @@ end
 
 axis(Mesh.BdBox);
 axis tight;
-colormap(bluesea(-1));
+colormap(noir);
 drawnow;
 
 end

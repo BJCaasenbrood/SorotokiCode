@@ -11,15 +11,14 @@ msh = msh.generateMesh;
 
 %% show generated mesh
 fem = Fem(msh);
-fem = fem.set('TimeStep',1/5,...
+fem = fem.set('TimeStep',1/2,...
               'ResidualNorm',1e-3,...
               'VolumeInfill',0.3,...
-              'PrescribedDisplacement',false,...
               'VolumetricPressure',true,...
-              'FilterRadius',2,...
-              'Periodic',[20, 0],...
+              'FilterRadius',2.0,...
+              'Penal',4,...
               'Nonlinear',false,...
-              'MaxIterationMMA',80,...
+              'MaxIterationMMA',50,...
               'Movie',false,...
               'MovieAxis',[0 100 0 20],...
               'OptimizationProblem','Compliant');
@@ -30,17 +29,17 @@ fem = fem.AddConstraint('Support',id,[1,1]);
 
 id = fem.FindNodes('Right'); 
 fem = fem.AddConstraint('Output',id,[0,-1]);
-fem = fem.AddConstraint('Spring',id,[1,1]);
+fem = fem.AddConstraint('Spring',id,[0,1e-3]);
 % 
-% id = fem.FindNodes('Line',[15,20,0,0]); 
-% fem = fem.AddConstraint('Output',id,[0,-1]);
-% fem = fem.AddConstraint('Spring',id,[0,5]);
+id = fem.FindNodes('Line',[15,20,0,0]); 
+fem = fem.AddConstraint('Output',id,[0,-1]);
+fem = fem.AddConstraint('Spring',id,[0,1e-3]);
 
 id = fem.FindElements('Location',[10,10],1);
-fem = fem.AddConstraint('PressureCell',id,[1e-3,0]);
+fem = fem.AddConstraint('PressureCell',id,[1e-4,0]);
 
 %% set density
-fem = fem.initialTopology('Hole',[10,10],2);
+fem = fem.initialTopology('Hole',[10,10],3);
 
 %% material
 fem.Material = Dragonskin10A;
@@ -50,8 +49,8 @@ fem.optimize();
 
 function Dist = PneuNet(P)
   R1 = dRectangle(P,0,20,0,20);
-  R2 = dRectangle(P,-4,1,4,20);
-  R3 = dRectangle(P,19,24,4,20);
+  R2 = dRectangle(P,-4,1,4,22);
+  R3 = dRectangle(P,19,24,4,22);
   C1 = dCircle(P,0,4.5,1);
   C2 = dCircle(P,20,4.5,1);
   Dist = dDiff(dDiff(dDiff(dDiff(R1,R2),R3),C1),C2);

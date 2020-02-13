@@ -250,7 +250,7 @@ function Gmodel = GenerateObject(Gmodel,varargin)
     Gmodel.TextureMap = Normal2RGB(Gmodel.Normal);
     Gmodel.RMatrix = eye(4);
     Gmodel.BdBox = BoundingBox(Gmodel.Node); 
-    Gmodel.TextureStretch = 0.75;
+    Gmodel.TextureStretch = 0.7;
     
     fcell = num2cell(Gmodel.Element,2);
     [~,Gmodel.V2F,Gmodel.F2V] = ElementAdjecency(fcell);

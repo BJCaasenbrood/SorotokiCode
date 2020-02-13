@@ -1,10 +1,10 @@
 clc; clear; close all;
 
 %% model
-obj = Gmodel('David.stl');
+obj = Gmodel('Astroid.stl');
 
 %% set texture
-obj.Texture = wolfram;
+obj.Texture = green;
 % obj.Emission = lime;
 % 
 % obj.set('AOPower',1.5,...

@@ -4,7 +4,7 @@ sdf = @(x) dRectangle(x,0,10,0,10);
 %% generate mesh
 msh = Mesh(sdf);
 msh = msh.set('BdBox',[0,10,0,10],...
-              'NElem',250,...
+              'NElem',500,...
               'MaxIteration',500,...
               'ShowMeshing',false,...
               'Triangulate',false);
@@ -15,7 +15,7 @@ msh = msh.generateMesh;
 msh.show();
 
 fem = Fem(msh);
-fem = fem.set('TimeStep',1/25,...
+fem = fem.set('TimeStep',1/15,...
               'ResidualNorm',1e-3,...
               'DisplaceNorm',1e-3,...
               'Nonlinear',true,...
@@ -24,15 +24,11 @@ fem = fem.set('TimeStep',1/25,...
 %% add constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,0]);
 fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[0,1]);
-fem = fem.AddConstraint('Load',fem.FindNodes('Line',[0 4 10 10]),[0,-4]);
+fem = fem.AddConstraint('Load',fem.FindNodes('Line',[0 2 10 10]),[0,-4]);
 fem = fem.AddConstraint('Support',fem.FindNodes('Line',[0 4 10 10]),[1,0]);
 
-%fem.Material = Ecoflex0030('Yeoh');
-fem.Material = NeoHookeanMaterial('E',5,'Nu',0.25);
+fem.Material = Ecoflex0030;
+%fem.Material = Dragonskin10A;%NeoHookeanMaterial('E',5,'Nu',0.25);
 
 %% solving
 fem.solve();
-
-%% plotting
-figure(101); clf;
-fem.show('Svm');

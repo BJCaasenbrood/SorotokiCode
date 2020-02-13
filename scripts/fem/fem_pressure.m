@@ -13,7 +13,7 @@ msh = msh.generateMesh;
 
 %% show generated mesh
 fem = Fem(msh);
-fem = fem.set('TimeStep',1/50,...
+fem = fem.set('TimeStep',1/10,...
               'ResidualNorm',1e-3,...
               'Nonlinear',true,...
               'Penal',4,...
@@ -21,16 +21,12 @@ fem = fem.set('TimeStep',1/50,...
               'PrescribedDisplacement',false);
 
 %% add constraint
+fem = fem.AddConstraint('Support',fem.FindNodes('Right'),[1,1]);
 fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,1]);
-%fem = fem.AddConstraint('Support',fem.FindNodes('Right'),[1,1]);
 fem = fem.AddConstraint('PressureCell',fem.FindElements(...
-    'Location',[5,5],1),[-1e-3,0]);
+    'Location',[5,5],1),[4e-4,0]);
 
-% fem.Material = YeohMaterial('C1',17e-3,'C2',-0.2e-3,'C3',0.023e-3,...
-%       'D1',10,'D2',10,'D3',10);
-
-%fem.Material = Ecoflex0030;
-fem.Material = NeoHookeanMaterial('E',1,'Nu',0.35);
+fem.Material = Dragonskin10A;
 
 %% generate void region
 f = @(x) dRectangle(x,2,18,2,8);

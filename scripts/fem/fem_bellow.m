@@ -20,7 +20,7 @@ fem = fem.set('TimeStep',1/5,...
 %% add constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[1,1]);
 fem = fem.AddConstraint('Support',fem.FindNodes('Top'),[1,0]);
-fem = fem.AddConstraint('Load',fem.FindNodes('Top'),[0,-5]);
+fem = fem.AddConstraint('Load',fem.FindNodes('Top'),[0,-10]);
 
 fem.Material = Ecoflex0030;
 

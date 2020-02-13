@@ -108,7 +108,7 @@ mesh.Node = Node;
 end
 
 %-------------------------------------------------------------- ROTATE MESH
-function Node = SE3Mesh(mesh,Arg)
+function mesh = SE3Mesh(mesh,Arg)
 
 Node0 = mesh.Node; 
 Node0(:,4) = 1;
@@ -121,7 +121,7 @@ H(1:3,4) = [r(3),r(2),r(1)].';
 H(4,4) = 1;
 
 Node = H*Node0.';
-Node = Node(1:3,:).';
+mesh.Node = Node(1:3,:).';
 
 end
 

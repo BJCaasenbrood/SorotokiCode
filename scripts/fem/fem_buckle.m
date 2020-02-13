@@ -1,11 +1,12 @@
-clc; clear; close all;
+clr;
 %% set signed distance function
 sdf = @(x) dRectangle(x,0,40,0,2);
 
 %% generate mesh
 msh = Mesh(sdf);
 msh = msh.set('BdBox',[0,40,0,2],...
-              'NElem',150);
+              'NElem',50,...
+              'MaxIteration',150);
       
 msh = msh.generateMesh;
 

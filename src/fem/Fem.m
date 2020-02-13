@@ -11,6 +11,7 @@ classdef Fem < handle
         BdBox;
         Center;
         Topology;
+        Log;
     end
     
     properties (Access = private)
@@ -47,9 +48,9 @@ classdef Fem < handle
         EndIncrement;
         LoadingFactor;
         
-        ResidualNorm = 1e-4;
-        StressNorm = 1e-4;
-        DisplaceNorm = 1e-4;
+        ResidualNorm = 1e-3;
+        StressNorm = 1e-6;
+        DisplaceNorm = 1e-6;
         Objective = 1e-4;
         Constraint = 1e-4;
         
@@ -92,9 +93,9 @@ classdef Fem < handle
         VolumeInfill = 0.3;
         Ersatz = 1e-3; 
         Penal = 1;
-        PenalMax = 5;
+        PenalMax = 4;
         PenalStep = 10;
-        ChangeMax = 10;
+        ChangeMax = .1;
         Beta = 1.5;
         FilterRadius = 0.5;
         SpatialFilter;
@@ -213,7 +214,7 @@ h{3} = patch('Faces',Fem.Mesh.get('Boundary'),'Vertices',V,...
 
 if Fem.VolumetricPressure
     id = FindElements(Fem,'FloodFill',Fem,Fem.Density); 
-    Pc = Fem.Mesh.get('Center');
+    Pc = Fem.Center;
     h{4} = plot(Pc(id,1),Pc(id,2),'o','Color',lightblue);
     h{5} = plot(Pc(id,1),Pc(id,2),'.','Color',lightblue);
 end
@@ -338,7 +339,7 @@ if Fem.SolverPlot || ~Fem.SolverStartMMA
     figure(101); Fem.show('Un');
 end
 
-while true
+while true 
     
     [Fem,Terminate] = SolverTimer(Fem);
     if Terminate, break; end
@@ -346,7 +347,7 @@ while true
     flag = 0;
     Singular = false;
     Fem.Divergence = 0;
-    
+        
     while flag == 0
         
         % assemble global system matrices
@@ -398,13 +399,15 @@ while true
         elseif flag == 1 && ~Fem.Nonlinear
             Fem.Utmp = Delta;
             Fem.Node = UpdateNode(Fem,Delta);
+            Pc = ComputeCentroid(Fem);
+            Fem.Center = Pc;
         elseif flag == 1 && Fem.Nonlinear
             Fem.Utmp = Delta;
             Fem.Node = UpdateNode(Fem,Delta);
-            [Pc,~,Nv,Ev] = ComputeCentroid(Fem);
+            [Pc,~,~,~] = ComputeCentroid(Fem);
             Fem.Center = Pc;
-            Fem.Normal = Nv;
-            Fem.Edge = Ev;
+%            Fem.Normal = Nv;
+%            Fem.Edge = Ev;
         end
     end 
     
@@ -421,8 +424,24 @@ while true
         Fem.fyNodal = force(2*(1:Fem.NNode));
     end
     
+    if ~isempty(Fem.Output)
+       [ux,uy,un] = DisplacementField(Fem,Fem.Utmp);
+       idNodes = Fem.Output(:,1);
+       if isempty(Fem.Log)
+           Fem.Log = cell(3,1);
+           Fem.Log{1} = ux(idNodes);
+           Fem.Log{2} = uy(idNodes);
+           Fem.Log{3} = un(idNodes);
+       else
+           Fem.Log{1} = append(Fem.Log{1},ux(idNodes));
+           Fem.Log{2} = append(Fem.Log{2},uy(idNodes));
+           Fem.Log{3} = append(Fem.Log{3},un(idNodes));
+       end
+               
+    end
+    
     if Fem.SolverPlot || ~Fem.SolverStartMMA
-        figure(101); Fem.show('Svm');
+        figure(101); Fem.show('Svm'); drawnow;
     end
     
     if ~Fem.Nonlinear, break; end
@@ -433,7 +452,7 @@ end
 %------------------------------------------------------ optimization solver
 function Fem = optimize(Fem)
  
-showInformation(Fem);
+showInformation(Fem,'TopologyOptimization');
     
 Fem.SpatialFilter = GenerateRadialFilter(Fem,Fem.FilterRadius);
 Fem.SolverPlot = false;
@@ -441,7 +460,7 @@ Fem.IterationMMA = 0;
 Fem.SolverStartMMA = true;
 flag = true;
 
-Fem.show('ISO');
+Fem.show('E+');
 drawnow;
 
 while flag
@@ -458,7 +477,7 @@ while flag
     % solve nonlinear finite elements
     Fem = Fem.solve();
     
-    % compute cost functionals and analysis sensitivities
+    % objective and constraints
     [f,dfdE,dfdV] = ObjectiveFunction(Fem);
     [g,dgdE,dgdV] = ConstraintFunction(Fem);
     
@@ -485,7 +504,7 @@ while flag
     [flag,Fem] = CheckConvergenceOpt(Fem);
     
     % draw
-    Fem.show('ISO');
+    Fem.show('E+');
     drawnow;
 end
 
@@ -544,7 +563,7 @@ end
 %----------------------------------------------------- reconstruct topology
 function Fem = former(Fem, Thickness)
 
-Res = 400;    
+Res = 100;    
 Layers = 40;
 Patch = 5;
 
@@ -730,7 +749,9 @@ function Fem = initialTopology(Fem,varargin)
     else
         Fem.Density = InitialDesign(Fem,{[1,1],1});
     end
-Fem.Density = Fem.SpatialFilter*(1.2*Fem.Density*Fem.VolumeInfill);
+    
+Fem.Density = Fem.SpatialFilter*(0.8*Fem.Density + ...
+    random(1e-3,5e-3,Fem.NElem)');
 end
 
 %--------------------------------------------------------------- find nodes
@@ -803,8 +824,8 @@ Fem.ShapeFnc = tmp.ShapeFnc;
 end
 
 if Fem.VolumetricPressure
-   [E,~,~,~] = MaterialField(Fem);
-   E = Fem.Mesh.get('NodeToFace')*E;
+   [~,~,E,~] = MaterialField(Fem);
+   E = wthresh(Fem.Mesh.get('NodeToFace')*E,'s',Fem.VoidTolerance);
    %E = Fem.Mesh.get('NodeToFace')*ones(Fem.NElem,1)*E;
    Ev = kron(E,[1;1]);
 end
@@ -833,12 +854,14 @@ for el = 1:Fem.NElem
     Fem.k(index+1:index+NDof^2) = Ke(:);
     Fem.t(index+1:index+NDof^2) = Kte(:);
     Fem.fi(index+1:index+NDof) = Fe(:);
-    Fem.fb0(index+1:index+NDof) = Kte*Ve(:);
+    Fem.fb0(index+1:index+NDof) = Ke*Ve(:);
+    %Fem.fb0(index+1:index+NDof) = Ve(:);
     
     if Fem.VolumetricPressure
         Ed = diag(Ev(eDof));
         Fem.ed(index+1:index+NDof^2) = Ed(:);
         Fem.fb(index+1:index+NDof) = Ed*Ke*Ve(:);
+        %Fem.fb(index+1:index+NDof) = Ed*Ve(:);
     end
     
     Fem.s(subindex+1:subindex+NDof/2,1) = Svme(:);
@@ -992,16 +1015,15 @@ if Fem.VolumetricPressure
             Fb = beta*sparse(Fem.i,Fem.e,Fem.fb0);
             CV = zeros(Fem.NElem,1);
             CV(id) = A(id)*mean(Fem.PressureCell(:,2));
-            fe = Fb*CV(:);
+            fe = beta*W*Fb*CV(:);
             Fem.dFdE(:,ii) = ((fe - f0)/(dz));
         end
-        
         Fem.Density = z0;
     end
 end
 
 Fem.fInternal = Fe; 
-Fem.fExternal = F - spMat*Fem.Utmp;
+Fem.fExternal = F - 0*spMat*Fem.Utmp;
 Fem.TangentStiffness = Ktr + spMat;
 Fem.Stiffness = K + spMat;
 Fem.Residual = Fem.fInternal - Fem.fExternal;
@@ -1021,8 +1043,7 @@ FreeDofs = setdiff(AllDofs,FixedDofs);
 end
 
 %--------------------------------------------------- local element matrices
-function [Fe,Qe,Me,Ce,Ke,Kte,Svme,SS,EE] = ...
-    Locals(Fem,eNode,eDof)
+function [Fe,Qe,Me,Ce,Ke,Kte,Svme,SS,EE] = Locals(Fem,eNode,eDof)
 
 nn = length(eNode);
 Fe = zeros(2*nn,1);
@@ -1088,7 +1109,7 @@ for q = 1:length(W)
     Ce = Ce + tau*W(q)*Fem.Zeta*(NN.')*NN*dJ;
     
     % lagrangian strain
-    Elagran = 0.5*(C -eye(3));
+    Elagran = (1/2)*(C - eye(3));
     
     % true stress
     Scauchy = (1/det(F))*F*S0*(F.');
@@ -1343,15 +1364,22 @@ CriteriaStress = (DiffSVM > Fem.StressNorm);
 
 Criteria = CriteriaResidual && CriteriaStress && CriteriaDisplace;
 
-if (Criteria && (Fem.Iteration <= Fem.MaxIteration) && ~SingularKt )    
+if Fem.SolverResidual(end,1) > Fem.SolverResidual(end-1,1)
+   Fem.Divergence = Fem.Divergence + 1;
+end
+
+if (Criteria && (Fem.Iteration <= Fem.MaxIteration) && ~SingularKt && ...
+         Fem.Divergence < 3)
     flag = 0;
 else
     if (Fem.Iteration > Fem.MaxIteration) || SingularKt || ...
             Fem.SolverResidual(end) > (25*Fem.Material.Emod)
         flag = 2; 
         Fem.Convergence = false;
-    elseif (Fem.Iteration == 1);
-        flag = 0;        
+    elseif (Fem.Iteration == 1)
+        flag = 0;    
+    elseif (Fem.Divergence >= 3)
+        flag = 2;        
     else
         flag = 1;
         Fem.Convergence = true;
@@ -1359,7 +1387,6 @@ else
     if round((100*Fem.Iteration/Fem.MaxIteration)) > 75
         Fem.MaxIteration = round(Fem.MaxIteration)*1.25;
     end
-    
 end
 
 if ~Fem.SolverStartMMA, ProcessMonitor(Fem); end
@@ -1391,6 +1418,11 @@ elseif ~Fem.Convergence
     Fem.TimeStep = max(Fem.TimeStep/2,Fem.TimeStepMin);
     Fem.Time = Fem.Time - Fem.TimeStep;
     Fem.MaxIteration = Fem.MaxIteration + 15;
+    if ~Fem.SolverStartMMA
+    fprintf('------------------------------------------------------------|\n');
+    fprintf(' Bisection                                                  |\n');
+    fprintf('------------------------------------------------------------|\n');
+    end
 end
 
 Fem.Iteration = 1;
@@ -1401,7 +1433,9 @@ end
 
 Fem.LoadingFactor = (Fem.Time/Fem.TimeEnd);
 
-if Fem.SolverStartMMA, ProcessMonitor(Fem); end
+if (Fem.SolverStartMMA && Terminate)||(Fem.SolverStartMMA && ~Fem.Nonlinear)
+    ProcessMonitor(Fem); 
+end
 
 end
 
@@ -1420,7 +1454,6 @@ end
 end
 
 %%/////////////////////////////////////////////////// TOPOLOGY OPTIMIZATION
-
 %------------------------------------------------------ objective function
 function [f,dfdE,dfdV] = ObjectiveFunction(Fem)
     
@@ -1730,7 +1763,7 @@ function ProcessMonitor(Fem)
 FreeDofs = GetFreeDofs(Fem);
 
 if Fem.SolverStartMMA
-if Fem.IterationMMA == 1  && Fem.Increment == 1 && Fem.Iteration == 1
+if Fem.IterationMMA == 1 && Fem.Iteration == 1
 fprintf(' Iter | Inc  | Residual  | Obj. fun. | Vol.  | Change | p    |\n');
 fprintf('--------------------------------------------------------------\n');
 end
@@ -1739,8 +1772,9 @@ fprintf(' %1.0f\t  | %1.0f\t | %1.3e | %1.3e | %0.3f | %0.3f  | %0.2f \n',...
     Fem.IterationMMA,Fem.Increment,norm(Fem.Residual(FreeDofs)),...
     (Fem.Objective(end)),Fem.Constraint(end)+1,norm(Fem.Change),Fem.Penal);
 
+
 else
-if Fem.Iteration == 1  && Fem.Increment == 1
+if Fem.Iteration == 1 && Fem.Increment == 1
 fprintf(' Inc | Iter  | Residual  | Max. Svm  | Time | dt      | p   |\n');
 fprintf('--------------------------------------------------------------\n');
 end
