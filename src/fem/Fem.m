@@ -1804,7 +1804,6 @@ fprintf(' %1.0f\t  | %1.0f\t | %1.3e | %1.3e | %0.3f | %0.3f  | %0.2f \n',...
     Fem.IterationMMA,Fem.Increment,norm(Fem.Residual(FreeDofs)),...
     (Fem.Objective(end)),Fem.Constraint(end)+1,norm(Fem.Change),Fem.Penal);
 
-
 else
 if Fem.Iteration == 1 && Fem.Increment == 1
 fprintf(' Inc | Iter  | Residual  | Max. Svm  | Time | dt      | p   |\n');
