@@ -10,7 +10,7 @@ sdf = @(x) PneuNet(x,W,H,E,D);
 %% generate mesh
 msh = Mesh(sdf);
 msh = msh.set('BdBox',[0,W,0,H],...
-              'NElem',1e3,...
+              'NElem',300,...
               'MaxIteration',50,...
               'ShowMeshing',false,...
               'Triangulate',false);
@@ -37,14 +37,16 @@ fem = fem.set('TimeStep',1/3,...
 
 %% add constraint
 id = fem.FindNodes('Left'); 
-fem = fem.AddConstraint('Support',id,[1,1]);
+fem = fem.AddConstraint('Support',id,[1,0]);
+id = fem.FindNodes('Bottom'); 
+fem = fem.AddConstraint('Support',id,[0,1]);
 
 id = fem.FindNodes('Right'); 
-fem = fem.AddConstraint('Output',id,[0,-1]);
-fem = fem.AddConstraint('Spring',id,[0,1]);
+fem = fem.AddConstraint('Output',id,[-1,0]);
+fem = fem.AddConstraint('Spring',id,[1,0]);
 
 id = fem.FindElements('Location',[W/2,H/2],1);
-fem = fem.AddConstraint('PressureCell',id,[1e-3,0]);
+fem = fem.AddConstraint('PressureCell',id,[-1e-3,0]);
 
 %% set density
 fem = fem.initialTopology('Hole',[W/2,H/2],1);

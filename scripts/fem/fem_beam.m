@@ -1,15 +1,13 @@
 clr;
-%% set signed distance function
+%% generate mesh from sdf
 sdf = @(x) dRectangle(x,0,5,0,1);
 
-%% generate mesh
 msh = Mesh(sdf);
-msh = msh.set('BdBox',[0,5,0,1],...
-              'NElem',500);
+msh = msh.set('BdBox',[0,5,0,1],'NElem',500);
       
 msh = msh.generateMesh;
 
-%% generate fem model
+%% add boundary conditions 
 fem = Fem(msh);
 fem = fem.set('TimeStep',1/15);
 
@@ -19,7 +17,7 @@ fem = fem.AddConstraint('Load',fem.FindNodes('Right'),[0,-1e-3]);
 fem = fem.AddConstraint('Output',fem.FindNodes('Bottom'),[0,1e-3]);
 
 %% select material
-fem.Material = Dragonskin10A;
+fem.Material = Ecoflex0030;
 
 %% solving
 fem.solve();
