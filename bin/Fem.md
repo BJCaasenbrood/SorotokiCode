@@ -48,7 +48,7 @@ fem.solve();
 ```matlab
 %% generate mesh from sdf
 sdf = @(x) TensileBone(x,8,2,3,1,0.75);
-%% 
+
 msh = Mesh(sdf);
 msh = msh.set('BdBox',[0,10,0,10],'NElem',500);
 msh = msh.generateMesh;
