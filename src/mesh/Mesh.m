@@ -47,7 +47,12 @@ function obj = Mesh(SDF,varargin)
     obj.NElem = 100;
     obj.Dimension = 2;
     for ii = 1:2:length(varargin)
-        obj.(varargin{ii}) = varargin{ii+1};
+        if strcmp(varargin{ii},'Quads')
+            N = num2cell(varargin{ii+1});
+            obj.Center = Quads(obj.BdBox,N{:});
+        else
+            obj.(varargin{ii}) = varargin{ii+1};
+        end
     end
 end
 

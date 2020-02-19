@@ -129,10 +129,10 @@ classdef Fem < handle
 methods  
 %---------------------------------------------------------------- Fem Class
 function obj = Fem(Mesh,varargin) 
-    obj = ConvertMeshToFem(obj,Mesh);
     for ii = 1:2:length(varargin)
         obj.(varargin{ii}) = varargin{ii+1};
     end
+    obj = ConvertMeshToFem(obj,Mesh);
 end
 
 %---------------------------------------------------------------------- get     
@@ -222,11 +222,11 @@ end
 
 if flag == 1
 switch(Request)
-case('Residual'), cla; semilogy(Fem.SolverResidual);
-case('Stress'), cla; semilogy(Fem.SolverVonMises);
-case('Displace'), cla; semilogy(Fem.SolverDisplace);
-case('Objective'), cla; plot(Fem.Objective);
-case('Constraint'), cla; plot(Fem.Constraint);
+case('Residual'), semilogy(Fem.SolverResidual,'linewidth',1);
+case('Stress'),  semilogy(Fem.SolverVonMises,'linewidth',1);
+case('Displace'),  semilogy(Fem.SolverDisplace,'linewidth',1);
+case('Objective'),  plot(Fem.Objective,'linewidth',1);
+case('Constraint'),  plot(Fem.Constraint,'linewidth',1);
 otherwise, flag = 2;
 end
 end
@@ -255,11 +255,7 @@ if flag == 2
         if ispos(Forc(ii,3)), symbol = '\bf \uparrow'; end
         if isneg(Forc(ii,3)), symbol = '\bf \downarrow'; end
         vecmag = 0.05*sum(abs(Fem.BdBox))/4;
-        %text(V(id,1)-.1,V(id,2),symbol,'fontsize',10,'Color','b');
     end
-    
-    %id = Forc(:,1);
-    %quiver(V(id,1),V(id,2),vecmag*Forc(:,2),vecmag*Forc(:,3),'b');
     
     for ii = 1:length(Out)
         id = Out(ii);
@@ -292,12 +288,12 @@ if flag == 3
     clf;
     former(Fem,10);
     ISOVALUE = 0.1;
-    showISO(Fem,lerp(ISOVALUE,.175,Fem.IterationMMA/(...
+    showISO(Fem,lerp(ISOVALUE,.175,Fem.IterationMMA/(...f
         0.5*Fem.MaxIterationMMA)),0.5);
     end    
 end
 
-if Fem.Movie
+if Fem.Movie && strcmp(Request,'ISO')
     if Fem.MovieStart == false
        Fem.MovieStart = true;
        if ~Fem.SolverStartMMA, Name = 'fem'; else, Name = 'topo'; end
@@ -566,7 +562,7 @@ end
 %----------------------------------------------------- reconstruct topology
 function Fem = former(Fem, Thickness)
 
-Res = 200;    
+Res = 300;    
 Layers = 40;
 Patch = 5;
 
@@ -830,7 +826,7 @@ if Fem.VolumetricPressure
     %[E,~,V,~] = MaterialField(Fem);
     %dV = Fem.PressureCell(:,2)*(V/Fem.Ersatz);
     dV = Fem.PressureCell(:,2);
-else, dV = 0*Fem.Density;
+else, dV = 0;
 end
 
 index = 0; subindex = 0;
@@ -994,14 +990,14 @@ if Fem.VolumetricPressure
     Pc = Fem.Mesh.get('Center');
     id = FindElements(Fem,'FloodFill',Fem,Fem.Density);
     idnull = setdiff(1:Fem.NElem,id);
-    [W,~,V,~] = MaterialField(Fem);
-    %[~,~,W,~] = MaterialField(Fem);
-    W = ones(Fem.NElem,1).*W;
+    %[W,~,V,~] = MaterialField(Fem,true);
+    %[~,~,W,~] = MaterialField(Fem,true);
+    W = ones(Fem.NElem,1);%.*W;
     W(idnull) = 0;
-    V = Fem.Mesh.get('NodeToFace')*V;
-    Ev = wthresh(kron(V,[1;1]),'h',Fem.VoidTolerance);
-    W = ones(Fem.NElem,1);
-    W(idnull) = 0;
+    %V = Fem.Mesh.get('NodeToFace')*V;
+    %Ev = wthresh(kron(V,[1;1]),'h',Fem.VoidTolerance);
+    %Ev = wthresh(V,'h',Fem.VoidTolerance);
+    %W(idnull) = 0;
     %W = Fem.SpatialFilter*W;
     %fe = beta*Ev.*sparse(Fem.i,1,W(Fem.e).*Fem.ft);
     %W = Fem.SpatialFilter*W;
@@ -1009,7 +1005,7 @@ if Fem.VolumetricPressure
     %V = Fem.Mesh.get('NodeToFace')*V;
     %Ev = wthresh(kron(V,[1;1]),'h',Fem.VoidTolerance);
     
-    %Ft = beta*Ev.*sparse(Fem.i,1,W(Fem.e).*Fem.ft);
+    %Ft = beta*sparse(Fem.i,1,W(Fem.e).*(Fem.e).*Fem.ft);
     Ft = beta*sparse(Fem.i,1,W(Fem.e).*Fem.ft);
     
     if Fem.SolverStartMMA
@@ -1441,10 +1437,12 @@ elseif ~Fem.Convergence
     Fem.TimeStep = max(Fem.TimeStep/2,Fem.TimeStepMin);
     Fem.Time = Fem.Time - Fem.TimeStep;
     Fem.MaxIteration = Fem.MaxIteration + 15;
-    if ~Fem.SolverStartMMA
+    %if ~Fem.SolverStartMMA
     fprintf('------------------------------------------------------------|\n');
     fprintf(' Bisection                                                  |\n');
     fprintf('------------------------------------------------------------|\n');
+    if 
+        Terminate = true;
     end
 end
 
@@ -1635,8 +1633,12 @@ end
 end
 
 %--------------------------------------------------- material interpolation 
-function [E,dEdy,V,dVdy] = MaterialField(Fem)
-y = Fem.SpatialFilter*Fem.Density;
+function [E,dEdy,V,dVdy] = MaterialField(Fem,ForceFilterOff)
+if nargin < 2, ForceFilterOff = false; end
+
+if ~ForceFilterOff, y = Fem.SpatialFilter*Fem.Density;
+else, y = Fem.Density; end
+
 eps = Fem.Ersatz;
 switch(Fem.MaterialInterpolation)
   case('SIMP')
@@ -1804,7 +1806,6 @@ fprintf(' %1.0f\t  | %1.0f\t | %1.3e | %1.3e | %0.3f | %0.3f  | %0.2f \n',...
     Fem.IterationMMA,Fem.Increment,norm(Fem.Residual(FreeDofs)),...
     (Fem.Objective(end)),Fem.Constraint(end)+1,norm(Fem.Change),Fem.Penal);
 
-
 else
 if Fem.Iteration == 1 && Fem.Increment == 1
 fprintf(' Inc | Iter  | Residual  | Max. Svm  | Time | dt      | p   |\n');
@@ -1896,6 +1897,7 @@ switch(Request)
         if ~isempty(Fem.MovieAxis), axis(Fem.MovieAxis); end
         if ~isempty(Fem.MovieCAxis), caxis(Fem.MovieCAxis); end
         drawnow;
+        background(gitpage);
         gif;
 end
 end

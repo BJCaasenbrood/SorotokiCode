@@ -2,12 +2,7 @@
 sdf = @(x) dRectangle(x,0,8,0,2);
 
 %% generate mesh
-msh = Mesh(sdf);
-msh = msh.set('BdBox',[0,8,0,2],...
-              'NElem',500,...
-              'MaxIteration',150,...
-              'Triangulate',false);
-      
+msh = Mesh(sdf,'BdBox',[0,8,0,2],'Quads',15);      
 msh = msh.generateMesh;
 
 %% show generated mesh
@@ -26,13 +21,14 @@ id = fem.FindNodes('Right');
 fem = fem.AddConstraint('Support',id,[1,1]);
 
 id = fem.FindNodes('Location',[4,2],4); 
-fem = fem.AddConstraint('Load',id,[0,-2e-3]);
+fem = fem.AddConstraint('Load',id,[0,-1e-3]);
 
 %% material
 fem.Material = Dragonskin10A;
 
 %% set density
-%fem = fem.initialTopology('Equidistance',[1,1],.5);
+%fem = fem.initialTopology('Equidistance',[4,1],0.5);
+fem.Density = 0.5*ones(fem.NElem,1);
 
 %% solving
 fem.optimize();

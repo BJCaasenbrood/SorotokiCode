@@ -129,10 +129,10 @@ classdef Fem < handle
 methods  
 %---------------------------------------------------------------- Fem Class
 function obj = Fem(Mesh,varargin) 
-    obj = ConvertMeshToFem(obj,Mesh);
     for ii = 1:2:length(varargin)
         obj.(varargin{ii}) = varargin{ii+1};
     end
+    obj = ConvertMeshToFem(obj,Mesh);
 end
 
 %---------------------------------------------------------------------- get     
@@ -1388,7 +1388,7 @@ if Fem.SolverResidual(end,1) > Fem.SolverResidual(end-1,1)
 end
 
 if (Criteria && (Fem.Iteration <= Fem.MaxIteration) && ~SingularKt && ...
-         Fem.Divergence < 3)
+         Fem.Divergence < 5)
     flag = 0;
 else
     if (Fem.Iteration > Fem.MaxIteration) || SingularKt || ...
@@ -1397,8 +1397,9 @@ else
         Fem.Convergence = false;
     elseif (Fem.Iteration == 1 && Fem.Nonlinear)
         flag = 0;    
-    elseif (Fem.Divergence >= 3)
+    elseif (Fem.Divergence >= 5)
         flag = 2;        
+        Fem.Convergence = false;
     else
         flag = 1;
         Fem.Convergence = true;
@@ -1434,13 +1435,15 @@ if Fem.Convergence
     
 elseif ~Fem.Convergence
     Fem.Utmp = Fem.U;
-    Fem.TimeStep = max(Fem.TimeStep/2,Fem.TimeStepMin);
-    Fem.Time = Fem.Time - Fem.TimeStep;
+    Fem.TimeStep = clamp(Fem.TimeStep/2,Fem.TimeStepMin,1);
+    Fem.Time = clamp(Fem.Time - Fem.TimeStep,0,1);
     Fem.MaxIteration = Fem.MaxIteration + 15;
+    %if ~Fem.SolverStartMMA
     if ~Fem.SolverStartMMA
     fprintf('------------------------------------------------------------|\n');
     fprintf(' Bisection                                                  |\n');
     fprintf('------------------------------------------------------------|\n');
+        %Terminate = true;
     end
 end
 
@@ -1810,7 +1813,7 @@ fprintf(' Inc | Iter  | Residual  | Max. Svm  | Time | dt      | p   |\n');
 fprintf('--------------------------------------------------------------\n');
 end
 
-fprintf(' %1.0f\t | %1.0f\t | %1.3e | %1.3e | %1.2f | %1.1e | %0.1f |\n',...
+fprintf(' %1.0f\t | %1.0f\t | %1.3e | %1.3e | %1.2f | %1.4f | %0.1f |\n',...
     Fem.Increment,Fem.Iteration,norm(Fem.Residual(FreeDofs)),...
     max(Fem.s(:,1)),Fem.Time,Fem.TimeStep,Fem.Penal);   
 
