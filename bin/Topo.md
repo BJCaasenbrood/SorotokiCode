@@ -6,7 +6,7 @@
 
 ### Example: Pneu-net soft robot
 
-<div align="center"> <img src="./src/opt_pneunet.gif" width="450"> </div>
+<div align="center"> <img src="./src/opt_pneunet.gif" width="500"> </div>
 
 ```matlab
 %% set signed distance function
