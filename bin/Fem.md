@@ -19,6 +19,8 @@ fem.Material = Elastosil();
 ```
 
 ### Example: Beam 
+<div align="center"> <img src="./src/fem_beam.png" width="350"> </div>
+
 ```matlab
 %% generate mesh from sdf
 sdf = @(x) dRectangle(x,0,10,0,2);
