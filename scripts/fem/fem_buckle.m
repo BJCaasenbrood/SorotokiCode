@@ -2,31 +2,24 @@ clr;
 %% set signed distance function
 sdf = @(x) dRectangle(x,0,20,0,2);
 
-%% generate mesh
 msh = Mesh(sdf);
-msh = msh.set('BdBox',[0,20,0,2],...
-              'NElem',50,...
-              'MaxIteration',150,...
-              'Triangulate',false);
-      
+msh = msh.set('BdBox',[0,20,0,2],'Center',Quads([0,20,0,2],25,1));
 msh = msh.generateMesh;
 
 %% generate fem model
 fem = Fem(msh);
-fem = fem.set('TimeStep',1/200,...
-              'ResidualNorm',1e-3,...
-              'Nonlinear',true,...
-              'PrescribedDisplacement',true);
+fem = fem.set('TimeStep',1/200,'PrescribedDisplacement',true);
 
 %% add constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,1]);
 fem = fem.AddConstraint('Support',fem.FindNodes('SE'),[0,1]);
 fem = fem.AddConstraint('Support',fem.FindNodes('NE'),[0,1]);
-fem = fem.AddConstraint('Load',fem.FindNodes('Right'),[-10,0]);
+fem = fem.AddConstraint('Load',fem.FindNodes('Right'),[-10,1e-3]);
 
 %% add logger nodes
 fem = fem.AddConstraint('Output',fem.FindNodes('SE'),[0,0]);
 
+%% assign material
 fem.Material = Dragonskin10A;
 
 %% solving

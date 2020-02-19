@@ -1,13 +1,12 @@
-clc; clear; close all;
+clr;
 %% generate mesh from sdf
 sdf = @(x) dRectangle(x,0,1,0,1);
 
 msh = Mesh(sdf);
-msh = msh.set('BdBox',[0,1,0,1],'Center',[0.3 0.5; 0.6 0.5]);
-      
+msh = msh.set('BdBox',[0,1,0,1],'Center',Quads([0,1,0,1],10,2));
 msh = msh.generateMesh;
 
-%% show generated mesh
+%% generate fem model from mesh
 fem = Fem(msh);
 fem = fem.set('TimeStep',1/25,'PrescribedDisplacement',true);
 

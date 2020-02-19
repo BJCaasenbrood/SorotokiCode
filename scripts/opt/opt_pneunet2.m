@@ -1,20 +1,15 @@
 clr;
 %% set signed distance function
-W = 20;
-H = 40;
-E = 1;
-D = 20;
+W = 20;     % width
+H = 40;     % heigth
+E = 1;      % edge
+T = 20;     % thickness
 
-sdf = @(x) PneuNet(x,W,H,E,D);
+sdf = @(x) PneuNet(x,W,H,E,T);
 
-%% generate mesh
+%% generate mesh from sdf
 msh = Mesh(sdf);
-msh = msh.set('BdBox',[0,W,0,H],...
-              'NElem',300,...
-              'MaxIteration',50,...
-              'ShowMeshing',false,...
-              'Triangulate',false);
-      
+msh = msh.set('BdBox',[0,W,0,H],'NElem',1e3);
 msh = msh.generateMesh;
 
 %% show generated mesh
@@ -48,14 +43,13 @@ fem = fem.AddConstraint('Spring',id,[1,0]);
 id = fem.FindElements('Location',[W/2,H/2],1);
 fem = fem.AddConstraint('PressureCell',id,[-1e-3,0]);
 
-%% set density
+%% set initial topology
 fem = fem.initialTopology('Hole',[W/2,H/2],1);
 
-%% material
+%% assign material
 fem.Material = Dragonskin10A;
 
 %% solving
-figure(101);
 fem.optimize();
 
 function Dist = PneuNet(P,W,H,E,D)
