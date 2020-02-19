@@ -18,7 +18,7 @@ fem.Material = Dragonskin20A();
 fem.Material = Elastosil();   	 
 ```
 
-### Example: Beam 
+### Example: Clamped beam 
 <div align="center"> <img src="./src/fem_beam.png" width="350"> </div>
 
 ```matlab
