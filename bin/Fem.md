@@ -19,7 +19,6 @@ fem.Material = Elastosil();
 ```
 
 ### Example: Pinned beam 
-<div align="center"> <img src="./src/fem_beam.png" width="350"> </div>
 
 ```matlab
 %% generate mesh from sdf
@@ -42,6 +41,8 @@ fem.Material = Ecoflex0030;
 %% solving
 fem.solve();
 ```
+
+<div align="center"> <img src="./src/fem_beam.png" width="350"> </div>
 
 ### Example: Tensile bone
 ```matlab
