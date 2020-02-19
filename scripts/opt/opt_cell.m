@@ -6,8 +6,8 @@ sdf = @(x) dRectangle(x,0,10,0,7.5);
 %% generate mesh
 msh = Mesh(sdf);
 msh = msh.set('BdBox',[0,10,0,7.5],...
-              'NElem',750,...
-              'MaxIteration',150,...
+              'NElem',400,...
+              'MaxIteration',50,...
               'ShowMeshing',false,...
               'Triangulate',false);
       
@@ -28,41 +28,31 @@ fem = fem.set('TimeStep',1/3,...
               'OptimizationProblem','Compliant');
 
 %% add constraint
-id = fem.FindNodes('Left'); 
-fem = fem.AddConstraint('Support',id,[1,0]);
-id = fem.FindNodes('Bottom'); 
-fem = fem.AddConstraint('Support',id,[0,1]);
+fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,0]);
+fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[0,1]);
 
-id = fem.FindElements('Location',[1,1],1);
+id = fem.FindElements('Location',[0,0],1);
 fem = fem.AddConstraint('PressureCell',id,[-1e-3,0]);
 
-id = fem.FindElements('Location',[1,7.5]);
+id = fem.FindNodes('NW');
 fem = fem.AddConstraint('Output',id,[0,-1]);
-fem = fem.AddConstraint('Spring',id,[0,1]);
-
-% id = fem.FindNodes('Location',[10,0],1); 
-% fem = fem.AddConstraint('Output',id,[-0.05,0]);
-% fem = fem.AddConstraint('Spring',id,[5,0]);
-
+fem = fem.AddConstraint('Spring',id,[0,1e-3]);
+% % 
+% id = fem.FindNodes('SE');
+% fem = fem.AddConstraint('Output',id,[-1,-1]);
+% fem = fem.AddConstraint('Spring',id,[1e-3,0]);
 %% material
-% fem.Material = YeohMaterial('C1',17e-3,'C2',-0.2e-3,'C3',0.023e-3,...
-%     'D1',1.5,'D2',2.0,'D3',1.0);
-
 fem.Material = Dragonskin10A;
 
-%fem.Material = MooneyMaterial('C10',3,'K',50);
-
-%fem.Material = LinearMaterial('E',3,'Nu',0.49);
-
 %% set density
-fem = fem.initialTopology('Hole',[0,0],5);
+fem = fem.initialTopology('Hole',[0,0],3);
 
 %% solving
 fem.optimize();
 
 %% reconstruct
 fem = fem.set('ReflectionPlane',[1,1],...
-        'CellRepetion',[2,4]);
+        'CellRepetion',[2,6]);
 
 fem = fem.former(10);
 fem.showISO(0.15,.5);

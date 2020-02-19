@@ -79,10 +79,10 @@ flag = 0;
 if isempty(Mesh.Center)
     Pc = randomPointSet(Mesh); 
 else
-    Mesh.MaxIteration = 2;
+    Mesh.MaxIteration = 1;
     Pc = Mesh.Center; 
-    d = Mesh.SDF(Pc);
-    Pc = Pc(d(:,end)<0,:);  
+    %d = Mesh.SDF(Pc);
+    %Pc = Pc(d(:,end)<0,:);  
     Mesh.NElem = length(Pc);
 end
 
@@ -262,7 +262,7 @@ Ctr = 0;
 while(Ctr < Mesh.NElem)
     Y = zeros(Mesh.NElem,Mesh.Dimension);
     for ii = 1:Mesh.Dimension
-    Y(:,ii) = (B(ii+1)-B(ii))*rand(Mesh.NElem,1)+B(ii);
+    Y(:,ii) = (B(2*ii)-B(2*ii-1))*rand(Mesh.NElem,1)+B(2*ii-1);
     end
     d = Mesh.SDF(Y);
     I = find(d(:,end)<0);               
@@ -369,7 +369,6 @@ end
 
 %----------------------------------------------- triangulate polygonal mesh
 function [v, f] = MeshTriangulation(Mesh,Center,v0,f0)
-
 f = [];
 
 for ii = 1:Mesh.NElem

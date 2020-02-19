@@ -6,10 +6,7 @@ sdf = @(x) PneuNet(x);
 %% generate mesh
 msh = Mesh(sdf);
 msh = msh.set('BdBox',[0,20,0,20],...
-              'NElem',500,...
-              'MaxIteration',100,...
-              'ShowMeshing',false,...
-              'Triangulate',false);
+              'Center',Seedlist);
       
 msh = msh.generateMesh;
 
@@ -55,7 +52,6 @@ fem.optimize();
 % fem.former(10);
 % fem.showISO(0.05,.5);
 
-
 function Dist = PneuNet(P)
   R1 = dRectangle(P,0,20,0,20);
   R2 = dRectangle(P,-4,1,4,24);
@@ -63,5 +59,11 @@ function Dist = PneuNet(P)
   C1 = dCircle(P,0,4.5,1);
   C2 = dCircle(P,20,4.5,1);
   Dist = dDiff(dDiff(dDiff(dDiff(R1,R2),R3),C1),C2);
+end
+
+function x = Seedlist;
+
+x 
+
 end
 

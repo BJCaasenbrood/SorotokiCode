@@ -4,15 +4,16 @@ sdf = @(x) dCircle(x,0,0,1);
 %% generate mesh
 msh = Mesh(sdf);
 msh = msh.set('BdBox',[-1,1,-1,1],...
-              'NElem',500);
+              'Center',SeedList);
       
 msh = msh.generateMesh;
-msh.show;
+
 %% show generated mesh
 fem = Fem(msh);
 fem = fem.set('TimeStep',1/15,...
-              'ResidualNorm',1e-5,...
+              'ResidualNorm',1e-3,...
               'Nonlinear',true,...
+              'FilterRadius',1e-7,...
               'Penal',4,...
               'VolumetricPressure',true,...
               'PrescribedDisplacement',false);
@@ -20,16 +21,16 @@ fem = fem.set('TimeStep',1/15,...
 %% add constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Bottom',2),[1,1]);
 fem = fem.AddConstraint('PressureCell',fem.FindElements(...
-    'Location',[0,0],1),[-4e-3,0]);
+    'Location',[0,0],1),[1e-4,0]);
 
-fem.Material = Ecoflex0030;%LinearMaterial('E',1,'Nu',0.4);
+fem.Material = Dragonskin10A;
 
 %% generate void region
-fem = fem.initialTopology('Hole',[0,0],.75);
+%fem = fem.initialTopology('Hole',[0,0],.75);
 % 
-% id = fem.FindElements('Location',[0,0]);
-% fem.Density = ones(fem.NElem,1);
-% fem.Density(id) = 1e-2;
+id = fem.FindElements('Location',[0,0]);
+fem.Density = ones(fem.NElem,1);
+fem.Density(id) = 1e-2;
 
 %% solving
 fem.solve();

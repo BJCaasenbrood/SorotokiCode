@@ -4,18 +4,18 @@ sdf = @(x) PneuGrip(x);
 
 %% generate mesh
 msh = Mesh(sdf);
-msh = msh.set('BdBox',[-5,13,0,5],...
-              'NElem',1e3,...
+msh = msh.set('BdBox',[5,13,0,5],...
+              'NElem',700,...
               'MaxIteration',50);
-   
+      
 msh = msh.generateMesh;
 
 %% generate fem model
 fem = Fem(msh);
 fem = fem.set('TimeStep',1/5,...
               'ResidualNorm',1e-3,...
-              'VolumeInfill',0.3,...
-              'FilterRadius',1.5,...
+              'VolumeInfill',0.25,...
+              'FilterRadius',0.75,...
               'Nonlinear',false,...
               'MaxIterationMMA',80,...
               'Penal',4,...
@@ -29,15 +29,15 @@ fem = fem.AddConstraint('Support',id,[1,1]);
 id = fem.FindNodes('Top'); 
 fem = fem.AddConstraint('Support',id,[0,1]);
 
-id = fem.FindNodes('Location',[13,4.5],1);
+id = fem.FindNodes('Location',[13,3],1);
 fem = fem.AddConstraint('Output',id,[0,1]);
-fem = fem.AddConstraint('Spring',id,[0,1]);
+fem = fem.AddConstraint('Spring',id,[0,1e-3]);
 
-id = fem.FindElements('Location',[5,5],1);
-fem = fem.AddConstraint('PressureCell',id,[5e-4,0]);
+id = fem.FindElements('Location',[-5,5],1);
+fem = fem.AddConstraint('PressureCell',id,[-1e-3,0]);
 
 %% set density
-fem = fem.initialTopology('Hole',[5,5],2);
+fem = fem.initialTopology('Hole',[-5,5],2);
 
 %% material
 fem.Material = Dragonskin10A;
