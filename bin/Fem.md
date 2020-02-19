@@ -18,30 +18,33 @@ fem.Material = Dragonskin20A();
 fem.Material = Elastosil();   	 
 ```
 
-### Example: Clamped beam 
+### Example: Supported beam 
 <div align="center"> <img src="./src/fem_beam.png" width="350"> </div>
 
 ```matlab
 %% generate mesh from sdf
-sdf = @(x) dRectangle(x,0,10,0,2);
+%% generate mesh from sdf
+sdf = @(x) dRectangle(x,0,5,0,1);
 
 msh = Mesh(sdf);
-msh = msh.set('BdBox',[0,10,0,2],'NElem',500);
+msh = msh.set('BdBox',[0,5,0,1],'Center',Quads([0,5,0,1],25,5));
 msh = msh.generateMesh;
 
-%% generate fem model from mesh
-fem = Fem(msh);
-fem = fem.set('TimeStep',1/15,'ResidualNorm',1e-3);
-
 %% add boundary conditions 
-fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,1]);
-fem = fem.AddConstraint('Load',fem.FindNodes('Right'),[0,-1e-3]);
+fem = Fem(msh);
+fem = fem.set('TimeStep',1/50);
 
-%% assign material
+%% add constraint
+fem = fem.AddConstraint('Support',fem.FindNodes('SW'),[1,1]);
+fem = fem.AddConstraint('Support',fem.FindNodes('SE'),[0,1]);
+fem = fem.AddConstraint('Load',fem.FindNodes('Bottom'),[0,-1e-2]);
+
+%% select material
 fem.Material = Ecoflex0030;
 
 %% solving
 fem.solve();
+
 ```
 
 ### Example: Tensile bone
