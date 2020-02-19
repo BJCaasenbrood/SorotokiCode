@@ -1,31 +1,22 @@
 clc;  clear; close all;
-%% set signed distance function
-sdf = @(x) TensileBone(x,8,2,3.5,1,0.75);
-%% generate mesh
+%% generate mesh from sdf
+sdf = @(x) TensileBone(x,8,2,3,1,0.75);
+%% 
 msh = Mesh(sdf);
-msh = msh.set('BdBox',[0,10,0,10],...
-              'NElem',500,...
-              'MaxIteration',150,...
-              'ShowMeshing',false,...
-              'Triangulate',false);
-      
+msh = msh.set('BdBox',[0,10,0,10],'NElem',500);
 msh = msh.generateMesh;
 
-%% generate fem model
+%% generate fem model from mesh
 fem = Fem(msh);
-fem = fem.set('TimeStep',1/20,...
-              'ResidualNorm',1e-3,...
-              'Nonlinear',true,...
-              'PrescribedDisplacement',true);
+fem = fem.set('TimeStep',1/10,'PrescribedDisplacement',true);
 
-%% add constraint
+%% add boundary conditions
 fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,0]);
 fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[0,1]);
-fem = fem.AddConstraint('Load',fem.FindNodes('Top'),[0,8]);
+fem = fem.AddConstraint('Load',fem.FindNodes('Top'),[0,4]);
 
-%fem.Material = Ecoflex0030;
-%fem.Material = MooneyMaterial('C10',8,'K',160);
-fem.Material = NeoHookeanMaterial('E',60,'Nu',0.48); 
+fem.Material = Ecoflex0030;
+
 %% solving
 fem.solve();
 
