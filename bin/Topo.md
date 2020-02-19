@@ -5,6 +5,9 @@
 [**Homepage**](https://bjcaasenbrood.github.io/SorotokiCode/)
 
 ### Example: Pneu-net soft robot
+
+<div align="center"> <img src="./src/opt_pneunet.gif" width="650"> </div>
+
 ```matlab
 %% set signed distance function
 sdf = @(x) PneuNet(x);
