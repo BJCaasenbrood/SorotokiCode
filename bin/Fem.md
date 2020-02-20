@@ -1,6 +1,6 @@
 <div align="center"> <img src="./src/fem.png" width="650"> </div>
 
-# Nonlinear Finite Elements
+# Finite Element Method
 
 [**Homepage**](https://bjcaasenbrood.github.io/SorotokiCode/)
 
@@ -18,31 +18,32 @@ fem.Material = Dragonskin20A();
 fem.Material = Elastosil();   	 
 ```
 
-### Example: Pinned beam 
+### Example: Clamped beam 
 
 ```matlab
 %% generate mesh from sdf
-sdf = @(x) dRectangle(x,0,5,0,1);
+sdf = @(x) dRectangle(x,0,10,0,1);
 
-msh = Mesh(sdf,'BdBox',[0,5,0,1],'Center',Quads([0,5,0,1],25,5));
+msh = Mesh(sdf,'BdBox',[0,10,0,1],'Quads',[25,5]);
 msh = msh.generateMesh;
 
-%% add boundary conditions 
-fem = Fem(msh,'TimeStep',1/50);
+%% generate fem model from mesh
+fem = Fem(msh,'TimeStep',1/15);
 
-%% add constraint
-fem = fem.AddConstraint('Support',fem.FindNodes('S5'),[1,1]);
-fem = fem.AddConstraint('Support',fem.FindNodes('SE'),[1,1]);
-fem = fem.AddConstraint('Load',fem.FindNodes('Bottom'),[0,-1e-2]);
+%% add boundary conditions
+fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,1]);
+fem = fem.AddConstraint('Support',fem.FindNodes('Right'),[1,1]);
+fem = fem.AddConstraint('Load',fem.FindNodes('Bottom'),[0,-2e-2]);
 
 %% select material
-fem.Material = Ecoflex0030;
+fem.Material = Dragonskin10A;
 
 %% solving
 fem.solve();
-```
 
+```
 <div align="center"> <img src="./src/fem_beam.png" width="350"> </div>
+
 
 ### Example: Tensile bone
 ```matlab
@@ -83,3 +84,4 @@ D0 = dDiff(dDiff(dDiff(R1,R2),C1),C2);
 D = dDiff(dDiff(dDiff(D0,R3),C3),C4);
 end
 ```
+<div align="center"> <img src="./src/fem_tensile.png" width="350"> </div>
