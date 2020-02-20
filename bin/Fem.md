@@ -19,7 +19,6 @@ fem.Material = Elastosil();
 ```
 
 ### Example: Clamped beam 
-
 ```matlab
 %% generate mesh from sdf
 sdf = @(x) dRectangle(x,0,10,0,1);
@@ -85,6 +84,7 @@ end
 <div align="center"> <img src="./src/fem_tensile.png" width="550"> </div>
 
 ### Example: Buckling beam 
+```matlab
 %% generate mesh from sdf
 sdf = @(x) dRectangle(x,0,20,0,2);
 
