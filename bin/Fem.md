@@ -84,4 +84,4 @@ D0 = dDiff(dDiff(dDiff(R1,R2),C1),C2);
 D = dDiff(dDiff(dDiff(D0,R3),C3),C4);
 end
 ```
-<div align="center"> <img src="./src/fem_tensile.png" width="350"> </div>
+<div align="center"> <img src="./src/fem_tensile.png" width="550"> </div>
