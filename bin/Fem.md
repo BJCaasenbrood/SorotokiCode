@@ -1,16 +1,17 @@
 <div align="center"> <img src="./src/fem.png" width="650"> </div>
 
 # Finite Element Method
+[**Sorotoki**](https://bjcaasenbrood.github.io/SorotokiCode/) provides a finite element solver for linear and nonlinear (geometrically and hyperelastic) problems. The *Fem.lib* works coherenly with the mesing libary *Mesh.lib*. The finite element toolkit provides a set of material models (e.g., Neo-Hookean, and Yeoh) that allow for a wide modeling variaty of 'soft materials'. Furhtermore, the toolkit also provides some preset materials that are popular in soft robotics, such as Ecoflex0030 and Dragonskin.
 
 [**Homepage**](https://bjcaasenbrood.github.io/SorotokiCode/)
 
 ### List of material models:
 ```matlab
 % different material models
-fem.Material = LinearMaterial('E',-,'Nu',-);           % linear isotropic
-fem.Material = NeoHookeanMaterial('E',-,'Nu',-);       % neo-hookean model
-fem.Material = MooneyMaterial('C10',-,'C01',-,'K',-);  % mooney-rivlin model
-fem.Material = YeohMaterial('C1',-,'C2',-,'C3',-)      % yeoh model
+fem.Material = LinearMaterial('E',-,'Nu',-);           
+fem.Material = NeoHookeanMaterial('E',-,'Nu',-);     
+fem.Material = MooneyMaterial('C10',-,'C01',-,'K',-); 
+fem.Material = YeohMaterial('C1',-,'C2',-,'C3',-)  
                             
 % different preset materials
 fem.Material = Ecoflex0030();
