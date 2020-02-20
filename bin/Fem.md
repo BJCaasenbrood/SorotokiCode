@@ -41,7 +41,7 @@ fem.Material = Dragonskin10A();
 fem.solve();
 
 ```
-<div align="center"> <img src="./src/fem_beam.png" width="350"> </div>
+<div align="center"> <img src="./src/fem_beam.png" width="550"> </div>
 
 
 ### Example: Tensile bone
