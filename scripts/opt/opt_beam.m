@@ -27,7 +27,6 @@ fem = fem.AddConstraint('Load',id,[0,-1e-3]);
 fem.Material = Dragonskin10A;
 
 %% set density
-%fem = fem.initialTopology('Equidistance',[4,1],0.5);
 fem.Density = 0.5*ones(fem.NElem,1);
 
 %% solving

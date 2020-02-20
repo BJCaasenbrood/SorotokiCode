@@ -31,7 +31,7 @@ fem = fem.AddConstraint('Load',id,[0,-1e-4]);
 fem.Material = Dragonskin10A;
 
 %% set density
-fem = fem.initialTopology('Equidistance',[2,1],.25);
+fem = fem.initialTopology('Hole',[2.5,1],.5);
 
 %% solving
 fem.optimize();

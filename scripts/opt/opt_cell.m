@@ -1,16 +1,11 @@
 clear; close all; clc;
 
 %% set signed distance function
-sdf = @(x) dRectangle(x,0,10,0,7.5);
+sdf = @(x) dRectangle(x,0,10,0,5);
 
 %% generate mesh
 msh = Mesh(sdf);
-msh = msh.set('BdBox',[0,10,0,7.5],...
-              'NElem',400,...
-              'MaxIteration',50,...
-              'ShowMeshing',false,...
-              'Triangulate',false);
-      
+msh = msh.set('BdBox',[0,10,0,5],'Quads',20);
 msh = msh.generateMesh;
 
 %% show generated mesh
@@ -34,13 +29,14 @@ fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[0,1]);
 id = fem.FindElements('Location',[0,0],1);
 fem = fem.AddConstraint('PressureCell',id,[-1e-3,0]);
 
-id = fem.FindNodes('NW');
+id = fem.FindNodes('Line',[0 1 5 5]);
 fem = fem.AddConstraint('Output',id,[0,-1]);
 fem = fem.AddConstraint('Spring',id,[0,1e-3]);
-% % 
-% id = fem.FindNodes('SE');
-% fem = fem.AddConstraint('Output',id,[-1,-1]);
-% fem = fem.AddConstraint('Spring',id,[1e-3,0]);
+
+id = fem.FindNodes('Line',[10 10 0 1]);
+fem = fem.AddConstraint('Output',id,[0.25,0]);
+fem = fem.AddConstraint('Spring',id,[1e-3,0]);
+
 %% material
 fem.Material = Dragonskin10A;
 

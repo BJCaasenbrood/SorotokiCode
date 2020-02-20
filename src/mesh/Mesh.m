@@ -71,7 +71,12 @@ end
 %---------------------------------------------------------------------- set
 function Mesh = set(Mesh,varargin)
     for ii = 1:2:length(varargin)
-        Mesh.(varargin{ii}) = varargin{ii+1};
+        if strcmp(varargin{ii},'Quads')
+            N = num2cell(varargin{ii+1});
+            Mesh.Center = Quads(Mesh.BdBox,N{:});
+        else
+            Mesh.(varargin{ii}) = varargin{ii+1};
+        end
     end
 end
 
@@ -86,8 +91,8 @@ if isempty(Mesh.Center)
 else
     Mesh.MaxIteration = 1;
     Pc = Mesh.Center; 
-    %d = Mesh.SDF(Pc);
-    %Pc = Pc(d(:,end)<0,:);  
+    d = Mesh.SDF(Pc);
+    Pc = Pc(d(:,end)<0,:);  
     Mesh.NElem = length(Pc);
 end
 

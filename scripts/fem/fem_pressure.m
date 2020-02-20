@@ -22,9 +22,8 @@ fem = fem.set('TimeStep',1/10,...
 %% add constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[1,1]);
 fem = fem.AddConstraint('Support',fem.FindNodes('Top'),[1,1]);
-%fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[1,1]);
 fem = fem.AddConstraint('PressureCell',fem.FindElements(...
-    'Location',[5,5],1),[1e-1,0]);
+    'Location',[5,5],1),[1e-4,0]);
 
 fem.Material = Dragonskin10A;
 
