@@ -18,7 +18,7 @@ fem.Material = Dragonskin20A();
 fem.Material = Elastosil();   	 
 ```
 
-### Example: Pinned beam 
+### Example: Clamped beam 
 
 ```matlab
 %% generate mesh from sdf
@@ -31,8 +31,8 @@ msh = msh.generateMesh;
 fem = Fem(msh,'TimeStep',1/15);
 
 %% add boundary conditions
-fem = fem.AddConstraint('Support',fem.FindNodes('SW'),[1,1]);
-fem = fem.AddConstraint('Support',fem.FindNodes('SE'),[0,1]);
+fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,1]);
+fem = fem.AddConstraint('Support',fem.FindNodes('Right'),[1,1]);
 fem = fem.AddConstraint('Load',fem.FindNodes('Bottom'),[0,-2e-2]);
 
 %% select material
@@ -42,8 +42,8 @@ fem.Material = Dragonskin10A;
 fem.solve();
 
 ```
-
 <div align="center"> <img src="./src/fem_beam.png" width="350"> </div>
+
 
 ### Example: Tensile bone
 ```matlab
@@ -84,3 +84,4 @@ D0 = dDiff(dDiff(dDiff(R1,R2),C1),C2);
 D = dDiff(dDiff(dDiff(D0,R3),C3),C4);
 end
 ```
+<div align="center"> <img src="./src/fem_tensile.png" width="350"> </div>
