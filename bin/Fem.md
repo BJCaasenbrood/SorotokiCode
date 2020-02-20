@@ -25,7 +25,7 @@ fem.Material = Elastosil();
 sdf = @(x) dRectangle(x,0,10,0,1);
 
 msh = Mesh(sdf,'BdBox',[0,10,0,1],'Quads',[25,5]);
-msh = msh.generateMesh;
+msh = msh.generateMesh();
 
 %% generate fem model from mesh
 fem = Fem(msh,'TimeStep',1/15);
@@ -36,7 +36,7 @@ fem = fem.AddConstraint('Support',fem.FindNodes('Right'),[1,1]);
 fem = fem.AddConstraint('Load',fem.FindNodes('Bottom'),[0,-2e-2]);
 
 %% select material
-fem.Material = Dragonskin10A;
+fem.Material = Dragonskin10A();
 
 %% solving
 fem.solve();
@@ -50,13 +50,11 @@ fem.solve();
 %% generate mesh from sdf
 sdf = @(x) TensileBone(x,8,2,3,1,0.75);
 
-msh = Mesh(sdf);
-msh = msh.set('BdBox',[0,10,0,10],'NElem',500);
-msh = msh.generateMesh;
+msh = Mesh(sdf,'BdBox',[0,10,0,10],'NElem',500);
+msh = msh.generateMesh();
 
 %% generate fem model from mesh
-fem = Fem(msh);
-fem = fem.set('TimeStep',1/10,'PrescribedDisplacement',true);
+fem = Fem(msh,'TimeStep',1/10,'PrescribedDisplacement',true);
 
 %% add boundary conditions
 fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,0]);
@@ -64,7 +62,7 @@ fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[0,1]);
 fem = fem.AddConstraint('Load',fem.FindNodes('Top'),[0,4]);
 
 %% assign material
-fem.Material = Ecoflex0030;
+fem.Material = Ecoflex0030();
 
 %% solving
 fem.solve();
