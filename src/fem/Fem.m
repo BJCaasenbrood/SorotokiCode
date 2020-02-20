@@ -164,7 +164,7 @@ end
 %--------------------------------------------------------------------- show
 function h = show(Fem,varargin)
     
-if nargin<2, Request = 'SDF'; 
+if nargin<2, Request = '0'; 
 else, Request = varargin{1}; end
 
 S = 'interp'; 
@@ -173,6 +173,7 @@ flag = 0;
 colormap(Fem.CMap);
 
 switch(Request)
+    case('0'),  Z = zeros(Fem.NNode,1);
     case('SDF'), Z = Fem.Mesh.SDF(Fem.Mesh.Node); Z = Z(:,end);
     case('Svm'), Z = Fem.VonMisesNodal;
     case('Sxx'), Z = Fem.sxxNodal;

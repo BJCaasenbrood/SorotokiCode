@@ -26,8 +26,9 @@ fem.Material = Ecoflex0030;
 fem.solve();
 
 %% plot force-displacement relation
-figure(102);
-plot(fem.Log{3},fem.Log{6},'linewidth',2,'Color',col(2));
-axis tight; grid on;
-xlabel('Displacement (mm)','interpreter','latex');
-ylabel('Reaction force (mN)','interpreter','latex');
+figure(101);
+subplot(2,1,1); fem.show();
+subplot(2,1,2); plot(fem.Log{3},fem.Log{6},'linewidth',2,'Color',col(2));
+xlabel('Displacement (mm)','interpreter','latex','fontsize',12);
+ylabel('Reaction force (N)','interpreter','latex','fontsize',12);
+grid on; set(gca,'linewidth',1);

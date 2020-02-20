@@ -3,7 +3,7 @@ clc;  clear; close all;
 sdf = @(x) TensileBone(x,8,2,3,1,0.75);
 %% 
 msh = Mesh(sdf);
-msh = msh.set('BdBox',[0,10,0,10],'NElem',150);
+msh = msh.set('BdBox',[0,10,0,10],'NElem',500);
 msh = msh.generateMesh;
 
 %% generate fem model from mesh
