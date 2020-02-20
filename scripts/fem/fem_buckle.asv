@@ -12,8 +12,7 @@ fem = fem.set('TimeStep',1/200,'PrescribedDisplacement',true);
 
 %% add constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,1]);
-fem = fem.AddConstraint('Support',fem.FindNodes('Right'),[0,1]);
-fem = fem.AddConstraint('Load',fem.FindNodes('Right'),[-4,0]);
+fem = fem.AddConstraint('Load',fem.FindNodes('Right'),[-4,1e-3]);
 
 %% add logger nodes
 fem = fem.AddConstraint('Output',fem.FindNodes('SE'),[0,0]);
@@ -27,7 +26,7 @@ fem.solve();
 %% plot force-displacement relation
 figure(101);
 subplot(2,1,1); fem.show();
-subplot(2,1,2); plot(fem.Log{3},fem.Log{6}*1e3,'linewidth',2,'Color',col(2));
+subplot(2,1,2); plot(fem.Log{3},fem.Log{6},'linewidth',2,'Color',col(2));
 xlabel('Displacement (mm)','interpreter','latex','fontsize',12);
-ylabel('Reaction force (mN)','interpreter','latex','fontsize',12);
+ylabel('Reaction force (N)','interpreter','latex','fontsize',12);
 grid on; set(gca,'linewidth',1);
