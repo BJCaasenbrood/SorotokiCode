@@ -7,7 +7,7 @@
 ### Example: Pneu-net soft robot
 
 ```matlab
-%% set signed distance function
+%% generate mesh from sdf
 W = 20;   % width
 H = 40;   % height  
 E = 1;    % edge 
@@ -15,25 +15,19 @@ T = 20;   % thickness
 
 sdf = @(x) PneuNet(x,W,H,E,T);
 
-%% generate mesh
-msh = Mesh(sdf);
-msh = msh.set('BdBox',[0,W,0,H],...
-              'NElem',1000
-      
+msh = Mesh(sdf'BdBox',[0,W,0,H],'NElem',1000
 msh = msh.generateMesh;
 
-%% show generated mesh
-fem = Fem(msh);
-fem = fem.set('TimeStep',1/3,...
+%% generate fem model from mesh
+fem = Fem(msh,'TimeStep',1/3,...
               'VolumeInfill',0.3,...
               'Penal',4,...
-              'VolumetricPressure',true,...
               'FilterRadius',4,...
               'Periodic',[1/2, 0],...
               'Repeat',ones(1,7),...
               'OptimizationProblem','Compliant');
 
-%% add constraint
+%% add boundary condition
 id = fem.FindNodes('Left'); 
 fem = fem.AddConstraint('Support',id,[1,1]);
 
