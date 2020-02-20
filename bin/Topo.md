@@ -6,8 +6,6 @@
 
 ### Example: Pneu-net soft robot
 
-<div align="center"> <img src="./src/opt_pneunet.gif" width="550"> </div>
-
 ```matlab
 %% set signed distance function
 W = 20;   % width
@@ -63,7 +61,8 @@ C1 = dCircle(P,0,T + 0.5,1);
 C2 = dCircle(P,W,T + 0.5,1);
 Dist = dDiff(dDiff(dDiff(dDiff(R1,R2),R3),C1),C2);
 end
-
-
 ```
+
+<div align="center"> <img src="./src/opt_pneunet.gif" width="550"> </div>
+
 
