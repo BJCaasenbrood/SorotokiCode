@@ -19,13 +19,12 @@ fem.Material = Elastosil();
 ```
 
 ### Example: Clamped beam 
-
 ```matlab
 %% generate mesh from sdf
 sdf = @(x) dRectangle(x,0,10,0,1);
 
 msh = Mesh(sdf,'BdBox',[0,10,0,1],'Quads',[25,5]);
-msh = msh.generateMesh;
+msh = msh.generateMesh();
 
 %% generate fem model from mesh
 fem = Fem(msh,'TimeStep',1/15);
@@ -36,7 +35,7 @@ fem = fem.AddConstraint('Support',fem.FindNodes('Right'),[1,1]);
 fem = fem.AddConstraint('Load',fem.FindNodes('Bottom'),[0,-2e-2]);
 
 %% select material
-fem.Material = Dragonskin10A;
+fem.Material = Dragonskin10A();
 
 %% solving
 fem.solve();
@@ -50,13 +49,11 @@ fem.solve();
 %% generate mesh from sdf
 sdf = @(x) TensileBone(x,8,2,3,1,0.75);
 
-msh = Mesh(sdf);
-msh = msh.set('BdBox',[0,10,0,10],'NElem',500);
-msh = msh.generateMesh;
+msh = Mesh(sdf,'BdBox',[0,10,0,10],'NElem',500);
+msh = msh.generateMesh();
 
 %% generate fem model from mesh
-fem = Fem(msh);
-fem = fem.set('TimeStep',1/10,'PrescribedDisplacement',true);
+fem = Fem(msh,'TimeStep',1/10,'PrescribedDisplacement',true);
 
 %% add boundary conditions
 fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,0]);
@@ -64,7 +61,7 @@ fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[0,1]);
 fem = fem.AddConstraint('Load',fem.FindNodes('Top'),[0,4]);
 
 %% assign material
-fem.Material = Ecoflex0030;
+fem.Material = Ecoflex0030();
 
 %% solving
 fem.solve();
@@ -84,4 +81,41 @@ D0 = dDiff(dDiff(dDiff(R1,R2),C1),C2);
 D = dDiff(dDiff(dDiff(D0,R3),C3),C4);
 end
 ```
-<div align="center"> <img src="./src/fem_tensile.png" width="350"> </div>
+<div align="center"> <img src="./src/fem_tensile.png" width="550"> </div>
+
+### Example: Buckling beam 
+```matlab
+%% generate mesh from sdf
+sdf = @(x) dRectangle(x,0,20,0,2);
+
+msh = Mesh(sdf,'BdBox',[0,20,0,2],'NElem',150);
+msh = msh.generateMesh;
+
+%% generate fem model from mesh
+fem = Fem(msh,'TimeStep',1/200,'PrescribedDisplacement',true);
+
+%% add boundary condition
+fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,1]);
+fem = fem.AddConstraint('Support',fem.FindNodes('SE'),[0,1]);
+fem = fem.AddConstraint('Support',fem.FindNodes('NE'),[0,1]);
+fem = fem.AddConstraint('Load',fem.FindNodes('Right'),[-4,0]);
+
+%% add logger nodes
+fem = fem.AddConstraint('Output',fem.FindNodes('SE'),[0,0]);
+
+%% assign material
+fem.Material = Ecoflex0030;
+
+%% solving
+fem.solve();
+
+%% plot force-displacement relation
+figure(101);
+subplot(2,1,1); fem.show();
+subplot(2,1,2); plot(fem.Log{3},fem.Log{6},'linewidth',2,'Color',col(2));
+xlabel('Displacement (mm)','interpreter','latex','fontsize',12);
+ylabel('Reaction force (N)','interpreter','latex','fontsize',12);
+grid on; set(gca,'linewidth',1);
+```
+
+<div align="center"> <img src="./src/fem_buckle.png" width="550"> </div>
