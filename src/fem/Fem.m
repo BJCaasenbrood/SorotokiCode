@@ -241,23 +241,25 @@ if flag == 2
     if ~isempty(Fem.Pressure), Pres = Fem.Pressure(:,1); else, Pres = []; end
     
     hold on;
-    for ii = 1:length(Supp)
+    for ii = 1:size(Supp,1)
         id = Supp(ii,1);
         if (Supp(ii,2) && Supp(ii,3)), symbol = '\Delta';
         else, symbol = '\Delta'; end
-        text(V(id,1)-.1,V(id,2),symbol,'fontsize',10,'Color','r');
+        plot(V(id,1),V(id,2),'marker','d','markersize',5,'Color',col(1));
     end
     
-    for ii = 1:length(Forc)
+    for ii = 1:size(Forc,1)
         id = Forc(ii,1);
         if ispos(Forc(ii,2)), symbol = '\bf \rightarrow'; end
         if isneg(Forc(ii,2)), symbol = '\bf \leftarrow'; end
         if ispos(Forc(ii,3)), symbol = '\bf \uparrow'; end
         if isneg(Forc(ii,3)), symbol = '\bf \downarrow'; end
-        vecmag = 0.05*sum(abs(Fem.BdBox))/4;
+        vecmag = 0.15*sum(abs(axis))/4;
     end
     
-    for ii = 1:length(Out)
+    plotvector(V(Forc(:,1),:),Forc(:,2:3)*vecmag);
+    
+    for ii = 1:size(Out,1)
         id = Out(ii);
         if ispos(Out(ii,2)), symbol = '\bf \rightarrow'; end
         if isneg(Out(ii,2)), symbol = '\bf \leftarrow'; end
