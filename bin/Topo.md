@@ -8,24 +8,19 @@
 
 ```matlab
 %% generate mesh from sdf
-W = 20;   % width
-H = 40;   % height  
-E = 1;    % edge 
-T = 20;   % thickness
+sdf = @(x) PneuNet(x,20,40,1,20);
 
-sdf = @(x) PneuNet(x,W,H,E,T);
-
-msh = Mesh(sdf'BdBox',[0,W,0,H],'NElem',1000
+msh = Mesh(sdf'BdBox',[0,20,0,40],'NElem',1000);
 msh = msh.generateMesh;
 
 %% generate fem model from mesh
-fem = Fem(msh,'TimeStep',1/3,...
-              'VolumeInfill',0.3,...
+fem = Fem(msh,'VolumeInfill',0.3,...
               'Penal',4,...
               'FilterRadius',4,...
-              'Periodic',[1/2, 0],...
-              'Repeat',ones(1,7),...
               'OptimizationProblem','Compliant');
+              
+%% set spatial settings
+fem = fem.set('Periodic',[1/2, 0],'Repeat',ones(1,7));
 
 %% add boundary condition
 id = fem.FindNodes('Left'); 
