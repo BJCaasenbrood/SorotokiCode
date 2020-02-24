@@ -4,11 +4,10 @@ sdf = @(x) TensileBone(x,8,2,3,1,0.75);
 %% 
 msh = Mesh(sdf);
 msh = msh.set('BdBox',[0,10,0,10],'NElem',500);
-msh = msh.generateMesh;
+msh = msh.generate();
 
 %% generate fem model from mesh
-fem = Fem(msh);
-fem = fem.set('TimeStep',1/10,'PrescribedDisplacement',true);
+fem = Fem(msh,'TimeStep',1/10,'PrescribedDisplacement',true);
 
 %% add boundary conditions
 fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,0]);

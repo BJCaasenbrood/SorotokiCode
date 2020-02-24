@@ -2,19 +2,19 @@ clr;
 %% generate mesh from sdf
 sdf = @(x) dRectangle(x,0,10,0,1);
 
-msh = Mesh(sdf,'BdBox',[0,10,0,1],'Quads',[25,4]);
-msh = msh.generateMesh;
+msh = Mesh(sdf,'BdBox',[0,10,0,1],'NElem',150);
+msh = msh.generate();
 
-%% add boundary conditions 
-fem = Fem(msh,'TimeStep',1/15);
+%% generate fem model from mesh
+fem = Fem(msh,'TimeStep',1/40);
 
 %% add constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,1]);
 fem = fem.AddConstraint('Support',fem.FindNodes('Right'),[1,1]);
-fem = fem.AddConstraint('Load',fem.FindNodes('Bottom'),[0,-2e-2]);
+fem = fem.AddConstraint('Load',fem.FindNodes('Bottom'),[0,-3e-2]);
 
 %% select material
-fem.Material = Dragonskin10A;
+fem.Material =  Ecoflex0030;
 
 %% solving
 fem.solve();

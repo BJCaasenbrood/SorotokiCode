@@ -16,9 +16,9 @@ classdef Model
         dq;
         ddq;
         t;
-        E = 1e2;
+        E = 350;
         nu = 0.495;
-        mu = 0.5;
+        mu = .1;
         xia0 = [0,0,0,1,0,0].';
         Phi;
         Ba; Bc; 
@@ -26,7 +26,7 @@ classdef Model
         NModal = 5;
         Grav = 9.81;
         Radius = 1e-2;
-        Density = 2;
+        Density = 1e-2;
         Length = 1;
         Length0;
         P1; P2; P3;
@@ -77,14 +77,15 @@ T = linspace(0,Model.tspan,1e2);
 q0 = zeros(Model.NModal*Model.NDof,1);
 
 %options = odeset('Events', @myEvent);
-[ts,ys] = ode45(@(t,x) KinematicODE(Model,t,x),T,q0);
+opt = odeset('RelTol',1e-3,'AbsTol',1e-5);
+[ts,ys] = ode45(@(t,x) KinematicODE(Model,t,x),T,q0,opt);
 
 Model.g = ys;
 Model.t = ts;
 
 end
 
-%---------------------------------------------------------------------- set
+%----------------------------------------------------------------- simulate
 function Model = simulate(Model)
     
 dt = 1e-2;
@@ -101,8 +102,30 @@ Model.t = ts;
 
 end
 
+function h = show(Model)
+   
+N = Model.Nq;
+X = linspace(0,1,200);
+
+Model.q(:,1) = Model.g(end,1:N).';
+Model.dq(:,1) = 0*Model.q(:,1);
+Model.ddq(:,1) = 0*Model.q(:,1);
+ee = Model.Ba*Model.Phi(Model.Length)*Model.q;
+Model.Length = ee(4);
+g0 = [1,0,0,0,0,0,0];
+eta0 = [0,0,0,0,0,0];
+deta0 = [0,0,0,0,0,0];
+[~,yf] = ode45(@(t,x) ForwardODE(Model,t,x),X,[g0 eta0 deta0]);
+G = yf(:,1:7);
+
+figure(101);
+plot3(G(:,5),G(:,6),G(:,7),'linewidth',2,'Color',col(1));
+axis equal;
+    
+end
+
 %---------------------------------------------------------------------- set
-function show(Model)
+function h = showModel(Model)
     
 figure(101); hold all;
 N = Model.Nq;
@@ -159,12 +182,8 @@ for ii = 1:FPS:length(Model.t)
     msh.updateNode();
     msh.update();
     mshgr.update();
-    %axis equal;
     axis(1.5*[-.5 .5 -.5 .5 -1 0]);
-    %view(80,-5);
     drawnow;
-    %pause(1/24);
-    %if ii == 1, gif('srm2.gif','DelayTime',1/24); else, gif; end
 end
     
 end
@@ -232,9 +251,10 @@ end
 
 %---------------------------------------------------------------------- set
 function [F0,Q0] = InverseDynamicModel(Model)
-% ee = Model.Ba*Model.Phi(Model.Length)*Model.q + Model.xia0;
-% Model.Length = ee(4);
-X = 0:0.01:1;
+%X = 0:0.01:1;
+options = odeset('RelTol',1e-3);
+
+X = [0 1];
 
 % forward integration
 g0 = [1,0,0,0,0,0,0];
@@ -242,17 +262,17 @@ eta0 = [0,0,0,0,0,0];
 deta0 = [0,0,0,0,0,0];
 
 [~,yf] = ode45(@(t,x) ForwardODE(Model,t,x),X,...
-    [g0 eta0 deta0]);
+    [g0 eta0 deta0],options);
 
 % backwards integration
 g1 = yf(end,1:7);
 eta1 = yf(end,8:13);
 deta1 = yf(end,14:19);
-F1 = smoothstep(Model.t)*[0,0,0,0,0,0];
+F1 = [0,0,0.1e-5,0,0,0];
 Qa = zeros(Model.Nq,1).';
 
 [~,yb] = ode45(@(t,x) BackwardODE(Model,t,x),flip(X),...
-    [g1 eta1 deta1 F1 Qa]);
+    [g1 eta1 deta1 F1 Qa],options);
 
 F0 = -yb(end,20:25).';
 Q0 = yb(end,26:end).';
@@ -303,14 +323,14 @@ R = Quat2Rot(Q);
 A = StrainMap(R*Kappa(:));
 M = MassTensor(Model);
 
-win = 0.05;
+win = 0.1;
 
-X0 = ndelta(t+win,win); 
-X0_ = ndelta(t-win,win);
-X1 = ndelta(t-1/2+win,win); 
-X1_ = ndelta(t-1/2-win,win);
-X2 = ndelta(t-1+win,win); 
-X2_ = ndelta(t-1-win,win);
+X0 = tdelta(t+win,win); 
+X0_ = tdelta(t-win,win);
+X1 = tdelta(t-1/2+win,win); 
+X1_ = tdelta(t-1/2-win,win);
+X2 = tdelta(t-1+win,win); 
+X2_ = tdelta(t-1-win,win);
 
 % m1x = Model.P1(1)*(X1 - X0_);%*(smoothstep(f*Model.t) - smoothstep(f*Model.t-3));
 % m2x = Model.P2(1)*(X2 - X1_);%*smoothstep(f*Model.t);
@@ -324,20 +344,19 @@ m2x = Model.P2(1)*(X2 - X1_);
 m1y = Model.P1(2)*(X1 - X0_);
 m2y = Model.P2(2)*(X2 - X1_);
 
-D1 = [0;0;Model.Radius];
-D2 = [0;-Model.Radius;0];
+p0 = Model.Density;
+A = pi*Model.Radius^2;
 
-Gamma_c = [1;0;0] + cross(Kappa,D1);
-
-FBar = [0,m1x+m2x,m1y+m2y,0,0,0].';
+FBar = 0*[0,m1x+m2x,m1y+m2y,0,0,0].';
+FBar(4:end) = -0*Model.Grav*R*[0;r(1)*p0*A;0];
 %Fc = 0*[cross(D1,Gamma_c); Gamma_c]*(a*ndelta(t-0.5,0.01));
 
 dg = 0*g;
 dg(1:4) = ((2*norm(Q))^(-1))*A*Q;
 dg(5:7) = R*Gamma(:);
 dg(8:13) = -admap(eta)*eta+dee;
-% dg(14:19) = -admap(eta)*deta - admap(deta)*eta + ddee;
-% dg(20:25) = (admap(ee)).'*L + M*deta - admap(eta).'*M*eta - FBar;
+%dg(14:19) = -admap(eta)*deta - admap(deta)*eta + ddee;
+%dg(20:25) = (admap(ee)).'*L + M*deta - admap(eta).'*M*eta - FBar;
 dg(14:19) = 0*ddee;
 dg(20:25) = (admap(ee)).'*L - FBar;
 dg(26:end) = -Model.Phi(t).'*Model.Ba.'*L;

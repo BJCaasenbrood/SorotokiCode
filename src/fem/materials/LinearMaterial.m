@@ -45,7 +45,12 @@ function [S, D] = PiollaStress(LinearMaterial,F)
 E0 = LinearMaterial.E;
 Nu0 = LinearMaterial.Nu;
 D=E0/(1-Nu0^2)*[1 Nu0 Nu0 0;Nu0 1 Nu0 0; Nu0 Nu0 1 0;0 0 0 (1-Nu0)/2];
-S = zeros(3);
+D2=E0/(1-Nu0^2)*[1 Nu0 0; Nu0 1 0;0 0 (1-Nu0)/2];
+C = F.'*F;
+
+e = (1/2)*(C - eye(3));
+S = D2*[e(1,1);e(2,2);e(1,2)];
+S = [S(1,1),S()]
 end
 
 %---------------------------------------------------------------------- set

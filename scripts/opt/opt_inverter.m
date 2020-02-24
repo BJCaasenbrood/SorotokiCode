@@ -2,14 +2,9 @@
 sdf = @(x) dRectangle(x,0,5,0,2);
 
 %% generate mesh
-msh = Mesh(sdf);
-msh = msh.set('BdBox',[0,5,0,2],...
-              'NElem',500,...
-              'MaxIteration',150,...
-              'ShowMeshing',false,...
-              'Triangulate',false);
+msh = Mesh(sdf,'BdBox',[0,5,0,2],'Quads',50);
       
-msh = msh.generateMesh;
+msh = msh.generate();
 
 %% show generated mesh
 msh.show();
@@ -41,28 +36,12 @@ fem = fem.AddConstraint('Output',id,[-1,0]);
 fem = fem.AddConstraint('Spring',id,[.1,0]);
 
 %% set density
-fem = fem.initialTopology([1,1],.5);
+fem = fem.initialTopology([1,1],.05);
 
 %% material
-% fem.Material = YeohMaterial('C1',17e-3,'C2',-0.2e-3,'C3',0.023e-3,...
-%     'D1',15,'D2',20,'D3',10);
-
-% fem.Material = YeohMaterial('C1',1,'C2',0,'C3',0,...
-%     'D1',1.0,'D2',1.0,'D3',1.0);
-
 fem.Material = LinearMaterial('E',10,'Nu',0.49);
-
-% fem.Material = YeohMaterial('C1',17e-3,'C2',-0.2e-3,'C3',0.023e-3,...
-%     'D1',1.5,'D2',2.0,'D3',1.0);
-
-
-fem.show('E');
 
 %% solving
 fem.optimize();
-
-%% former
-fem.former();
-fem.showTopo(0.15);
 
 

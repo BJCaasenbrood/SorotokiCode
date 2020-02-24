@@ -13,13 +13,6 @@ classdef Mesh
     
     properties (Access = private)
         Area;
-        Support;
-        Load;
-        Spring;
-        Output;
-        OutputDir;
-        PressureCell;
-        FixedDensity;
         Convergence;
         Velocity;
         Adjecency;
@@ -27,12 +20,13 @@ classdef Mesh
         NodeToFace;
         Boundary;
         Normal;
+        Edge;
         Iteration = 0;
         ElemMat = -1;
         eps = 1e-4; 
         eta = 0.9; 
         Triangulate = false;
-        MaxIteration = 100;
+        MaxIteration;
         ShowMeshing = false;
         CollapseTol = 0.2;
         ConvNorm = 1e-3;
@@ -44,8 +38,10 @@ methods
 %--------------------------------------------------------------- Mesh Class
 function obj = Mesh(SDF,varargin) 
     obj.SDF = SDF;
-    obj.NElem = 100;
+    obj.NElem = 200;
     obj.Dimension = 2;
+    obj.ShowProcess = false;
+    obj.MaxIteration = 100;
     for ii = 1:2:length(varargin)
         if strcmp(varargin{ii},'Quads')
             N = num2cell(varargin{ii+1});
@@ -81,10 +77,10 @@ function Mesh = set(Mesh,varargin)
 end
 
 %---------------------------------------------------------------------- set
-function Mesh = generateMesh(Mesh)
-Mesh.Iteration = 1; 
+function Mesh = generate(Mesh)
+    
+Mesh.Iteration   = 1; 
 Mesh.Convergence = 1e7;
-flag = 0;
 
 if isempty(Mesh.Center)
     Pc = randomPointSet(Mesh); 
@@ -96,27 +92,34 @@ else
     Mesh.NElem = length(Pc);
 end
 
-A_ = (Mesh.BdBox(2)-Mesh.BdBox(1))*...
-     (Mesh.BdBox(4)-Mesh.BdBox(3));
+% a-prioiri area estimate
+Anew = (Mesh.BdBox(2)-Mesh.BdBox(1))*(Mesh.BdBox(4)-Mesh.BdBox(3));
 
+flag = 0;
+% loyd's algorithm 
 while flag == 0
   
+  % update seeding points
   P = Pc;
   
-  Rp = pointSetReflect(Mesh,P,A_); 
+  % reflection of seedings
+  Rp = pointSetReflect(Mesh,P,Anew); 
   
+  % bounding box seedings 
   Rb = boundingReflect(Mesh);
 
+  % generate Voronoi tesselation
   [v,f] = voronoin([P;Rp;Rb],{'Qt','Pp'});   
   
+  % compute centroid and area
   [Pc,A] = computeCentroid(Mesh,f,v); 
   
   Mesh.Velocity = vecnorm((P - Pc)')';
   
-  A_ = sum(abs(A));
+  Anew = sum(abs(A));
   
   Mesh.Convergence = append(Mesh.Convergence,sqrt(sum((A.^2).*sum((Pc-P)...
-      .*(Pc-P),2)))*Mesh.NElem/(A_^1.5));
+      .*(Pc-P),2)))*Mesh.NElem/(Anew^1.5));
   
   [flag,Mesh] = CheckConvergence(Mesh);
   
@@ -148,73 +151,61 @@ if Mesh.Triangulate
     Mesh.NNode = length(v);
 end
 
-[Pc,A,Nv] = computeCentroid(Mesh,f,v); 
+[Pc,A,Nv,Ev] = computeCentroid(Mesh,f,v); 
 
-Mesh.Center = Pc;
-Mesh.Node = v;
+Mesh.Center  = Pc;
+Mesh.Node    = v;
 Mesh.Element = f;
-Mesh.NNode = length(v);
-Mesh.NElem = length(f);
-Mesh.Area = A;
-Mesh.Normal = Nv;
+Mesh.NNode   = length(v);
+Mesh.NElem   = length(f);
+Mesh.Area    = A;
+Mesh.Normal  = Nv;
+Mesh.Edge  = Ev;
 
 Mesh = ElementAdjecency(Mesh);
-end
-
-%---------------------------------------------------------- add constraints
-function Mesh = addConstraint(Mesh,varargin)
-    
-for ii = 1:2:length(varargin)
-  if size(varargin{ii+1},2) == 3
-      Mesh.(varargin{ii}) = varargin{ii+1};
-  else
-      warning([varargin{ii}, ' has incorrect input'] );
-  end
-end
-    
 end
 
 %---------------------------------------------------------------- show mesh
 function show(Mesh,varargin)
-    
 if nargin<2, Request = -1; 
 else, Request = varargin{1}; end
 
+% generate elemental matrices for plotting
 Mesh = ElementAdjecency(Mesh);
 fs = 'interp';
 
 switch(Request)
-    case('SDF'), Z = Mesh.SDF(Mesh.Node); Z = Z(:,end);
-    case('Velocity'), Z = (Mesh.Velocity')'; caxis([0 0.01]); fs = 'flat';
+    case('SDF'),      Z = Mesh.SDF(Mesh.Node); Z = Z(:,end);
+    case('Velocity'), Z = (Mesh.Velocity')'; caxis([0 0.01]); 
     case('Gradient'), Z = GradientField(Mesh,Mesh.Node);
-    case('Node'), Z = varargin{2};
-    case('Element'), Z = varargin{2};
-    otherwise; Dist = Mesh.SDF(Mesh.Node); Z = Dist(:,end);
+    case('Node'),     Z = varargin{2};
+    case('Element'),  Z = varargin{2};
+    otherwise;        Z = zeros(Mesh.NNode,1);
 end
 
 if ~strcmp(Request,'Node') && ~strcmp(Request,'Element')
 clf; axis equal; axis off; hold on;
     
-patch('Faces',Mesh.ElemMat,'Vertices',Mesh.Node,...
-    'FaceVertexCData',Z,'Facecolor',fs,'LineStyle','-',...
-    'Linewidth',1.5,'FaceAlpha',1.0,'EdgeColor','k');
+% plot tesselation
+patch('Faces',Mesh.ElemMat,'Vertices',Mesh.Node,'FaceVertexCData',Z,...
+    'Facecolor',fs,'LineStyle','-','Linewidth',1.5,'FaceAlpha',1.0,...
+    'EdgeColor','k');
 
-patch('Faces',Mesh.Boundary,'Vertices',Mesh.Node,...
-    'LineStyle','-','Linewidth',2,'EdgeColor','k');
+% plot boundaries
+patch('Faces',Mesh.Boundary,'Vertices',Mesh.Node,'LineStyle','-',...
+    'Linewidth',2,'EdgeColor','k');
 
 hold on;
 
 elseif strcmp(Request,'Node')
-plot(Mesh.Node(Z,1),Mesh.Node(Z,2),'.','Color','r');
+    plot(Mesh.Node(Z,1),Mesh.Node(Z,2),'.','Color','r');
 elseif strcmp(Request,'Element')
-plot(Mesh.Center(Z,1),Mesh.Center(Z,2),'.','Color','r');    
+    plot(Mesh.Center(Z,1),Mesh.Center(Z,2),'.','Color','r');    
 end
 
-axis(Mesh.BdBox);
-axis tight;
-colormap(noir);
+axis(Mesh.BdBox); axis tight;
+colormap(turbo);
 drawnow;
-
 end
 
 %----------------------------------------------------------------- show SDF
@@ -259,11 +250,11 @@ function ElementList = FindElements(Mesh,Request)
     n = Mesh.Center;
     ElementList = FindNodes(n,Request);
 end
-
 %-------------------------------------------------------------- END METHODS
 end
 
 methods (Access = private)
+    
 %----------------------------------------------- generate a random pointset
 function P = randomPointSet(Mesh)
 P = zeros(Mesh.NElem,Mesh.Dimension);
@@ -287,7 +278,7 @@ function Rp = pointSetReflect(Mesh,P,A)
 Alpha = 1.5*sqrt(A/Mesh.NElem);
 d = Mesh.SDF(P);  
 
-% number of constituent bdry segments
+% number of assigned boundary segments
 NBdrySegs = size(d,2)-1;   
 if Mesh.Dimension == 2
 n1 = (Mesh.SDF(P+repmat([Mesh.eps,0],Mesh.NElem,1))-d)/Mesh.eps;
@@ -298,7 +289,7 @@ n2 = (Mesh.SDF(P+repmat([0,Mesh.eps,0],Mesh.NElem,1))-d)/Mesh.eps;
 n3 = (Mesh.SDF(P+repmat([0,0,Mesh.eps],Mesh.NElem,1))-d)/Mesh.eps;
 end
 
-%Logical index of seeds near the boundary
+% logical index of seeds near the boundary
 I  = abs(d(:,1:NBdrySegs))<Alpha; 
 P1 = repmat(P(:,1),1,NBdrySegs); 
 P2 = repmat(P(:,2),1,NBdrySegs); 
@@ -335,11 +326,12 @@ Rb = [X(:),Y(:)];
 end
 
 %------------------------------------------------ compute centroid polygons
-function [Pc,A,Nv] = computeCentroid(Mesh,f,v)
-
+function [Pc,A,Nv,Ev] = computeCentroid(Mesh,f,v)
+    
 Pc = zeros(Mesh.NElem,2); 
 A = zeros(Mesh.NElem,1);
 Nv = cell(Mesh.NElem,1);
+Ev = cell(Mesh.NElem,1);
 
 for el = 1:Mesh.NElem
 
@@ -352,6 +344,7 @@ for el = 1:Mesh.NElem
   
   if nargout > 2
       n = ([vx,vy] - [vxS,vyS]);
+      eG = zeros(length(vx),1);
       
       for ii = 1:length(n)
           Nullspace = transpose(null(n(ii,:)));
@@ -359,14 +352,17 @@ for el = 1:Mesh.NElem
           else, n(ii,:) = Nullspace;
           end
           a = [vxS(ii)-vx(ii),vyS(ii)-vy(ii)];
+          eG(ii,1) = sqrt(a(1)^2 + a(2)^2);
           a = a/norm(a);
           b = [n(ii,1),n(ii,2)];
           d = b(1)*a(2) - b(2)*a(1);
           n(ii,:) = -sign(d)*n(ii,:);
       end
       
-      nS = n([nv 1:nv-1],:); n = 0.5*nS+0.5*n;
+      nS = n([nv 1:nv-1],:); n = nS+n;
+      eS = eG([nv 1:nv-1],:);
       Nv{el} = (n./sqrt(n(:,1).^2 + n(:,2).^2));
+      Ev{el} = 0.5*(eS + eG);
   end
   
   tmp = vx.*vyS - vy.*vxS;
@@ -485,7 +481,6 @@ K = sparse(i,j,s,NNode0, NNode0);
 p = symrcm(K);
 cNode(p(1:NNode0))=1:NNode0;
 [Node,Element] = Rebuild(Mesh,Node0,Element0,cNode);
-
 end
 
 %------------------------------------------------ generate elemental matrix
@@ -559,7 +554,6 @@ end
 
 %------------------------------------------------------- get gradient field
 function RGB = GradientField(Mesh,P)
-    
 d = Mesh.SDF(P);  
 N = length(P);
 n1 = (Mesh.SDF(P+repmat([Mesh.eps,0],N,1))-d)/Mesh.eps;
@@ -570,36 +564,27 @@ end
 
 %------------------------------------------------------ isotropic reduction
 function [flag,Mesh] = CheckConvergence(Mesh)
-    
 Criteria = (Mesh.Convergence(end) > Mesh.ConvNorm);
 
-if (Criteria && (Mesh.Iteration <= Mesh.MaxIteration))    
-    flag = 0;
+if (Criteria && (Mesh.Iteration < Mesh.MaxIteration)), flag = 0;
 else
     if (Mesh.Iteration > Mesh.MaxIteration), flag = 2; 
     elseif (Mesh.Iteration == 1), flag = 0;        
     else, flag = 1;
     end
 end
-
 if Mesh.ShowProcess; ProcessMonitor(Mesh); end
-
 end
 
 %---------------------------------------------------------- material filter 
 function ProcessMonitor(Mesh)
-
 if Mesh.Iteration == 1
-fprintf(' Iter | Change    | Residual  | Max. Svm  | Time | dt      | p   |\n');
+fprintf(' Iter   | Residual  | Max. Svm  | Time | dt      | p   |\n');
 fprintf('--------------------------------------------------------------\n');
 end
-
-fprintf(' %1.0f\t  | %1.3e |\n',...
-    Mesh.Iteration,Mesh.Convergence(end));   
-
+fprintf(' %i  \t| %1.3e | %1.3e |\n',...
+    Mesh.Iteration,Mesh.Convergence(end),max(Mesh.Velocity));   
 end
-
-
 end
 end
 

@@ -74,9 +74,8 @@ end
 
 %----------------------------------------------------- POLYGONAL QUADRATURE
 function [weight,point] = PolyQuad(nn)
-
-[W,Q]   = TriQuad;                  % intrg. pnts & wgts for ref. triangle
-[p,Tri] = PolyTrnglt(nn,[0 0]);     % triangulate from origin
+[W,Q]   = TriQuad;                 
+[p,Tri] = PolyTrnglt(nn,[0 0]);  
 point   = zeros(nn*length(W),2);
 weight  = zeros(nn*length(W),1);
 
@@ -87,17 +86,16 @@ for k = 1:nn
         J0 = p(sctr,:)'*dNds;
         l = (k-1)*length(W) + q;
         point(l,:) = N'*p(sctr,:);
-        %weight(l) = det(J0)*W(q);
-        weight(l) = W(q);
+        weight(l) = det(J0)*W(q);
+        %weight(l) = W(q);
     end
 end
 
 end
 
 %---------------------------------------------------- TRIANGULAR QUADRATURE
-function [weight,point] = TriQuad
-
-precision = 0;
+function [weight,point] = TriQuad(precision)
+if nargin<1, precision = 0; end
 
 if (precision == 0)
     xw=...
@@ -153,7 +151,6 @@ end
 
 point = xw(:,1:2);
 weight = xw(:,3);
-
 end
 
 %----------------------------------------------- TRIANGULAR SHAPE FUNCTIONS

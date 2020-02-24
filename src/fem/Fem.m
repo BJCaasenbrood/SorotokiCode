@@ -22,8 +22,10 @@ classdef Fem < handle
         Output;
         Pressure;
         PressureCell;
+        Contact;
         Contraction;
         ElemNDof;
+        ElemSort;
         Normal;
         Edge;
         VonMisesNodal; 
@@ -108,12 +110,9 @@ classdef Fem < handle
         OutputVector; Change; dFdE;
         Periodic;
                
-        VoidTolerance = 0.05*4; 
+        VoidTolerance = 0.05*6; 
         
-        CutOff = 0.84;
-        Threshold = .003;
-        GaussianWeight = 10;
-        GaussianRadius = .45;
+        Crop;
         Reflect;
         NumGridX; NumGridY;
         Grid; Grideval;
@@ -215,9 +214,11 @@ h{3} = patch('Faces',Fem.Mesh.get('Boundary'),'Vertices',V,...
 
 if Fem.VolumetricPressure
     id = FindElements(Fem,'FloodFill',Fem,Fem.Density); 
-    Pc = Fem.Center;
-    h{4} = plot(Pc(id,1),Pc(id,2),'o','Color',lightblue);
-    h{5} = plot(Pc(id,1),Pc(id,2),'.','Color',lightblue);
+    if strcmp(Request,'E+'), Pc = computeCentroid(Fem);
+    else, Pc = Fem.Mesh.get('Center'); 
+    end
+    %h{4} = plot(Pc(id,1),Pc(id,2),'o','Color','k');
+    h{5} = plot(Pc(id,1),Pc(id,2),'.','Color','k');
 end
 end
 
@@ -319,6 +320,7 @@ end
 %-------------------------------------------------------------------- solve
 function Fem = solve(Fem)
     
+Fem.Log = [];    
 Fem.TimeDelta = Fem.TimeEnd;
 Fem.Increment = 1;
 Fem.Iteration = 1;
@@ -346,6 +348,12 @@ while true
     flag = 0;
     Singular = false;
     Fem.Divergence = 0;
+        
+    % load increment
+    Fem.LoadingFactor = sigmoid(Fem.Time/Fem.TimeEnd,0);
+    
+    % reset iteration
+    Fem.Iteration = 1;
         
     while flag == 0
         
@@ -378,7 +386,7 @@ while true
         
         % evaluate convergence criteria
         Fem.SolverResidual = append(Fem.SolverResidual,...
-            norm(Fem.Residual(FreeDofs)));
+            max(abs(Fem.Residual(FreeDofs))));
         
         Fem.SolverVonMises = append(Fem.SolverVonMises,...
             max(Fem.s(:,1)));
@@ -398,20 +406,19 @@ while true
         elseif flag == 1 && ~Fem.Nonlinear
             Fem.Utmp = Delta;
             Fem.Node = UpdateNode(Fem,Delta);
-            Pc = ComputeCentroid(Fem);
-            Fem.Center = Pc;
         elseif flag == 1 && Fem.Nonlinear
             Fem.Utmp = Delta;
             Fem.Node = UpdateNode(Fem,Delta);
-            [Pc,~,~,~] = ComputeCentroid(Fem);
-            Fem.Center = Pc;
+            %[Pc,~,~,~] = ComputeCentroid(Fem);
+            %Fem.Center = Pc;
 %            Fem.Normal = Nv;
 %            Fem.Edge = Ev;
         end
     end 
     
     if ~Fem.SolverStartMMA
-        if ~Fem.Nonlinear, Fem = AssembleGlobalSystem(Fem, true); end
+        Fem = AssembleGlobalSystem(Fem, true);
+        
         Fem.VonMisesNodal = full(sparse(Fem.l,1,Fem.s(:,1))./sparse(Fem.l,1,Fem.v));
         Fem.sxxNodal = full(sparse(Fem.l,1,Fem.s(:,2))./sparse(Fem.l,1,Fem.v));
         Fem.syyNodal = full(sparse(Fem.l,1,Fem.s(:,3))./sparse(Fem.l,1,Fem.v));
@@ -424,18 +431,20 @@ while true
         Fem.fyNodal = force(2*(1:Fem.NNode));
     end
     
-    if ~isempty(Fem.Output)
+    if ~isempty(Fem.Output) && ~Fem.SolverStartMMA
        [ux,uy,un] = DisplacementField(Fem,Fem.Utmp);
        [fx,fy,fn] = DisplacementField(Fem,Fem.fInternal);
        idNodes = Fem.Output(:,1);
        if isempty(Fem.Log)
-           Fem.Log = cell(6,1);
+           Fem.Log = cell(7,1);
            Fem.Log{1} = ux(idNodes); 
            Fem.Log{2} = uy(idNodes);
            Fem.Log{3} = un(idNodes);
            Fem.Log{4} = fx(idNodes); 
            Fem.Log{5} = fy(idNodes);
            Fem.Log{6} = fn(idNodes);
+           Fem.Log{7} = Fem.VonMisesNodal(idNodes);
+           Fem.Log{8} = Fem.sxxNodal(idNodes);
        else
            Fem.Log{1} = append(Fem.Log{1},ux(idNodes));
            Fem.Log{2} = append(Fem.Log{2},uy(idNodes));
@@ -443,6 +452,8 @@ while true
            Fem.Log{4} = append(Fem.Log{4},fx(idNodes));
            Fem.Log{5} = append(Fem.Log{5},fy(idNodes));
            Fem.Log{6} = append(Fem.Log{6},fn(idNodes));
+           Fem.Log{7} = append(Fem.Log{7},Fem.VonMisesNodal(idNodes));
+           Fem.Log{8} = append(Fem.Log{8},Fem.sxxNodal(idNodes));
        end
                
     end
@@ -466,8 +477,7 @@ Fem.SolverPlot = false;
 Fem.IterationMMA = 0;
 Fem.SolverStartMMA = true;
 flag = true;
-Visual = 'ISO';
-dRho = Fem.ChangeMax;
+Visual = 'E+';
 
 Fem.show(Visual);
 drawnow;
@@ -502,7 +512,7 @@ while flag
     end
     
     % determine material change
-    Fem.Change = clamp(ZNew - Fem.Density,-dRho,dRho);
+    Fem.Change = clamp(ZNew - Fem.Density,-Fem.ChangeMax,Fem.ChangeMax);
     Fem.Density =  Fem.Density + Fem.Change;
     
     % evaluate fitness
@@ -513,10 +523,8 @@ while flag
     [flag,Fem] = CheckConvergenceOpt(Fem);
     
     % draw
-    if mod(Fem.IterationMMA,10) == 0
-        Fem.show(Visual);
-        drawnow;
-    end
+    Fem.show(Visual);
+    drawnow;
 end
 
 Fem.SolverStartMMA = false;
@@ -524,57 +532,8 @@ Fem.SolverStartMMA = false;
 end
 
 %----------------------------------------------------- reconstruct topology
-function Fem = formerSDF(Fem, Threshold, Weight, Radius)
-Res = 200;    
-Layers = 40;
-Patch = 5;
-
-SDF = Fem.SpatialFilter*Fem.Density;
-P0 = Fem.Center(SDF>=Threshold,:);
-Rp = Reflection(Fem,P0); P = [P0;Rp];
-
-if Fem.VolumetricPressure
-    id = FindElements(Fem,'FloodFill',Fem,Fem.Density);
-    SDFFill = zeros(Fem.NElem,1); SDFFill(id) = 1;
-    SDFFill = clamp((SDFFill + Fem.SpatialFilter*Fem.Density),0,1);
-    P0Fill = Fem.Center(SDFFill>=Threshold,:);
-    RpFill = Reflection(Fem,P0Fill); P0Fill = [P0Fill;RpFill];
-end
-
-dx = 0.01*(Fem.BdBox(2) - Fem.BdBox(1));
-dy = 0.01*(Fem.BdBox(4) - Fem.BdBox(3));
-xq = linspace(Fem.BdBox(1)+dx,Fem.BdBox(2)-dx,Res); 
-yq = linspace(Fem.BdBox(3)+dy,Fem.BdBox(4)-dy,Res);
-
-[xxq,yyq] = meshgrid(xq,yq);
-GridPoints = [xxq(:),yyq(:)];
-
-for ii = 1:length(P)
-    r = (xq-P(ii,1)).^2+(yq-P(ii,2)).^2;
-    a = Weight;
-    b = Radius;
-    d{ii} = (-a*(1-3*(b^-2)*r.^2)).*((r<=b/3) & (r>=0)) + ...
-    (-(3*a/2)*(1-r/b).^2).*((r<=b) & (r>b/3)) + 0;
-end
-
-dist = sum(cat(3,d{:}),3); V = dist(:);
-
-xg = GridPoints(:,1); yg = GridPoints(:,2); 
-id = find((xg>=Fem.BdBox(1)-eps) & (xg<=Fem.BdBox(2)+eps) & ...
-    (yg>=Fem.BdBox(3)-eps) & (yg<=Fem.BdBox(4)+eps));
-
-GridPoints = GridPoints(id,:);
-dist = dist(id,:);
-
-%P = griddata(xq,yq,V,xxq,yyq);
-
-
-end
-
-%----------------------------------------------------- reconstruct topology
 function Fem = former(Fem, Thickness)
-
-Res = 300;    
+Res = 200;    
 Layers = 40;
 Patch = 5;
 
@@ -585,23 +544,34 @@ V = Fem.Mesh.get('NodeToFace')*Fem.SpatialFilter*Fem.Density;
 
 if Fem.VolumetricPressure
     id = FindElements(Fem,'FloodFill',Fem,Fem.Density);
-    Fill = zeros(Fem.NElem,1); Fill(id) = 1;
+    Pc = Fem.Mesh.Center;
+    S = zeros(Fem.NElem,1); 
+    d = DistancePointSet(Fem,Pc,Pc(id,:),0.5*Fem.FilterRadius);
+    ide = unique(d(:,2));
+    rhotmp =  Fem.SpatialFilter*Fem.Density;
+    S(ide,1) = (rhotmp(ide)>Fem.VoidTolerance)*0.5;
+    Fill = zeros(Fem.NElem,1); Fill(id) = 0.5;
+    E = Fem.Mesh.get('NodeToFace')*...
+   Fem.SpatialFilter*(S + Fem.Density*0.01);
     V2 = clamp(Fem.Mesh.get('NodeToFace')*...
-        (Fill + Fem.SpatialFilter*Fem.Density),0,1);
+   Fem.SpatialFilter*(Fill + Fem.Density-0.1),0,1);
+end
+
+if isempty(Fem.Crop), B = Fem.BdBox; 
+else, B = Fem.Crop;
 end
 
 x = verts(:,1); y = verts(:,2);
-dx = 0.0*(Fem.BdBox(2) - Fem.BdBox(1));
-dy = 0.0*(Fem.BdBox(4) - Fem.BdBox(3));
-xq = linspace(Fem.BdBox(1)+dx,Fem.BdBox(2)-dx,Res); 
-yq = linspace(Fem.BdBox(3)+dy,Fem.BdBox(4)-dy,Res);
+dx = 0.01*(B(2) - B(1));
+dy = 0.01*(B(4) - B(3));
+xq = linspace(B(1)+dx,B(2)-dx,Res); 
+yq = linspace(B(3)+dy,B(4)-dy,Res);
 
 [xxq,yyq] = meshgrid(xq,yq);
 P = griddata(x,y,V,xxq,yyq);
 vrt = [xxq(:),yyq(:)];
 Dist = Fem.Mesh.SDF(vrt); Dist = Dist(:,end);
-tol = 0.1*sqrt((Fem.BdBox(2)-Fem.BdBox(1))*...
-    (Fem.BdBox(4)-Fem.BdBox(3))/length(vrt));
+tol = 0.1*sqrt((B(2)-B(1))*(B(4)-B(3))/length(vrt));
 P = P(:); P(Dist > tol) = 0; 
 P = (reshape(P,Res,Res)); 
 V = cat(3,xxq,yyq,P);
@@ -613,18 +583,28 @@ if Fem.VolumetricPressure
     P = (reshape(P,Res,Res));
     
     GapFill = cat(3,xxq,yyq,P);
+    
+    P = griddata(x,y,E,xxq,yyq);
+    Dist = Fem.Mesh.SDF([xxq(:),yyq(:)]); Dist = Dist(:,end);
+    P = P(:);  P(isnan(P))=0;
+    P = (reshape(P,Res,Res));
+    
+    EdgeFill = cat(3,xxq,yyq,P);
 end
 
-SDF = V(:,:,3);
-SDF = GaussianFilter(SDF,3);
-SDF = repmat(SDF,[1 1 Layers]);
+SDF0 = V(:,:,3);
+SDF0 = GaussianFilter(SDF0,10);
+SDF = repmat(SDF0,[1 1 Layers]);
 
 if Fem.VolumetricPressure
     V = GapFill;
     SDF2 = V(:,:,3);
-    SDF2 = GaussianFilter(SDF2,5);
+    SDF2 = GaussianFilter(SDF2,10);
     ZFiller = repmat(SDF2,[1 1 Patch]);
-    SDF(:,:,2:Patch+1) = ZFiller;
+    for ii = 1:Patch
+        ZFiller(:,:,ii) = lerp(SDF2+0.01*ii,SDF0,cos((1/Patch)*pi));
+    end
+    %SDF(:,:,2:Patch+1) = ZFiller;
 end
 
 % zero padding
@@ -645,7 +625,6 @@ end
 
 %----------------------------------------------------- reconstruct topology
 function Fem = showISO(Fem,varargin)
-
 V = Fem.Topology;
 X = Fem.TopologyGridX; 
 Y = Fem.TopologyGridY; 
@@ -698,19 +677,32 @@ end
 end
 
 cla;
-image(scaleX*Rpt(1)*[min(min(min(X))) max(max(max(X)))],...
-      scaleY*Rpt(2)*[min(min(min(Y))) max(max(max(Y)))],...
-    (GaussianFilter((SDF >= varargin{1})*255,2)));
+Uxx = scaleX*Rpt(1)*[min(min(min(X))) max(max(max(X)))];
+Uyy = scaleY*Rpt(2)*[min(min(min(Y))) max(max(max(Y)))];
+I = GaussianFilter((SDF >= varargin{1})*255,3);
+[XX,YY] = meshgrid(linspace(Uxx(1),Uxx(2),size(I,1)),...
+                   linspace(Uyy(1),Uyy(2),size(I,2)));
+
+im = I(:); 
+Ipos = reshape(im>0,size(I));
+Ineg = reshape(im<=0,size(I));
+
+[Dpos,~] = bwdist(Ipos,'euclidean');
+[Dneg,~] = bwdist(Ineg,'euclidean');
+Dist = rescale(Dpos) - rescale(Dneg);
+
+%contourf(XX,YY,-Dist,[-1e-6,1e-6]);
+
+image((max(Uxx)/max(Uxx))*rescale(Uxx),(max(Uyy)/max(Uxx))*rescale(Uyy),I);
 
 axis equal; axis off; 
 colormap(noir(-1)); 
 caxis([0 1]);
 background('w');
-
 end
 
 %----------------------------------------------------- reconstruct topology
-function Fem = showSTL(Fem,value)
+function obj = showSTL(Fem,value)
     
 V = Fem.Topology;
 X = Fem.TopologyGridX; 
@@ -718,7 +710,6 @@ Y = Fem.TopologyGridY;
 Z = Fem.TopologyGridZ; 
 
 [faces,vertices] = MarchingCubes(X,Y,Z,V,value);
-
 
 figure(101);
 cla;
@@ -757,7 +748,7 @@ function Fem = initialTopology(Fem,varargin)
         Fem.Density = InitialDesign(Fem,{[1,1],1});
     end
     
-Fem.Density = Fem.SpatialFilter*(Fem.VolumeInfill*Fem.Density);
+    Fem.Density = Fem.SpatialFilter*(1.25*Fem.Density*Fem.VolumeInfill);
 end
 
 %--------------------------------------------------------------- find nodes
@@ -779,11 +770,16 @@ function Fem = AddConstraint(Fem,varargin)
     
 for ii = 1:3:length(varargin)
   if size(varargin{ii+2},2) == 2
-      BC = [varargin{ii+1},repmat(varargin{ii+2},...
-          [length(varargin{ii+1}),1])];
-      Fem.(varargin{ii}) = [Fem.(varargin{ii});BC];
       if strcmp(varargin{ii},'PressureCell')
          Fem.VolumetricPressure = true; 
+         Fem.(varargin{ii}) = [varargin{ii+1},repmat(varargin{ii+2},...
+          [length(varargin{ii+1}),1])];
+      elseif strcmp(varargin{ii},'Contact')
+          Fem.(varargin{ii}) = {varargin{ii+1},varargin{ii+2}};
+      else 
+          BC = [varargin{ii+1},repmat(varargin{ii+2},...
+          [length(varargin{ii+1}),1])];
+            Fem.(varargin{ii}) = [Fem.(varargin{ii});BC];
       end
   else
       warning([varargin{ii}, ' has incorrect input'] );
@@ -796,21 +792,41 @@ methods (Access = private)
 %%///////////////////////////////////////////////////////// FINITE ELEMENTS
 %------------------------------------------------ convert mesh to fem class
 function Fem = ConvertMeshToFem(Fem,Mesh)
-Fem.Mesh = Mesh;
-Fem.Node = Mesh.get('Node');
-Fem.Node0 = Mesh.get('Node');
-Fem.NNode = Mesh.get('NNode');
-Fem.Element = Mesh.get('Element');
-Fem.NElem = Mesh.get('NElem');
-Fem.BdBox = Mesh.get('BdBox');
-Fem.Density = ones(Fem.NElem,1)+random(0,0.1,Fem.NElem).';
-Fem.SpatialFilter = GenerateRadialFilter(Fem,Fem.FilterRadius);
-Fem.TimeStep0 = Fem.TimeStep;
-Fem.Center = Fem.Mesh.get('Center');
-%Fem.Normal = ComputeNormal(Fem);
-[~,~,Fem.Normal,Fem.Edge] = ComputeCentroid(Fem);
+Fem.Mesh     = Mesh;
+Fem.Node     = Mesh.get('Node');
+Fem.Node0    = Mesh.get('Node');
+Fem.NNode    = Mesh.get('NNode');
+Fem.Element  = Mesh.get('Element');
+Fem.NElem    = Mesh.get('NElem');
+Fem.Center   = Mesh.get('Center');
+Fem.BdBox    = Mesh.get('BdBox');
+Fem.Density  = ones(Fem.NElem,1);
 Fem.Residual = zeros(2*Fem.NNode,1);
-Fem.Utmp = zeros(2*Fem.NNode,1);
+Fem.Utmp     = zeros(2*Fem.NNode,1);
+Fem.TimeStep0 = Fem.TimeStep;
+
+Fem.SpatialFilter = GenerateRadialFilter(Fem,Fem.FilterRadius);
+[~,~,Fem.Normal,Fem.Edge] = computeCentroid(Fem);
+
+Fem.ElemNDof = 2*cellfun(@length,Fem.Element);
+
+if (~Fem.AssembledSystem && ~Fem.Nonlinear) || Fem.Nonlinear
+Fem.i = zeros(sum(Fem.ElemNDof.^2),1);
+Fem.j  = Fem.i; 
+Fem.e  = Fem.i; 
+Fem.fi = Fem.i; 
+Fem.k  = Fem.i; 
+Fem.m  = Fem.i; 
+Fem.c  = Fem.i; 
+Fem.t  = Fem.i; 
+Fem.fb = Fem.i; 
+Fem.ft = Fem.i;
+Fem.s  = zeros(Fem.NNode,6); 
+Fem.s  = zeros(Fem.NNode,3);
+Fem.l  = zeros(Fem.NNode,1); 
+Fem.v  = Fem.l;
+end
+
 end
 
 %------------------------------------ assemble global finite-element system 
@@ -818,61 +834,59 @@ function Fem = AssembleGlobalSystem(Fem,ForceBuild)
     
 if nargin < 2, ForceBuild = false; end
 
-Fem.ElemNDof = 2*cellfun(@length,Fem.Element);
-if (~Fem.AssembledSystem && ~Fem.Nonlinear) || Fem.Nonlinear
-Fem.i = zeros(sum(Fem.ElemNDof.^2),1);
-Fem.j = Fem.i; Fem.e = Fem.i; Fem.fi = Fem.i; Fem.k = Fem.i; 
-Fem.m = Fem.i; Fem.c = Fem.i; Fem.t = Fem.i; Fem.fb = Fem.i; 
-Fem.ft = Fem.i;
-Fem.fb0 = Fem.i;
-Fem.s = zeros(Fem.NNode,6); Fem.s = zeros(Fem.NNode,3);
-Fem.l = zeros(Fem.NNode,1); Fem.v = Fem.l;
-end
-
 if (Fem.Iteration == 1 && Fem.Increment == 1)
     tmp = struct; tmp.Element = Fem.Element;
     tmp = TabulateShapeFunctions(tmp);
     Fem.ShapeFnc = tmp.ShapeFnc;
 end
 
-if Fem.VolumetricPressure, dV = Fem.PressureCell(:,2); else, dV = 0; end
+if Fem.VolumetricPressure
+    beta = Fem.OptFactor*Fem.LoadingFactor;
+    dV = beta*Fem.PressureCell(:,2);
+else, dV = 0; 
+end
 
-index = 0; subindex = 0;
+[E,~,V] = MaterialField(Fem);
+
+index    = 0; 
+subindex = 0;
 
 if (~Fem.AssembledSystem && ~Fem.Nonlinear) || Fem.Nonlinear || ForceBuild
     
 for el = 1:Fem.NElem
-    
+   
     NDof = Fem.ElemNDof(el);
     eDof = reshape([2*Fem.Element{el}-1;
-        2*Fem.Element{el}],NDof,1);
+                    2*Fem.Element{el}],NDof,1);
     
     [Fe,Qe,Me,Ce,Ke,Kte,Svme,SS,EE,Te] = ...
-    Locals(Fem,Fem.Element{el},eDof,dV);
+    Locals(Fem,Fem.Element{el},eDof,dV,V(el));
+    
+    ind1 = index+1:index+NDof^2;
+    ind2 = index+1:index+NDof;
+    ind3 = subindex+1:subindex+NDof/2;
 
-    Ve = ElemCellVolumeForce(Fem,Fem.Element{el},el);   
-    
     I = repmat(eDof ,1,NDof); J = I';
-    Fem.e(index+1:index+NDof^2) = el;
-    Fem.i(index+1:index+NDof^2) = I(:);
-    Fem.j(index+1:index+NDof^2) = J(:);
-    Fem.m(index+1:index+NDof^2) = Me(:);
-    Fem.c(index+1:index+NDof^2) = Ce(:);
-    Fem.k(index+1:index+NDof^2) = Ke(:);
-    Fem.t(index+1:index+NDof^2) = Kte(:);
-    Fem.fi(index+1:index+NDof) = Fe(:);
-    Fem.ft(index+1:index+NDof) = Te(:);
-    Fem.fb0(index+1:index+NDof) = Ke*Ve(:);
+    Fem.e(ind1) = el;
+    Fem.i(ind1) = I(:);
+    Fem.j(ind1) = J(:);
+    Fem.m(ind1) = Me(:);
+    Fem.c(ind1) = Ce(:);
+    Fem.k(ind1) = Ke(:);
+    Fem.t(ind1) = Kte(:);
+    Fem.fi(ind2) = Fe(:);
+    Fem.ft(ind2) = Te(:);    
     
-    Fem.s(subindex+1:subindex+NDof/2,1) = Svme(:);
-    Fem.s(subindex+1:subindex+NDof/2,2) = SS(:,1);
-    Fem.s(subindex+1:subindex+NDof/2,3) = SS(:,2);
-    Fem.s(subindex+1:subindex+NDof/2,4) = SS(:,4);
-    Fem.p(subindex+1:subindex+NDof/2,1) = EE(:,1);
-    Fem.p(subindex+1:subindex+NDof/2,2) = EE(:,2);
-    Fem.p(subindex+1:subindex+NDof/2,3) = EE(:,4);
-    Fem.v(subindex+1:subindex+NDof/2) = Qe(:);
-    Fem.l(subindex+1:subindex+NDof/2) = Fem.Element{el}(:);
+    Fem.s(ind3,1) = E(el)*Svme(:);
+    Fem.s(ind3,2) = E(el)*SS(:,1);
+    Fem.s(ind3,3) = E(el)*SS(:,2);
+    Fem.s(ind3,4) = E(el)*SS(:,4);
+    Fem.p(ind3,1) = E(el)*EE(:,1);
+    Fem.p(ind3,2) = E(el)*EE(:,2);
+    Fem.p(ind3,3) = E(el)*EE(:,4);
+    Fem.v(ind3) = Qe(:);
+    Fem.l(ind3) = Fem.Element{el}(:);
+    
     index = index + NDof^2;
     subindex = subindex + NDof/2;
 end
@@ -884,7 +898,7 @@ end
 
 %------------------------ assemble prescribed boundary forces/displacements
 function Fem = AssembleBoundaryConditions(Fem)
-
+    
 [E,~,~,~] = MaterialField(Fem);
 
 NSpring = size(Fem.Spring,1);
@@ -911,20 +925,50 @@ if Fem.Nonlinear, beta = Fem.OptFactor*Fem.LoadingFactor;
 else, beta = 1;
 end
 
-if ~isempty(Fem.Load)
+if ~isempty(Fem.Load) && ~Fem.PrescribedDisplacement
 NLoad = size(Fem.Load,1);
-F(2*Fem.Load(1:NLoad,1)-1,1) = beta*Fem.Load(1:NLoad,2)/NLoad;
-F(2*Fem.Load(1:NLoad,1),1) = beta*Fem.Load(1:NLoad,3)/NLoad;
+A = sign(Fem.Mesh.get('NodeToFace'));
+Gamma = A(Fem.Load(1:NLoad,1),:);
+W = sum(Gamma,2)/sum(sum(Gamma,2));
+F(2*Fem.Load(1:NLoad,1)-1,1) = beta*W.*Fem.Load(1:NLoad,2);
+F(2*Fem.Load(1:NLoad,1),1) = beta*W.*Fem.Load(1:NLoad,3);
+end
+
+if ~isempty(Fem.Contact)
+    SDF = Fem.Contact{1};
+    Move = Fem.Contact{2};
+    Y = Fem.Node;
+    Y(:,1) = Y(:,1) - beta*Move(1);
+    Y(:,2) = Y(:,2) - beta*Move(2);
+    d = SDF(Y); I = find((d(:,end))<0);   
+    eps = 1e-5;
+    n1 = (SDF(Y(I,:)+repmat([eps,0],size(Y(I,:),1),1))-d(I,end))/eps;
+    n2 = (SDF(Y(I,:)+repmat([0,eps],size(Y(I,:),1),1))-d(I,end))/eps;
+    Ux = -1.95*d(I,end).*n1(:,end);
+    Uy = -1.95*d(I,end).*n2(:,end);
+    F(2*I(1:size(Y(I,:),1),1)-1,1) = Ux;
+    F(2*I(1:size(Y(I,:),1),1),1) = Uy;
+    
+    pDof = zeros(2*length(I),1);
+    fDof = zeros(2*length(I),1);
+    for kk = 1:length(I)
+        pDof(2*kk-1) = 2*I(kk)-1; pDof(2*kk) = 2*I(kk);
+        fDof(2*kk-1) = Ux(kk); fDof(2*kk) = Uy(kk);
+    end
+    
+    Fem.PrescribedDisplacement = true;
 end
 
 if Fem.PrescribedDisplacement
-    F = sparse(2*Fem.NNode,1);
+    
+    if ~isempty(Fem.Load)
     if abs(Fem.Load(1,2))>0
         pDof = reshape(2*Fem.Load(:,1)-1,NLoad,1);
         F(pDof) = Fem.Load(1:NLoad,2); id = 1;
-    else
+    else 
         pDof = reshape(2*Fem.Load(:,1),NLoad,1);
         F(pDof) = Fem.Load(1:NLoad,3); id = 2;
+    end
     end
     
     EMod = Fem.Material.Emod();
@@ -936,8 +980,11 @@ if Fem.PrescribedDisplacement
         KTtmp(pDof,pDof) = -EMod*eye(length(pDof));
         Ktr = KTtmp;
 
+        if isempty(Fem.Contact), alpha = Fem.TimeStep*Fem.OptFactor;
+        else, alpha = 1; end
+        
         if Fem.Iteration == 1
-        F(pDof) = Fe(pDof)-EMod*F(pDof)*Fem.TimeStep*Fem.OptFactor;
+        F(pDof) = Fe(pDof)-EMod*F(pDof)*alpha;
         else, F(pDof) = Fe(pDof); 
         end
     else
@@ -945,7 +992,10 @@ if Fem.PrescribedDisplacement
         Ktmp(pDof,:) = I(pDof,:);
         Ktmp(:,pDof) = I(:,pDof);
         F = -beta*K*F;
-        F(pDof) = beta*Fem.Load(1:NLoad,id+1);
+        if isempty(Fem.Contact), F(pDof) = beta*Fem.Load(1:NLoad,id+1);
+        else, F(pDof) = beta*fDof;
+        end
+            
         K = Ktmp;
     end
 end
@@ -991,12 +1041,13 @@ if Fem.VolumetricPressure
     Pc = Fem.Mesh.get('Center');
     id = FindElements(Fem,'FloodFill',Fem,Fem.Density);
     idnull = setdiff(1:Fem.NElem,id);
-    %[W,~,V,~] = MaterialField(Fem,true);
-    [~,~,W,~] = MaterialField(Fem,true);
+    %[~,~,V,~] = MaterialField(Fem);
+    %[~,~,W,~] = MaterialField(Fem,true);
     W = ones(Fem.NElem,1);
     W(idnull) = 0;
+    %W = Fem.SpatialFilter*W;
     %V = Fem.Mesh.get('NodeToFace')*V;
-    %Ev = wthresh(kron(V,[1;1]),'h',Fem.VoidTolerance);
+    %Ev = wthresh(kron(V,[1;1]),'h',-Fem.VoidTolerance);
     %Ev = wthresh(V,'h',Fem.VoidTolerance);
     %W(idnull) = 0;
     %W = Fem.SpatialFilter*W;
@@ -1006,10 +1057,10 @@ if Fem.VolumetricPressure
     %V = Fem.Mesh.get('NodeToFace')*V;
     %Ev = wthresh(kron(V,[1;1]),'h',Fem.VoidTolerance);
     
-    %Ft = beta*sparse(Fem.i,1,W(Fem.e).*(Fem.e).*Fem.ft);
+    %Ft = beta*sparse(Fem.i,1,W(Fem.e).*V(Fem.e).*Fem.ft);
     Ft = beta*sparse(Fem.i,1,W(Fem.e).*Fem.ft);
     
-    if Fem.SolverStartMMA
+    if Fem.SolverStartMMA || Fem.Nonlinear
         z0 = Fem.Density;
         dz = Fem.ChangeMax;
         Fem.dFdE = zeros(2*Fem.NNode,Fem.NElem);
@@ -1028,7 +1079,7 @@ if Fem.VolumetricPressure
             W(idnull) = 0;
             %W = Fem.SpatialFilter*W;
             %fe = beta*Ev.*sparse(Fem.i,1,W(Fem.e).*Fem.ft);
-            fe = beta*sparse(Fem.i,1,W(Fem.e).*Fem.ft);
+            fe = sparse(Fem.i,1,W(Fem.e).*Fem.ft);
             Fem.dFdE(:,ii) = ((fe - Ft)/(dz));
         end
         Fem.Density = z0;
@@ -1058,23 +1109,26 @@ FreeDofs = setdiff(AllDofs,FixedDofs);
 end
 
 %--------------------------------------------------- local element matrices
-function [Fe,Qe,Me,Ce,Ke,Kte,Svme,SS,EE,Te] = Locals(Fem,eNode,eDof,dV)
-
-nn = length(eNode);
-Fe = zeros(2*nn,1);
-Te = zeros(2*nn,1);
-Me = zeros(2*nn,2*nn);
-Ce = zeros(2*nn,2*nn);
-Ke = zeros(2*nn,2*nn);
+function [Fe,Qe,Me,Ce,Ke,Kte,Svme,SS,EE,Te] = Locals(Fem,eNode,eDof,dV,Rb)
+% get order
+nn  = length(eNode);
+    
+% get gauss points and weights
+W  = Fem.ShapeFnc{nn}.W;
+Q  = Fem.ShapeFnc{nn}.Q;    
+Fe  = zeros(2*nn,1);
+Te  = zeros(2*nn,1);
+Me  = zeros(2*nn,2*nn);
+Ce  = zeros(2*nn,2*nn);
+Ke  = zeros(2*nn,2*nn);
 Kte = zeros(2*nn,2*nn);
-Qe = ones(nn,1);
-W = Fem.ShapeFnc{nn}.W;
-Q = Fem.ShapeFnc{nn}.Q;
-
 SGP = zeros(length(W),6);
 EGP = zeros(length(W),6);
+Qe  = ones(nn,1);
+
 Nshp = length(Fem.ShapeFnc{nn}.N(:,:,1));
 NNe = zeros(length(W),Nshp);
+
 Et = [dV;dV;0];
 
 % quadrature loop
@@ -1090,6 +1144,15 @@ for q = 1:length(W)
     
     % deformation gradient   
     F = DeformationGradient(Fem,Delta,dNdx);
+    
+    % polar decompostion
+    [R,S,~] = PolarDecomposition(Fem,F);
+
+    % increase robustness low density
+    S = Rb*(S-eye(3)) + eye(3);
+    
+    % reconstruct deformation gradient
+    F = R*S;
     
     % right cauchy-green strain
     C = F.'*F;
@@ -1131,48 +1194,25 @@ for q = 1:length(W)
     % lagrangian strain
     Elagran = (1/2)*(C - eye(3));
     
-    % true stress
+    % true stress and lagrangian strain
     SGP(q,:) = VoightNotation((1/det(F))*F*S0*(F.'));
-    
     EGP(q,:) = VoightNotation(Elagran);
     
-    % construct shaping
+    % construct shape functions
     NNe(((q-1)*Nshp + 1):(q*Nshp)) = N(:).';
 end
 
 SS = NNe.'*SGP;
 EE = NNe.'*EGP;
-[Svm, ~] = VonMises(SS(:,1),SS(:,2),SS(:,3),...
-                    SS(:,4),SS(:,5),SS(:,6));
+[Svm, ~] = VonMises(SS(:,1),SS(:,2),SS(:,3),SS(:,4),SS(:,5),SS(:,6));
 Svme = Svm(:); 
-end
 
-%----------------------------------------------------- deformation gradient
-function F = DeformationGradient(Fem,U,dNdx)
-nn = length(U)/2;
-F = zeros(3);
-UU = zeros(nn,2);
-UU(:,1) = U(1:2:2*nn);
-UU(:,2) = U(2:2:2*nn);
-F(1:2,1:2) = (dNdx'*UU)';
-F = F + eye(3);
-end
-
-%----------------------------------------------- TRIANGULAR SHAPE FUNCTIONS
-function [Node,Node0] = UpdateNode(Fem,U)
-Node0 = Fem.Node0; Ntmp = Node0;
-
-[ux,uy,~] = DisplacementField(Fem,U);
-
-Ntmp(:,1) = Node0(:,1) + ux(:);
-Ntmp(:,2) = Node0(:,2) + uy(:);
-
-Node = Ntmp;
+%Ke = 0.5*(Ke+Ke');
+%Kte = 0.5*(Kte+Kte');
 end
 
 %----------------------------------------------- TRIANGULAR SHAPE FUNCTIONS
 function [ux,uy,un] = DisplacementField(Fem,U)
-
 ux = zeros(Fem.NNode,1);
 uy = zeros(Fem.NNode,1);
 un = zeros(Fem.NNode,1);
@@ -1200,78 +1240,45 @@ end
 
 end
 
-%---------------------------------------------- COMPUTE CENTROID OF POLYGON
-function [Pc,A,Nv,Ev] = ComputeCentroid(Fem)
-    
-f = Fem.Element;
-ver = Fem.Node;
-Pc = zeros(Fem.NElem,2); 
-A = zeros(Fem.NElem,1);
-Nv = cell(Fem.NElem,1);
-Ev = cell(Fem.NElem,1);
-
-for el = 1:Fem.NElem
-
-  vx = ver(f{el},1); 
-  vy = ver(f{el},2); 
-  nv = length(f{el}); 
-  
-  vxS = vx([2:nv 1]); 
-  vyS = vy([2:nv 1]); 
-
-  n = ([vx,vy] - [vxS,vyS]);
-  eG = zeros(length(vx),1);
-  
-  for ii = 1:length(n)
-      Nullspace = transpose(null(n(ii,:)));
-      if size(Nullspace,1) == 2, n(ii,:) = Nullspace(1,:);
-      else, n(ii,:) = Nullspace;
-      end
-      a = [vxS(ii)-vx(ii),vyS(ii)-vy(ii)]; 
-      eG(ii,1) = sqrt(a(1)^2 + a(2)^2);
-      a = a/eG(ii,1);
-      b = [n(ii,1),n(ii,2)];
-      d = b(1)*a(2) - b(2)*a(1);
-      n(ii,:) = sign(d)*n(ii,:);
-  end
-  
-  nS = n([nv 1:nv-1],:); n = nS+n;
-  eS = eG([nv 1:nv-1],:);
-  Nv{el} = (n./sqrt(n(:,1).^2 + n(:,2).^2));
-  Ev{el} = 0.5*(eS + eG);
-  
-  tmp = vx.*vyS - vy.*vxS;
-  A(el) = 0.5*sum(tmp);
-  Pc(el,:) = 1/(6*A(el,1))*[sum((vx+vxS).*tmp),...
-                            sum((vy+vyS).*tmp)];
+%----------------------------------------------------- deformation gradient
+function F = DeformationGradient(~,U,dNdx)
+nn = length(U)/2;
+UU = zeros(nn,2);
+UU(:,1) = U(1:2:2*nn);
+UU(:,2) = U(2:2:2*nn);
+F = (dNdx'*UU)';
+F = [F(1,1)+1,F(1,2),0; F(2,1),F(2,2)+1,0;0,0,1];
 end
 
+%---------------------------------------------------------- polar decompose
+function [R,S,V] = PolarDecomposition(~,F)
+[M, N] = size(F);
+if M ~= N
+    error('Matrix must be square.');
 end
-
-%---------------------------------------------- COMPUTE CENTROID OF POLYGON
-function n = ComputeNormal(Fem)
-
-n{Fem.NElem} = [];
-
-for ii = 1:Fem.NElem
-    id = Fem.Element{ii};
-    Nd = Fem.Node(id,:) - repmat(Fem.Center(ii,:),length(id),1);
-    n{ii} = Nd;
-end
-
+C = F'*F;
+[Q0, lambdasquare] = eig(C);
+lambda = sqrt(diag((lambdasquare))); % extract the components
+% Uinv is the inverse of U and is constructed with the help of Q0. Uinv is
+% produced in the same base as F not in the base of its eigenvectors.
+Uinv = repmat(1./lambda',size(F,1),1).*Q0*Q0';
+% Using the definition, R, U and V can now be calculated
+R = F*Uinv;
+S = R'*F;
+V = F*R';
 end
 
 %---------------------------------------------------------- strain operator
-function [Bn,Bg,NN,tau] = NonlinearStrainOperator(Fem,N,dNdx,F)
+function [Bn,Bg,NN,tau] = NonlinearStrainOperator(~,N,dNdx,F)
 nn = length(N);
 
 NN = zeros(2,2*nn);
-NN(1,1:2:2*nn) = N(:)';
-NN(2,2:2:2*nn) = N(:)';
+NN(1,1:2:2*nn) = N.';
+NN(2,2:2:2*nn) = N.';
 dNdxX = dNdx(:,1).';
 dNdxY = dNdx(:,2).';
 
-if strcmp(Fem.Type,'PlaneStress') || strcmp(Fem.Type,'PlaneStrain')
+%if strcmp(Fem.Type,'PlaneStress') || strcmp(Fem.Type,'PlaneStrain')
     Bn = zeros(3,2*nn); 
     Bg = zeros(4,2*nn);
     
@@ -1288,49 +1295,26 @@ if strcmp(Fem.Type,'PlaneStress') || strcmp(Fem.Type,'PlaneStrain')
     Bg(4,2:2:2*nn) = dNdxY;
     
     tau = 1;
-end
+%end
 
 end 
 
-%--------------------------------------------------- linear strain operator
-function [B,NN,tau] = LinearStrainOperator(Fem,N,dNdx)
-
-nn = length(N);
-
-NN = zeros(2,2*nn);
-NN(1,1:2:2*nn) = N(:)';
-NN(2,2:2:2*nn) = N(:)';
-% XX(1,1:2:2*nn) = Xe(:,1);
-% XX(1,2:2:2*nn) = Xe(:,2);
-
-% X = XX*NN.';
-
-if strcmp(Fem.Type,'PlaneStress') || strcmp(Fem.Type,'PlaneStrain')
-    B = zeros(3,2*nn);
-    B(1,1:2:2*nn) = dNdx(:,1)';
-    B(2,2:2:2*nn) = dNdx(:,2)';
-    B(3,1:2:2*nn) = dNdx(:,2)';
-    B(3,2:2:2*nn) = dNdx(:,1)';
-    tau = 1;
-elseif strcmp(Fem.Type,'AxiSymmetric')
-%     B = zeros(4,2*nn);
-%     B(1,1:2:2*nn) = dNdx(:,1)';
-%     B(2,2:2:2*nn) = dNdx(:,2)';
-%     B(3,1:2:2*nn) = N.'/X(1);
-%     B(4,1:2:2*nn) = dNdx(:,2)';
-%     B(4,2:2:2*nn) = dNdx(:,1)';
-%     tau = 2*pi*X(1);
-end
-
-end
-
 %------------------------------------------------------ isotropic reduction
-function [S, D, G] = IsotropicReduction(Fem,D0,S0)
+function [S, D, G] = IsotropicReduction(~,D0,S0)
 
 D = zeros(3,3); 
 S = zeros(3,1);
 
-if strcmp(Fem.Type,'PlaneStrain')
+% if Type == 1
+% D(1:2,1:2) = D0(1:2,1:2); D(3,3) = D0(4,4);
+% SIG = [S0(1),S0(4);
+%        S0(4),S0(2)];
+% G = kron(eye(2),SIG);
+% S(1) = S0(1); 
+% S(2) = S0(2); 
+% S(3) = S0(4); 
+% 
+% elseif Type == 2
 D(1:2,1:2) = D0(1:2,1:2); D(3,3) = D0(4,4);
 SIG = [S0(1),S0(4);
        S0(4),S0(2)];
@@ -1339,43 +1323,15 @@ S(1) = S0(1);
 S(2) = S0(2); 
 S(3) = S0(4); 
 
-elseif strcmp(Fem.Type,'PlaneStress')
-D(1:2,1:2) = D0(1:2,1:2); D(3,3) = D0(4,4);
-SIG = [S0(1),S0(4);
-       S0(4),S0(2)];
-G = kron(eye(2),SIG);
-S(1) = S0(1); 
-S(2) = S0(2); 
-S(3) = S0(4); 
-
-elseif strcmp(Fem.Type,'AxiSymmetric')
-
-end
-end
-
-%--------------------------------------------------- elemental force vector
-function Ve = ElemCellVolumeForce(Fem,eNode,ElemId)
-
-nn = length(eNode);
-Ve = zeros(2*nn,1);
-
-Norm = Fem.Normal;
-
-for ii = 1:nn
-    a = Norm{ElemId}(ii,1);
-    b = Norm{ElemId}(ii,2);
-    Ve(2*ii - 1,1) = a/norm([a,b]);
-    Ve(2*ii,1) = b/norm([a,b]);
-end
-
+% elseif strcmp(Fem.Type,'AxiSymmetric')
+% 
+% end
 end
 
 %------------------------------------------------------ isotropic reduction
 function [flag,Fem] = CheckConvergence(Fem,SingularKt)
 
 CriteriaResidual = (Fem.SolverResidual(end) > Fem.ResidualNorm);
-
-%CriteriaDisplace = (Fem.SolverDisplace(end) > Fem.DisplaceNorm);
 
 DiffSVM = abs(Fem.SolverVonMises(end-1)/Fem.SolverVonMises(end) - 1);
 
@@ -1440,22 +1396,16 @@ elseif ~Fem.Convergence
     Fem.TimeStep = clamp(Fem.TimeStep/2,Fem.TimeStepMin,1);
     Fem.Time = clamp(Fem.Time - Fem.TimeStep,0,1);
     Fem.MaxIteration = Fem.MaxIteration + 15;
-    %if ~Fem.SolverStartMMA
     if ~Fem.SolverStartMMA
     fprintf('------------------------------------------------------------|\n');
     fprintf(' Bisection                                                  |\n');
     fprintf('------------------------------------------------------------|\n');
-        %Terminate = true;
     end
 end
-
-Fem.Iteration = 1;
 
 if ~Fem.SolverStart, Fem.Increment = 1; Fem.SolverStart = true;
 else, Fem.Increment = Fem.Increment + 1;
 end
-
-Fem.LoadingFactor = (Fem.Time/Fem.TimeEnd);
 
 if (Fem.SolverStartMMA && Terminate)||(Fem.SolverStartMMA && ~Fem.Nonlinear)
     ProcessMonitor(Fem); 
@@ -1496,7 +1446,6 @@ f = Fem.fExternal.'*u;
 lam = 0*u(:,1);
 lam(fDof) = K(fDof,fDof)\Fem.fExternal(fDof);
 temp = cumsum(-u(Fem.i).*Fem.k.*lam(Fem.j));
-%temp = cumsum(-Fem.fInternal(Fem.i).*lam(Fem.j));
 temp = temp(cumsum(Fem.ElemNDof.^2));
 dfdE = [temp(1);temp(2:end)-temp(1:end-1)];
 elseif strcmp(Fem.OptimizationProblem,'Compliant') && ~Fem.Nonlinear
@@ -1515,14 +1464,11 @@ K = sparse(Fem.i,Fem.j,E(Fem.e).*Fem.t);
 lam = 0*u(:,1);
 lam(fDof) = K(fDof,fDof)\Fem.OutputVector(fDof);
 temp = cumsum(u(Fem.i).*Fem.k.*lam(Fem.j));
-%temp = cumsum(-Fem.fi(Fem.i)*lam(Fem.j));
 temp = temp(cumsum(Fem.ElemNDof.^2));
 dfdE = [temp(1);temp(2:end)-temp(1:end-1)];
 end
 
-if Fem.VolumetricPressure && Fem.Nonlinear
-dfdE = dfdE(:) + (lam(:)'*Fem.dFdE)';
-elseif Fem.VolumetricPressure && ~Fem.Nonlinear  
+if Fem.VolumetricPressure 
 temp = cumsum(Fem.dFdE(Fem.e).*lam(Fem.j));
 temp = temp(cumsum(Fem.ElemNDof.^2));
 dfdE = dfdE + [temp(1);temp(2:end)-temp(1:end-1)];
@@ -1571,12 +1517,14 @@ if iter > 1, Fem.xold1 = Fem.xold1; else, Fem.xold1 = 0; end
 if iter > 2, Fem.xold2 = Fem.xold2; else, Fem.xold2 = 0; end
 
 [xmma,~,~,~,~,~,~,~,~,Fem.low,Fem.upp] = mmasub(M,N,iter,xval,xmin,xmax,...
-    Fem.xold1,Fem.xold2,f0val,df0dx,df0dx2,fval,dfdx,dfdx2,...
-    Fem.low,Fem.upp,A0,A,C,D);
+    Fem.xold1,Fem.xold2,f0val,df0dx,df0dx2,fval,dfdx,dfdx2,Fem.low,...
+    Fem.upp,A0,A,C,D);
 
-alpha = max(0.9-iter/90,0);
-
+if strcmp(Fem.OptimizationProblem,'Compliance'), zNew = xmma;
+else
+alpha = max(0.9-iter/Fem.MaxIterationMMA,0);
 zNew = (1-alpha)*xmma + alpha*xval;
+end
 
 if iter >= 1, Fem.xold1 = xval; end
 if iter >= 2, Fem.xold2 = Fem.xold1; end
@@ -1610,20 +1558,13 @@ elseif strcmp(Fem.OptimizationProblem,'Compliant')
         else, l2=lmid;   end
     end
 end
-
-%alpha = max(0.9-iter/80,0);
-%zNew = (1-alpha)*zNew + alpha*z0;
-
-%Change = max(abs(zNew-z0))/(zMax-zMin);
 end
 
 %------------------------------------------------------ isotropic reduction
 function [bool,Fem] = CheckConvergenceOpt(Fem)
 
 if ((norm(1) > 1e-3) && (Fem.IterationMMA <= Fem.MaxIterationMMA))
-    
     bool = true;
-
     if (mod(Fem.IterationMMA,Fem.PenalStep) == 0 && ...
             Fem.Penal < Fem.PenalMax)
         Fem.Penal = Fem.Penal + 1;
@@ -1662,7 +1603,6 @@ end
 
 %---------------------------------------------------------- material filter 
 function P = GenerateRadialFilter(Fem,R)
-
 if R<0, P = speye(Fem.NElem); return; end
 
 PS1 = Fem.Mesh.get('Center');
@@ -1807,13 +1747,13 @@ fprintf(' %1.0f\t  | %1.0f\t | %1.3e | %1.3e | %0.3f | %0.3f  | %0.2f \n',...
 
 else
 if Fem.Iteration == 1 && Fem.Increment == 1
-fprintf(' Inc | Iter  | Residual  | Max. Svm  | Time | dt     | p    |\n');
+fprintf(' Inc | Iter  | Residual  | Max. Svm  | Time | Beta  | dt     |\n');
 fprintf('--------------------------------------------------------------\n');
 end
 
-fprintf(' %1.0f\t | %1.0f\t | %1.3e | %1.3e | %1.2f | %1.4f | %0.1f  |\n',...
+fprintf(' %1.0f\t | %1.0f\t | %1.3e | %1.3e | %1.2f | %1.3f | %1.3f  |\n',...
     Fem.Increment,Fem.Iteration,norm(Fem.Residual(FreeDofs)),...
-    max(Fem.s(:,1)),Fem.Time,Fem.TimeStep,Fem.Penal);   
+    max(Fem.s(:,1)),Fem.Time,Fem.LoadingFactor,Fem.TimeStep);   
 
 end 
 

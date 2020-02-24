@@ -1,18 +1,19 @@
 function sorotoki(arg)
 % -------------------------------------------------------------------------
-if nargin < 1, clc; clear; arg = 'demo'; end
-if ~exist('config/__init__.txt','file'), arg = 'install'; end
+if nargin < 1, clc; clear; arg = 'install'; end
+%if ~exist('config/__init__.txt','file'), arg = 'install'; end
 % ------------------------------------------------------------------------
 
 switch(arg)
     case('install');  setupToolkit;
     case('demo');     showDemo;
+    case('cd');       getPath;
 end
 
 end
 
 function showDemo
-ccc;
+clr;
 set = {'bunny preview demo',...
        'dragon preview demo',...
        'advanced FV-mesh preview demo',...
@@ -162,6 +163,7 @@ cout(['* Adding SOROTOKI libraries to path, ',...
 
 if Request == 1
 fprintf(FID,'%% base.lib \n');
+WriteToFile(Path);
 WriteToFile([Path,'\config\']);
 WriteToFile([Path,'\src\__version__']);
 WriteToFile([Path,'\src\__base__']);
@@ -173,6 +175,7 @@ WriteToFile([Path,'\data\matcap']);
 WriteToFile([Path,'\data\matcap\img']);
 WriteToFile([Path,'\data\stl']);
 else
+addpath(Path);
 addpath([Path,'\config\']);
 addpath([Path,'\src\__version__']);
 addpath([Path,'\src\__base__']);

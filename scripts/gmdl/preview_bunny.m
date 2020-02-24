@@ -6,14 +6,13 @@ obj = Gmodel('Bunny.stl');
 obj.Texture = grey;
 obj.Emission = [0.75 0.75 0.75];
 
-obj.set('SSSPower',1.0,...
-        'AORadius',0.2,...
-        'AOPower',5,...
-        'AmbientOcclusion',true);
-
+% obj.set('SSSPower',1.6,...
+%         'AORadius',0.5,...
+%         'AOPower',2,...
+%         'AO',true);
+% 
 obj.bake();
     
 %% set view
 obj.render(); 
-view(240,20); 
-obj.update();
+obj.ground();

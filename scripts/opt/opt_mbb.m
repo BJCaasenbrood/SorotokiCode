@@ -1,33 +1,26 @@
 clr;
-%% set signed distance function
+%% generate mesh from sdf
 sdf = @(x) dRectangle(x,0,5,0,2);
 
-%% generate mesh
-msh = Mesh(sdf,'BdBox',[0,5,0,2],'Quads',20);     
-msh = msh.generateMesh;
+msh = Mesh(sdf,'BdBox',[0,5,0,2],'NElem',800);     
+msh = msh.generate();
 
-%% show generated mesh
-fem = Fem(msh);
-fem = fem.set('TimeStep',1/5,...
-              'ResidualNorm',1e-3,...
-              'FilterRadius',0.3,...
-              'VolumeInfill',0.3,...
-              'Penal',4,...
-              'OptimizationProblem','Compliance',...
-              'ChangeMax',0.2,...
-              'ReflectionPlane',[-1,0],...
-              'Nonlinear',true);
+%% generate fem from mesh
+fem = Fem(msh,'TimeStep',1/4,'Nonlinear',true,...
+              'OptimizationProblem','Compliance');
 
-%% add constraint
-id = fem.FindNodes('Left'); 
-fem = fem.AddConstraint('Support',id,[1,0]);
-id = fem.FindNodes('SE'); 
-fem = fem.AddConstraint('Support',id,[0,1]);
+fem = fem.set('FilterRadius',0.3,'VolumeInfill',0.3,...
+              'Penal',4,'ReflectionPlane',[-1,0]);
 
-id = fem.FindNodes('NW',[4,2],5); 
-fem = fem.AddConstraint('Load',id,[0,-1e-4]);
+%% add boundary condition
+fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,0]);
+fem = fem.AddConstraint('Support',fem.FindNodes('SE'),[0,1]);
+fem = fem.AddConstraint('Load',fem.FindNodes('NW',[4,2],4),[0,-1e-4]);
 
-%% material
+id = fem.FindElements('Location',[3,0.5],1);
+fem = fem.AddConstraint('PressureCell',id,[5e-4,0]);
+
+%% assign material
 fem.Material = Dragonskin10A;
 
 %% set density

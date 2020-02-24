@@ -8,14 +8,10 @@ msh = msh.set('BdBox',[0,25,0,25],...
               'NElem',500,...
               'MaxIteration',50);
 
-msh = msh.generateMesh;
+msh = msh.generate();
 
 %% generate fem model from mesh
-fem = Fem(msh);
-fem = fem.set('TimeStep',1/5,...
-              'ResidualNorm',1e-3,...
-              'PrescribedDisplacement',true,...
-              'LineStyle','-');
+fem = Fem(msh,'TimeStep',1/5,'PrescribedDisplacement',true);
 
 %% add constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[1,1]);

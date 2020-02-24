@@ -1,6 +1,7 @@
 function [normal,normalf] = TriangleNormal(vertex,face)
+
 %   Copyright (c) 2004 Gabriel Peyr?
-%[vertex,face] = check_face_vertex(vertex,face);
+
 face = face.';
 vertex = vertex.';
 nface = size(face,2);

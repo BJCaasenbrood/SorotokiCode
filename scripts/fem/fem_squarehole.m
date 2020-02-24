@@ -4,7 +4,7 @@ sdf = @(x) SquareHole(x,2,.5);
 
 msh = Mesh(sdf);
 msh = msh.set('BdBox',[0,5,0,5],'NElem',50,'MaxIteration',150);
-msh = msh.generateMesh;
+msh = msh.generate();
 
 %% generate fem model from mesh
 fem = Fem(msh);

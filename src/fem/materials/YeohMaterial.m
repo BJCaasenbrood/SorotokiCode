@@ -5,9 +5,9 @@ classdef YeohMaterial
         C1 = 10;
         C2 = 0;
         C3 = 0;
-        D1 = 500;
-        D2 = 500;
-        D3 = 500;
+        D1 = 50;
+        D2 = 50;
+        D3 = 50;
     end
     
     properties (Access = private)
@@ -58,13 +58,6 @@ J = sqrt(det(C));
 
 YeohC = [YeohMaterial.C1,YeohMaterial.C2,YeohMaterial.C3];
 YeohD = [YeohMaterial.D1,YeohMaterial.D2,YeohMaterial.D3];
-%Fvol = J^(1/3)*eye(3);
-%Fiso = J^(-1/3)*F;
-
-% if (nargin > 2) && Robustness
-% YeohD(1) = 100; YeohD(2) = 100; YeohD(3) = 100;
-% YeohC(2) = YeohC(2)*1.5;
-% end
 
 I = eye(3,3);
 Cinv = minv(C);
@@ -94,12 +87,6 @@ TOb2 = TensorOperation(I,Cinv,true);
 TOb3 = TensorOperation(Cinv,Cinv,true);
 TOb4 = TensorOperation(Cinv,Cinv,false);
 
-% TOa = TensorOperation_mex(II3,II3,true);
-% TOb1 = TensorOperation_mex(Cinv,I,true);
-% TOb2 = TensorOperation_mex(I,Cinv,true);
-% TOb3 = TensorOperation_mex(Cinv,Cinv,true);
-% TOb4 = TensorOperation_mex(Cinv,Cinv,false);
-
 TOc = TOb3;
 TOd1 = TOb3;
 TOd2 = TOb4;
@@ -117,5 +104,8 @@ end
 end
 
 methods (Access = private)
+
+
+    
 end
 end

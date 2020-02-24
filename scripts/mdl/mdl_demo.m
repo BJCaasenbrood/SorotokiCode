@@ -1,19 +1,21 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-clc; clear; close all;
+clc; clear; %close all;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-tab = [0,1,1,1,0,0];
+tab = [0,1,1,0,0,0];
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 mdl = Model(tab);
 
 mdl = mdl.set('NModal',2,'tspan',3);
-mdl = mdl.set('P1',[1e-5 1e-5]*-2,...
-              'P2',[7e-5 0e-5]);
+mdl = mdl.set('P1',[0e-4 0e-5],...
+              'P2',[0e-4 0e-4]);
           
 mdl = mdl.GenerateModel();
-mdl = mdl.simulate();
+mdl = mdl.solve();
 
-figure(99);
-plot(mdl.get('t'),mdl.get('g'));
+% figure(99);
+% plot(mdl.get('t'),mdl.get('g'));
 
-pause;
+%pause;
+hold on;
 mdl.show();
+view(180,90);
