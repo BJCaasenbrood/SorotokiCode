@@ -6,36 +6,23 @@
 
 ### Example: Pneu-net soft robot
 
-<div align="center"> <img src="./src/opt_pneunet.gif" width="550"> </div>
-
 ```matlab
-%% set signed distance function
-W = 20;   % width
-H = 40;   % height  
-E = 1;    % edge 
-T = 20;   % thickness
+%% generate mesh from sdf
+sdf = @(x) PneuNet(x,20,40,1,20);
 
-sdf = @(x) PneuNet(x,W,H,E,T);
-
-%% generate mesh
-msh = Mesh(sdf);
-msh = msh.set('BdBox',[0,W,0,H],...
-              'NElem',1000
-      
+msh = Mesh(sdf'BdBox',[0,20,0,40],'NElem',1000);
 msh = msh.generateMesh;
 
-%% show generated mesh
-fem = Fem(msh);
-fem = fem.set('TimeStep',1/3,...
-              'VolumeInfill',0.3,...
+%% generate fem model from mesh
+fem = Fem(msh,'VolumeInfill',0.3,...
               'Penal',4,...
-              'VolumetricPressure',true,...
               'FilterRadius',4,...
-              'Periodic',[1/2, 0],...
-              'Repeat',ones(1,7),...
               'OptimizationProblem','Compliant');
+              
+%% set spatial settings
+fem = fem.set('Periodic',[1/2, 0],'Repeat',ones(1,7));
 
-%% add constraint
+%% add boundary condition
 id = fem.FindNodes('Left'); 
 fem = fem.AddConstraint('Support',id,[1,1]);
 
@@ -63,7 +50,8 @@ C1 = dCircle(P,0,T + 0.5,1);
 C2 = dCircle(P,W,T + 0.5,1);
 Dist = dDiff(dDiff(dDiff(dDiff(R1,R2),R3),C1),C2);
 end
-
-
 ```
+
+<div align="center"> <img src="./src/opt_pneunet.gif" width="550"> </div>
+
 
