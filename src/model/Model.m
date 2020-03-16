@@ -50,7 +50,7 @@ function obj = Model(Table,varargin)
     obj.Table = Table;
     obj.NLink = size(Table,1);
     obj.LumpedMass = false;
-    obj.Grav = 9.81*0;
+    obj.Grav = 9.81;
     obj.Movie = false;
     obj.MovieStart = false;
     obj.MovieAxis = 1.5*[-.5 .5 -.5 .5 -1 0.5];
@@ -59,7 +59,7 @@ function obj = Model(Table,varargin)
     obj.Radius = 1e-2;
     obj.E = 4e2;
     obj.nu = 0.4;
-    obj.mu = 0.1;
+    obj.mu = 0.3;
     obj.Length = 1;
     obj.NModal = 2;
     obj.Chebyshev = true;
@@ -331,7 +331,7 @@ n0   = [0,0,0,0,0,0];
 
 % dynamic coriolis/viscous forces
 [~,Qr,yf,ts] = InverseDynamicModel(Model,q_,dq_,0*ddq_,g0,n0,n0);
-Qv = Qr- Qc;
+Qv = Qr - Qc;
 
 % building the interia matrix
 MC = zeros(N);
@@ -346,18 +346,25 @@ end
 % compute control action
 g1 = yf(end,1:7);
 eta1 = yf(end,8:13);
-%Qs = -J0.'*Model.Controller(Model.t,g1);
+Qd = -J0.'*Model.Controller(Model.t,g1);
 
 % compute pressure inputs
-t1 = PressureVector(1,0,0);
-t2 = PressureVector(0,0,0);
-Qs = (J1.'*(t1 - t2) + J0.'*t2)*clamp(t/5,0,1);
+H = PressureMatrix;
+I = ones(6,1);
+O = zeros(6,1);
+opt = optimoptions('fmincon','Algorithm','sqp','Display','none');
+tau = fmincon(@(x) x.'*x,I*1e-3,[J1.'*H, (J0.'- J1.')*H],Qd,[],[],O,I,[],opt);
+if isempty(tau), tau = zeros(6,1); end
+
+t1 = H*tau(1:3);
+t2 = H*tau(4:6);
+Qs = (J1.'*(t1 - t2) + J0.'*t2);
 
 Qa = Qc + Qv + Qs;
 
 dx = x;
 dx(1:N,1) = x(Model.NModal*Model.NDof+1:end);
-dx(N+1:end,1) = MC\(-Model.Dee*dq_ -Qa - Model.Kee*q_);
+dx(N+1:end,1) = MC\(-Qa - Model.Kee*q_ -Model.Dee*dq_ );
 
 % delta operator
 function y = dalpha(a,N), y = logical(1:N==a).'; end
@@ -465,19 +472,13 @@ end
 
 J0 = transpose(Ad(GL))*(J0 + 0.5*dx*localJ(Model,GL,1));
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    function J = localJ(Model,g,t)
-        Q = g(1:4);
-        r = g(5:7);
+%----------------------------------------------------------------
+function J = localJ(Model,g,t), Q = g(1:4); r = g(5:7);
         J = Adgmap(Q,r)*Model.Ba*Model.Phi(t);
-    end
-    
-    function A = Ad(g)
-        Q = g(1:4);
-        r = g(5:7);
-        A = Adgmap(Q,r);
-    end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+end
+%----------------------------------------------------------------
+function A = Ad(g), Q = g(1:4); r = g(5:7); A = Adgmap(Q,r); end
+%----------------------------------------------------------------
     
 end
   
@@ -592,8 +593,8 @@ M = diag([p0*J1,p0*J2,p0*J3,p0*A, p0*A, p0*A]);
 end
 
 %----------------------------------------------------- control input tensor 
-function P = PressureVector(p11,p12,p13)
-P1 = [p11;p12;p13];
+function P = PressureMatrix
+%P1 = [p11;p12;p13];
 A = 5e-6;
 r = 1;
 
@@ -604,7 +605,7 @@ H = [ 0,              0,             0;
       0,              0,             0;
       0,              0,             0];
 
-P = A*H*P1(:);
+P = A*H;
   
 end
 
