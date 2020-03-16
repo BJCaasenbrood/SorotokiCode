@@ -127,7 +127,6 @@ end
 
 %--------------------------------------------------------------- SCALE MESH
 function mesh = ScaleMesh(mesh,Arg)
-
 Ax = Arg{1};
 Scale  = Arg{2};
 Node0 = mesh.Node;
@@ -135,13 +134,13 @@ Node = Node0;
 
 if strcmp(Ax,'x')
     Node(:,1) = Scale*Node0(:,1);
-    Node(:,1) = Node(:,1) - mean(Node0(:,1));
+    Node(:,1) = Node(:,1);% - mean(Node0(:,1));
 elseif strcmp(Ax,'y')
     Node(:,2) = Scale*Node0(:,2);
-    Node(:,2) = Node(:,2) - mean(Node0(:,2));
+    Node(:,2) = Node(:,2);% - mean(Node0(:,2));
 elseif strcmp(Ax,'z')
     Node(:,3) = Scale*Node0(:,3);
-    Node(:,3) = Node(:,3) - min(Node0(:,3));
+    Node(:,3) = Node(:,3);% - min(Node0(:,3));
 else 
 end
 

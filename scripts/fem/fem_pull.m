@@ -14,7 +14,7 @@ fem = fem.AddConstraint('Support',fem.FindNodes('Right'),[0,1]);
 fem = fem.AddConstraint('Load',fem.FindNodes('Right'),[2,0]);
 
 %% assign material
-fem.Material = Ecoflex0030;
+fem.Material = TPU90;
 
 %% solving
 fem.solve();

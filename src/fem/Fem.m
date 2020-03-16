@@ -197,6 +197,14 @@ end
 
 if length(Z) == Fem.NNode, Z = Smoothing(Fem,Z,1); end
 
+if length(varargin) == 2 && flag == 0
+    handle = varargin{2}; 
+    set(handle{2},'FaceVertexCData',Z); 
+    set(handle{2},'Vertices',V); 
+    set(gca,'Children',[handle{2} handle{3} handle{1}]);
+    return; 
+end
+
 if flag == 0
 cla; axis equal;     
 axis off; hold on; h{3} = [];
@@ -210,7 +218,7 @@ h{2} = patch('Faces',Fem.Mesh.get('ElemMat'),'Vertices',V,...
     'Linewidth',1.0,'FaceAlpha',1.0,'EdgeColor','k');
 
 h{3} = patch('Faces',Fem.Mesh.get('Boundary'),'Vertices',V,...
-    'LineStyle','-','Linewidth',2,'EdgeColor','k');
+    'LineStyle','-','Linewidth',1.5,'EdgeColor','k');
 
 if Fem.VolumetricPressure
     id = FindElements(Fem,'FloodFill',Fem,Fem.Density); 
@@ -337,7 +345,8 @@ Fem.Node = Fem.Node0;
 showInformation(Fem,'NonlinearFem');
 
 if Fem.SolverPlot || ~Fem.SolverStartMMA
-    figure(101); Fem.show('Un');
+    figure(101); 
+    h = Fem.show('Un');
 end
 
 while true 
@@ -459,7 +468,8 @@ while true
     end
     
     if Fem.SolverPlot || ~Fem.SolverStartMMA
-        figure(101); Fem.show('Svm'); drawnow;
+        Fem.show('Svm',h); 
+        drawnow;
     end
     
     if ~Fem.Nonlinear, break; end
@@ -477,7 +487,7 @@ Fem.SolverPlot = false;
 Fem.IterationMMA = 0;
 Fem.SolverStartMMA = true;
 flag = true;
-Visual = 'E+';
+Visual =  'ISO';
 
 Fem.show(Visual);
 drawnow;
@@ -533,7 +543,7 @@ end
 
 %----------------------------------------------------- reconstruct topology
 function Fem = former(Fem, Thickness)
-Res = 200;    
+Res = 300;    
 Layers = 40;
 Patch = 5;
 
@@ -593,7 +603,7 @@ if Fem.VolumetricPressure
 end
 
 SDF0 = V(:,:,3);
-SDF0 = GaussianFilter(SDF0,10);
+SDF0 = GaussianFilter(SDF0,5);
 SDF = repmat(SDF0,[1 1 Layers]);
 
 if Fem.VolumetricPressure
@@ -960,7 +970,7 @@ if ~isempty(Fem.Contact)
 end
 
 if Fem.PrescribedDisplacement
-    
+    NLoad = size(Fem.Load,1);
     if ~isempty(Fem.Load)
     if abs(Fem.Load(1,2))>0
         pDof = reshape(2*Fem.Load(:,1)-1,NLoad,1);
@@ -1520,11 +1530,13 @@ if iter > 2, Fem.xold2 = Fem.xold2; else, Fem.xold2 = 0; end
     Fem.xold1,Fem.xold2,f0val,df0dx,df0dx2,fval,dfdx,dfdx2,Fem.low,...
     Fem.upp,A0,A,C,D);
 
-if strcmp(Fem.OptimizationProblem,'Compliance'), zNew = xmma;
-else
-alpha = max(0.9-iter/Fem.MaxIterationMMA,0);
-zNew = (1-alpha)*xmma + alpha*xval;
-end
+%if strcmp(Fem.OptimizationProblem,'Compliance'), 
+dx = clamp(xmma - xval,-Fem.ChangeMax,Fem.ChangeMax);
+zNew = xval + dx;
+% else
+% alpha = max(0.9-iter/Fem.MaxIterationMMA,0);
+% zNew = (1-alpha)*xmma + alpha*xval;
+% end
 
 if iter >= 1, Fem.xold1 = xval; end
 if iter >= 2, Fem.xold2 = Fem.xold1; end

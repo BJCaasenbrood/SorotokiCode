@@ -17,7 +17,7 @@ fem = fem.AddConstraint('Support',fem.FindNodes('Line',[0 4 10 10]),[1,0]);
 fem = fem.AddConstraint('Load',fem.FindNodes('Line',[0 2 10 10]),[0,-5]);
 
 %% assign material
-fem.Material = Dragonskin10A;
+fem.Material = TPU90;
 
 %% solving
 fem.solve();

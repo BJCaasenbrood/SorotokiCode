@@ -257,6 +257,7 @@ fv.faces = f;
 fv.objects(1).type='f';
 fv.objects(1).data.vertices=fv.faces;
 objwriter(fv,'test.obj');
+
 end
 
 
@@ -274,7 +275,7 @@ function Gmodel = GenerateObject(Gmodel,varargin)
     if isa(msh{1},'char')
        [~,Gmodel.Name,ext] = fileparts(msh{1});
        if strcmp(ext,'.stl'), [f,v] = stlreader(msh{1});
-       elseif strcmp(ext,'.obj'), [f,v] = objreader(msh{1});
+       elseif strcmp(ext,'.obj'), [v,f] = objreader(msh{1});
        else, cout('err','* extension not recognized');
        end
     elseif isa(msh{1},'function_handle')
@@ -294,7 +295,7 @@ function Gmodel = GenerateObject(Gmodel,varargin)
 %        [f,v] = isosurface(single(X),single(Y),...
 %            single(Z),single(D),1e-6);
        
-       %f = fliplr(f);
+       %f = fliplr(f);    
     elseif length(msh) == 2
        v = msh{1};
        f = msh{2};        
@@ -435,7 +436,7 @@ end
 end
 
 function Groundplane(Gmodel)
-tmp = Gmodel.BdBox; a = 0.2;
+tmp = Gmodel.BdBox; a = 0.1;
 tmp(1) = Gmodel.BdBox(1)-a*( Gmodel.BdBox(2) - Gmodel.BdBox(1)); 
 tmp(2) = Gmodel.BdBox(2)+a*( Gmodel.BdBox(2) - Gmodel.BdBox(1)); 
 tmp(3) = Gmodel.BdBox(3)-a*( Gmodel.BdBox(4) - Gmodel.BdBox(3)); 
@@ -460,6 +461,13 @@ v = [tmp(1),tmp(3), tmp(5);
 f = [1,2,3,4];
 
 [I,~] = imread('checker.jpg');
+
+dX = (tmp(2)-tmp(1));
+dY = (tmp(4)-tmp(3));
+
+if dY/dX >= 2, I = vertzcat(I,I);
+elseif dX/dY >= 2, I = horzcat(I,I);
+end
 
 hold all
 warpim(X,Y,X*0 + tmp(5),I);

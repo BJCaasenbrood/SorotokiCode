@@ -1,9 +1,9 @@
 clr;
 %% generate mesh from sdf
-W = 20;   % width
-H = 40;   % height  
-E = 1;    % edge 
-T = 20;   % thickness
+W = 10;   % width
+H = 15;   % height  
+E = 0.5;  % edge 
+T = 8;    % thickness
 
 sdf = @(x) PneuNet(x,W,H,E,T);
 
@@ -12,11 +12,12 @@ msh = msh.generate();
 
 %% show generated mesh
 fem = Fem(msh,'TimeStep',1/4,...
-              'VolumeInfill',0.3,...
+              'VolumeInfill',0.25,...
               'Penal',4,...
-              'FilterRadius',3,...
+              'FilterRadius',1,...
+              'MaxIterationMMA',150,...
               'Periodic',[1/2, 0],...
-              'Repeat',[1,1,1],...
+              'Repeat',[1 1 1 1],...
               'Nonlinear',false,...
               'OptimizationProblem','Compliant');
 
@@ -29,7 +30,7 @@ fem = fem.AddConstraint('Output',id,[0,-1]);
 fem = fem.AddConstraint('Spring',id,[0,1]);
 
 id = fem.FindElements('Location',[W/2,H/2],1);
-fem = fem.AddConstraint('PressureCell',id,[5e-4,0]);
+fem = fem.AddConstraint('PressureCell',id,[5e-2,0]);
 
 %% set density
 fem = fem.initialTopology('Hole',[W/2,H/2],.5);
@@ -44,7 +45,7 @@ function Dist = PneuNet(P,W,H,E,T)
 R1 = dRectangle(P,0,W,0,H);
 R2 = dRectangle(P,-W/2,E,T,H+H/2);
 R3 = dRectangle(P,W-E,W+W/2,T,H+H/2);
-C1 = dCircle(P,0,T + 0.5,1);
-C2 = dCircle(P,W,T + 0.5,1);
+C1 = dCircle(P,0,T + E/2,E);
+C2 = dCircle(P,W,T + E/2,E);
 Dist = dDiff(dDiff(dDiff(dDiff(R1,R2),R3),C1),C2);
 end
