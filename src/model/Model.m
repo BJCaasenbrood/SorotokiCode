@@ -9,6 +9,7 @@ classdef Model
         Table;
         g;
         Controller;
+        Pressure;
     end
     
     properties (Access = private)
@@ -62,7 +63,7 @@ function obj = Model(Table,varargin)
     obj.mu = 0.3;
     obj.Length = 1;
     obj.NModal = 2;
-    obj.Chebyshev = true;
+    obj.Chebyshev = false;
     obj.PressureArea = 5e-5;
     
     for ii = 1:2:length(varargin)
@@ -96,13 +97,13 @@ function Model = generate(Model)
 end
 
 %---------------------------------------------------------------------- set
-function Model = solve(Model)
-    
+function Model = solve(Model)   
 dt = 1e-1;
 T = 0:dt:Model.tspan;
 q0 = zeros(Model.NModal*Model.NDof,1);
 
-opts = optimoptions('fsolve','Display','none','TolFun',1e-5);
+opts = optimoptions('fsolve','Display','none','TolFun',1e-6,...
+    'Algorithm','levenberg-marquardt','InitDamping',.01);
 ys = fsolve(@(x) KinematicODE(Model,T,x),q0,opts);
 
 Model.g = ys(:)';
@@ -113,13 +114,14 @@ end
 %----------------------------------------------------------------- simulate
 function Model = simulate(Model)
 N = Model.NModal*Model.NDof;
-dt = 1e-1;
+dt = 1e-2;
 T = 0:dt:Model.tspan;
 q0 = zeros(N,1);
 dq0 = zeros(N,1);
 
 opt = odeset('RelTol',1e-1,'AbsTol',1e-1);
 [ts,ys] = ode23tb(@(t,x) DynamicODE(Model,t,x),T,[q0 dq0],opt);
+%[ts,ys] = ode1(@(t,x) DynamicODE(Model,t,x),T,[q0; dq0]);
 
 Model.g = ys;
 Model.t = ts;
@@ -130,11 +132,8 @@ function show(Model)
    
 N = Model.Nq;
 X = linspace(0,1,200);
-FPS = round((1/12)/(mean(diff(Model.t))));
-axis([-.5 .5 -.5 .5 -1 .5]);
 
-if length(Model.t) > 2
-FPS = round((1/12)/(mean(diff(Model.t))));
+if length(Model.t) > 2, FPS = round((1/24)/(mean(diff(Model.t))));
 else, FPS = 1;
 end
 
@@ -153,9 +152,8 @@ for ii = 1:FPS:length(Model.t)
     
     figure(101);
     cla;
-    plot3(G(:,6),G(:,7),-G(:,5),'linewidth',2,'Color',col(1));
-    axis equal
-    
+    plot3(G(:,6),G(:,7),-G(:,5),'linewidth',2,'Color',col(1));    
+    if ~isempty(Model.MovieAxis), axis equal; axis(Model.MovieAxis); end
 end
     
 end
@@ -198,6 +196,10 @@ else, FPS = 1; i0 = 1;
 end
 
 for ii = i0:FPS:length(Model.t)
+    
+    plotvector([0;0;0],[0.2;0;0],'Color',col(1),'linewidth',2);
+    plotvector([0;0;0],[0;0.2;0],'Color',col(2),'linewidth',2);
+    plotvector([0;0;0],[0;0;0.2],'Color',col(3),'linewidth',2);
 
     msh.resetNode();
     mshgr.resetNode();
@@ -293,6 +295,7 @@ end
 %---------------------------------------------------------------------- set
 function dx = KinematicODE(Model,~,x)
 N = Model.NModal*Model.NDof;
+H = PressureMatrix;
 Model.t = Model.tspan;
 Model.q = x;
 q_   = x(1:N); 
@@ -304,8 +307,19 @@ n0   = [0,0,0,0,0,0];
 
 [J0,J1] = JacobianCompute(Model,ts, yf(:,1:7));
 
-t1 = PressureVector(1,0,1);
-t2 = PressureVector(0,0,1);
+% t1 = PressureVector(1,0,1);
+% t2 = PressureVector(0,0,1);
+% Qs = (J1.'*(t1 - t2) + J0.'*t2);
+
+% compute control action
+% g1 = yf(end,1:7);
+% eta1 = yf(end,8:13);
+% Qs = -J0.'*Model.Controller(Model.tspan,g1);
+
+% compute pressure forces
+tau = Model.Pressure(Model.t);
+t1 = H*tau(1:3);
+t2 = H*tau(4:6);
 Qs = (J1.'*(t1 - t2) + J0.'*t2);
 
 Qa = Qc + Qs;
@@ -316,54 +330,59 @@ end
 %---------------------------------------------------------------------- set
 function dx = DynamicODE(Model,t,x)
 N = Model.NModal*Model.NDof;
+H = PressureMatrix;
 Model.q(:,1)  = x(1:N);
 Model.dq(:,1) = x(N+1:end);
 Model.t = t;
 
-q_   = x(1:N);
-dq_  = x(N+1:end);
-ddq_ = Model.dq(:,1)*0;
-g0   = [1,0,0,0,0,0,0];
-n0   = [0,0,0,0,0,0];
+q_  = x(1:N);
+dq_ = x(N+1:end);
+g0  = [1,0,0,0,0,0,0];
+n0  = [0,0,0,0,0,0];
 
 % static potential/reaction forces
-[~,Qc] = InverseDynamicModel(Model,q_,0*dq_,0*ddq_,g0,n0,n0);
+[~,Qc] = InverseDynamicModel(Model,q_,0*dq_,0*dq_,g0,n0,n0);
 
 % dynamic coriolis/viscous forces
-[~,Qr,yf,ts] = InverseDynamicModel(Model,q_,dq_,0*ddq_,g0,n0,n0);
+[~,Qr,yf,ts] = InverseDynamicModel(Model,q_,dq_,0*dq_,g0,n0,n0);
 Qv = Qr - Qc;
 
 % building the interia matrix
-MC = zeros(N);
-for ii = 1:(Model.NModal*Model.NDof)
-    [~,Mtmp] = InverseDynamicModel(Model,q_,0*dq_,dalpha(ii,N),g0,n0,n0);
-    MC(:,ii) = -Mtmp + Qc;
+if ~Model.LumpedMass
+    MC = zeros(N);
+    for ii = 1:(Model.NModal*Model.NDof)
+        [~,Mtmp] = InverseDynamicModel(Model,q_,0*dq_,dalpha(ii,N),g0,n0,n0);
+        MC(:,ii) = -Mtmp + Qc;
+    end
+else
+    MC = Model.Mee;
 end
 
 % construct jacobian matrix
-[J0,J1] = JacobianCompute(Model,ts, yf(:,1:7));
+if ~isempty(Model.Controller) || ~isempty(Model.Pressure)
+[J0, J1] = JacobianCompute(Model,ts, yf(:,1:7));
+end
+
+if t > 2
+   1; 
+end
 
 % compute control action
-g1 = yf(end,1:7);
-eta1 = yf(end,8:13);
-Qd = -J0.'*Model.Controller(Model.t,g1);
+if ~isempty(Model.Controller)
+g1  = yf(end,1:7);
+Qd  = -(Adgmap(g1)*J0).'*Model.Controller(Model.t,g1(5:7)');
+tau = OptimalControlInput(J0,J1,H,Qd);
+Qs  = [J1.'*H, (J0.'- J1.')*H]*tau;
 
-% compute pressure inputs
-H = PressureMatrix;
-I = ones(6,1);
-O = zeros(6,1);
-opt = optimoptions('fmincon','Algorithm','sqp','Display','none');
-tau = fmincon(@(x) x.'*x,I*1e-3,[J1.'*H, (J0.'- J1.')*H],Qd,[],[],O,I,[],opt);
-if isempty(tau), tau = zeros(6,1); end
-
-t1 = H*tau(1:3);
-t2 = H*tau(4:6);
-Qs = (J1.'*(t1 - t2) + J0.'*t2);
+elseif ~isempty(Model.Pressure)
+tau = Model.Pressure(Model.t);
+Qs  = [J1.'*H, (J0.'- J1.')*H]*tau;
+end
 
 Qa = Qc + Qv + Qs;
 
 dx = x;
-dx(1:N,1) = x(Model.NModal*Model.NDof+1:end);
+dx(1:N,1)     = x(N+1:end);
 dx(N+1:end,1) = MC\(-Qa - Model.Kee*q_ -Model.Dee*dq_ );
 
 % delta operator
@@ -459,25 +478,23 @@ dx = mean(diff(t));
 G0 = gmat(1,:);
 GL = gmat(end,:);
 
-J0 = dx*0.5*localJ(Model,G0,0);
+J0 = 0.5*dx*localJ(Model,G0,0);
 
 for ii = 1:length(t)-1
     J0 = J0 + dx*localJ(Model,gmat(ii,:),t(ii));
     if ii == floor(length(t)/2)-1
     GMID = gmat(ii+1,:);
     J1 = J0 + 0.5*dx*localJ(Model,GMID,t(ii+1));
-    J1 = transpose(Ad(GMID))*J1;
+    J1 = transpose(Adgmap(GMID))*J1;
+    %J1 = J1;
     end
 end
 
-J0 = transpose(Ad(GL))*(J0 + 0.5*dx*localJ(Model,GL,1));
+J0 = transpose(Adgmap(GL))*(J0 + 0.5*dx*localJ(Model,GL,1));
 
 %----------------------------------------------------------------
-function J = localJ(Model,g,t), Q = g(1:4); r = g(5:7);
-        J = Adgmap(Q,r)*Model.Ba*Model.Phi(t);
+function J = localJ(Model,g,t), J = Adgmap(g)*Model.Ba*Model.Phi(t);
 end
-%----------------------------------------------------------------
-function A = Ad(g), Q = g(1:4); r = g(5:7); A = Adgmap(Q,r); end
 %----------------------------------------------------------------
     
 end
@@ -545,7 +562,9 @@ g(4:6,1:3) = Uh;
 end
 
 %------------------------------------------- adjoint map on lie group SE(3)
-function Adg = Adgmap(Q,r)
+function Adg = Adgmap(g)
+Q = g(1:4);
+r = g(5:7); 
 R = Quat2Rot(Q);
 Adg = zeros(6); 
 Adg(1:3,1:3) = R;
@@ -579,7 +598,7 @@ J3 = 0.25*pi*Model.Radius^4;
 E0 = Model.E;
 nu0 = Model.nu;
 G0 = (E0)/(2*(1+nu0));
-H = diag([G0*J1,E0*J2,E0*J3, 0.001*E0*A, G0*A, G0*A]);
+H = diag([G0*J1,E0*J2,E0*J3, E0*A, G0*A, G0*A]);
 end
 
 %---------------------------------------- infinitesimal body inertia tensor 
@@ -597,16 +616,32 @@ function P = PressureMatrix
 %P1 = [p11;p12;p13];
 A = 5e-6;
 r = 1;
+v = 0;
 
 H = [ 0,              0,             0;
       0, -0.5*r*sqrt(3), 0.5*r*sqrt(3);
      -r,          0.5*r,         0.5*r;
-      0,              0,             0;
+     -v,             -v,            -v;
       0,              0,             0;
       0,              0,             0];
 
 P = A*H;
   
+end
+
+%----------------------------------------------------- control input tensor 
+function tau = OptimalControlInput(J0,J1,H,Qd)
+I = ones(6,1);
+O = zeros(6,1);
+opt = optimoptions('fmincon','Algorithm','interior-point',...
+'MaxIterations',50,'Display','none');
+Aeq = [J1.'*H, (J0.'- J1.')*H]; 
+b = Qd;
+%tau = fmincon(@(x) 0.5*(Aeq*x-b).'*(Aeq*x-b),rand(6,1),[],[],[],[],O,I,[],opt);
+tau = lsqminnorm(Aeq,b);
+%tau = lsqlin(Aeq,b,-eye(6),I*1e-6);
+if isempty(tau), tau = zeros(6,1); end
+
 end
 
 %-------------------------------------------------------------- movie maker
