@@ -10,6 +10,8 @@ classdef Model
         g;
         Controller;
         Pressure;
+        Texture;
+        q0;
     end
     
     properties (Access = private)
@@ -36,6 +38,7 @@ classdef Model
         Chebyshev;
         DistLoad;
         PressureArea;
+        Jacobian;
         
         Movie;
         MovieStart;
@@ -65,6 +68,8 @@ function obj = Model(Table,varargin)
     obj.NModal = 2;
     obj.Chebyshev = false;
     obj.PressureArea = 5e-5;
+    obj.Texture = 1.2*grey;
+    obj.Jacobian = true;
     
     for ii = 1:2:length(varargin)
         obj.(varargin{ii}) = varargin{ii+1};
@@ -98,17 +103,18 @@ end
 
 %---------------------------------------------------------------------- set
 function Model = solve(Model)   
+q0 = zeros(Model.NModal*Model.NDof,1);
 dt = 1e-1;
 T = 0:dt:Model.tspan;
-q0 = zeros(Model.NModal*Model.NDof,1);
+opts = optimoptions('fsolve','Display','none','TolFun',1e-3,...
+    'Algorithm','levenberg-marquardt');
+ys = fsolve(@(x) KinematicODE(Model,Model.tspan,x),q0,opts);
 
-opts = optimoptions('fsolve','Display','none','TolFun',1e-6,...
-    'Algorithm','levenberg-marquardt','InitDamping',.01);
-ys = fsolve(@(x) KinematicODE(Model,T,x),q0,opts);
+% opt = odeset('RelTol',1e-1,'AbsTol',1e-1);
+% [~,ys] = oderk(@(t,x) KinematicODE(Model,Model.tspan,x),T,q0);
 
-Model.g = ys(:)';
+Model.g = ys(:).';
 Model.t = 1;
-
 end
 
 %----------------------------------------------------------------- simulate
@@ -116,11 +122,13 @@ function Model = simulate(Model)
 N = Model.NModal*Model.NDof;
 dt = 1e-2;
 T = 0:dt:Model.tspan;
-q0 = zeros(N,1);
-dq0 = zeros(N,1);
+x0 = zeros(N,1);
+dx0 = zeros(N,1);
+
+if ~isempty(Model.q0), x0 = Model.q0; end
 
 opt = odeset('RelTol',1e-1,'AbsTol',1e-1);
-[ts,ys] = ode23tb(@(t,x) DynamicODE(Model,t,x),T,[q0 dq0],opt);
+[ts,ys] = ode23tb(@(t,x) DynamicODE(Model,t,x),T,[x0 dx0],opt);
 %[ts,ys] = ode1(@(t,x) DynamicODE(Model,t,x),T,[q0; dq0]);
 
 Model.g = ys;
@@ -129,7 +137,6 @@ end
 
 %--------------------------------------------------------------------- show
 function show(Model)
-   
 N = Model.Nq;
 X = linspace(0,1,200);
 
@@ -161,21 +168,21 @@ end
 %------------------------------------------------------------ show 3D model
 function showModel(Model)
     
-figure(101); hold all; cla;
+figure(101); hold all; %cla;
 N = Model.Nq;
 Model.Length = Model.Length0;
 X = linspace(0,1,200);
 
-%msh = Gmodel('SlenderRod.stl');
-msh = Gmodel('SoftActuatorRedux.stl');
+msh = Gmodel('SlenderRod.stl');
+%msh = Gmodel('SoftActuatorRedux.stl');
 mshgr = Gmodel('SoftGripperRedux.stl');
 %mshgr = Gmodel([]);
-%mshgr = mshgr.set('Node0',mshgr.Node*1e-6);
-% mshgr = mshgr.set('Node',mshgr.Node*1e-6);
+mshgr = mshgr.set('Node0',mshgr.Node*1e-6);
+mshgr = mshgr.set('Node',mshgr.Node*1e-6);
 
 % set texture
-msh.Texture = 1.25*grey;%1.25*base;
-mshgr.Texture = 1.25*grey;%1.25*base;
+msh.Texture = Model.Texture;%1.25*base;
+mshgr.Texture = Model.Texture;%1.25*base;
 
 msh = msh.bake();
 mshgr = mshgr.bake();
@@ -197,9 +204,9 @@ end
 
 for ii = i0:FPS:length(Model.t)
     
-    plotvector([0;0;0],[0.2;0;0],'Color',col(1),'linewidth',2);
-    plotvector([0;0;0],[0;0.2;0],'Color',col(2),'linewidth',2);
-    plotvector([0;0;0],[0;0;0.2],'Color',col(3),'linewidth',2);
+    plotvector([0;0;0],[0.2;0;0],'Color',col(1),'linewidth',2,'MaxHeadSize',0.75);
+    plotvector([0;0;0],[0;0.2;0],'Color',col(2),'linewidth',2,'MaxHeadSize',0.75);
+    plotvector([0;0;0],[0;0;0.2],'Color',col(3),'linewidth',2,'MaxHeadSize',0.75);
 
     msh.resetNode();
     mshgr.resetNode();
@@ -272,10 +279,13 @@ end
 %---------------------------------------------------------------------- set
 function P = ShapeFunction(Model,X)
 
-if ~Model.Chebyshev
-for ii = 1:Model.NModal, P(1,ii) = X.^(ii-1); end
+%P = sym(zeros(Model.NModal,1));
+Pc = cell(Model.NDof,1);
+   
+if Model.Chebyshev
+    for ii = 1:Model.NModal, P(1,ii) = X.^(ii-1); end
 else
-for ii = 1:Model.NModal, P(1,ii) = chebyshev(X,ii-1); end
+    for ii = 1:Model.NModal, P(1,ii) = chebyshev(X,ii-1); end
 end
 for ii = 1:Model.NDof, Pc{ii,1} = P; end
 
@@ -293,7 +303,7 @@ P = dirac(x,n);
 end
 
 %---------------------------------------------------------------------- set
-function dx = KinematicODE(Model,~,x)
+function dx = KinematicODE(Model,t,x)
 N = Model.NModal*Model.NDof;
 H = PressureMatrix;
 Model.t = Model.tspan;
@@ -305,22 +315,24 @@ n0   = [0,0,0,0,0,0];
 % static potential/reaction forces
 [~,Qc,yf,ts] = InverseDynamicModel(Model,q_,0*q_,0*q_,g0,n0,n0);
 
+% compute jacobian
+if Model.Jacobian
 [J0,J1] = JacobianCompute(Model,ts, yf(:,1:7));
-
-% t1 = PressureVector(1,0,1);
-% t2 = PressureVector(0,0,1);
-% Qs = (J1.'*(t1 - t2) + J0.'*t2);
+end
 
 % compute control action
-% g1 = yf(end,1:7);
-% eta1 = yf(end,8:13);
-% Qs = -J0.'*Model.Controller(Model.tspan,g1);
+if ~isempty(Model.Controller)
+g1  = yf(end,1:7);
+Qd  = -(Adgmap(g1)*J0).'*Model.Controller(Model.t,g1(5:7)');
+tau = OptimalControlInput(J0,J1,H,Qd);
+Qs  = [J1.'*H, (J0.'- J1.')*H]*tau;
 
-% compute pressure forces
+elseif ~isempty(Model.Pressure)
 tau = Model.Pressure(Model.t);
-t1 = H*tau(1:3);
-t2 = H*tau(4:6);
-Qs = (J1.'*(t1 - t2) + J0.'*t2);
+Qs  = [J1.'*H, (J0.'- J1.')*H]*tau;
+else
+Qs = Qc*0;
+end
 
 Qa = Qc + Qs;
 
@@ -363,10 +375,6 @@ if ~isempty(Model.Controller) || ~isempty(Model.Pressure)
 [J0, J1] = JacobianCompute(Model,ts, yf(:,1:7));
 end
 
-if t > 2
-   1; 
-end
-
 % compute control action
 if ~isempty(Model.Controller)
 g1  = yf(end,1:7);
@@ -377,6 +385,8 @@ Qs  = [J1.'*H, (J0.'- J1.')*H]*tau;
 elseif ~isempty(Model.Pressure)
 tau = Model.Pressure(Model.t);
 Qs  = [J1.'*H, (J0.'- J1.')*H]*tau;
+else
+Qs = 0;
 end
 
 Qa = Qc + Qv + Qs;
@@ -460,7 +470,7 @@ adet = admap(eta);
 
 dg = 0*g;
 FBar = zeros(6,1);
-FBar(4:6) = FBar(4:6) - R.'*M(4,4)*[Model.Grav,0,0].';
+FBar(4:6) = FBar(4:6) - 0*R.'*M(4,4)*[Model.Grav,0,0].';
 
 dg(1:4)    = ((2*norm(Q))^(-1))*A*Q;
 dg(5:7)    = R*Gamma(:);

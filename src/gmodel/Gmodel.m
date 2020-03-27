@@ -99,6 +99,11 @@ function Gmodel = ground(Gmodel)
     Groundplane(Gmodel);
 end
 
+%-------------------------------------------------------------- plot ground
+function Gmodel = box(Gmodel)
+    BoundingBox(Gmodel);
+end
+
 %--------------------------------------------------------------------- show
 function Gmodel = render(Gmodel,varargin)
     
@@ -472,6 +477,36 @@ end
 hold all
 warpim(X,Y,X*0 + tmp(5),I);
 hold off;
+
+patch('Faces',f,'Vertices',v,...
+    'Linewidth',1.5,'linestyle','-','FaceColor','none',...
+    'EdgeColor',[1 1 1]*0.5);
+end
+
+function BoundingBox(Gmodel)
+tmp = Gmodel.BdBox; a = 0.1;
+tmp(1) = Gmodel.BdBox(1)-a*( Gmodel.BdBox(2) - Gmodel.BdBox(1)); 
+tmp(2) = Gmodel.BdBox(2)+a*( Gmodel.BdBox(2) - Gmodel.BdBox(1)); 
+tmp(3) = Gmodel.BdBox(3)-a*( Gmodel.BdBox(4) - Gmodel.BdBox(3)); 
+tmp(4) = Gmodel.BdBox(4)+a*( Gmodel.BdBox(4) - Gmodel.BdBox(3)); 
+tmp(5) = Gmodel.BdBox(5)-0*( Gmodel.BdBox(6) - Gmodel.BdBox(5)); 
+tmp(6) = Gmodel.BdBox(6)+a*( Gmodel.BdBox(6) - Gmodel.BdBox(5)); 
+
+v = [tmp(1),tmp(3), tmp(5);  
+     tmp(2),tmp(3), tmp(5);
+     tmp(2),tmp(4), tmp(5);
+     tmp(1),tmp(4), tmp(5);
+     tmp(1),tmp(3), tmp(6);  
+     tmp(2),tmp(3), tmp(6);
+     tmp(2),tmp(4), tmp(6);
+     tmp(1),tmp(4), tmp(6)];
+ 
+f = [1,2,3,4;
+     5,6,7,8;
+     1,5,nan,nan;
+     2,6,nan,nan;
+     3,7,nan,nan;
+     4,8,nan,nan];
 
 patch('Faces',f,'Vertices',v,...
     'Linewidth',1.5,'linestyle','-','FaceColor','none',...

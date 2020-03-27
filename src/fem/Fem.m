@@ -65,7 +65,7 @@ classdef Fem < handle
         Utmp = 0;
         
         MaxIteration = 50;
-        MaxIterationMMA = 60;
+        MaxIterationMMA = 100;
         SolverStart = false;
         SolverStartMMA = false;
         SolverPlot = true;

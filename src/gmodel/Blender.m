@@ -141,6 +141,13 @@ elseif strcmp(Ax,'y')
 elseif strcmp(Ax,'z')
     Node(:,3) = Scale*Node0(:,3);
     Node(:,3) = Node(:,3);% - min(Node0(:,3));
+    if Scale < 1
+        B = mesh.get('BdBox');
+        mesh.set('BdBox',[B(1),B(2),B(3),B(4),-Scale*B(6),B(5)]);
+    else
+        B = mesh.get('BdBox');
+        mesh.set('BdBox',[B(1),B(2),B(3),B(4),B(5),Scale*B(5)]);
+    end
 else 
 end
 
