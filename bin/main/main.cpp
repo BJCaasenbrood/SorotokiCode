@@ -1,4 +1,5 @@
 //#include "src/RTdebug.h"
+#include <fstream>
 #include "src/tictoc.h"
 #include "src/Model.cpp"
 
@@ -12,17 +13,20 @@ int main()
 	// generate model-class
 	Model mdl(tab,3);
 
-	mdl.P1 << 0,0,0;
-	mdl.P2 << 0.01,0,0;
+	mdl.P1 << 0,0,0.75;
+	mdl.P2 << .5,0,0;
 
 	// solve soft robotic system
 	tic();
 	x =  mdl.implicit_solve();
 	toc();
 
-	cout << x << endl;
+	// output data
+	ofstream myfile;
+  	myfile.open ("data.log");
+  	myfile << x << "\n";
+  	myfile.close();
 
-	getchar();
 	return 0;
 }
 

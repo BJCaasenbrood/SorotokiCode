@@ -8,6 +8,7 @@ classdef Model
         tspan = 1;
         Table;
         g;
+        tau;
         Controller;
         Pressure;
         Texture;
@@ -68,7 +69,7 @@ function obj = Model(Table,varargin)
     obj.NModal = 2;
     obj.Chebyshev = false;
     obj.PressureArea = 5e-5;
-    obj.Texture = 1.2*grey;
+    obj.Texture = 1.25*grey;
     obj.Jacobian = true;
     
     for ii = 1:2:length(varargin)
@@ -117,6 +118,23 @@ Model.g = ys(:).';
 Model.t = 1;
 end
 
+%---------------------------------------------------------------------- set
+function Model = csolve(Model)   
+dir_path = './src/model/tools/solver';
+out = fullfile(dir_path,'input.log');
+fileID = fopen(out,'w');
+fprintf(fileID,'%d\n',Model.Pressure(Model.tspan));
+fclose(fileID);
+tic
+system('cd src/model/tools/solver && main.exe');
+toc
+y = load('src/model/tools/solver/state.log');
+Model.g = y(:,2:end);
+Model.t = y(:,1);
+y = load('src/model/tools/solver/tau.log');
+Model.tau = y(:,2:end);
+end
+
 %----------------------------------------------------------------- simulate
 function Model = simulate(Model)
 N = Model.NModal*Model.NDof;
@@ -124,6 +142,8 @@ dt = 1e-2;
 T = 0:dt:Model.tspan;
 x0 = zeros(N,1);
 dx0 = zeros(N,1);
+
+x0(1) = 2;
 
 if ~isempty(Model.q0), x0 = Model.q0; end
 
@@ -173,12 +193,12 @@ N = Model.Nq;
 Model.Length = Model.Length0;
 X = linspace(0,1,200);
 
-msh = Gmodel('SlenderRod.stl');
-%msh = Gmodel('SoftActuatorRedux.stl');
+%msh = Gmodel('SlenderRod.stl');
+msh = Gmodel('SoftActuatorRedux.stl');
 mshgr = Gmodel('SoftGripperRedux.stl');
 %mshgr = Gmodel([]);
-mshgr = mshgr.set('Node0',mshgr.Node*1e-6);
-mshgr = mshgr.set('Node',mshgr.Node*1e-6);
+%mshgr = mshgr.set('Node0',mshgr.Node*1e-6);
+%mshgr = mshgr.set('Node',mshgr.Node*1e-6);
 
 % set texture
 msh.Texture = Model.Texture;%1.25*base;
@@ -289,7 +309,7 @@ else
 end
 for ii = 1:Model.NDof, Pc{ii,1} = P; end
 
-P = blkdiag(Pc{:}) + 1e-16*X;
+P = blkdiag(Pc{:}); %+ 1e-16*X;
 end
 
 %---------------------------------------------------------------------- set
@@ -324,12 +344,12 @@ end
 if ~isempty(Model.Controller)
 g1  = yf(end,1:7);
 Qd  = -(Adgmap(g1)*J0).'*Model.Controller(Model.t,g1(5:7)');
-tau = OptimalControlInput(J0,J1,H,Qd);
-Qs  = [J1.'*H, (J0.'- J1.')*H]*tau;
+F = OptimalControlInput(J0,J1,H,Qd);
+Qs  = [J1.'*H, (J0.'- J1.')*H]*F;
 
 elseif ~isempty(Model.Pressure)
-tau = Model.Pressure(Model.t);
-Qs  = [J1.'*H, (J0.'- J1.')*H]*tau;
+F = Model.Pressure(Model.t);
+Qs  = [J1.'*H, (J0.'- J1.')*H]*F;
 else
 Qs = Qc*0;
 end
@@ -379,12 +399,12 @@ end
 if ~isempty(Model.Controller)
 g1  = yf(end,1:7);
 Qd  = -(Adgmap(g1)*J0).'*Model.Controller(Model.t,g1(5:7)');
-tau = OptimalControlInput(J0,J1,H,Qd);
-Qs  = [J1.'*H, (J0.'- J1.')*H]*tau;
+F = OptimalControlInput(J0,J1,H,Qd);
+Qs  = [J1.'*H, (J0.'- J1.')*H]*F;
 
 elseif ~isempty(Model.Pressure)
-tau = Model.Pressure(Model.t);
-Qs  = [J1.'*H, (J0.'- J1.')*H]*tau;
+F = Model.Pressure(Model.t);
+Qs  = [J1.'*H, (J0.'- J1.')*H]*F;
 else
 Qs = 0;
 end
@@ -402,7 +422,7 @@ end
 
 %---------------------------------------------------------------------- set
 function [F0,Q0,Y,X] = InverseDynamicModel(Model,q,dq,ddq,g0,eta0,deta0)
-X = linspace(0,Model.Length,30);
+X = linspace(0,Model.Length,1000);
 
 % forward integration
 [~,yf] = oderk(@(t,x) ForwardODE(Model,t,x,q,dq,ddq),X,[g0, eta0 deta0]);
@@ -503,7 +523,8 @@ end
 J0 = transpose(Adgmap(GL))*(J0 + 0.5*dx*localJ(Model,GL,1));
 
 %----------------------------------------------------------------
-function J = localJ(Model,g,t), J = Adgmap(g)*Model.Ba*Model.Phi(t);
+function J = localJ(Model,g,t)
+    J = Adgmap(g)*Model.Ba*Model.Phi(t);
 end
 %----------------------------------------------------------------
     
@@ -640,7 +661,7 @@ P = A*H;
 end
 
 %----------------------------------------------------- control input tensor 
-function tau = OptimalControlInput(J0,J1,H,Qd)
+function Q = OptimalControlInput(J0,J1,H,Qd)
 I = ones(6,1);
 O = zeros(6,1);
 opt = optimoptions('fmincon','Algorithm','interior-point',...
@@ -648,9 +669,9 @@ opt = optimoptions('fmincon','Algorithm','interior-point',...
 Aeq = [J1.'*H, (J0.'- J1.')*H]; 
 b = Qd;
 %tau = fmincon(@(x) 0.5*(Aeq*x-b).'*(Aeq*x-b),rand(6,1),[],[],[],[],O,I,[],opt);
-tau = lsqminnorm(Aeq,b);
+Q = lsqminnorm(Aeq,b);
 %tau = lsqlin(Aeq,b,-eye(6),I*1e-6);
-if isempty(tau), tau = zeros(6,1); end
+if isempty(Q), Q = zeros(6,1); end
 
 end
 

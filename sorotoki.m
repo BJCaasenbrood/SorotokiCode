@@ -255,6 +255,7 @@ if Request == 1
 fprintf(FID,'%% mdl.lib \n');
 WriteToFile([Path,'\src\model']);
 WriteToFile([Path,'\src\model\tools']);
+WriteToFile([Path,'\src\model\tools\solver']);
 else
 addpath([Path,'\src\model']);
 addpath([Path,'\src\model\tools']);
