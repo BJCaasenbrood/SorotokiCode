@@ -3,7 +3,7 @@ function C = linspacen(A,B,n)
 N = size(A); %Store size
 
 if ~all(size(A)==size(B)), error('A and B should be the same size'); end
-s
+
 if n==1 %Same behaviour as linspace
     C=B;
 else

@@ -1,18 +1,14 @@
+clr;
 
-t = stepspace(0,0.001,6000);
+[x,y,z] = peaks(300);
 
+z = z*0.25;
 
-y = zeros(6000,1);
-y2 = zeros(6000,1);
+figure
+surf(x,y,z,'linestyle','none');
 
-for ii = 1:6000
-   y(ii) = st(t(ii),0,2);
-   y2(ii) = st(t(ii),3,4);
-end
+colormap(viridis)
 
-plot(t,y,t,y2)
-
-function y = st(x,a,b)
-y = max(0.0,min((x - a) / abs(b - a),1.0));
-y =  y * y * (3 - 2 * y);
-end
+axis tight
+axis equal
+axis off;

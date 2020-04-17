@@ -3,46 +3,45 @@
 
 #include <cstdio>
 #include <iostream>
-#include <iterator>
 #include <iomanip>
 #include <fstream>
 #include <algorithm>
 #include <unistd.h>
-#include <cmath>
-#include <vector> 
 #include "liegroup.h"
 #include "shapes.cpp"
 #include "qprog.hpp"
-#include "pthres.hpp"
 #include "tictoc.h"
 #include "smoothstep.h"
 
+//#define FULL_CONTROLLER
+//#define CONSTRAINED_CONTROLLER
 #define WRITE_OUTPUT
 #define TICTOC
 //#define QUASINEWTON
+//#define JACOBIAN
 
 #define PRECISION 5
 
 #define NMODE 3
 #define SDOMAIN 1
 #define TDOMAIN 10
-#define SPACESTEP 15
-#define TIMESTEP 0.05
+#define SPACESTEP 10
+#define TIMESTEP 0.0333
 #define INTSTEP 900
 
-#define ATOL 1e-6
-#define RTOL 1e-4
+#define ATOL 1e-4
+#define RTOL 1e-3
 #define MAX_ITER 1e5
 #define SPEEDUP 1.0
 
 #define PRS_AREA 1e-5
-#define GRAVITY 0.00
+#define GRAVITY 9.81
 #define PI 3.1415926
 #define RADIUS 0.01
-#define RHO 0.005
-#define EMOD 400
+#define RHO 0.01
+#define EMOD 4e2
 #define NU 0.4
-#define MU 0.3
+#define MU 0.2
 //#define MU 0.01 // (static solver)
 
 typedef Eigen::Array<int, 6, 1> V6i;
@@ -74,6 +73,8 @@ class Model
   	M6f Mtt, Ktt, Dtt;
   	Mxf Mee, Kee, Dee;
   	Vxf q, dq, ddq;
+  	Vxf Qa, Qv, Qu, Qd;
+  	Vxf qd;
   	V6f Xi0;
 
   	V7f g;
@@ -89,18 +90,17 @@ class Model
 	Model(V6i table);
 
 	void output(const char* str, float t, Vxf x);
-	void read();
+	void read(const char* str, Vxf &x);
 	void cleanup();
 
-	void realtimeController(float t, Mxf J1, Mxf J2);
+	void realtimeController(float t, Mxf &A1, Mxf &A2, Vxf Qdes, Vxf &X);
 
 	Vxf solve();
 	Vxf implicit_solve();
 	Vxf simulate();
 	Vxf implicit_simulate();
-	void fmincon(Mxf &A, Vxf &b, Vxf &x);
 
-	Vxf inverseDynamics(Vxf v, Vxf dv, Vxf ddv);
+	void inverseDynamics(Vxf v, Vxf dv, Vxf ddv, Vxf &Q);
 	void buildJacobian(float se, Mxf &J);
 	void buildInertia(Vxf x, Mxf &M);
 
@@ -116,14 +116,13 @@ class Model
 	Mxf &K, Mxf &M, Mxf &D);
 
 	Mxf tableConstraints(V6i table);
-	Mxf hessianInverse(float dt);
+	void hessianInverse(float dt, Vxf R, Vxf &dx);
 
 	void buildInertiaTensor();
 	void buildStiffnessTensor();
 	void buildDampingTensor();
 	void buildGlobalSystem();
-	
-	M4f strainMapping(V3f k);
+
 	Mxf pressureMapping();
 };
 

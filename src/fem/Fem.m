@@ -201,21 +201,21 @@ if length(varargin) == 2 && flag == 0
     handle = varargin{2}; 
     set(handle{2},'FaceVertexCData',Z); 
     set(handle{2},'Vertices',V); 
-    set(gca,'Children',[handle{2} handle{3} handle{1}]);
+%    set(gca,'Children',[handle{2} handle{3} handle{1}]);
     return; 
 end
 
 if flag == 0
 cla; axis equal;     
 axis off; hold on; h{3} = [];
-if length(Z) ~= Fem.NNode, T=Fem.Mesh.get('NodeToFace'); Z=T*Z; end
+%if length(Z) ~= Fem.NNode, T=Fem.Mesh.get('NodeToFace'); Z=T*Z; end
 
 h{1} = patch('Faces',Fem.Mesh.get('Boundary'),'Vertices',Fem.Node0,...
     'LineStyle','-','Linewidth',1,'EdgeColor','k');
 
 h{2} = patch('Faces',Fem.Mesh.get('ElemMat'),'Vertices',V,...
     'FaceVertexCData',Z,'Facecolor',S,'LineStyle',Fem.LineStyle,...
-    'Linewidth',1.0,'FaceAlpha',1.0,'EdgeColor','k');
+    'Linewidth',1.5,'FaceAlpha',1.0,'EdgeColor','k');
 
 h{3} = patch('Faces',Fem.Mesh.get('Boundary'),'Vertices',V,...
     'LineStyle','-','Linewidth',1.5,'EdgeColor','k');
@@ -298,7 +298,7 @@ if flag == 3
     switch(Request)
     case('ISO')
     clf; former(Fem,10);
-    if nargin < 3, ISOVALUE = 0.1; else, ISOVALUE = varargin{2};
+    if nargin < 3, ISOVALUE = 0.2; else, ISOVALUE = varargin{2};
     end
     showISO(Fem,ISOVALUE,0.5);
     end    
@@ -445,24 +445,28 @@ while true
        [fx,fy,fn] = DisplacementField(Fem,Fem.fInternal);
        idNodes = Fem.Output(:,1);
        if isempty(Fem.Log)
-           Fem.Log = cell(7,1);
-           Fem.Log{1} = ux(idNodes); 
-           Fem.Log{2} = uy(idNodes);
-           Fem.Log{3} = un(idNodes);
-           Fem.Log{4} = fx(idNodes); 
-           Fem.Log{5} = fy(idNodes);
-           Fem.Log{6} = fn(idNodes);
-           Fem.Log{7} = Fem.VonMisesNodal(idNodes);
-           Fem.Log{8} = Fem.sxxNodal(idNodes);
+           Fem.Log = cell(10,2);
+           Fem.Log{1,1} = 'ux'; Fem.Log{1,2} = ux(idNodes); 
+           Fem.Log{2,1} = 'uy'; Fem.Log{2,2} = uy(idNodes);
+           Fem.Log{3,1} = 'un'; Fem.Log{3,2} = un(idNodes);
+           Fem.Log{4,1} = 'fx'; Fem.Log{4,2} = fx(idNodes); 
+           Fem.Log{5,1} = 'fy'; Fem.Log{5,2} = fy(idNodes);
+           Fem.Log{6,1} = 'fy'; Fem.Log{6,2} = fn(idNodes);
+           Fem.Log{7,1} = 'Svm'; Fem.Log{7,2} = Fem.VonMisesNodal(idNodes);
+           Fem.Log{8,1} = 'Sxx'; Fem.Log{8,2} = Fem.sxxNodal(idNodes);
+           Fem.Log{9,1} = 'Syy'; Fem.Log{9,2} = Fem.syyNodal(idNodes);
+           Fem.Log{10,1} = 'Sxy'; Fem.Log{10,2} = Fem.sxyNodal(idNodes);
        else
-           Fem.Log{1} = append(Fem.Log{1},ux(idNodes));
-           Fem.Log{2} = append(Fem.Log{2},uy(idNodes));
-           Fem.Log{3} = append(Fem.Log{3},un(idNodes));
-           Fem.Log{4} = append(Fem.Log{4},fx(idNodes));
-           Fem.Log{5} = append(Fem.Log{5},fy(idNodes));
-           Fem.Log{6} = append(Fem.Log{6},fn(idNodes));
-           Fem.Log{7} = append(Fem.Log{7},Fem.VonMisesNodal(idNodes));
-           Fem.Log{8} = append(Fem.Log{8},Fem.sxxNodal(idNodes));
+           Fem.Log{1,2} = append(Fem.Log{1,2},ux(idNodes));
+           Fem.Log{2,2} = append(Fem.Log{2,2},uy(idNodes));
+           Fem.Log{3,2} = append(Fem.Log{3,2},un(idNodes));
+           Fem.Log{4,2} = append(Fem.Log{4,2},fx(idNodes));
+           Fem.Log{5,2} = append(Fem.Log{5,2},fy(idNodes));
+           Fem.Log{6,2} = append(Fem.Log{6,2},fn(idNodes));
+           Fem.Log{7,2} = append(Fem.Log{7,2},Fem.VonMisesNodal(idNodes));
+           Fem.Log{8,2} = append(Fem.Log{8,2},Fem.sxxNodal(idNodes));
+           Fem.Log{9,2} = append(Fem.Log{9,2},Fem.syyNodal(idNodes));
+           Fem.Log{10,2} = append(Fem.Log{10,2},Fem.sxyNodal(idNodes));
        end
                
     end
@@ -703,10 +707,11 @@ Dist = rescale(Dpos) - rescale(Dneg);
 
 %contourf(XX,YY,-Dist,[-1e-6,1e-6]);
 
-image((max(Uxx)/max(Uxx))*rescale(Uxx),(max(Uyy)/max(Uxx))*rescale(Uyy),I);
+image(rescale(Uxx),...
+    ((max(Uyy)-min(Uyy))/(max(Uxx) - min(Uxx)))*rescale(Uyy),I);
 
 axis equal; axis off; 
-colormap(noir(-1)); 
+colormap(metro(-1)); 
 caxis([0 1]);
 background('w');
 end

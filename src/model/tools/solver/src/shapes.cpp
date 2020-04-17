@@ -7,7 +7,17 @@ using namespace Eigen;
 //---------------------------------------------------
 //--------------------------------- initialize class
 //---------------------------------------------------
-void Shapes::set(int nmode, int ndof, string str) 
+Shapes::Shapes(){
+	poly = false;
+	cheby = false;
+	cubic = false;
+	legen = false;
+}
+
+//---------------------------------------------------
+//--------------------------------- initialize class
+//---------------------------------------------------
+void Shapes::set(int nmode, int ndof, const char* str) 
 {
 	NMode = max(0,min(nmode,10));
 	NDof = max(0,min(ndof,6));
@@ -21,55 +31,70 @@ void Shapes::set(int nmode, int ndof, string str)
 	if (str == "cubic"){
 		cubic = true;
 	}
+	if (str == "legendre"){
+		legen = true;
+	}
 
 }
 
 //---------------------------------------------------
 //---------------------------------- evaluate shapes
 //---------------------------------------------------
-Vxf Shapes::phi(float s)
+void Shapes::phi(float s, Vxf &p)
 {
-	Vxf p(NMode);
-	p = Vxf::Zero(NMode);
+	p.setZero();
 
 	// construct basic polynomials
 	if (poly){
 		for (int i = 0; i < NMode; i++)
 		{
-			p(i) = pow(s,i);
+			p(i) = pow(s,(float)(i));
 		}
 	}
 
 	// construct chebyshev polynomials
 	if (cheby){
+
+		s = (2.0*s-1.0);
 		for (int i = 0; i < NMode; i++)
 		{
-			p(i) = cos((float)(i)*acos((2.0*s)-1.0));
-			//p(i) = pow(s,(float)(i));
+			p(i) = cos((float)(i)*acos(s));
 		}
 	}
 
-	return p;
+		// construct legendre polynomials
+	if (legen){
+
+		s = (2.0*s-1.0);
+		for (int i = 0; i < NMode; i++)
+		{	
+			if(i==0){ p(i) = 1;};
+			if(i==1){ p(i) = s;};
+			if(i==2){ p(i) = 0.5*(3*s*s - 1);};
+			if(i==3){ p(i) = 0.5*(5*s*s*s - 3*s);};
+			if(i==4){ p(i) = 0.125*(35*s*s*s*s - 30*s*s + 3);};
+			if(i==5){ p(i) = 0.125*(63*s*s*s*s*s - 70*s*s*s + 15*s);};
+			//p(i) = legendre(i,s);
+		}
+	}
+
 }
 
 //---------------------------------------------------
 //---------------------------- evaluate shape-matrix
 //---------------------------------------------------
-Mxf Shapes::eval(float s)
+void Shapes::eval(float s, Mxf &Phi)
 {
 
 	Vxf p(NMode);
-	Mxf Phi(NDof,NDof*NMode);
-	Phi = Mxf::Zero(NDof,NMode*NDof);
+	Phi.setZero();
 
 	// evaluate shape at sigma
-	p.noalias() = phi(s);
+	phi(s,p);
 
 	// build shape function matrix
 	for (int i = 0; i < NDof; i++)
 	{	
 		Phi.block(i,i*NMode,1,NMode).noalias() = p.transpose();
 	}
-
-	return Phi;
 }

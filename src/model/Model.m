@@ -4,6 +4,7 @@ classdef Model
         Links;
         Dof;
         NDof;
+        NModal;
         NLink = 1;
         tspan = 1;
         Table;
@@ -28,7 +29,6 @@ classdef Model
         Phi;
         Ba; Bc; 
         Mee; Kee; Dee; Qee;
-        NModal;
         Grav;
         Radius;
         Density;
@@ -125,6 +125,10 @@ out = fullfile(dir_path,'input.log');
 fileID = fopen(out,'w');
 fprintf(fileID,'%d\n',Model.Pressure(Model.tspan));
 fclose(fileID);
+out = fullfile(dir_path,'state.log');
+fileID = fopen(out,'w');
+fprintf(fileID,'%d\n',Model.q0);
+fclose(fileID);
 tic
 system('cd src/model/tools/solver && main.exe');
 toc
@@ -143,12 +147,12 @@ T = 0:dt:Model.tspan;
 x0 = zeros(N,1);
 dx0 = zeros(N,1);
 
-x0(1) = 2;
+x0(1) = 0;
 
-if ~isempty(Model.q0), x0 = Model.q0; end
+%if ~isempty(Model.q0), x0 = Model.q0; end
 
 opt = odeset('RelTol',1e-1,'AbsTol',1e-1);
-[ts,ys] = ode23tb(@(t,x) DynamicODE(Model,t,x),T,[x0 dx0],opt);
+[ts,ys] = ode23tb(@(t,x) DynamicODE(Model,t,x),T,[x0;dx0],opt);
 %[ts,ys] = ode1(@(t,x) DynamicODE(Model,t,x),T,[q0; dq0]);
 
 Model.g = ys;
@@ -201,8 +205,8 @@ mshgr = Gmodel('SoftGripperRedux.stl');
 %mshgr = mshgr.set('Node',mshgr.Node*1e-6);
 
 % set texture
-msh.Texture = Model.Texture;%1.25*base;
-mshgr.Texture = Model.Texture;%1.25*base;
+msh.Texture = Model.Texture;
+mshgr.Texture = Model.Texture;
 
 msh = msh.bake();
 mshgr = mshgr.bake();
@@ -218,15 +222,16 @@ view(60,5);
 msh.update();
 mshgr.update();
 
-if length(Model.t) > 2, FPS = round((1/12)/(mean(diff(Model.t)))); i0 = 1;
+if length(Model.t) > 2, FPS = round((1/10)/(mean(diff(Model.t)))); i0 = 1;
 else, FPS = 1; i0 = 1;
 end
 
+plotvector([0;0;0],[0.2;0;0],'Color',col(1),'linewidth',2,'MaxHeadSize',0.75);
+plotvector([0;0;0],[0;0.2;0],'Color',col(2),'linewidth',2,'MaxHeadSize',0.75);
+plotvector([0;0;0],[0;0;0.2],'Color',col(3),'linewidth',2,'MaxHeadSize',0.75);
+
 for ii = i0:FPS:length(Model.t)
-    
-    plotvector([0;0;0],[0.2;0;0],'Color',col(1),'linewidth',2,'MaxHeadSize',0.75);
-    plotvector([0;0;0],[0;0.2;0],'Color',col(2),'linewidth',2,'MaxHeadSize',0.75);
-    plotvector([0;0;0],[0;0;0.2],'Color',col(3),'linewidth',2,'MaxHeadSize',0.75);
+   
 
     msh.resetNode();
     mshgr.resetNode();
@@ -251,11 +256,19 @@ for ii = i0:FPS:length(Model.t)
     msh = Blender(msh,'Scale',{'z',-1});
     mshgr = Blender(mshgr,'SE3',yf(end,1:7));
     mshgr = Blender(mshgr,'Scale',{'z',-1});
+%     
+%     R = Quat2Rot(yf(end,1:4));
+%     r = yf(end,5:7);
+%     plotvector([0;0;0]+r(:),R.'*[0.2;0;0],'Color',col(1),'linewidth',2,'MaxHeadSize',0.75);
+%     plotvector([0;0;0]+r(:),R.'*[0;0.2;0],'Color',col(2),'linewidth',2,'MaxHeadSize',0.75);
+%     plotvector([0;0;0]+r(:),R.'*[0;0;0.2],'Color',col(3),'linewidth',2,'MaxHeadSize',0.75);
     
     mshgr.updateNode();
     msh.updateNode();
     msh.update();
     mshgr.update();
+    
+    title(['T = ',num2str(Model.t(ii),3)]);
         
     if ~isempty(Model.MovieAxis), axis(Model.MovieAxis); end
     
@@ -267,7 +280,7 @@ for ii = i0:FPS:length(Model.t)
             MovieMaker(Model);
         end
     end
-    
+
 end
     
 end
@@ -354,6 +367,12 @@ else
 Qs = Qc*0;
 end
 
+qd_ = q_*0;
+qd_(1) = 1.0;
+
+Qs = 1e-5*(q_ - qd_) - Model.Kee*qd_;
+
+
 Qa = Qc + Qs;
 
 dx(:,1) = Model.Dee\(-Qa - Model.Kee*q_);
@@ -408,6 +427,13 @@ Qs  = [J1.'*H, (J0.'- J1.')*H]*F;
 else
 Qs = 0;
 end
+
+A = []; V = []; S = []; D = [];
+
+qd_ = q_*0;
+qd_(1) = 1.0;
+
+Qs = 1e-5*(q_ - qd_) - Model.Kee*qd_;
 
 Qa = Qc + Qv + Qs;
 

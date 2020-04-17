@@ -10,13 +10,16 @@ typedef Eigen::MatrixXf Mxf;
 
 class Shapes{
 
-	bool cheby, poly, cubic;
+	bool cheby, poly, cubic, legen;
   	int  NMode, NDof;
 
   public:
-  	void set(int nmode = 3, int ndof = 6, string str = "polynomial");
-  	Mxf eval(float X = 0.0);
-  	Vxf phi(float X = 0.0);  	
+
+  	Shapes();
+
+  	void set(int nmode = 3, int ndof = 6, const char* str = "polynomial");
+  	void eval(float X, Mxf &Phi);
+  	void phi(float X, Vxf &p);  	
   	
 };
 

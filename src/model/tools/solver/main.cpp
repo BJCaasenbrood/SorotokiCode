@@ -1,4 +1,3 @@
-//#include "src/RTdebug.h"
 #include "src/Model.cpp"
 
 int main()
@@ -9,12 +8,6 @@ int main()
 
 	// generate model-class
 	Model mdl(tab);
-
-	// read input
-	mdl.read();
-
-	// clean up data.log
-	mdl.cleanup();
 
 	// solve system
 	mdl.implicit_simulate();

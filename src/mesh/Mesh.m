@@ -169,6 +169,7 @@ end
 function show(Mesh,varargin)
 if nargin<2, Request = -1; 
 else, Request = varargin{1}; end
+figure(101);
 
 % generate elemental matrices for plotting
 Mesh = ElementAdjecency(Mesh);
@@ -236,7 +237,7 @@ caxis([-1,1 + 1e-6]);
 axis equal;
 axis off;
 plotbox;
-
+set(gca, 'YDir','normal');
 view(0,90);
 end
 
