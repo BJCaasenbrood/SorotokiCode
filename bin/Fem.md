@@ -25,7 +25,7 @@ fem.Material = Elastosil();
 sdf = @(x) dRectangle(x,0,10,0,1);
 
 msh = Mesh(sdf,'BdBox',[0,10,0,1],'Quads',[25,5]);
-msh = msh.generateMesh();
+msh = msh.generate();
 
 %% generate fem model from mesh
 fem = Fem(msh,'TimeStep',1/15);
@@ -51,7 +51,7 @@ fem.solve();
 sdf = @(x) TensileBone(x,8,2,3,1,0.75);
 
 msh = Mesh(sdf,'BdBox',[0,10,0,10],'NElem',500);
-msh = msh.generateMesh();
+msh = msh.generate();
 
 %% generate fem model from mesh
 fem = Fem(msh,'TimeStep',1/10,'PrescribedDisplacement',true);
@@ -90,7 +90,7 @@ end
 sdf = @(x) dRectangle(x,0,20,0,2);
 
 msh = Mesh(sdf,'BdBox',[0,20,0,2],'NElem',150);
-msh = msh.generateMesh;
+msh = msh.generate();
 
 %% generate fem model from mesh
 fem = Fem(msh,'TimeStep',1/200,'PrescribedDisplacement',true);
