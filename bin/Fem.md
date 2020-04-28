@@ -1,7 +1,7 @@
 <div align="center"> <img src="./src/fem.png" width="650"> </div>
 
 # Finite Element Method
-[**Sorotoki**](https://bjcaasenbrood.github.io/SorotokiCode/) provides a finite element solver for linear and nonlinear (hyper-elasticity and geometric nonlinearity) problems. The *Fem.lib* works coherenly with the mesing libary *Mesh.lib*. The finite element toolkit offers a set of material models (e.g., Hookean, Neo-Hookean, Mooney-Rivlin, and Yeoh) that should allow for a wide modeling range of 'soft materials'. Furthermore, the toolkit also provides some preset materials that are popular in soft robotics, such as Ecoflex0030 and Dragonskin.
+[**Sorotoki**](https://bjcaasenbrood.github.io/SorotokiCode/) provides a finite element solver for linear and nonlinear (hyper-elasticity and geometric nonlinearity) problems. The *Fem.lib* works coherenly with the mesing libary *Mesh.lib*. The finite element toolkit offers a set of material models (e.g., Hookean, Neo-Hookean, Mooney-Rivlin, and Yeoh) that should allow for a wide modeling range of 'soft materials'. Furthermore, the toolkit also provides some preset materials that are used extensivly in the field of soft robotics, eaxmples included Ecoflex0030, Dragonskin30, Elastosil, and NinjaFlex TPU.
 
 [**Homepage**](https://bjcaasenbrood.github.io/SorotokiCode/)
 
