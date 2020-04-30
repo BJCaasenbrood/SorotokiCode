@@ -3,7 +3,7 @@ clr;
 sdf = @(x) dRectangle(x,-10,10,0,10);
 
 %% generate mesh
-msh = Mesh(sdf,'NElem',250,'BdBox',[-10,10,0,10]);
+msh = Mesh(sdf,'NElem',500,'BdBox',[-10,10,0,10]);
 msh = msh.generate();
 
 %% generate fem model from mesh

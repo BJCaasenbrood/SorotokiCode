@@ -1,7 +1,7 @@
 clc; clear; close all;
 
 %% model
-obj = Gmodel('Dragon.stl');
+obj = Gmodel('Pneunet.stl');
 
 %% set texture
 obj.Texture = redwax;

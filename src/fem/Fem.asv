@@ -144,9 +144,6 @@ function obj = Fem(Mesh,varargin)
     obj.Residual = zeros(2*obj.NNode,1);
     obj.Utmp     = zeros(2*obj.NNode,1);
     
-%     obj.OptFactor = 0;
-%     obj.LoadingFactor = 0;
-%     
     for ii = 1:2:length(varargin)
         obj.(varargin{ii}) = varargin{ii+1};
     end
@@ -253,15 +250,15 @@ end
 if ~isempty(Fem.Contact)
     SDF = Fem.Contact{1};
     Move = Fem.Contact{2};
-    BD = 1.2*Fem.BdBox;
+    BD = 2*Fem.BdBox;
     [px,py] = meshgrid(linspace(BD(1),BD(2),20),linspace(BD(3),BD(4),20));
     Y = [px(:),py(:)];
-    beta = 0.975*Fem.Time;
+    beta = Fem.OptFactor*Fem.LoadingFactor;
     Y(:,1) = Y(:,1) - beta*Move(1);
     Y(:,2) = Y(:,2) - beta*Move(2);
     d = SDF(Y);
     D = reshape(d(:,end),[20,20]);
-    h{5} = contourf(px,py,-D,[1e-3 1e-3],'linewidth',1.5,'FaceColor',col(1));
+    h{5} = contourf(px,py,D,0);
 end
 end
 

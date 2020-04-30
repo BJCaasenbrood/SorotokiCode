@@ -4,8 +4,9 @@ clc; clear; close all;
 obj = Gmodel('SoftRoboticArm.stl');
 
 %% set texture
-obj.Texture = base;
+obj.Texture = grey;
 obj = obj.bake();
 
 %% show
 obj = obj.render();
+view(180,-5);
