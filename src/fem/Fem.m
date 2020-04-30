@@ -254,13 +254,13 @@ if ~isempty(Fem.Contact)
     SDF = Fem.Contact{1};
     Move = Fem.Contact{2};
     BD = 1.2*Fem.BdBox;
-    [px,py] = meshgrid(linspace(BD(1),BD(2),20),linspace(BD(3),BD(4),20));
+    [px,py] = meshgrid(linspace(BD(1),BD(2),50),linspace(BD(3),BD(4),50));
     Y = [px(:),py(:)];
     beta = 0.975*Fem.Time;
     Y(:,1) = Y(:,1) - beta*Move(1);
     Y(:,2) = Y(:,2) - beta*Move(2);
     d = SDF(Y);
-    D = reshape(d(:,end),[20,20]);
+    D = reshape(d(:,end),[50,50]);
     h{5} = contourf(px,py,-D,[1e-3 1e-3],'linewidth',1.5,'FaceColor',col(1));
 end
 end

@@ -20,6 +20,6 @@ fem.Material = Dragonskin10A;
 fem.solve();
 
 function Dist = SDF(x)
-R = 10;
+R = 3;
 Dist = dCircle(x,0,10+R,R);
 end
