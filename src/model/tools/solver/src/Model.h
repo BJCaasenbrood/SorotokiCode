@@ -13,7 +13,7 @@
 #include "tictoc.h"
 #include "smoothstep.h"
 
-//#define FULL_CONTROLLER
+#define FULL_CONTROLLER
 //#define CONSTRAINED_CONTROLLER
 #define WRITE_OUTPUT
 #define TICTOC
@@ -22,11 +22,11 @@
 
 #define PRECISION 5
 
-#define NMODE 3
+#define NMODE 1
 #define SDOMAIN 1
 #define TDOMAIN 10
 #define SPACESTEP 10
-#define TIMESTEP 0.0333
+#define TIMESTEP 0.033333
 #define INTSTEP 900
 
 #define ATOL 1e-4

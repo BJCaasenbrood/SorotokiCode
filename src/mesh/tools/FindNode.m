@@ -150,8 +150,8 @@ while(~isempty(stack))
     v0 = stack(end);
     stack(end) = [];
     list(v0)=1;
-    neigh=(m(:,v0) & ~list); 
-    stack = unique( [stack; find(neigh)]);  
+    neigh=(m(:,v0) & ~list);
+    stack = unique( [stack; find(neigh)]); 
 end
 end
 

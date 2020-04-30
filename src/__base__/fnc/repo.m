@@ -23,7 +23,6 @@ function repo(Request)
 
 if nargin < 1, Request = ''; end
 
-fprintf('=====================================================\n')
 switch(Request)
     case('demo');      DirectoryDemos;
     case('demos');     DirectoryDemos;
@@ -42,35 +41,52 @@ switch(Request)
     case('colors');    DirectoryColors;
     case('colormap');  DirectoryColormap;
     case('colormaps'); DirectoryColormap;
+    case('opt');       DirectoryOptimization;
     otherwise;         BaseRepo;
 end
-fprintf('=====================================================\n')
+
 end
 
 function BaseRepo
-dir('.\data\color\')
-dir('.\data\colormap\')
-dir('.\data\matcap\')
-dir('.\scripts\**')
+p = cdsoro;
+dir([p,'\data\color\']);
+dir([p,'\data\colormap\']);
+dir([p,'\data\matcap\']);
+dir([p,'\scripts\**']);
 end
 
 function DirectoryColors
-dir('.\data\colors\**\*.m');
+p = cdsoro;
+dir([p,'\data\colors\**\*.m']);
 end
 
 function DirectorySDF
-dir('.\examples\resources\implicit\**\*.m');
+p = cdsoro;
+dir([p,'\examples\resources\implicit\**\*.m']);
 end
 
 function DirectoryModels
-dir('.\data\stl\**\*.stl');
-dir('.\data\stl\**\*.obj');
+p = cdsoro;
+dir([p,'\data\stl\**\*.stl']);
+dir([p,'\data\stl\**\*.obj']);
 end
 
 function DirectoryMaterials
-dir('.\data\matcap\**\*.m');
+p = cdsoro;
+dir([p,'\data\matcap\**\*.m']);
 end
 
 function DirectoryDemos
-dir('.\scripts\**\*.m');
+p = cdsoro;
+dir([p,'\scripts\**\*.m']);
+end
+
+function DirectoryOptimization
+p = cdsoro;
+dir([p,'\scripts\opt\*.m']);
+end
+
+function DirectoryColormap
+p = cdsoro;
+dir([p,'\data\colormap\*.m']);
 end

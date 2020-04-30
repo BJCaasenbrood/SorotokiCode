@@ -21,16 +21,17 @@ classdef Mesh
         Boundary;
         Normal;
         Edge;
-        Iteration = 0;
-        ElemMat = -1;
-        eps = 1e-4; 
-        eta = 0.9; 
-        Triangulate = false;
+        Iteration;
+        ElemMat;
+        eps; 
+        eta; 
+        Triangulate;
         MaxIteration;
-        ShowMeshing = false;
-        CollapseTol = 0.2;
-        ConvNorm = 1e-3;
-        ShowProcess = false;
+        ShowMeshing ;
+        CollapseTol;
+        ConvNorm;
+        ShowProcess;
+        Colormap;
     end
     
 %--------------------------------------------------------------------------
@@ -42,6 +43,17 @@ function obj = Mesh(SDF,varargin)
     obj.Dimension = 2;
     obj.ShowProcess = false;
     obj.MaxIteration = 100;
+    obj.Iteration = 0;
+    obj.ElemMat = -1;
+    obj.eps = 1e-4; 
+    obj.eta = 0.9; 
+    obj.Triangulate = false;
+    obj.ShowMeshing = false;
+    obj.CollapseTol = 0.2;
+    obj.ConvNorm = 1e-3;
+    obj.ShowProcess = false;
+    obj.Colormap = turbo;
+    
     for ii = 1:2:length(varargin)
         if strcmp(varargin{ii},'Quads')
             N = num2cell(varargin{ii+1});
@@ -143,9 +155,7 @@ f = f(1:Mesh.NElem);
 if Mesh.Triangulate
     Mesh.Node = v;
     Mesh.Element = f;
-    Mesh.NNode = length(v);
-    Mesh.NElem = length(f);
-    [v,f] = MeshTriangulation(Mesh,P,v,f);
+    [v,f] = MeshTriangulation(Mesh,P,v,f,length(f), length(v));
     [v,f] = ResequenceNodes(Mesh,v,f);
     Mesh.NElem = length(f);
     Mesh.NNode = length(v);
@@ -173,7 +183,7 @@ figure(101);
 
 % generate elemental matrices for plotting
 Mesh = ElementAdjecency(Mesh);
-fs = 'interp';
+fs = 'flat';
 
 switch(Request)
     case('SDF'),      Z = Mesh.SDF(Mesh.Node); Z = Z(:,end);
@@ -205,7 +215,7 @@ elseif strcmp(Request,'Element')
 end
 
 axis(Mesh.BdBox); axis tight;
-colormap(turbo);
+colormap(Mesh.Colormap);
 drawnow;
 end
 
@@ -375,14 +385,14 @@ end
 end
 
 %----------------------------------------------- triangulate polygonal mesh
-function [v, f] = MeshTriangulation(Mesh,Center,v0,f0)
+function [v, f] = MeshTriangulation(~,Center,v0,f0,Nel,Nvr)
 f = [];
 
-for ii = 1:Mesh.NElem
+for ii = 1:Nel
     el = f0{ii};
     n = numel(el);
     elem = [el(1:n)', [el(2:n)'; el(1)], ...
-            repmat(Mesh.NNode+ii,n,1)];
+            repmat(Nvr+ii,n,1)];
     f = [f; elem];
 end
 

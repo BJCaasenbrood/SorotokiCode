@@ -2,11 +2,12 @@ clr;
 %% generate mesh from sdf
 sdf = @(x) dRectangle(x,0,3,0,1);
 
-msh = Mesh(sdf,'BdBox',[0,3,0,1],'Quads',5,'Triangulate',true);
+msh = Mesh(sdf,'BdBox',[0,3,0,1],'Quads',[25,5]);
 msh = msh.generate();
 
 %% generate fem model from mesh
-fem = Fem(msh,'TimeStep',1/25,'PrescribedDisplacement',true);
+fem = Fem(msh,'TimeStep',1/25,'PrescribedDisplacement',true,...
+              'Linestyle','none');
 
 %% add boundary conditions
 fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,1]);

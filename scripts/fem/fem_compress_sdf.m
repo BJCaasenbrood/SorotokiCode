@@ -7,7 +7,7 @@ msh = Mesh(sdf,'NElem',500,'BdBox',[-10,10,0,10]);
 msh = msh.generate();
 
 %% generate fem model from mesh
-fem = Fem(msh,'TimeStep',1/50,'Nonlinear',true,'FilterRadius',1e-2);
+fem = Fem(msh,'TimeStep',1/15,'Nonlinear',true,'FilterRadius',1e-2);
 
 %% add constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[0,1]);
@@ -18,8 +18,8 @@ fem.Material = Dragonskin10A;
 % 
 %% create subsurface component
 %fem.Density = fem.Density*0.25; 
-id = fem.FindElements('SDF',@(x) Subsurface(x));
-fem.Density(id) = .1;
+% id = fem.FindElements('SDF',@(x) Subsurface(x));
+% fem.Density(id) = .1;
 
 %% solving
 fem.solve();

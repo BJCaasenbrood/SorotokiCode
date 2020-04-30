@@ -23,8 +23,10 @@ classdef Gmodel < handle
         TextureMap;
         TextureStretch;
         Shading;
+        Colormap;
         
         FlipNormals;
+        ShowAOActive;
         AOPower;
         AOBias;
         AOBit;
@@ -57,6 +59,7 @@ function obj = Gmodel(varargin)
     obj.AOBit = 3;
     obj.AORadius = 0.3;
     obj.AOInvert = false;
+    obj.Colormap = turbo;
             
     obj.AO = false;
     obj.SSS = false;
@@ -226,7 +229,7 @@ function showAO(Gmodel,varargin)
     AOmap = TextureSmoothing(Gmodel.Element,Gmodel.AOTextureMap,10);
     
     set(Gmodel.FigHandle,'FaceVertexCData',AOmap,'facecolor','interp');
-    colormap(gray);
+    colormap(Gmodel.Colormap);
     drawnow;
 end
 

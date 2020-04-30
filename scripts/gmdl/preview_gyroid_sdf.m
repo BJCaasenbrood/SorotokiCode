@@ -4,7 +4,7 @@ t = 0.5;    % thickness
 f = 4;      % frequency
 
 Dist = @(X) SDF(X,t,f);
-BdBox = 1.01*[-1,1,-1,1,-1,1];
+BdBox = domain(-1.1,1.1,3);
 obj = Gmodel(Dist,BdBox,'Quality',50);
 
 %% set texture

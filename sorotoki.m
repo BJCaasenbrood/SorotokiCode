@@ -162,6 +162,8 @@ cout(['* Adding SOROTOKI libraries to path, ',...
     'this might take a minute...\n']);
 
 if Request == 1
+str = strrep(Path,'\','\\');
+fprintf(FID,['%%!INSTALDIR:',str,'\n']);
 fprintf(FID,'%% base.lib \n');
 WriteToFile(Path);
 WriteToFile([Path,'\config\']);
@@ -235,11 +237,15 @@ if Request == 1
 fprintf(FID,'%% fem.lib \n');
 WriteToFile([Path,'\src\fem']);
 WriteToFile([Path,'\src\fem\tools\']);
+WriteToFile([Path,'\src\fem\tools\tpswarp']);
+WriteToFile([Path,'\src\fem\tools\mma']);
 WriteToFile([Path,'\src\fem\materials\']);
 WriteToFile([Path,'\src\fem\materials\samples']);
 else
 addpath([Path,'\src\fem']);
 addpath([Path,'\src\fem\tools\']);
+addpath([Path,'\src\fem\tools\tpswarp']);
+addpath([Path,'\src\fem\tools\mma']);
 addpath([Path,'\src\fem\materials\']);
 addpath([Path,'\src\fem\materials\samples']);
 pause(.3);

@@ -69,7 +69,7 @@ function obj = Model(Table,varargin)
     obj.NModal = 2;
     obj.Chebyshev = false;
     obj.PressureArea = 5e-5;
-    obj.Texture = 1.25*grey;
+    obj.Texture = virtual;
     obj.Jacobian = true;
     
     for ii = 1:2:length(varargin)
@@ -218,7 +218,7 @@ axis equal;
 if ~isempty(Model.MovieAxis), axis(Model.MovieAxis); end
 drawnow;
 %axis([-.5 .5 -.5 .5 -1 .5])
-view(60,5);
+view(30,5);
 msh.update();
 mshgr.update();
 
@@ -231,7 +231,6 @@ plotvector([0;0;0],[0;0.2;0],'Color',col(2),'linewidth',2,'MaxHeadSize',0.75);
 plotvector([0;0;0],[0;0;0.2],'Color',col(3),'linewidth',2,'MaxHeadSize',0.75);
 
 for ii = i0:FPS:length(Model.t)
-   
 
     msh.resetNode();
     mshgr.resetNode();
@@ -322,7 +321,7 @@ else
 end
 for ii = 1:Model.NDof, Pc{ii,1} = P; end
 
-P = blkdiag(Pc{:}); %+ 1e-16*X;
+P = blkdiag(Pc{:})+ 1e-16*X;
 end
 
 %---------------------------------------------------------------------- set

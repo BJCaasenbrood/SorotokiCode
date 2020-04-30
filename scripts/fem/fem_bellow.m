@@ -3,11 +3,7 @@ clr;
 sdf = @(x) Bellow(x,5,4,6,5,7,5,2);
 
 %% generate mesh
-msh = Mesh(sdf);
-msh = msh.set('BdBox',[0,25,0,25],...
-              'NElem',500,...
-              'MaxIteration',50);
-
+msh = Mesh(sdf,'BdBox',[0,25,0,25],'NElem',1500);
 msh = msh.generate();
 
 %% generate fem model from mesh
@@ -19,7 +15,7 @@ fem = fem.AddConstraint('Support',fem.FindNodes('Top'),[1,0]);
 fem = fem.AddConstraint('Load',fem.FindNodes('Top'),[0,-10]);
 
 %% assign material
-fem.Material = Ecoflex0030;
+fem.Material = Dragonskin10A;
 
 %% solving
 fem.solve();
@@ -39,5 +35,6 @@ function Dist = Bellow(P,r0,r1,r2,r3,r4,x,t)
   
   Dist0 = dDiff(dIntersect(R6,C5),C6);
   Dist1 = dUnion(dDiff(dIntersect(R3,C4),C3),R4);
-  Dist  = dUnion(dUnion(dDiff(dUnion(R2,dIntersect(R1,C2)),C1),Dist1),Dist0);
+  Dist  = dUnion(dUnion(dDiff(dUnion(R2,dIntersect(R1,...
+      C2)),C1),Dist1),Dist0);
 end
