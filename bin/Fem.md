@@ -1,7 +1,7 @@
 <div align="center"> <img src="./src/fem.png" width="650"> </div>
 
 # Finite Element Method
-[**Sorotoki**](https://bjcaasenbrood.github.io/SorotokiCode/) provides a finite element solver for linear and nonlinear (hyper-elasticity and geometric nonlinearity) problems. The *Fem.lib* works coherenly with the mesing libary *Mesh.lib*. The finite element toolkit offers a set of material models (e.g., Hookean, Neo-Hookean, Mooney-Rivlin, and Yeoh) that should allow for a wide modeling range of 'soft materials'. Furhtermore, the toolkit also provides some preset materials that are popular in soft robotics, such as Ecoflex0030 and Dragonskin.
+[**Sorotoki**](https://bjcaasenbrood.github.io/SorotokiCode/) provides a finite element solver for linear and nonlinear (hyper-elasticity and geometric nonlinearity) problems. The *Fem.lib* works coherenly with the mesing libary *Mesh.lib*. The finite element toolkit offers a set of material models (e.g., Hookean, Neo-Hookean, Mooney-Rivlin, and Yeoh) that should allow for a wide modeling range of 'soft materials'. Furthermore, the toolkit also provides some preset materials that are used extensivly in the field of soft robotics, eaxmples included: Ecoflex0030, Dragonskin30, Elastosil, and NinjaFlex TPU.
 
 [**Homepage**](https://bjcaasenbrood.github.io/SorotokiCode/)
 
@@ -17,6 +17,7 @@ fem.Material = YeohMaterial('C1',-,'C2',-,'C3',-)
 fem.Material = Ecoflex0030();
 fem.Material = Dragonskin20A();   	 
 fem.Material = Elastosil();   	 
+fem.Material = TPU90();   	 
 ```
 
 ### Example: Clamped beam 
@@ -25,7 +26,7 @@ fem.Material = Elastosil();
 sdf = @(x) dRectangle(x,0,10,0,1);
 
 msh = Mesh(sdf,'BdBox',[0,10,0,1],'Quads',[25,5]);
-msh = msh.generateMesh();
+msh = msh.generate();
 
 %% generate fem model from mesh
 fem = Fem(msh,'TimeStep',1/15);
@@ -51,7 +52,7 @@ fem.solve();
 sdf = @(x) TensileBone(x,8,2,3,1,0.75);
 
 msh = Mesh(sdf,'BdBox',[0,10,0,10],'NElem',500);
-msh = msh.generateMesh();
+msh = msh.generate();
 
 %% generate fem model from mesh
 fem = Fem(msh,'TimeStep',1/10,'PrescribedDisplacement',true);
@@ -90,7 +91,7 @@ end
 sdf = @(x) dRectangle(x,0,20,0,2);
 
 msh = Mesh(sdf,'BdBox',[0,20,0,2],'NElem',150);
-msh = msh.generateMesh;
+msh = msh.generate();
 
 %% generate fem model from mesh
 fem = Fem(msh,'TimeStep',1/200,'PrescribedDisplacement',true);
@@ -105,7 +106,7 @@ fem = fem.AddConstraint('Load',fem.FindNodes('Right'),[-4,0]);
 fem = fem.AddConstraint('Output',fem.FindNodes('SE'),[0,0]);
 
 %% assign material
-fem.Material = Ecoflex0030;
+fem.Material = Ecoflex0030();
 
 %% solving
 fem.solve();
