@@ -1,7 +1,7 @@
 <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script> 
 <div align="center"> <img src="./bin/src/softrobot.png" width="650"> </div> <br/>
 
-Sorotoki is an open-source MATLAB toolkit that includes an array of modeling and designing tools for soft robotics. The toolkit aims to bring together the various scientific disciplines within the field of soft robotics, e.g., continuum mechanics, dynamical system- and control theory, and computer graphics. 
+[**Sorotoki**](https://bjcaasenbrood.github.io/SorotokiCode/) is an open-source MATLAB toolkit that includes an array of modeling and designing tools for soft robotics. This toolkit brings together various scientific disciplines within the field of soft robotics, including continuum mechanics, dynamical system- and control theory, shape- and topology optimization, computer graphics, and many more! 
 
 # Installation
 Download the latest stable version ([.zip](https://github.com/BJCaasenbrood/SorotokiCode/zipball/master) or [.tar](https://github.com/BJCaasenbrood/SorotokiCode/tarball/master)) and unpack the compressed folder at any desired work directory. To install the toolkit, simply run the command below. That's it, the soft robotics toolkit is now ready-to-use.
@@ -11,7 +11,7 @@ sorotoki();
 ```
 
 # Getting started
-The main class of **ToPy** is 'Topology'. It defines the main constraints, grid and parameters of optimization -- but you don't really have to bother yourself with this if you just want to get some results.
+**Sorotoki** consists of a library of objected-oriented classes that simplify and accelerate the development of soft robotic modeling. The classes integrate perfectly with each other and fill many of the perceived gaps between scientific disciplines. For instance, mesh.lib and fem.lib provide numerical tools to deals with the continuum mechanical behavior of soft materials, whose material models can be integrated into the state-space description with the class model.lib.
 ```matlab
 % list of classes
 msh = Mesh();	 % meshing class
