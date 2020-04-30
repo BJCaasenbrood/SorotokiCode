@@ -11,7 +11,7 @@ sorotoki();
 ```
 
 # Getting started
-**Sorotoki** consists of a library of objected-oriented classes that simplify and accelerate the development of soft robotic modeling. The classes integrate perfectly with each other and fill many of the perceived gaps between scientific disciplines. For instance, mesh.lib and fem.lib provide numerical tools to deals with the continuum mechanical behavior of soft materials, whose material models can be integrated into the state-space description with the class model.lib.
+**Sorotoki** consists of a library of objected-oriented classes that simplify and accelerate the development of soft robotic modeling. The classes integrate perfectly with each other and fill many of the perceived gaps between scientific disciplines. For instance, *Mesh()* and *Fem()* provide numerical tools to deals with the continuum mechanical behavior of soft materials, whose material models can be integrated into the state-space description with the class *Model()*. The four core Classes of Sorotoki are shown below:
 ```matlab
 % list of classes
 msh = Mesh();	 % meshing class
