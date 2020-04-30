@@ -4,12 +4,11 @@ clc; clear; close all;
 obj = Gmodel('Dragon.stl');
 
 %% set texture
-obj.Texture = wax;
-obj.Emission = [0.25 0.85 0.55];
+obj.Texture = redwax;
+obj.Emission = 1.5*col(2);
 
-obj.set('SSSPower',0.72,...
+obj.set('SSSPower',0.75,...
         'AORadius',0.3,...
-        'AOPower',0.40,...
         'SSS',true);
 
 obj.bake();
