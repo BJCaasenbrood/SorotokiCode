@@ -49,4 +49,19 @@ view(90,15); axis tight;
 
 
 ### Sub-Surface Scattering (SSS)
+```matlab
+%% preview
+obj = Gmodel('Bunny.stl');
+
+%% set texture settings
+obj.set('Texture',grey,'Emission',[0.70 0.70 0.70],...
+        'SSS',true,'SSSPower',1.40,'SSSRadius',0.2);
+    
+obj.bake().render().update();
+
+%% set AO map object
+obj_ = obj.copy('Translate',{'y',100});
+obj_.render().showMap('SSS');
+view(90,15); axis tight;
+```
 <div align="center"> <img src="./src/bunny_SSS.png" width="450"> </div>
