@@ -18,7 +18,11 @@ $$
 
 where $$s_\Omega(x)$$ representing a sign function, and $$\partial \Omega$$ the boundary of the domain $$\Omega$$. The sign of the distance function determines if the coordinate is inside or outside the bounded domain. 
 
-## Circular domain 
-The simplest example is a 2-dimensional circle with radius $$R = 1$$ centered at the origin. The signed distance function for assosciated with the domain $$\Omega$$ defined by $$d(x,y) = \sqrt{x^2 + y^2} - 1$$.
+## Example
+The simplest example is a two-dimensional circle with radius $$R$$ at the origin. The signed distance function for assosciated with the domain $$\Omega$$ defined by $$d(x,y) = \sqrt{x^2 + y^2} - R$$. In Matlab, this gives the following lines of code:
+
+'''matlab
+
+'''
 
 [**Homepage**](https://bjcaasenbrood.github.io/SorotokiCode/)
