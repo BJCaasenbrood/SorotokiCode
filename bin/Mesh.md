@@ -5,7 +5,7 @@
 [**Sorotoki**](https://bjcaasenbrood.github.io/SorotokiCode/) offers mesh generation for triangular, quadrilateral, and polygonal elements. The restricted material domains for the meshes are defined by so-called *signed distance functions* (SDF). The toolkit provides a set of geometeric shape (e.g., circles, rectangles, lines) and boolean operators, e.g., union, difference, and intersect. Together these operation allow for a wide range of meshing domain. 
 
 # Signed distance functions
-A signed distance functions (SDF) passes a spatial coordinate and returns the shortest distance to the boundary of a domain $$\Omega$$. In mathematical terms, the signed distance function $$d_\Omega: \mathbb{R}^n \mapsto \mathbb{R}$$ assosciated with the subset $$\Omega$$ of Euclidean space $$\mathbb{R}^n$$ is defined by
+A signed distance functions (SDF) passes a spatial coordinate and returns the shortest distance to the boundary of a domain $$\Omega$$. Mathematically, the signed distance function $$d_\Omega: \mathbb{R}^n \mapsto \mathbb{R}$$ assosciated with the subset $$\Omega$$ of Euclidean space $$\mathbb{R}^n$$ is defined by
 
 $$ d_\Omega(x) := s_\Omega(x) \min_{y \in \partial \Omega} \lVert x - y \rVert$$ 
 
@@ -17,5 +17,8 @@ $$ s_\Omega =
 $$
 
 where $$s_\Omega(x)$$ representing a sign function, and $$\partial \Omega$$ the boundary of the domain $$\Omega$$. The sign of the distance function determines if the coordinate is inside or outside the bounded domain. 
+
+## Circular domain 
+The simplest example is a 2-dimensional circle with radius $$R = 1$$ centered at the origin. The signed distance function for assosciated with the domain $$\Omega$$ defined by $$d(x,y) = \sqrt{x^2 + y^2} - 1$$.
 
 [**Homepage**](https://bjcaasenbrood.github.io/SorotokiCode/)
