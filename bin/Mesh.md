@@ -1,6 +1,52 @@
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script> 
 <div align="center"> <img src="./src/mesh.png" width="650"> </div>
 
 # Mesh Generation
 [**Sorotoki**](https://bjcaasenbrood.github.io/SorotokiCode/) offers mesh generation for triangular, quadrilateral, and polygonal elements. The restricted material domains for the meshes are defined by so-called *signed distance functions* (SDF). The toolkit provides a set of geometeric shape (e.g., circles, rectangles, lines) and boolean operators, e.g., union, difference, and intersect. Together these operation allow for a wide range of meshing domain. 
+
+# Signed distance functions
+A signed distance functions (SDF) passes a spatial coordinate and returns the shortest distance to the boundary of a domain $$\Omega$$. Mathematically, the signed distance function $$d_\Omega: \mathbb{R}^n \mapsto \mathbb{R}$$ assosciated with the subset $$\Omega$$ of Euclidean space $$\mathbb{R}^n$$ is defined by
+
+$$ d_\Omega(x) := s_\Omega(x) \min_{y \in \partial \Omega} \lVert x - y \rVert$$ 
+
+$$ s_\Omega = 
+\begin{cases}
+-1, & x \in\Omega \\
++1, & x \in \mathbb{R}^n\setminus \Omega
+\end{cases}
+$$
+
+where $$s_\Omega(x)$$ representing a sign function, and $$\partial \Omega$$ the boundary of the domain $$\Omega$$. The sign of the distance function determines if the coordinate is inside or outside the bounded domain. 
+
+### Example
+The simplest example is a two-dimensional circle with radius $$R$$ at the origin. The signed distance function for assosciated with the domain $$\Omega$$ defined by $$d(x,y) = \sqrt{x^2 + y^2} - R$$. In Matlab, this gives the following lines of code:
+
+```matlab
+%% set signed distance function
+msh = Mesh(@(x) SDF(x,0),'BdBox',[-1 3 -1 3]);
+subplot(2,2,1); msh.showSDF;
+
+msh = Mesh(@(x) SDF(x,1),'BdBox',[-2 2 -1 3]);
+subplot(2,2,2); msh.showSDF;
+
+msh = Mesh(@(x) SDF(x,2),'BdBox',[-1.5 2.5 -1 3]);
+subplot(2,2,3); msh.showSDF;
+
+msh = Mesh(@(x) SDF(x,3),'BdBox',[-1 3 -1 3]);
+subplot(2,2,4); msh.showSDF;
+
+function Dist = SDF(x,b)
+R = dRectangle(x,0,2,0,2);
+C = dCircle(x,0,1,1);
+
+switch(b)
+    case(0), Dist = R;
+    case(1), Dist = C;
+    case(2), Dist = dUnion(R,C);
+    case(3), Dist = dDiff(R,C);
+end
+end
+end
+```
 
 [**Homepage**](https://bjcaasenbrood.github.io/SorotokiCode/)
