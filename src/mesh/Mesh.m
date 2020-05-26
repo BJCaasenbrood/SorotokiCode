@@ -39,9 +39,26 @@ classdef Mesh
 %--------------------------------------------------------------------------
 methods  
 %--------------------------------------------------------------- Mesh Class
-function obj = Mesh(SDF,varargin) 
-    obj.SDF          = SDF;
-    obj.NElem        = 200;
+function obj = Mesh(Input,varargin) 
+    
+    if isa(Input,'char')
+       [~,~,ext] = fileparts(Input);
+       if strcmp(ext,'.stl'), [f,v] = stlreader(Input);
+       elseif strcmp(ext,'.obj'), [v,f] = objreader(Input);
+       else, cout('err','* extension not recognized');
+       end
+       
+       obj.Node    = v;
+       obj.NNode   = length(v);
+       obj.Element = num2cell(f,2);
+       obj.NElem   = length(f);
+       obj.BdBox   = boxhull(v);
+       
+    elseif isa(Input,'function_handle')
+       obj.SDF = Input;
+       obj.NElem = 200;
+    end
+    
     obj.ShowProcess  = false;
     obj.MaxIteration = 100;
     obj.Iteration    = 0;
@@ -70,7 +87,8 @@ function obj = Mesh(SDF,varargin)
         end
     end
     
-    if obj.Triangulate, obj.Type = 'C2T3'; end
+    if obj.Triangulate,  obj.Type = 'C2T3'; end
+    if isempty(obj.SDF), obj.Type = 'C3T3'; end
     
     obj.Dim = 0.5*numel(obj.BdBox);
 end
@@ -247,6 +265,9 @@ colormap(Mesh.Colormap);
 drawnow;
 end
 
+%---------------------------------------------------------------- show mesh
+function Mesh = list(Mesh)
+
 %----------------------------------------------------------------- show SDF
 function showSDF(Mesh,varargin)
 Bd = 1.05*Mesh.BdBox; 
@@ -265,7 +286,6 @@ P = [X(:),Y(:)];
 D = Mesh.SDF(P);
 Dist = reshape(D(:,end),[Q, Q]);
 %Ds = reshape(mod(D(:,end),dl),[Q, Q]);
-V = (turbo(50));
 cla;
 %image(x,y,Dist+2); hold on;
 DistBnd = -wthresh(-Dist,'h',1e-6);
@@ -663,7 +683,12 @@ if Mesh.Dim == 2
     face = Mesh.Element;
 elseif Mesh.Dim == 3
     nodeset = cellfun(@(X) Mesh.Node(X,:),Mesh.Element,'UniformOutput',false);
-    faceEl = cellfun(@(X) convhulln(X,{'Qt'}),nodeset,'UniformOutput',false);
+    if ~strcmp(Mesh.Type,'C3T3')
+        faceEl = cellfun(@(X) convhulln(X,{'Qt','Pp'}),nodeset,...
+            'UniformOutput',false);
+    else
+        faceEl = Mesh.Element;
+    end
     face = num2cell(vertcat(faceEl{:}),2);
 end
 
@@ -672,15 +697,21 @@ n = Mesh.NElem;
 p = max(cellfun(@max,face));    
 MaxNVer = max(cellfun(@numel,face));     
 if Mesh.Dim < 3
-tri = GenerateElementalMatrix(Mesh);
-Mesh.ElemMat = tri;
+    tri = GenerateElementalMatrix(Mesh);
+    Mesh.ElemMat = tri;
 else
-[A,tri,triID] = GenerateElementalMatrix(Mesh);
-Mesh.ElemMat = A;    
-MaxNVer = max(cellfun(@numel,num2cell(tri,2)));
-edges = cellfun(@numel,num2cell(tri,2));
-p = max(cellfun(@max,num2cell(tri,2)));  
-Mesh.ElementToFace = sparse(1:length(A),triID,1);
+    if ~strcmp(Mesh.Type,'C3T3')
+        [A,tri,triID] = GenerateElementalMatrix(Mesh);
+    else
+        A = vertcat(Mesh.Element{:});
+        tri = vertcat(Mesh.Element{:});
+        triID = (1:Mesh.NElem).';
+    end
+    Mesh.ElemMat = A;
+    MaxNVer = max(cellfun(@numel,num2cell(tri,2)));
+    edges = cellfun(@numel,num2cell(tri,2));
+    p = max(cellfun(@max,num2cell(tri,2)));
+    Mesh.ElementToFace = sparse(1:length(A),triID,1);
 end
 
 set = 1:n;
