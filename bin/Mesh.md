@@ -15,4 +15,6 @@ $$
 \end{cases}
 $$
 
+where $$\partial \Omega$$ is the boundary, and $$d(x,y)$$ the shortest eucleudian distance.
+
 [**Homepage**](https://bjcaasenbrood.github.io/SorotokiCode/)
