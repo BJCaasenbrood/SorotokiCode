@@ -265,13 +265,18 @@ P = [X(:),Y(:)];
 D = Mesh.SDF(P);
 Dist = reshape(D(:,end),[Q, Q]);
 %Ds = reshape(mod(D(:,end),dl),[Q, Q]);
-V = (bluesea(50));
+V = (turbo(50));
 cla;
-image(x,y,Dist+2); hold on;
-contour(X,Y,Dist*1e-6,7,'-','linewidth',1,'Color',V(4,:)); 
-contour(X,Y,Dist,[0 1e-6],'k-','linewidth',2.5); 
-colormap((bluesea(2)));
-caxis([-1,1 + 1e-6]);
+%image(x,y,Dist+2); hold on;
+DistBnd = -wthresh(-Dist,'h',1e-6);
+
+
+surf(x,y,Dist,'linestyle','none'); hold on;
+contour3(X,Y,DistBnd,5,'w-','linewidth',1)%,%'Color',V(4,1:3)); 
+contour(X,Y,Dist,[0 1e-6],'w-','linewidth',2); 
+%colormap((bluesea(20)));
+colormap(viridis);
+caxis([-1,2 + 1e-6]);
 axis equal;
 axis off;
 plotbox;

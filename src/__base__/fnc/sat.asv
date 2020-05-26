@@ -1,0 +1,4 @@
+function y = sat(x,b)
+ y = (atan(5.*x)-atan(-5.*x))/(pi);
+end
+

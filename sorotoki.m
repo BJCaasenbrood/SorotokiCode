@@ -21,7 +21,7 @@ set = {'bunny preview demo',...
        'nonlinear fem demo',...
        'topology design demo'};
 
-request = CallAction(set);
+request = action(set);
 
 switch(request)
     case(1); preview_bunny;
@@ -31,7 +31,7 @@ switch(request)
     case(5); fem_demo;
     case(6); nlfem_demo;
     case(7); design_demo;
-    otherwise; CallWarning('please select demo from the list above.');
+    otherwise; warning('please select demo from the list above.');
 end
 
 end

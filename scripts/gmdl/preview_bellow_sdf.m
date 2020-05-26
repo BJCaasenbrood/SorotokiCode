@@ -13,11 +13,11 @@ obj.bake();
 obj.render(); 
 
 function Dist = SDF(x)
-x = pRepeat(x,[0,0,22]);
-y = dRevolve(x);
+x  = pRepeat(x,[0,0,22]);
+y  = dRevolve(x);
 B1 = Bellow(y,5,4,6,5,7,5,2);
-y = dTranslate(x,[44,0,0]);
-y = dRevolve(y);
+y  = dTranslate(x,[44,0,0]);
+y  = dRevolve(y);
 B2 = Bellow(y,5,4,6,5,7,5,2);
 Dist = dSmoothUnion(B1,B2,7);
 end

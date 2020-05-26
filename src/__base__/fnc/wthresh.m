@@ -43,6 +43,6 @@ x = sign(x)*tmp;
 
 function x = wthreshHard(x,t)
 coder.inline('always');
-x = x*(abs(x) > t);
+x = x*((x) > t);
 
 %--------------------------------------------------------------------------
