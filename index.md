@@ -21,7 +21,7 @@ obj = Gmodel();  % graphics model class
 mdl = Model();   % dynamical model class
 ```
 
-### Documentation and libary usage
+# Documentation and libary usage
 * [**Mesh generation**](./bin/Mesh.md). 
 * [**Finite Element Method**](./bin/Fem.md).
 * [**Topology Optimization**](./bin/Topo.md).
