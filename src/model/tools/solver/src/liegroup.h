@@ -1,6 +1,8 @@
 #ifndef LIEGROUP_H
 #define LIEGROUP_H
 
+#define _USE_MATH_DEFINES
+#include <cmath>
 #include "Eigen/Dense"
 using namespace Eigen;
 
@@ -57,6 +59,40 @@ void quat2rot(V4f q, M3f &R)
 //---------------------------------------------------
 //-------------- adjoint action on Lie algebra se(3)
 //---------------------------------------------------
+void SE3toR6(V7f g, V6f &t)
+{
+
+	float w,x,y,z;
+	float roll,pitch,yaw;
+	w = g(0); 
+	x = g(1); 
+	y = g(2); 
+	z = g(3);
+
+    float sinr_cosp = 2*(w*x + y*z);
+    float cosr_cosp = 1- 2*(x*x + y*y);
+    roll = std::atan2(sinr_cosp, cosr_cosp);
+
+    // pitch (y-axis rotation)
+    float sinp = 2 * (w*y - z*x);
+    if (std::abs(sinp) >= 1){
+        pitch = std::copysign(M_PI / 2, sinp); // use 90 degrees if out of range
+    }
+    else{
+        pitch= std::asin(sinp);
+    }
+
+    // yaw (z-axis rotation)
+    float siny_cosp = 2 * (w*z + x*y);
+    float cosy_cosp = 1 - 2*(y*y + z*z);
+    yaw = std::atan2(siny_cosp, cosy_cosp);
+
+    t << roll,pitch,yaw,g(4),g(5),g(6);
+}
+
+//---------------------------------------------------
+//-------------- adjoint action on Lie algebra se(3)
+//---------------------------------------------------
 void admap(V6f x, M6f &ad)
 {
 	V3f W;
@@ -77,9 +113,8 @@ void admap(V6f x, M6f &ad)
 //---------------------------------------------------
 //------------------ adjoint map on lie group SE(3)
 //---------------------------------------------------
-M6f Admap(V7f x)
+void Admap(V7f x, M6f &Ad)
 {
-	M6f Ad;
 	M3f R,S;
 	V4f w;
 	V3f v;
@@ -94,16 +129,13 @@ M6f Admap(V7f x)
 	Ad.block(3,3,3,3).noalias() = R;
 	Ad.block(0,3,3,3).noalias() = M3f::Zero(3,3);
 	(Ad.block(3,0,3,3)).noalias() = S*R;
-
-	return Ad;
 }
 
 //---------------------------------------------------
 //------------------ adjoint map on lie group SE(3)
 //---------------------------------------------------
-M6f AdmapInv(V7f x)
+void AdmapInv(V7f x, M6f &Ad)
 {
-	M6f Ad;
 	M3f R, S;
 	V4f w;
 	V3f v;
@@ -120,8 +152,6 @@ M6f AdmapInv(V7f x)
 	Ad.block(3,3,3,3).noalias() = R;
 	Ad.block(0,3,3,3).noalias() = M3f::Zero(3,3);
 	(Ad.block(3,0,3,3)).noalias() = R*S.transpose();
-
-	return Ad;
 }
 
 //---------------------------------------------------

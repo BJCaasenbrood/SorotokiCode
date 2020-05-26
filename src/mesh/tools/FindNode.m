@@ -1,6 +1,6 @@
 function x = FindNode(Node,varargin)
 
-tol = BuildTolerance(Node); 
+tol   = BuildTolerance(Node); 
 BdBox = BoundingBox(Node);
 
 Request = varargin{1}; 
@@ -21,7 +21,7 @@ switch(Request)
     case('RightMid');   x = RightMid(Node,BdBox);
     case('TopHalf');    x = TopHalf(Node,BdBox,tol);
     case('BotHalf');    x = BotHalf(Node,BdBox,tol);
-    case('Location');   x = Location(Node,varargin{2:end});
+    case('Location');   x = Location(Node,BdBox,varargin{2:end});
     case('SDFE');        x = SignedFunctionEdge(Node,varargin{2:end},tol);
     case('SDF');        x = SignedFunction(Node,varargin{2:end},tol);
     case('Line');       x = Line(Node,varargin{2:end},tol);
@@ -58,19 +58,27 @@ id = find(abs(Node(:,1)-BdBox(2)) < tol & abs(Node(:,2)-BdBox(4)) < tol );
 end
 
 function id = Top(Node,BdBox,tol)
-id = find(abs(Node(:,2) - BdBox(4))<tol);
+if length(BdBox) == 4, id = find(abs(Node(:,2) - BdBox(4))<tol);
+else, id = find(abs(Node(:,3) - BdBox(6))<tol);
+end
 end
 
 function id = Bottom(Node,BdBox,tol)
-id = find(abs(Node(:,2) - BdBox(3))<tol );
+if length(BdBox) == 4, id = find(abs(Node(:,2) - BdBox(3))<tol );
+else, id = find(abs(Node(:,3) - BdBox(5))<tol);
+end
 end
 
 function id = Left(Node,BdBox,tol)
-id = find(abs(Node(:,1) - BdBox(1))<tol);
+if length(BdBox) == 4, id = find(abs(Node(:,1) - BdBox(1))<tol);
+else, id = find(abs(Node(:,1) - BdBox(1))<tol);
+end
 end
 
 function id = Right(Node,BdBox,tol)
-id = find(abs(Node(:,1) - BdBox(2))<tol);
+if length(BdBox) == 4, id = find(abs(Node(:,1) - BdBox(2))<tol);
+else, id = find(abs(Node(:,1) - BdBox(2))<tol);
+end
 end
 
 function id = TopHalf(Node,BdBox,tol)
@@ -112,9 +120,15 @@ BdBox = BoundingBox(Node);
 eps = 0.1*sqrt((BdBox(2)-BdBox(1))*(BdBox(4)-BdBox(3))/size(Node,1));
 end
 
-function id = Location(Node,Node0,N)
-if nargin < 3, N = 1; end
-Loc = sqrt((Node(:,1)-Node0(1)).^2+(Node(:,2)-Node0(2)).^2);
+function id = Location(Node,BdBox,Node0,N)
+if nargin < 4, N = 1; end
+if length(BdBox) == 4
+    Loc = sqrt((Node(:,1)-Node0(1)).^2+(Node(:,2)-Node0(2)).^2);
+elseif length(BdBox) == 6
+    Loc = sqrt((Node(:,1)-Node0(1)).^2+ ...
+        (Node(:,2)-Node0(2)).^2 + (Node(:,3)-Node0(3)).^2);
+end
+
 [~,Loc] = sort(Loc); id = Loc(1:N);
 end
 
@@ -156,10 +170,20 @@ end
 end
 
 function BdBox = BoundingBox(Node)
+if size(Node,2) == 2
 BdBox = zeros(4,1);
 BdBox(1) = min(Node(:,1));
 BdBox(2) = max(Node(:,1));
 BdBox(3) = min(Node(:,2));
 BdBox(4) = max(Node(:,2));
+else
+BdBox = zeros(6,1);
+BdBox(1) = min(Node(:,1));
+BdBox(2) = max(Node(:,1));
+BdBox(3) = min(Node(:,2));
+BdBox(4) = max(Node(:,2));   
+BdBox(5) = min(Node(:,3));
+BdBox(6) = max(Node(:,3));  
+end
 end
 

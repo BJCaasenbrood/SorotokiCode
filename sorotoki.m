@@ -1,7 +1,6 @@
 function sorotoki(arg)
 % -------------------------------------------------------------------------
 if nargin < 1, clc; clear; arg = 'install'; end
-%if ~exist('config/__init__.txt','file'), arg = 'install'; end
 % ------------------------------------------------------------------------
 
 switch(arg)
@@ -23,6 +22,7 @@ set = {'bunny preview demo',...
        'topology design demo'};
 
 request = CallAction(set);
+
 switch(request)
     case(1); preview_bunny;
     case(2); preview_dragon;
@@ -70,7 +70,7 @@ end
 
 if ~pingserver, error('No internet connection! '); end
 
-fprintf('* getting version_file_check from Git repository config/vernum.m \n');
+fprintf('* Getting version_file_check from Git repository config/vernum.m \n');
 url = ['https://raw.githubusercontent.com/BJCaasenbrood/',...
     'SorotokiCode/master/config/vernum.m'];
 filename = [verFolder,'/vernum.m'];
@@ -132,18 +132,16 @@ startup;
 cout('Text', '\n');
 cout('green','* INSTALLATION DONE! \n');
 cout('Text', '\n');
-cout('SOROTOKI toolkit is succesfully installed and ready-to-use! ');
+cout('* SOROTOKI toolkit is succesfully installed and ready-to-use! \n');
 
 pause(.01);
-cout(['The documentation can be found in doc/SorotokiManual.pdf',...
+cout(['* The documentation can be found in doc/SorotokiManual.pdf',...
     '. For more in-\nformation on the Soft Robotics Toolkit, visit',...
     ' the GitHub repository at: \n\n']) 
 fprintf(['<a href="https://github.com/BJCaasenbrood/SorotokiCode">',...
     'https://github.com/BJCaasenbrood/SorotokiCode</a> \n'])
 cout('Text', '\n');
 cout('Text', '* To get started with demonstrations, type ');
-cout('String', 'sorotoki ');
-cout('Text', 'or '); 
 cout('String', 'sorotoki(''demo'') \n');
 warning on;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -193,7 +191,7 @@ x = basePathConfirm;
 end
 end
 
-% -------------------------------------------------------------- ESSENTIALS
+% ---------------------------------------------------------------- GRAPHICS
 function x = IncludeGraphicsModel(Path,Request)
 global FID
 
@@ -209,7 +207,7 @@ x = graphicsmodelPathConfirm;
 end
 end
 
-% -------------------------------------------------------------- ESSENTIALS
+% -------------------------------------------------------------------- MESH
 function x = IncludeMesh(Path,Request)
 global FID
 
@@ -229,7 +227,7 @@ x = meshPathConfirm;
 end
 end
 
-% -------------------------------------------------------------- ESSENTIALS
+% --------------------------------------------------------------------- FEM
 function x = IncludeFiniteElement(Path,Request)
 global FID
 
@@ -253,7 +251,7 @@ x = femPathConfirm;
 end
 end
 
-% -------------------------------------------------------------- ESSENTIALS
+% ---------------------------------------------------------------- DYNAMICS
 function x = IncludeDynamicModel(Path,Request)
 global FID
 

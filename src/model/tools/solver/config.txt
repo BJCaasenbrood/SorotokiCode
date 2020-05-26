@@ -1,0 +1,39 @@
+[options]
+ENERGY_CONTROLLER = 1
+WRITE_OUTPUT      = 1
+
+[cosserat]
+E1 = 1
+E2 = 0
+E3 = 0
+K1 = 0
+K2 = 1
+K3 = 1
+
+[model]
+NMODE   = 3
+SDOMAIN = 1
+TDOMAIN = 20
+
+[solver]
+SPACESTEP = 10
+TIMESTEP  = 0.01
+INTSTEP   = 900
+ATOL      = 1e-8
+RTOL      = 1e-6
+MAX_IMPL  = 1
+MAX_ITER  = 1e5
+SPEEDUP   = 1.0
+
+[physics]
+RHO      = 0.02
+EMOD     = 4e2
+NU       = 0.4
+MU       = 1.5
+PRS_AREA = 1e-5
+GRAVITY  = 9.81
+RADIUS   = 0.01
+
+[control]
+KP = 1e-3
+KD = 2e-4

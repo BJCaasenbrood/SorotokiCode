@@ -9,11 +9,14 @@ classdef Model
         tspan = 1;
         Table;
         g;
+        ge;
         tau;
         Controller;
         Pressure;
         Texture;
         q0;
+        gain;
+        point;
     end
     
     properties (Access = private)
@@ -69,7 +72,7 @@ function obj = Model(Table,varargin)
     obj.NModal = 2;
     obj.Chebyshev = false;
     obj.PressureArea = 5e-5;
-    obj.Texture = virtual;
+    obj.Texture = studioclay;
     obj.Jacobian = true;
     
     for ii = 1:2:length(varargin)
@@ -125,9 +128,20 @@ out = fullfile(dir_path,'input.log');
 fileID = fopen(out,'w');
 fprintf(fileID,'%d\n',Model.Pressure(Model.tspan));
 fclose(fileID);
+%//////////////////////////////////
 out = fullfile(dir_path,'state.log');
 fileID = fopen(out,'w');
 fprintf(fileID,'%d\n',Model.q0);
+fclose(fileID);
+%//////////////////////////////////
+out = fullfile(dir_path,'gain.log');
+fileID = fopen(out,'w');
+fprintf(fileID,'%d\n',Model.gain);
+fclose(fileID);
+%//////////////////////////////////
+out = fullfile(dir_path,'point.log');
+fileID = fopen(out,'w');
+fprintf(fileID,'%d\n',Model.point);
 fclose(fileID);
 tic
 system('cd src/model/tools/solver && main.exe');
@@ -137,6 +151,8 @@ Model.g = y(:,2:end);
 Model.t = y(:,1);
 y = load('src/model/tools/solver/tau.log');
 Model.tau = y(:,2:end);
+y = load('src/model/tools/solver/g.log');
+Model.ge = y(:,2:end);
 end
 
 %----------------------------------------------------------------- simulate
@@ -201,8 +217,8 @@ X = linspace(0,1,200);
 msh = Gmodel('SoftActuatorRedux.stl');
 mshgr = Gmodel('SoftGripperRedux.stl');
 %mshgr = Gmodel([]);
-%mshgr = mshgr.set('Node0',mshgr.Node*1e-6);
-%mshgr = mshgr.set('Node',mshgr.Node*1e-6);
+% mshgr = mshgr.set('Node0',mshgr.Node*1e-6);
+% mshgr = mshgr.set('Node',mshgr.Node*1e-6);
 
 % set texture
 msh.Texture = Model.Texture;
@@ -222,13 +238,20 @@ view(30,5);
 msh.update();
 mshgr.update();
 
-if length(Model.t) > 2, FPS = round((1/10)/(mean(diff(Model.t)))); i0 = 1;
+if length(Model.t) > 2, FPS = round((1/8)/(mean(diff(Model.t)))); i0 = 1;
 else, FPS = 1; i0 = 1;
 end
 
 plotvector([0;0;0],[0.2;0;0],'Color',col(1),'linewidth',2,'MaxHeadSize',0.75);
 plotvector([0;0;0],[0;0.2;0],'Color',col(2),'linewidth',2,'MaxHeadSize',0.75);
 plotvector([0;0;0],[0;0;0.2],'Color',col(3),'linewidth',2,'MaxHeadSize',0.75);
+
+p = Model.point(4:6).';
+p = [p(3);p(2);-p(1)];
+
+h0 = plotvector(p,[0.2;0;0],'Color',col(4),'linewidth',2,'MaxHeadSize',0.75);
+h1 = plotvector(p,[0;0.2;0],'Color',col(4),'linewidth',2,'MaxHeadSize',0.75);
+h2 = plotvector(p,[0;0;0.2],'Color',col(4),'linewidth',2,'MaxHeadSize',0.75);
 
 for ii = i0:FPS:length(Model.t)
 
@@ -249,13 +272,30 @@ for ii = i0:FPS:length(Model.t)
 
     SweepSE3 = yf(:,1:7);
     
-    msh = Blender(msh,'Rotate',{'z',30});
-    mshgr = Blender(mshgr,'Rotate',{'z',30});
+    %msh = Blender(msh,'Rotate',{'y',30});
+    %mshgr = Blender(mshgr,'Rotate',{'z',30});
     msh = Blender(msh,'Sweep', {LinkID,SweepSE3});
     msh = Blender(msh,'Scale',{'z',-1});
     mshgr = Blender(mshgr,'SE3',yf(end,1:7));
     mshgr = Blender(mshgr,'Scale',{'z',-1});
-%     
+
+    if ii == 1      
+       h = plot3(SweepSE3(:,7),SweepSE3(:,6),-SweepSE3(:,5),'linewidth',1.5,...
+       'Color',col(1));
+    else 
+        delete(h);
+%         delete(h0);delete(h1);delete(h2);
+%         p = Model.point(4:6).';
+%         p = [p(3);p(2);-p(1)];
+% 
+%         h0 = plotvector(p,[0.2;0;0],'Color',col(4),'linewidth',2,'MaxHeadSize',0.75);
+%         h1 = plotvector(p,[0;0.2;0],'Color',col(4),'linewidth',2,'MaxHeadSize',0.75);
+%         h2 = plotvector(p,[0;0;0.2],'Color',col(4),'linewidth',2,'MaxHeadSize',0.75);
+%         h = plot3(SweepSE3(:,7),SweepSE3(:,6),-SweepSE3(:,5),'linewidth',1.5,...
+%        'Color',col(1));
+    end
+    
+    %     
 %     R = Quat2Rot(yf(end,1:4));
 %     r = yf(end,5:7);
 %     plotvector([0;0;0]+r(:),R.'*[0.2;0;0],'Color',col(1),'linewidth',2,'MaxHeadSize',0.75);
@@ -406,6 +446,7 @@ if ~Model.LumpedMass
     end
 else
     MC = Model.Mee;
+
 end
 
 % construct jacobian matrix

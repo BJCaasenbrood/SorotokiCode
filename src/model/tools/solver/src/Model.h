@@ -10,39 +10,23 @@
 #include "liegroup.h"
 #include "shapes.cpp"
 #include "qprog.hpp"
+#include "pinv.cpp"
 #include "tictoc.h"
 #include "smoothstep.h"
+#include "ConfigFile.cpp"
+#include "Chameleon.cpp"
 
-#define FULL_CONTROLLER
+//#define FULL_CONTROLLER
 //#define CONSTRAINED_CONTROLLER
-#define WRITE_OUTPUT
+//#define ENERGY_PROJECTION_CONTROLLER
+#define SOLVER_OUTPUT
+//#define WRITE_OUTPUT
 #define TICTOC
-//#define QUASINEWTON
-//#define JACOBIAN
+//#define QUASINETWON
+#define JACOBIAN
 
 #define PRECISION 5
-
-#define NMODE 1
-#define SDOMAIN 1
-#define TDOMAIN 10
-#define SPACESTEP 10
-#define TIMESTEP 0.033333
-#define INTSTEP 900
-
-#define ATOL 1e-4
-#define RTOL 1e-3
-#define MAX_ITER 1e5
-#define SPEEDUP 1.0
-
-#define PRS_AREA 1e-5
-#define GRAVITY 9.81
 #define PI 3.1415926
-#define RADIUS 0.01
-#define RHO 0.01
-#define EMOD 4e2
-#define NU 0.4
-#define MU 0.2
-//#define MU 0.01 // (static solver)
 
 typedef Eigen::Array<int, 6, 1> V6i;
 typedef Eigen::Matrix<float, 6, 6> M6f;
@@ -64,12 +48,40 @@ class Model
 {
   public:
 
+  	bool ENERGY_CONTROLLER;
+  	bool WRITE_OUTPUT;
+
+  	int E1,E2,E3;
+  	int K1,K2,K3; 
+
+  	int NMODE; 
+	float SDOMAIN; 
+	float TDOMAIN; 
+	int SPACESTEP;
+	float TIMESTEP; 
+	int INTSTEP;
+
+	float ATOL;
+	float RTOL; 
+	int MAX_IMPL;
+	int MAX_ITER; 
+	float SPEEDUP; 
+
+	float PRS_AREA; 
+	float GRAVITY; 
+	float RADIUS; 
+	float RHO; 
+	float EMOD; 
+	float NU; 
+	float MU; 
+
+  	float KP, KD;
   	int NDof, NState;
   	Shapes Phi;
 
   	Mxf Hess;
 
-  	Mxf Ba;
+  	Mxf Ba,Bc;
   	M6f Mtt, Ktt, Dtt;
   	Mxf Mee, Kee, Dee;
   	Vxf q, dq, ddq;
@@ -85,23 +97,29 @@ class Model
 	M4f A;
 
 	V6f gvec;
-	Vxf tau;
+	Vxf z0, tau, u;
 
-	Model(V6i table);
+	Model(const char* str);
 
-	void output(const char* str, float t, Vxf x);
+	void output(ofstream &file, float t, Vxf x);
 	void read(const char* str, Vxf &x);
 	void cleanup();
 
-	void realtimeController(float t, Mxf &A1, Mxf &A2, Vxf Qdes, Vxf &X);
+	void operationalSpaceDynamics(Mxf &J, Mxf &Jt, Vxf &dq, 
+	Mxf &M, Vxf &C, Vxf &G, Mxf &Mx, Vxf &Cx, Vxf &Gx);
+	void dynamicProjector(Mxf &J, Mxf &M, Mxf &S, Mxf &P);
+	void controllerWrench(float t, Mxf &J, Vxf &f);
 
+	/*
 	Vxf solve();
 	Vxf implicit_solve();
 	Vxf simulate();
+	*/
+	
 	Vxf implicit_simulate();
 
 	void inverseDynamics(Vxf v, Vxf dv, Vxf ddv, Vxf &Q);
-	void buildJacobian(float se, Mxf &J);
+	void buildJacobian(float se, Mxf &J, Mxf &Jt);
 	void buildInertia(Vxf x, Mxf &M);
 
 	void kinematicODE(float t, Vxf x, Vxf &dx);
@@ -109,13 +127,13 @@ class Model
 
 	void forwardODE(float s, Vff x, Vff &dx);
 	void backwardODE(float s, Vxf x, Vxf &dx);
-	void jacobiODE(float s, V13f x, V13f &dx, Mxf &dJ);
+	void jacobiODE(float s, V13f x, V13f &dx, Mxf &dJ, Mxf &dJt);
 	void inertiaODE(float s, V7f x, Mxf J, 
 	V7f &dx, Mxf &dJ, Mxf &dM);
 	void systemMatODE(float s, 
 	Mxf &K, Mxf &M, Mxf &D);
 
-	Mxf tableConstraints(V6i table);
+	Mxf tableConstraints(V6i table, bool set = true);
 	void hessianInverse(float dt, Vxf R, Vxf &dx);
 
 	void buildInertiaTensor();

@@ -2,12 +2,8 @@
 
 int main()
 {
-	// setting
-	V6i tab;
-	tab << 0,1,1,0,0,0;
-
 	// generate model-class
-	Model mdl(tab);
+	Model mdl("config.txt");
 
 	// solve system
 	mdl.implicit_simulate();

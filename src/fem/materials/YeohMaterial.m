@@ -61,9 +61,12 @@ YeohD = [YeohMaterial.D1,YeohMaterial.D2,YeohMaterial.D3];
 
 I = eye(3,3);
 Cinv = minv(C);
-C11=C(1,1); C22=C(2,2); C33=C(3,3);
+C11=C(1,1); 
+C22=C(2,2); 
+C33=C(3,3);
 I1 = C11+C22+C33;
 I1iso = J^(-2/3)*I1;
+%I1iso = I1;
 
 for ii = 1:3
     S = S + 2*(ii*YeohC(ii)*(I1iso - 3)^(ii-1))*J^(-2/3)*(I - (I1/3)*Cinv)...
@@ -91,7 +94,7 @@ TOc = TOb3;
 TOd1 = TOb3;
 TOd2 = TOb4;
 
-D = (4*J^(-4/3)*alpha)*TOa + ((-4/3)*J^(-2/3)*beta)*(TOb1 + TOb2 - ...
+D = (4*J^(-4/3)*alpha)*TOa - ((4/3)*J^(-2/3)*beta)*(TOb1 + TOb2 - ...
     (I1/3)*TOb3 - I1*TOb4) + (J^2)*gamma*TOc + delta*J*(TOd1 -2*TOd2);
 
 end

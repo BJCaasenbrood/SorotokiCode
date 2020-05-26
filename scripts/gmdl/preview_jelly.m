@@ -1,19 +1,13 @@
 clc; clear; close all;
 
 %% model
-obj = Gmodel('Pneunet.stl');
+obj = Gmodel('David.stl');
 
 %% set texture
-obj.Texture = redwax;
-obj.Emission = 1.5*col(2);
+obj.Texture = greenglass;
+obj.Emission = lime;
 
-obj.set('SSSPower',0.75,...
-        'AORadius',0.3,...
-        'SSS',true);
+obj.set('SSSPower',.75,'SSSRadius',0.3,'SSS',true);
 
-obj.bake();
-    
-%% set view
-obj.render(); 
-view(260,20); 
-obj.update();
+%% set visual
+obj.bake().render().update(); 

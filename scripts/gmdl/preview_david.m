@@ -4,10 +4,7 @@ clc; clear; close all;
 obj = Gmodel('David.stl');
 
 %% set texture
-obj.Texture = porcelain;
+obj.Texture = prusa;
 obj.set('AO',true,'AOPower',3.0,'AORadius',0.25);
 
-obj = obj.bake();
-
-%% show
-obj = obj.render();
+obj = obj.bake().render();

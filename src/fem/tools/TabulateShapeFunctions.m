@@ -1,6 +1,6 @@
 function fem = TabulateShapeFunctions(fem)
-ElemNNode = cellfun(@length,fem.Element); 
-fem.ShapeFnc = cell(max(ElemNNode),1);
+ElemNNode     = cellfun(@length,fem.Element); 
+fem.ShapeFnc  = cell(max(ElemNNode),1);
 
 for nn = min(ElemNNode):max(ElemNNode)
     [W,Q] = PolyQuad(nn);
@@ -33,13 +33,13 @@ dA = zeros(nn,2);
 for i=1:nn
     sctr = Tri(i,:);
     pT = p(sctr,:);
-    A(i,1) = 1/2*det([pT,ones(3,1)]);
+    A(i,1)  = 1/2*det([pT,ones(3,1)]);
     dA(i,1) = 1/2*(pT(3,2)-pT(2,2));
     dA(i,2) = 1/2*(pT(2,1)-pT(3,1));
 end
 
-A  = [A(nn,:);A];
-dA = [dA(nn,:);dA];
+A  = [A(nn,:); A];
+dA = [dA(nn,:); dA];
 
 for i=1:nn
     alpha(i,1) = 1/(A(i)*A(i+1));
@@ -65,11 +65,11 @@ p = [cos(2*pi*((1:nn))/nn);
 
 p = [p; xi];
 
-Tri = zeros(nn,3);
+Tri         = zeros(nn,3);
 Tri(1:nn,1) = nn+1;
 Tri(1:nn,2) = 1:nn;
 Tri(1:nn,3) = 2:nn+1;
-Tri(nn,3) = 1;
+Tri(nn,3)   = 1;
 end
 
 %----------------------------------------------------- POLYGONAL QUADRATURE
@@ -156,7 +156,6 @@ end
 %----------------------------------------------- TRIANGULAR SHAPE FUNCTIONS
 function [N,dNds] = TriShapeFnc(s)
 N = [1-s(1)-s(2); s(1); s(2)];
-
 dNds=[-1,-1; 1, 0; 0, 1];
 end
 

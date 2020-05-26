@@ -22,11 +22,10 @@ fem = fem.AddConstraint('Output',id,[0,1]);
 fem = fem.AddConstraint('Spring',id,[0,1e-3]);
 
 id = fem.FindElements('Location',[-5,5],1);
-fem = fem.AddConstraint('PressureCell',id,[-1e-4,0]);
+fem = fem.AddConstraint('PressureCell',id,[1e-4,0]);
 
 %% set density
-%fem = fem.initialTopology('Hole',[-2,5;1,5],3);
-fem = fem.initialTopology('Hole',[-5,5;1,5],2);
+fem = fem.initialTopology('Hole',[-5,5],2);
 
 %% material
 fem.Material = Ecoflex0030;

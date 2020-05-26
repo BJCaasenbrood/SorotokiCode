@@ -34,7 +34,6 @@ void Shapes::set(int nmode, int ndof, const char* str)
 	if (str == "legendre"){
 		legen = true;
 	}
-
 }
 
 //---------------------------------------------------

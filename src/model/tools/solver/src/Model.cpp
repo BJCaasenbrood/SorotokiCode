@@ -5,13 +5,58 @@ using namespace Eigen;
 
 ofstream statelog;
 ofstream taulog;
+ofstream glog;
 
 //---------------------------------------------------
 //-------------------------------- class constructor
 //---------------------------------------------------
-Model::Model(V6i tab){
-	Ba = tableConstraints(tab);
+Model::Model(const char* str){
+
+	V6i tab;
+
+	ConfigFile cf(str);
+
+	ENERGY_CONTROLLER = static_cast<bool>(cf.Value("options","ENERGY_CONTROLLER"));
+	WRITE_OUTPUT = static_cast<bool>(cf.Value("options","WRITE_OUTPUT"));
+
+	K1 = static_cast<int>(cf.Value("cosserat","K1"));	// e_xy
+	K2 = static_cast<int>(cf.Value("cosserat","K2"));	// e_xz
+	K3 = static_cast<int>(cf.Value("cosserat","K3"));	// e_yz
+	E1 = static_cast<int>(cf.Value("cosserat","E1"));	// e_xx
+	E2 = static_cast<int>(cf.Value("cosserat","E2"));	// e_yy
+	E3 = static_cast<int>(cf.Value("cosserat","E3"));	// e_zz
+
+	tab << K1,K2,K3,E1,E2,E3;
+
+	NMODE   = static_cast<int>(cf.Value("model","NMODE"));
+  	SDOMAIN = cf.Value("model","SDOMAIN");
+  	TDOMAIN = cf.Value("model","TDOMAIN");
+
+  	SPACESTEP = static_cast<int>(cf.Value("solver","SPACESTEP"));
+  	INTSTEP   = static_cast<int>(cf.Value("solver","INTSTEP"));
+  	MAX_IMPL  = static_cast<int>(cf.Value("solver","MAX_IMPL"));
+  	MAX_ITER  = static_cast<int>(cf.Value("solver","MAX_ITER"));
+  	ATOL      = cf.Value("solver","ATOL");
+  	RTOL      = cf.Value("solver","RTOL");
+  	SPEEDUP   = cf.Value("solver","SPEEDUP");
+  	TIMESTEP  = cf.Value("solver","TIMESTEP");
+
+  	RHO      = cf.Value("physics","RHO");
+  	EMOD     = cf.Value("physics","EMOD");
+  	NU       = cf.Value("physics","NU");
+  	MU       = cf.Value("physics","MU");
+  	PRS_AREA = cf.Value("physics","PRS_AREA");
+  	GRAVITY  = cf.Value("physics","GRAVITY");
+  	RADIUS   = cf.Value("physics","RADIUS");
+
+  	KP = cf.Value("control","KP");
+  	KD = cf.Value("control","KD");
+
+	Ba = tableConstraints(tab,true);
+	Bc = tableConstraints(tab,false);
 	NDof = Ba.cols();
+
+	cout << Ba << endl;
 
 	NState = NDof * NMODE;
 
@@ -22,18 +67,21 @@ Model::Model(V6i tab){
 	buildDampingTensor();
 	buildGlobalSystem();
 
-	q = Vxf::Constant(NState,ATOL);
-	dq = Vxf::Zero(NState);
+	q   = Vxf::Constant(NState,ATOL);
+	dq  = Vxf::Zero(NState);
 	ddq = Vxf::Zero(NState);
-	qd = Vxf::Zero(NState);
+	qd  = Vxf::Zero(NState);
 	tau = Vxf::Zero(6);
+	u   = Vxf::Zero(6);
+	z0  = Vxf::Zero(6);
 
-	Xi0  << 0,0,0,1,0,0;
-	gvec << 0,0,0,(float)GRAVITY,0,0;
+	Xi0 << 0.0, 0.0, 0.0, 1.0, 0.0, 0.0;
+	gvec << 0.0, 0.0, 0.0, GRAVITY, 0.0, 0.0;
 
 	// read input
 	read("state.log",q);
 	read("input.log",tau);
+	read("point.log",z0);
 
 	#ifdef FULL_CONTROLLER
 	read("state.log",qd);
@@ -48,8 +96,9 @@ Model::Model(V6i tab){
 	// clean up 
 	cleanup();
 
-
 	statelog.open("state.log", ios_base::app | ios::binary);
+	taulog.open("tau.log", ios_base::app | ios::binary);
+	glog.open("g.log", ios_base::app | ios::binary);
 
 	cout << setprecision(PRECISION) << endl;
 }	
@@ -57,14 +106,16 @@ Model::Model(V6i tab){
 //---------------------------------------------------
 //-------------------------------------- output file
 //---------------------------------------------------
-void Model::output(const char* str, float t, Vxf x){
+void Model::output(ofstream &file, float t, Vxf x){
 
-  	statelog << t << " ";
+	  file << t << " ";
 
-  	for (int i = 0; i < x.size(); i++){
-  		statelog << x(i) << " ";
-  	}
-  	statelog << "\n";
+	  for (int i = 0; i < x.size(); ++i)
+	  {
+	  	file << x(i) << " ";
+	  }
+
+	  file << "\n";
 }
 
 //---------------------------------------------------
@@ -87,77 +138,86 @@ void Model::read(const char* str, Vxf &x){
 //--------------------------------------- clean file
 //---------------------------------------------------
 void Model::cleanup(){
-	ofstream myfile1, myfile2;
+	ofstream myfile1, myfile2, myfile3;
 	myfile1.open("state.log", ofstream::out | ofstream::trunc);
 	myfile2.open("tau.log", ofstream::out | ofstream::trunc);
+	myfile3.open("g.log", ofstream::out | ofstream::trunc);
 	myfile1.close();
 	myfile2.close();
+	myfile3.close();
 }
 
-//---------------------------------------------------
-//----------------------------- real-time controller
-//---------------------------------------------------
-void Model::realtimeController(float t, Mxf &A1, Mxf &A2, 
-	Vxf Qdes, Vxf &X){
+//--------------------------------------------------
+//----------- transformation to task-space dynamics
+//--------------------------------------------------
+void Model::operationalSpaceDynamics(Mxf &J, Mxf &Jt, 
+	Vxf &dq, Mxf &M, Vxf &C, Vxf &G, Mxf &Mx, Vxf &Cx, 
+	Vxf &Gx){
 
 	int n = NState;
-	//Mxd G(6+n,6+n), CE(n,6+n), CI(6+n,6+n);
-	//Vxd x(6+n), g0(6+n), ce0(n), ci0(6+n), Gd(6+n);
+	int k = Mx.rows();
+
+	Mxf Mi(n,n), Li(k,k), Jg(n,k);
+
+	// compute task-space inertia matrix
+	Mi.noalias() = M.householderQr().solve(Mxf::Identity(n,n));
+	Li.noalias() = J*(Mi*J.transpose());
+	Mx.noalias() = Li.householderQr().solve(Mxf::Identity(k,k));
+		
+	// build generalized inverse
+	Jg.noalias() = Mi*J.transpose()*Mx;
+	//Jg.transposeInPlace();
 	
-	Mxd G(n+6,n+6), CE(n,n+6), CI(n+6,n+6), A(n,n+6);
-	Vxd x(n+6), g0(n+6), ce0(n+6), ci0(n+6), Gd(6+n), b(n);
+	// residual Lagrangian forces in task-space
+	Cx.noalias() = Jg.transpose()*C - Mx*Jt*dq;
+	Gx.noalias() = Jg.transpose()*G;	
 
- 	Mxf H(6,3);
-
- 	//CE.setZero();
- 	G.setIdentity();
- 	CI.setZero();
- 	g0.setZero();
- 	ci0.setZero();
- 	//ce0.setZero();
- 	//
-
- 	Gd.block(0,0,6,1) = Vxd::Constant(6,1.0);
- 	Gd.block(6,0,n,1) = Vxd::Constant(n,1e10);
- 	G.diagonal() = Gd;
- 	// ce0.noalias() = Qdes.cast<double>();
-
-  	H.noalias() = pressureMapping();
-
-  	A.block(0,0,n,3).noalias() = (A1.transpose()*H).cast<double>();
-  	A.block(0,3,n,3).noalias() = ((A2 - A1).transpose()*H).cast<double>();
-  	A.block(0,6,n,n).noalias() = (Mxf::Identity(n,n)).cast<double>();
-  	//A = ((A.array().abs() > 1e-3*A.norm()).select(A.array(),0.0)).cast<double>();
-  	b.noalias() = Qdes.cast<double>();
-  	
-
-  	//ce0.noalias() = -Qdes.cast<double>();
-  	//G += A.transpose()*A;
-  	//g0 = -A.transpose()*b;
-
-  	//A.setZero();
-  	//b.setZero();
-
-  	// solve quadratic programming
-  	solve_quadprog(G, g0, A.transpose(), -b, CI, ci0, x);
-  	
-  	//EigenQP::quadprog(G,g0,A,b,x);
-  	// write pressure output
-  	// if(isnan(x.norm()) == 0){
-  	X = x.block(0,0,6,1).cast<float>();
-  	// }
-  	//CompleteOrthogonalDecomposition<MatrixXd> cqr(A);
-
-  	//tau = (A.transpose() * A).ldlt().solve(A.transpose() * b).cast<float>();
-  	//X.setZero();
-  	// = (cqr.pseudoInverse()*b).cast<float>();
-
-  	// cout << A << endl;
-  	// cout << cqr.pseudoInverse() << endl;
-  	// cout << A.cast<float>()*tau << endl;
-  	// cout << b << endl;
 }
 
+//--------------------------------------------------
+//----- dynamically consistent null-space projector
+//--------------------------------------------------
+void Model::dynamicProjector(Mxf &J, Mxf &M, Mxf &S,
+	Mxf &P){
+
+	int n = NState;
+	int m = J.rows();
+	int k = S.cols();
+
+	Mxf Mi(n,n), X(m,k), Xpv(k,m);
+
+	// precompute inverse inertia
+	Mi.noalias() = M.householderQr().solve(Mxf::Identity(n,n));
+	Xpv.noalias() = (J*Mi*S).completeOrthogonalDecomposition().pseudoInverse();
+
+	// build dynamically consistent projector
+	P.noalias() = Xpv*J*Mi;
+
+}
+//---------------------------------------------------
+//----------- controller wrench at end-effector level
+//---------------------------------------------------
+void Model::controllerWrench(float t, Mxf &J, Vxf &f){
+
+	V6f z, dz, dz0, tmp;
+	M6f Adg;
+
+	dz0.setZero();
+
+	// get configuration-space in R6
+	SE3toR6(g,z);
+	Admap(g,Adg);
+
+	dz.noalias() = eta;
+	z0.block(0,0,3,1).noalias() = z.block(0,0,3,1);
+	dz0.block(0,0,3,1).noalias() = eta.block(0,0,3,1);
+
+	// compute wrench
+	f = KP*(z - z0) + KD*(dz - dz0);
+	f *= smoothstep(0.2*t,0,1);
+}
+
+/*
 //---------------------------------------------------
 //------------- explicit solver quasi-static problem
 //---------------------------------------------------
@@ -196,9 +256,13 @@ Vxf Model::solve(){
 	return x;
 }
 
+*/
+
+/*
 //---------------------------------------------------
 //------------------ explicit solver dynamic problem
 //---------------------------------------------------
+//
 Vxf Model::simulate(){
 	int n = NState;
 	int i = 0;
@@ -213,10 +277,6 @@ Vxf Model::simulate(){
 	// do time integration
 	while (t < ((float)TDOMAIN) && i < MAX_ITER){
 
-		#ifdef WRITE_OUTPUT
-		output("data.log",t,x.block(0,0,n,1));
-		#endif
-
 		dynamicODE(t,x,K1);
  		dynamicODE(t+(1.0/2.0)*dt, x+(1.0/2.0)*dt*K1, K2);
  		dynamicODE(t+(1.0/2.0)*dt, x+(1.0/2.0)*dt*K2, K3);
@@ -227,6 +287,17 @@ Vxf Model::simulate(){
   			break;
   		}
 
+  		#ifdef WRITE_OUTPUT
+		output(statelog,t,x.block(0,0,n,1));
+		output(taulog,t,u);
+		output(glog,t,g);
+		#endif
+
+		#ifdef SOLVER_OUTPUT
+		cout << "-------------/ " << endl;
+		cout << "tim =" << t << endl;
+		#endif 
+
   		x.noalias() += dx;
   		t += dt;
   		i++;
@@ -235,7 +306,9 @@ Vxf Model::simulate(){
 	// return solutions q* = q(t_eq)
 	return x.block(0,0,n,1);
 }
+*/
 
+/*
 //--------------------------------------------------
 //------------- implicit solve quasi-static problem
 //--------------------------------------------------
@@ -295,6 +368,7 @@ Vxf Model::implicit_solve(){
 	// return solutions q* = q(t_eq)
 	return x;
 }
+*/
 
 //--------------------------------------------------
 //------------------ implicit solve dynamic problem
@@ -318,12 +392,7 @@ Vxf Model::implicit_simulate(){
 	#endif
 
 	// solve implicit time integration
-	while (t < ((float)TDOMAIN) && i < MAX_ITER){
-
-		#ifdef WRITE_OUTPUT
-		output("state.log",t,x.block(0,0,n,1));
-		//output("tau.log",t,tau);
-		#endif
+	while (t < TDOMAIN && i < MAX_ITER){
 
 		dynamicODE(t,x,K1);
 
@@ -332,7 +401,7 @@ Vxf Model::implicit_simulate(){
 		dx.noalias() = -dr;
 
 		#ifndef QUASINETWON
-		while(abs(R.norm()) > RTOL && j < 10){
+		while(abs(R.block(n,0,n,1).norm()) > RTOL && j < MAX_IMPL){
 			dynamicODE(t+dt,x+dx,K2);
 			R.noalias() = dx - 0.5*dt*(K1 + K2);
 			hessianInverse(dt,R,dr);
@@ -344,6 +413,18 @@ Vxf Model::implicit_simulate(){
   		if(isnan(dx.norm())){
   			i = MAX_ITER; 
   		}
+
+  		if(WRITE_OUTPUT){
+			output(statelog,t,x.block(0,0,n,1));
+			output(taulog,t,u);
+			output(glog,t,g);
+		}
+
+		// #ifdef SOLVER_OUTPUT
+		// cout << "*/-------------/ " << endl;
+		// cout << "tim =" << t << endl;
+		// cout << "inc =" << j << endl;
+		// #endif 
 
   		x.noalias() += dx;
   		t += dt;
@@ -368,57 +449,88 @@ void Model::dynamicODE(float t, Vxf x, Vxf &dx){
 	Vxf x1(n), x2(n), null(n);
 	Vxf Q(n), Qa(n), Qv(n), Qu(n), Qd(n);
 	Mxf J1(6,n), J2(6,n), H(6,3);
+	Mxf J1t(6,n), J2t(6,n);
 
 	null.setZero();
-	Qu.noalias() = null;
+	Qu.setZero();
 
 	// extract the generalized coordinates 
 	x1.noalias() = x.block(0,0,n,1);
 	x2.noalias() = x.block(n,0,n,1);	
 
-	// solve static + dynamic forces
+	// solve position-dependent forces
 	inverseDynamics(x1,null,null,Qa);
 
-	// solve static + dynamic forces
+	// solve velocity-dependent forces
 	inverseDynamics(x1,x2,null,Qv);
 	Qv.noalias() -= Qa;
+
+	// add elastic material forces
+	Qa.noalias() += Kee*x1;
+
+	// add viscous material forces
+	Qv.noalias() += Dee*x2;
 
 	// compute inertia matrix
 	buildInertia(x1,Mee);
 
-	#ifdef JACOBIAN
-	// compute manipulator Jacobian
-	buildJacobian(0.5, J1);
-	buildJacobian(1.0, J2);
-	#endif
-
-	#ifdef CONSTRAINED_CONTROLLER
-	float kp = 100;
-	float kd = 5*2*sqrt(kp);
-
-	// compute control law
-	Qd.noalias() = Mee*(kp*(x1 - qd) + kd*x2) - Qa - Kee*x1;
-	realtimeController(t, J1, J2, Qd, tau);
-	#endif
-
 	// compute pressure forces
 	H.noalias() = pressureMapping();
-	Qu.noalias() = (J1.transpose()*H)*tau.block(0,0,3,1);
-	Qu.noalias() += ((J2 - J1).transpose()*H)*tau.block(3,0,3,1);
 
-	#ifdef FULL_CONTROLLER
-	float kp = 25;
-	float kd = 2*sqrt(kp);
-	Vxf xd1(n), xd2(n);
-	xd1 = qd;
-	xd2 = 0.0*qd;
-	Qu.noalias() = Mee*(kp*(x1-xd1) + kd*x2) - Qa - Kee*x1;
+	// compute manipulator Jacobian
+	#ifdef JACOBIAN
+		buildJacobian(0.5, J1, J1t);
+		buildJacobian(1.0, J2, J2t);
 	#endif
 
-	Q.noalias() = Qa + Qv + Qu;
+	if(ENERGY_CONTROLLER){
+		int l = Ba.cols();
+		int m = 4; // dimension of input-space
+		int k = 6; // dimension of task-space
+
+		Mxf S(n,m), Prj(k,n);
+		Mxf J(k,n), Jt(k,n);
+		Mxf Mz(k,k);
+		Vxf Cz(k), Pz(k), f(6);
+		M6f Adg;
+
+		// recover task-space Jacobian 
+		Admap(g,Adg);
+		J.noalias()  = Adg*J2;
+		Jt.noalias() = Adg*J2t;
+
+		S.block(0,0,n,l).noalias() = J1.transpose()*Ba;
+  		S.block(0,l,n,l).noalias() = (J2 - J1).transpose()*Ba;
+  		//S.noalias() = J2.transpose()*Ba;
+
+  		// compute operational space dynamics
+		//operationalSpaceDynamics(J,Jt,x2,Mee,Qv,Qa,Mz,Cz,Pz);
+
+		// compute null space projection
+		dynamicProjector(J,Mee,S,Prj);
+
+		// compute control-action in operational space
+		controllerWrench(t,J,f);
+
+		// project torques
+		Qu.noalias() = S*Prj*J.transpose()*(f);
+		u.noalias() = Prj*J.transpose()*(f);
+	}
+
+	//Qu.noalias() += (J1.transpose()*H)*tau.block(0,0,3,1);
+	//Qu.noalias() += ((J2 - J1).transpose()*H)*tau.block(3,0,3,1);
+
+	#ifdef FULL_CONTROLLER
+		float kp = 25;
+		float kd = 2*sqrt(kp);
+		Vxf xd1(n), xd2(n);
+		xd1 = qd;
+		xd2 = 0.0*qd;
+		Qu.noalias() = Mee*(kp*(x1-xd1) + kd*x2) - Qa - Kee*x1;
+	#endif
 
 	(dx.block(0,0,n,1)).noalias() = x2;
-	(dx.block(n,0,n,1)).noalias() = Mee.llt().solve(-Q - Kee*x1 - Dee*x2);
+	(dx.block(n,0,n,1)).noalias() = Mee.llt().solve(-Qa - Qv + Qu);
 
 }
 
@@ -430,6 +542,7 @@ void Model::kinematicODE(float t, Vxf x, Vxf &dx){
 	int n = NState;
 	Vxf Qa(n), null(n);
 	Mxf J1(6,n), J2(6,n), H(6,3);
+	Mxf J1t(6,n), J2t(6,n);
 
 	null.setZero();
 
@@ -438,8 +551,8 @@ void Model::kinematicODE(float t, Vxf x, Vxf &dx){
 
 	#ifdef CONSTRAINED_CONTROLLER
 	// compute manipulator Jacobian
-	buildJacobian(0.5, J1);
-	buildJacobian(1.0, J2);
+	buildJacobian(0.5, J1, J1t);
+	buildJacobian(1.0, J2, J2t);
 
 	// compute pressure forces
 	H = pressureMapping();
@@ -512,15 +625,20 @@ void Model::inverseDynamics(Vxf v, Vxf dv, Vxf ddv, Vxf &Q){
 //---------------------------------------------------
 //---------------------------- build Jacobian matrix
 //---------------------------------------------------
-void Model::buildJacobian(float se, Mxf &J){
+void Model::buildJacobian(float se, Mxf &J, Mxf &Jt){
 
 	int n = NState;
 	double ds,s;
 
 	Mxf K1J(6,n), K2J(6,n);
+	Mxf K1Jt(6,n), K2Jt(6,n);
+	M6f adeta, AdgInv;
 	V13f K1, K2;
 	V13f x, dx;
 
+	// initial Jacobian matrix
+	J.setZero();
+	Jt.setZero();
 	x.setZero();
 	x(0) = 1.0;
 
@@ -528,25 +646,32 @@ void Model::buildJacobian(float se, Mxf &J){
 	ds = (1.0*(se))/(1.0*(SPACESTEP));
 	s = 0.0;
 
-	// initial Jacobian matrix
-	J.setZero();
-
 	// do spatial integration
 	for (int i = 0; i < SPACESTEP; i++){
-		jacobiODE(s,x,K1,K1J);
- 		jacobiODE(s+(2.0/3.0)*ds, x+(2.0/3.0)*ds*K1, K2, K2J);
+		jacobiODE(s,x,K1,K1J,K1Jt);
+ 		jacobiODE(s+(2.0/3.0)*ds, x+(2.0/3.0)*ds*K1, K2, K2J, K2Jt);
 
   		s += ds;
   		x.noalias() += (ds/4.0)*(K1+3.0*K2);
   		J.noalias() += (ds/4.0)*(K1J+3.0*K2J);
+  		Jt.noalias() += (ds/4.0)*(K1Jt+3.0*K2Jt);
 	}
 
-	// transform Jacobian to local frame
-	K1J.noalias() = AdmapInv(x.block(0,0,7,1))*J;
-	J.noalias() = K1J;
-
+	// return configuration and velocities
 	g.noalias()   = x.block(0,0,7,1);
 	eta.noalias() = x.block(7,0,6,1);
+
+	// compute adjoint actions
+	AdmapInv(g,AdgInv);
+	admap(eta,adeta);
+
+	// transform Jacobian to local frame
+	K1J.noalias() = AdgInv*J;
+	J.noalias() = K1J;
+
+	// transform time-derivative Jacobian to local frame
+	K1Jt.noalias() = AdgInv*Jt;
+	Jt.noalias()  = K1Jt;
 }
 
 //---------------------------------------------------
@@ -634,10 +759,8 @@ void Model::backwardODE(float s, Vxf x, Vxf &dx){
 	int n = NState;
 
 	Mxf PMat(NDof,NState);
-	M6f adxi, addxi, adeta;
-	V6f Fb;
-
-	Fb = V6f::Zero(6);
+	M6f adxi, addxi, adeta, Adg;
+	V6f Fg;
 
 	// evaluate strain-field
 	Phi.eval(s,PMat);
@@ -652,6 +775,7 @@ void Model::backwardODE(float s, Vxf x, Vxf &dx){
 	admap(xi,adxi);
 	admap(dxi,addxi);
 	admap(eta,adeta);
+	Admap(x.block(0,0,7,1),Adg);
 
 	// decomposition configuration space
 	quat.noalias() = x.block(0,0,4,1);
@@ -662,23 +786,23 @@ void Model::backwardODE(float s, Vxf x, Vxf &dx){
 	xiE.noalias() = xi.block(3,0,3,1);
 
 	// add gravity component
-	Fb.noalias() += (Admap(x.block(0,0,7,1)).transpose())*Mtt*gvec;
+	Fg.noalias() = (Adg).transpose()*Mtt*gvec;
 
 	(dx.block(0,0,4,1)).noalias()  = (1.0/(2*quat.norm()))*A*quat;
 	(dx.block(4,0,3,1)).noalias()  = R*xiE;
 	(dx.block(7,0,6,1)).noalias()  = -adxi*eta + dxi;
 	(dx.block(13,0,6,1)).noalias() = -adxi*deta - addxi*eta + ddxi;
-	(dx.block(19,0,6,1)).noalias() = adxi.transpose()*lam - (adeta.transpose()*Mtt)*eta + Mtt*deta - Fb;
+	(dx.block(19,0,6,1)).noalias() = adxi.transpose()*lam - (adeta.transpose()*Mtt)*eta + Mtt*deta - Fg;
 	(dx.block(25,0,n,1)).noalias() = -(Ba*PMat).transpose()*lam;
 }
 
 //---------------------------------------------------
 //--------------- forward integrate compute Jacobian
 //---------------------------------------------------
-void Model::jacobiODE(float s, V13f x, V13f &dx, Mxf &dJ){
+void Model::jacobiODE(float s, V13f x, V13f &dx, Mxf &dJ, Mxf &dJt){
 
 	Mxf PMat(NDof,NState);
-	M6f adxi, Adg;
+	M6f adxi, Adg, adeta;
 
 	// evaluate strain-field
 	Phi.eval(s,PMat);
@@ -692,8 +816,9 @@ void Model::jacobiODE(float s, V13f x, V13f &dx, Mxf &dJ){
 	xiE.noalias()  = xi.block(3,0,3,1);
 
 	// precompute adjoint actions
-	Adg.noalias()  = Admap(x.block(0,0,7,1));
+	Admap(x.block(0,0,7,1),Adg);
 	admap(xi,adxi);
+	admap(eta,adeta);
 
 	quat2rot(quat,R);
 	strainMapping(R*xiK,A);
@@ -703,6 +828,7 @@ void Model::jacobiODE(float s, V13f x, V13f &dx, Mxf &dJ){
 	(dx.block(7,0,6,1)).noalias() = -adxi*eta + dxi;
 
 	dJ.noalias() = Adg*(Ba*PMat);
+	dJt.noalias() = Adg*adeta*(Ba*PMat);
 }
 
 //---------------------------------------------------
@@ -727,8 +853,8 @@ void Model::inertiaODE(float s, V7f x, Mxf J,
 	strainMapping(R*xiK,A);
 
 	// precompute adjoint actions
-	Adg.noalias() = Admap(x);
-	AdgInv.noalias() = AdmapInv(x);
+	Admap(x,Adg);
+	AdmapInv(x,AdgInv);
 
 	(dx.block(0,0,4,1)).noalias() = (1.0/(2*quat.norm()))*A*quat;
 	(dx.block(4,0,3,1)).noalias() = R*xiE;
@@ -744,14 +870,20 @@ void Model::inertiaODE(float s, V7f x, Mxf J,
 //---------------------------------------------------
 //----------- convert table to active/constraint set
 //---------------------------------------------------
-Mxf Model::tableConstraints(V6i table){
+Mxf Model::tableConstraints(V6i table, bool set){
 	int k = 0;
-	int na = (table>0).count();
-	Mxf B(6,na);
+	int na;
+
 	M6f Id;
 	Id = M6f::Identity();
 
+	if(set == true){na = (table>0).count();}
+	else{na = (table==0).count();}
+
+	Mxf B(6,na);
+
 	// construct matrix of active DOF's
+	if(set == true){
 	for (int i = 0; i < 6; ++i)
 	{
 		if (table(i) == true) 
@@ -760,8 +892,22 @@ Mxf Model::tableConstraints(V6i table){
 			k++;
 		}
 	}
+	}
+
+	// construct matrix of constraint DOF's
+	if(set == false){
+	for (int i = 0; i < 6; ++i)
+	{
+		if (table(i) == false) 
+		{
+			B.block(0,k,6,1) = Id.block(0,i,6,1);
+			k++;
+		}
+	}	
+	}
 
 	return B;
+
 }
 
 //---------------------------------------------------
@@ -833,7 +979,6 @@ void Model::buildDampingTensor(){
 //---------------------------------------------------
 void Model::buildGlobalSystem(){
 
-	//Mxf P,P0,P1;
 	int n = NState;
 	double h, s, ds;
 
@@ -860,9 +1005,9 @@ void Model::buildGlobalSystem(){
   		Dee.noalias() += (ds/4.0)*(K1D+3.0*K2D);
 	}
 
-	Mee = ((Mee.array().abs() > 1e-2*Mee.norm()).select(Mee.array(),0.0));
-	Kee = ((Kee.array().abs() > 1e-2*Kee.norm()).select(Kee.array(),0.0));
-	Dee = ((Dee.array().abs() > 1e-2*Dee.norm()).select(Dee.array(),0.0));
+	Mee = ((Mee.array().abs() > 1e-6*Mee.norm()).select(Mee.array(),0.0));
+	Kee = ((Kee.array().abs() > 1e-6*Kee.norm()).select(Kee.array(),0.0));
+	Dee = ((Dee.array().abs() > 1e-6*Dee.norm()).select(Dee.array(),0.0));
 
 	Mee = Mee.cast<float> ();
 	Kee = Kee.cast<float> ();
@@ -895,7 +1040,7 @@ Mxf Model::pressureMapping(){
 	K <<  0,            0,           0,
 	      0, -0.5*sqrt(3), 0.5*sqrt(3),
 	   -1.0,          0.5,         0.5,
-	      0,            0,           0,
+	   -0.0,         -0.0,        -0.0,
 	      0,            0,           0,
 	      0,            0,           0;
 

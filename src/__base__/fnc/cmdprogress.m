@@ -33,7 +33,7 @@ classdef cmdprogress < handle
             obj.last_msg_len = strlength(info_str);
         end
         %--- dtor
-        function delete(obj)
+        function delete(~)
             fprintf('\n')
         end
         %--- dot conversion

@@ -2,7 +2,7 @@ clr;
 %% generate mesh from sdf
 sdf = @(x) PneuNet(x,20,40,1,20);
 
-msh = Mesh(sdf,'BdBox',[0,20,0,40],'NElem',800);
+msh = Mesh(sdf,'BdBox',[0,20,0,40],'NElem',300);
 msh = msh.generate();
 
 %% show generated mesh
@@ -32,7 +32,7 @@ fem = fem.AddConstraint('PressureCell',id,[1e-3,0]);
 fem = fem.initialTopology('Hole',[10,25],1);
 
 %% material
-fem.Material = TPU90;
+fem.Material = Dragonskin10A;
 
 %% solving
 fem.optimize();

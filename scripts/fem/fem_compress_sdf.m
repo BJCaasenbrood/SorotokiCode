@@ -3,12 +3,12 @@ clr;
 sdf = @(x) dRectangle(x,-10,10,0,10);
 
 %% generate mesh
-msh = Mesh(sdf,'NElem',250,'BdBox',[-10,10,0,10]);
+msh = Mesh(sdf,'BdBox',[-10,10,0,10],'Quads',18^2);
 msh = msh.generate();
 
 %% generate fem model from mesh
-fem = Fem(msh,'TimeStep',1/50,'Nonlinear',true,'FilterRadius',1e-2);
-
+fem = Fem(msh,'TimeStep',1/50);
+fem = fem.set('Movie',true,'MovieAxis',[-12 12 0 16]);
 %% add constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[0,1]);
 fem = fem.AddConstraint('Contact',@(x) SDF(x),[0,-2]);
@@ -20,6 +20,5 @@ fem.Material = Dragonskin10A;
 fem.solve();
 
 function Dist = SDF(x)
-R = 3;
-Dist = dCircle(x,0,10+R,R);
+Dist = dCircle(x,0,13,3);
 end
