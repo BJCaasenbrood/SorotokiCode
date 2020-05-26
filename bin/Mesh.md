@@ -15,6 +15,6 @@ $$
 \end{cases}
 $$
 
-where $$$d(x,\partial \Omega)$$ represents the shortest distance to the boundary $$\partial \Omega$$.
+where $$d(x,\partial \Omega)$$ represents the shortest distance to the boundary $$\partial \Omega$$.
 
 [**Homepage**](https://bjcaasenbrood.github.io/SorotokiCode/)
