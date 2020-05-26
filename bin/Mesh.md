@@ -8,13 +8,11 @@
 A signed distance functions (SDF) passes spatial coordinates and returns a signed value representing the shortest distance to the boundary of a spatial domain $\Omega$. Mathematically, the signed distance function $$f: \mathbb{R^n} \mapsto \mathbb{R}$$ of a subset $$\omega \subset \R^n$$ is defined by
 
 $$
-\[
-    f(x)= 
+    f(x) := 
 \begin{cases}
-    \frac{x^2-x}{x},& \text{if } x\geq 1\\
-    0,              & \text{otherwise}
+    d(x,\partial \Omega )   & \text{if } x \in \Omega\\
+    -d(x,\partial \Omega ) & \text{if } x \in \Omega/\R^n
 \end{cases}
-\]
 $$
 
 [**Homepage**](https://bjcaasenbrood.github.io/SorotokiCode/)
