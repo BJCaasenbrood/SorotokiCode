@@ -5,7 +5,7 @@
 [**Sorotoki**](https://bjcaasenbrood.github.io/SorotokiCode/) offers mesh generation for triangular, quadrilateral, and polygonal elements. The restricted material domains for the meshes are defined by so-called *signed distance functions* (SDF). The toolkit provides a set of geometeric shape (e.g., circles, rectangles, lines) and boolean operators, e.g., union, difference, and intersect. Together these operation allow for a wide range of meshing domain. 
 
 # Signed distance functions
-A signed distance functions (SDF) passes a spatial coordinate and returns the shortest distance to the boundary of a domain $$\Omega$$. The signed distance function $$f: \mathbb{R}^n \mapsto \mathbb{R}$$ of a subset $$\Omega \subset \mathbb{R}^n$$ is defined by
+A signed distance functions (SDF) passes a spatial coordinate and returns the shortest distance to the boundary of a domain $$\Omega$$. The signed distance function $$f: \mathbb{R}^n \mapsto \mathbb{R}$$ of a n-dimensional subset $$\Omega \subset \mathbb{R}^n$$ is defined by
 
 $$
     f(x) := 
