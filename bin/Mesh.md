@@ -10,7 +10,7 @@ $$
     f(x) := 
 \begin{cases}
     d(x,\partial \Omega )   & \text{if } x \in \Omega\\
-    -d(x,\partial \Omega ) & \text{if } x \in \mathbb{R}^n \setdiff \Omega
+    -d(x,\partial \Omega ) & \text{if } x \in \mathbb{R}^n \setminus \Omega
 \end{cases}
 $$
 
