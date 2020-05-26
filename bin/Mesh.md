@@ -6,6 +6,7 @@
 
 # Signed distance functions
 A signed distance functions (SDF) passes a spatial coordinate and it returns the shortest distance to the boundary of a spatial domain $$\Omega$$. Mathematically, the signed distance function $$f: \mathbb{R}^n \mapsto \mathbb{R}$$ of a subset $$\Omega \subset \mathbb{R}^n$$ is defined by
+
 $$
     f(x) := 
 \begin{cases}
