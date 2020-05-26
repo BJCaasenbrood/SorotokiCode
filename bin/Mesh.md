@@ -9,7 +9,7 @@ A signed distance functions (SDF) passes a spatial coordinate and returns the sh
 
 $$ d_\Omega(x) := s_\Omega(x) \min_{y \in \partial \Omega} \lVert x - y \rVert$$ 
 
-$$ s_\Omega
+$$ s_\Omega = 
 \begin{cases}
 -1, & x \in\Omega \\
 +1, & x \in \mathbb{R}^n\setminus \Omega
