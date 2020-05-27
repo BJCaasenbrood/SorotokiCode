@@ -49,8 +49,8 @@ If you are planning on using Sorotoki in your academic work, please consider to 
 
 [3] C. Talischi, G. H. Paulino, A. Pereira, and I. F. M. Menezes, “PolyMesher: A general-purpose mesh generator for polygonal elements written in Matlab,” Struct. Multidiscip. Optim., vol. 45, no. 3, pp. 309–328, 2012.
 
-[3] N. Kim, *Introduction Analysis Finite Element to Nonlinear*. 2018.
+[4] N. Kim, *Introduction Analysis Finite Element to Nonlinear*. 2018.
 
-[4] M. Bendsoe and O. Sigmund, *Topology Optimization. Theory, Methods and Applications*. 2003.
+[5] M. Bendsoe and O. Sigmund, *Topology Optimization. Theory, Methods and Applications*. 2003.
 
 
