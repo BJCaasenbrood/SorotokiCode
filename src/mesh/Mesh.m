@@ -29,11 +29,13 @@ classdef Mesh
         eta; 
         Triangulate;
         MaxIteration;
-        ShowMeshing ;
+        Movie;
+        MovieStart;
         CollapseTol;
         ConvNorm;
         ShowProcess;
         Colormap;
+        LineStyle;
     end
     
 %--------------------------------------------------------------------------
@@ -66,11 +68,13 @@ function obj = Mesh(Input,varargin)
     obj.eps          = 1e-6; 
     obj.eta          = 0.9; %was 0.9
     obj.Triangulate  = false;
-    obj.ShowMeshing  = false;
+    obj.Movie        = false;
+    obj.MovieStart   = false;
     obj.CollapseTol  = 0.2;
     obj.ConvNorm     = 1e-3;
     obj.ShowProcess  = false;
     obj.Colormap     = turbo;
+    obj.LineStyle    = '-';
     obj.Type         = 'C2PX';
     
     for ii = 1:2:length(varargin)
@@ -177,11 +181,11 @@ while flag == 0
   
   Mesh.Iteration = Mesh.Iteration + 1;
   
-  if Mesh.ShowMeshing
+  if Mesh.Movie
      Mesh.Center = Pc;
      Mesh.Node = v;
      Mesh.Element = f(1:Mesh.NElem);
-     show(Mesh,'Velocity');
+     Mesh = show(Mesh,'Velocity');
   end
   
 end
@@ -245,7 +249,7 @@ clf; axis equal; axis off; hold on;
     
 % plot tesselation
 patch('Faces',Mesh.ElemMat,'Vertices',Mesh.Node,'FaceVertexCData',Z,...
-    'Facecolor',fs,'LineStyle','-','Linewidth',1.5,'FaceAlpha',1.0,...
+    'Facecolor',fs,'LineStyle',Mesh.LineStyle,'Linewidth',1.5,...
     'EdgeColor','k');
 
 % plot boundaries
@@ -253,7 +257,6 @@ patch('Faces',Mesh.Boundary,'Vertices',Mesh.Node,'LineStyle','-',...
     'Linewidth',2,'EdgeColor','k');
 
 hold on;
-
 elseif strcmp(Request,'Node')
     plot(Mesh.Node(Z,1),Mesh.Node(Z,2),'.','Color','r');
 elseif strcmp(Request,'Element')
@@ -263,10 +266,32 @@ end
 axis(Mesh.BdBox); axis tight;
 colormap(Mesh.Colormap);
 drawnow;
+
+if Mesh.Movie 
+    background(gitpage);
+    if Mesh.MovieStart == false
+       Mesh.MovieStart = true;
+       MovieMaker(Mesh,'mesh','Start');
+    else
+       MovieMaker(Mesh,'mesh','');
+    end
 end
 
-%---------------------------------------------------------------- show mesh
-function Mesh = list(Mesh)
+end
+
+%--------------------------------------------------------------- class list
+function list(Mesh)
+    
+fprintf('+------------+------------+ \n');    
+fprintf('| Class-name | Mesh()     | \n');
+fprintf('+------------+------------+ \n');
+fprintf('| Public:    | get()      | \n');
+fprintf('|            | set()      | \n');
+fprintf('|            | show()     | \n');
+fprintf('|            | generate() | \n');
+fprintf('+------------+------------+ \n');
+    
+end
 
 %----------------------------------------------------------------- show SDF
 function showSDF(Mesh,varargin)
@@ -801,6 +826,28 @@ end
 fprintf(' %i  \t| %1.3e | %1.3e |\n',...
     Mesh.Iteration,Mesh.Convergence(end),max(Mesh.Velocity));   
 end
+end
+
+end
+
+%-------------------------------------------------------------- movie maker
+function MovieMaker(Mesh,Name,Request)
+if nargin < 2, Request = ''; end
+
+if Mesh.Movie
+    switch(Request)
+        case('Start')
+            filename = string([Name,'_', char(datetime(now,...
+                              'ConvertFrom','datenum')),'.gif']);
+            
+            filename = erase(filename,[":"," "]);
+            background(gitpage); drawnow;
+            gif(char(filename),'frame',gcf,'nodither','Timestep',1/12);
+        otherwise
+            background(gitpage);
+            drawnow;
+            gif;
+    end
 end
 
 end

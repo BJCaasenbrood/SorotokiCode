@@ -3,6 +3,6 @@ clr;
 sdf = @(x) dRectangle(x,0,1,0,1);
 
 %% generate mesh
-msh = Mesh(sdf,'BdBox',[0,1,0,1],'NElem',150,'ShowMeshing',true);
+msh = Mesh(sdf,'BdBox',[-1,1,-1,1],'NElem',1500,'Movie',true);
 msh = msh.generate();
 

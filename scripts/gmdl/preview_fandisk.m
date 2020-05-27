@@ -1,7 +1,6 @@
 clr;
 %% model
-obj = Gmodel('Fandisk.stl');
-obj = obj.set('Shading','Face');
+obj = Gmodel('Fandisk.stl','Shading','Face');
 
 %% set texture
 obj.Texture = studioclay;

@@ -13,8 +13,10 @@ classdef Gmodel < handle
     properties (Access = private)
         Name;
         Node0;
+        Element0;
         SDF;
         BdBox;
+        Center;
         
         Figure;
         FigHandle;
@@ -45,6 +47,8 @@ classdef Gmodel < handle
                 
         AO;
         SSS;
+        
+        Slice;
         
         CameraPos;
         RMatrix;
@@ -178,8 +182,8 @@ end
 function vargout = update(Gmodel,varargin)
     
     
-    if nargout < 1
-    Gmodel = updateNode(Gmodel);
+    if nargout < 1 && isempty(Gmodel.Slice)
+        Gmodel = updateNode(Gmodel);
     end
     
     Gmodel = BakeCubemap(Gmodel,Gmodel.Texture);
@@ -204,8 +208,9 @@ function vargout = update(Gmodel,varargin)
 end
 
 %--------------------------------------------------------------------- show
-function Gmodel = resetNode(Gmodel)
+function Gmodel = reset(Gmodel)
     Gmodel.Node = Gmodel.Node0;
+    Gmodel.Element = Gmodel.Element0;
 end
 
 %--------------------------------------------------------------------- show
@@ -218,6 +223,11 @@ function Gmodel = updateNode(Gmodel,varargin)
         Gmodel.Element);
 
     set(Gmodel.FigHandle,'Vertices',Gmodel.Node);
+end
+
+%--------------------------------------------------------------------- show
+function Gmodel = updateElements(Gmodel,varargin)
+    set(Gmodel.FigHandle,'Faces',Gmodel.Element);
 end
 
 %--------------------------------------------------------------------- show
@@ -330,6 +340,72 @@ end
 
 end
 
+%---------------------------------------------------------------- slice
+function slice(Gmodel,dim,s)
+    
+if ~isempty(Gmodel.Slice), delete(Gmodel.Slice); end
+
+v = Gmodel.Node;
+I = Gmodel.Center(:,3) > s;
+J = -(v(:,3) - s) < 0.01*(Gmodel.BdBox(6) - Gmodel.BdBox(5));
+
+N = 150;
+
+lambda = 0.1*(Gmodel.BdBox(6) - Gmodel.BdBox(5));
+v = Gmodel.Node(J,:);
+B = boxhull(v(:,1:2),lambda);
+x = linspace(B(1),B(2),N);
+y = linspace(B(3),B(4),N);
+
+[X,Y] = meshgrid(x,y);
+
+fv = struct; 
+fv.faces = Gmodel.Element; 
+fv.vertices = Gmodel.Node;
+INC = double(inpolyhedron(fv,[X(:),Y(:),X(:)*0 + s]));
+fprintf('\n');
+
+A = GaussianFilter(reshape(INC,[N,N]),1);
+A(A < 0.5) = nan;
+
+%img = image(A);
+%set(img,'AlphaData', ~isnan(A));
+
+hold on;
+colormap(bluesea(4));
+
+Gmodel.Slice = surf(X,Y,zeros(N,N) + s,'cData',A,'linestyle','-',...
+    'AlphaData',~isnan(A),'facecolor','interp','Edgecolor','interp');
+
+% k = 1; j = 1;
+% while k < size(M,2)
+%     Nver = M(2,k);
+%     Ver{j} = [M(1:2,(k+1):(Nver+k));repmat(s,[1,Nver])];
+%     k = k + Nver + 1;
+%     j = j+1;
+% end
+% 
+% hold on;
+% for ii = 1:length(Ver)
+%    p = Ver{ii}';
+%    plot3(p(:,1),p(:,2),p(:,3),'.-');
+% end
+
+% v(:,3) = v(:,3) + 0.005*(Gmodel.BdBox(6) - Gmodel.BdBox(5));
+% 
+% Gmodel.Slice = patch('Faces',k(:)','Vertices',v,'Linewidth',1.5,'Edgecolor',...
+%     col(1),'FaceColor',col(1)*1.25);
+
+Gmodel.Node(J,3) = s;
+updateNode(Gmodel);
+Gmodel.Element(I,:) = nan;
+
+updateElements(Gmodel);
+Gmodel.Element = Gmodel.Element0;
+Gmodel.Node = Gmodel.Node0;
+
+end
+
 end
 
 methods (Access = private)
@@ -374,10 +450,11 @@ function Gmodel = GenerateObject(Gmodel,varargin)
     Gmodel.Node = v;
     Gmodel.Node0 = v;
     Gmodel.Element = f;
+    Gmodel.Element0 = f;
     Gmodel.VNormal = -vn;
     Gmodel.Normal = fn;  
     Gmodel.RMatrix = eye(4);
-    Gmodel.BdBox = BoundingBox(Gmodel.Node); 
+    Gmodel.BdBox = boxhull(Gmodel.Node); 
     Gmodel.TextureStretch = 1.0;
     
     fprintf(['* Vertices  = ', num2str(length(v)/1e3,4), 'k \n']); 
@@ -386,8 +463,13 @@ function Gmodel = GenerateObject(Gmodel,varargin)
     
     fcell = num2cell(Gmodel.Element,2);
     [~,Gmodel.V2F,Gmodel.F2V] = ElementAdjecency(fcell);
-    
+  
     Gmodel.TextureMap = Normal2RGB(Gmodel.Normal);
+    
+    f = num2cell(Gmodel.Element,2);
+    VCell = cellfun(@(E) Gmodel.Node(E,:),f,'UniformOutput',false);
+    c = cellfun(@(V) mean(V,1),VCell,'UniformOutput',false);
+    Gmodel.Center = vertcat(c{:});
 end
 
 %------------------------------------------------------------ bake cubemaps

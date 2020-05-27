@@ -13,8 +13,9 @@ end
 
 function showDemo
 clr;
-set = {'bunny preview demo',...
-       'dragon preview demo',...
+set = {'Meshing a 2D-circle',...
+       'Rendering stanford bunny',...
+       'Rendering dragon model',...
        'advanced FV-mesh preview demo',...
        'implicit meshing demo',...
        'linear fem demo',...
@@ -24,13 +25,14 @@ set = {'bunny preview demo',...
 request = action(set);
 
 switch(request)
-    case(1); preview_bunny;
-    case(2); preview_dragon;
-    case(3); preview_demo;
-    case(4); mesh_demo;
-    case(5); fem_demo;
-    case(6); nlfem_demo;
-    case(7); design_demo;
+    case(1); mesh_circle;
+    case(2); preview_bunny;
+    case(3); preview_dragon;
+    case(4); preview_demo;
+    case(5); mesh_demo;
+    case(6); fem_demo;
+    case(7); nlfem_demo;
+    case(8); design_demo;
     otherwise; warning('please select demo from the list above.');
 end
 

@@ -1,8 +1,9 @@
 clr;
 %% set signed distance function
-R = 1;  % radius
-sdf = @(x) sqrt(x(:,1).^2 + x(:,2).^2) - R^2;
+sdf = @(x) dCircle(x,0,0,1);
 
 %% generate mesh
-msh = Mesh(sdf,'BdBox',[-R,R,-R,R]);
-msh.showSDF();
+msh = Mesh(sdf,'BdBox',[-1,1,-1,1],'NElem',150,...
+           'Movie',true);
+       
+msh.generate();

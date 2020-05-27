@@ -2,17 +2,17 @@ function output = action(list)
 
 CommandSymbol = '*';
 
-CallDisplay('please, make a selection:');
+fprintf('* Please, make a selection: \n');
 
 for i = 1:length(list)
-   cprintf('Strings',['\t','  ','[',num2str(i),'] ',list{i}]);
+   cprintf('Green',['\t','  ','[',num2str(i),'] ',list{i}]);
    fprintf('\n'); 
 end
 
 fprintf(CommandSymbol);
-fprintf('*    '); 
+fprintf('  '); 
 
-cprintf('Text','input: ');
+cprintf('Text','>> ');
 output = input('');
 end
 
