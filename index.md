@@ -28,9 +28,6 @@ mdl = Model();   % dynamical model class
 * [**Graphics and Rendering**](./bin/Gmodel.md).
 * [**Dynamical Modeling**](./bin/Model.md).
 
-# Citation
-
-
 # Bibliography
 If you are planning on using Sorotoki in your academic work, please consider to cite the toolkit:
 ```
