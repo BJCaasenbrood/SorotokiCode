@@ -372,29 +372,11 @@ A(A < 0.5) = nan;
 %set(img,'AlphaData', ~isnan(A));
 
 hold on;
-colormap(bluesea(4));
+colormap(autumn(6));
 
 Gmodel.Slice = surf(X,Y,zeros(N,N) + s,'cData',A,'linestyle','-',...
     'AlphaData',~isnan(A),'facecolor','interp','Edgecolor','interp');
-
-% k = 1; j = 1;
-% while k < size(M,2)
-%     Nver = M(2,k);
-%     Ver{j} = [M(1:2,(k+1):(Nver+k));repmat(s,[1,Nver])];
-%     k = k + Nver + 1;
-%     j = j+1;
-% end
-% 
-% hold on;
-% for ii = 1:length(Ver)
-%    p = Ver{ii}';
-%    plot3(p(:,1),p(:,2),p(:,3),'.-');
-% end
-
-% v(:,3) = v(:,3) + 0.005*(Gmodel.BdBox(6) - Gmodel.BdBox(5));
-% 
-% Gmodel.Slice = patch('Faces',k(:)','Vertices',v,'Linewidth',1.5,'Edgecolor',...
-%     col(1),'FaceColor',col(1)*1.25);
+caxis([-15 10]);
 
 Gmodel.Node(J,3) = s;
 updateNode(Gmodel);

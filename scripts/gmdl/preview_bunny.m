@@ -13,7 +13,7 @@ obj.bake().render();
 obj.ground;
 background(gitpage);
 
-gif('bunny_cut.gif');
+gif('bunny_cut.gif','frame',gcf,'nodither');
 N = 80;
 dx = 80/N;
 x = 80;
