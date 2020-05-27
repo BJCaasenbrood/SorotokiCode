@@ -21,7 +21,7 @@ obj = Gmodel();  % graphics model class
 mdl = Model();   % dynamical model class
 ```
 
-To get started with some demos, type the following in the command window:
+To get started, type the following line in the command window:
 ```matlab
 % installation command
 sorotoki('demo');
