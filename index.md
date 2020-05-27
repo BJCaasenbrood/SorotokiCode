@@ -21,6 +21,12 @@ obj = Gmodel();  % graphics model class
 mdl = Model();   % dynamical model class
 ```
 
+To get started with some demos, type the following in the command window:
+```matlab
+% installation command
+sorotoki('demo');
+```
+
 # Documentation and libary usage
 * [**Mesh generation**](./bin/Mesh.md). 
 * [**Finite Element Method**](./bin/Fem.md).
