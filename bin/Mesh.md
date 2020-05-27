@@ -28,6 +28,7 @@ d = dRectangle(P,x1,x2,y1,y2);
 
 % three-dimensional
 d = dCube(P,x1,x2,y1,y2,z1,z2);
+d = dSphere(P,xc,yc,zc,r);
 d = dCuboid(P,a,b,c);
 
 ```
