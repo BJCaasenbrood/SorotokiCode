@@ -1,5 +1,4 @@
 function d = dMetaline(P,v1,v2,R,w)
-% v1 = [x1,y2,z1] // v2 = [x2,y2,z2]
 d = zeros(length(P),1);
 
 if length(R) == 1, R = d + R; end

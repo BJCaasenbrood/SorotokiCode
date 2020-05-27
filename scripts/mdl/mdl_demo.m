@@ -1,20 +1,21 @@
 clr;
 %% assign free DOF
-mdl = Model([0,1,1,1,0,0],'NModal',3);
+mdl = Model([0,1,1,1,0,0],'NModal',1);
 
 mdl = mdl.set('tspan',10,...
               'Grav',9.81,...
               'Jacobian',true,...
-              'MovieAxis',[-1 1 -1 1 -2.5 1]*0.5);
+              'MovieAxis',[-1 1 -1 1 0 1.5]*0.85);
 
 %% generate dynamic model
 mdl = mdl.generate();
 
 %% assign controllers
 mdl.gain = [3e-4,2e-5];
-mdl.point = [0,0,0,.7,0.4,0.4];
-mdl.Pressure = @(t) 0*[0;0;-1;1;1;0];
+mdl.point = [];%[0,0,0,.7,0.4,0.4];
+mdl.Pressure = @(t) [2;0;0];
 mdl.q0 = zeros(mdl.NDof*mdl.NModal);
+
 %% simulate soft robot
 mdl = mdl.csolve(); 
 

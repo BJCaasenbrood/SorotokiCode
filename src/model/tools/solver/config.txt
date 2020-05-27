@@ -1,5 +1,5 @@
 [options]
-ENERGY_CONTROLLER = 1
+ENERGY_CONTROLLER = 0
 WRITE_OUTPUT      = 1
 
 [cosserat]
@@ -11,9 +11,9 @@ K2 = 1
 K3 = 1
 
 [model]
-NMODE   = 3
+NMODE   = 1
 SDOMAIN = 1
-TDOMAIN = 20
+TDOMAIN = 6
 
 [solver]
 SPACESTEP = 10
@@ -27,9 +27,9 @@ SPEEDUP   = 1.0
 
 [physics]
 RHO      = 0.02
-EMOD     = 4e2
+EMOD     = 2e3
 NU       = 0.4
-MU       = 1.5
+MU       = 0.2
 PRS_AREA = 1e-5
 GRAVITY  = 9.81
 RADIUS   = 0.01

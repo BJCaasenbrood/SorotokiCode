@@ -131,8 +131,9 @@ function Gmodel = fix(Gmodel)
 end
 
 %-------------------------------------------------------------- plot ground
-function Gmodel = ground(Gmodel)
-    Groundplane(Gmodel);
+function Gmodel = ground(Gmodel,gnd)
+    if nargin < 2, Groundplane(Gmodel);
+    else, Groundplane(Gmodel,gnd); end
 end
 
 %-------------------------------------------------------------- plot ground
@@ -588,14 +589,19 @@ end
 end
 
 %----------------------------------------------------- generate groundplane
-function Groundplane(Gmodel)
-tmp = Gmodel.BdBox; a = 0.1;
-tmp(1) = Gmodel.BdBox(1)-a*( Gmodel.BdBox(2) - Gmodel.BdBox(1)); 
-tmp(2) = Gmodel.BdBox(2)+a*( Gmodel.BdBox(2) - Gmodel.BdBox(1)); 
-tmp(3) = Gmodel.BdBox(3)-a*( Gmodel.BdBox(4) - Gmodel.BdBox(3)); 
-tmp(4) = Gmodel.BdBox(4)+a*( Gmodel.BdBox(4) - Gmodel.BdBox(3)); 
-tmp(5) = Gmodel.BdBox(5)-0*( Gmodel.BdBox(6) - Gmodel.BdBox(5)); 
-tmp(6) = Gmodel.BdBox(6)+a*( Gmodel.BdBox(6) - Gmodel.BdBox(5)); 
+function Groundplane(Gmodel,gnd)
+if nargin < 2
+    tmp = Gmodel.BdBox; a = 0.1;
+    tmp(1) = Gmodel.BdBox(1)-a*( Gmodel.BdBox(2) - Gmodel.BdBox(1)); 
+    tmp(2) = Gmodel.BdBox(2)+a*( Gmodel.BdBox(2) - Gmodel.BdBox(1)); 
+    tmp(3) = Gmodel.BdBox(3)-a*( Gmodel.BdBox(4) - Gmodel.BdBox(3)); 
+    tmp(4) = Gmodel.BdBox(4)+a*( Gmodel.BdBox(4) - Gmodel.BdBox(3)); 
+    tmp(5) = Gmodel.BdBox(5)-0*( Gmodel.BdBox(6) - Gmodel.BdBox(5)); 
+    tmp(6) = Gmodel.BdBox(6)+a*( Gmodel.BdBox(6) - Gmodel.BdBox(5)); 
+else
+    tmp = gnd;
+end
+
 B = tmp;
 
 Nx = 4;

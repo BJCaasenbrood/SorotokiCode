@@ -277,10 +277,10 @@ for ii = i0:FPS:length(Model.t)
     SweepSE3 = yf(:,1:7);
     
     msh = Blender(msh,'Rotate',{'z',-30});
-    %mshgr = Blender(mshgr,'Rotate',{'z',-30});
+    mshgr = Blender(mshgr,'Rotate',{'z',30});
     msh = Blender(msh,'Sweep', {LinkID,SweepSE3});
     %msh = Blender(msh,'Scale',{'z',-1});
-    %mshgr = Blender(mshgr,'SE3',yf(end,1:7));
+    mshgr = Blender(mshgr,'SE3',yf(end,1:7));
     %mshgr = Blender(mshgr,'Scale',{'z',-1});
 
     if ii == 1      
@@ -311,10 +311,10 @@ for ii = i0:FPS:length(Model.t)
 %     plotvector([0;0;0]+r(:),R.'*[0;0.2;0],'Color',col(2),'linewidth',2,'MaxHeadSize',0.75);
 %     plotvector([0;0;0]+r(:),R.'*[0;0;0.2],'Color',col(3),'linewidth',2,'MaxHeadSize',0.75);
     
-   % mshgr.updateNode();
+    mshgr.updateNode();
     msh.updateNode();
     msh.update();
-    %mshgr.update();
+    mshgr.update();
     
     title(['T = ',num2str(Model.t(ii),3)]);
         

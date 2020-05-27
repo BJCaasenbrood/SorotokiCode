@@ -25,15 +25,15 @@ set = {'Meshing a 2D-circle',...
 request = action(set);
 
 switch(request)
-    case(1); mesh_circle;
-    case(2); preview_bunny;
-    case(3); preview_dragon;
-    case(4); preview_demo;
+    case(1); open mesh_circle; mesh_circle;
+    case(2); open preview_bunny; preview_bunny;
+    case(3); open preview_dragon; preview_dragon;
+    case(4); open preview_; preview_demo;
     case(5); mesh_demo;
     case(6); fem_demo;
     case(7); nlfem_demo;
     case(8); design_demo;
-    otherwise; warning('please select demo from the list above.');
+    otherwise; warning('Please select a demo from the list above.');
 end
 
 end

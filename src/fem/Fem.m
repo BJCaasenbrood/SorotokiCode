@@ -51,6 +51,7 @@ classdef Fem < handle
         TimeStepMin = 1e-3;
         EndIncrement;
         LoadingFactor;
+        SigmoidFactor;
         
         ResidualNorm = 1e-3;
         StressNorm = 1e-9;
@@ -145,6 +146,7 @@ function obj = Fem(Mesh,varargin)
     obj.Density  = ones(obj.NElem,1);
     obj.Residual = zeros(obj.Dim*obj.NNode,1);
     obj.Utmp     = zeros(obj.Dim*obj.NNode,1);
+    obj.SigmoidFactor  = 0;
        
     for ii = 1:2:length(varargin)
         obj.(varargin{ii}) = varargin{ii+1};
@@ -424,7 +426,7 @@ while true
     Fem.Divergence = 0;
         
     % load increment
-    Fem.LoadingFactor = sigmoid(Fem.Time/Fem.TimeEnd,0);
+    Fem.LoadingFactor = sigmoid(Fem.Time/Fem.TimeEnd,Fem.SigmoidFactor);
     
     % reset iteration
     Fem.Iteration = 1;

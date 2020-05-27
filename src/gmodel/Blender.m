@@ -129,8 +129,14 @@ end
 
 %--------------------------------------------------------------- SCALE MESH
 function mesh = ScaleMesh(mesh,Arg)
-Ax = Arg{1};
-Scale  = Arg{2};
+if isa(Arg,'cell')
+    Ax = Arg{1};
+    Scale  = Arg{2};
+else
+   Ax = 'uniform';
+   Scale = Arg;
+end
+    
 Node0 = mesh.Node;
 Node = Node0;
 
@@ -143,13 +149,8 @@ elseif strcmp(Ax,'y')
 elseif strcmp(Ax,'z')
     Node(:,3) = Scale*Node0(:,3);
     Node(:,3) = Node(:,3);% - min(Node0(:,3));
-%     if Scale < 1
-%         B = mesh.get('BdBox');
-%         mesh.set('BdBox',[B(1),B(2),B(3),B(4),-Scale*B(6),B(5)]);
-%     else
-%         B = mesh.get('BdBox');
-%         mesh.set('BdBox',[B(1),B(2),B(3),B(4),B(5),Scale*B(5)]);
-%     end
+elseif strcmp(Ax,'uniform')
+    Node = Scale*Node;
 else 
 end
 

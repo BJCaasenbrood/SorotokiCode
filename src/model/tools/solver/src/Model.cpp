@@ -517,7 +517,7 @@ void Model::dynamicODE(float t, Vxf x, Vxf &dx){
 		u.noalias() = Prj*J.transpose()*(f);
 	}
 
-	//Qu.noalias() += (J1.transpose()*H)*tau.block(0,0,3,1);
+	Qu.noalias() += (J2.transpose()*H)*tau.block(0,0,3,1);
 	//Qu.noalias() += ((J2 - J1).transpose()*H)*tau.block(3,0,3,1);
 
 	#ifdef FULL_CONTROLLER
