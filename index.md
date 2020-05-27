@@ -36,7 +36,7 @@ sorotoki('demo');
 
 
 ## Citation
-If you are planning on using Sorotoki in your academic work, please consider to cite the toolkit:
+If you are using Sorotoki in your academic work, please consider to cite the toolkit:
 ```
 @misc{Caasenbrood2018,
   author = {Caasenbrood, Brandon},
