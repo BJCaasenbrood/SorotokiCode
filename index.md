@@ -29,7 +29,7 @@ mdl = Model();   % dynamical model class
 * [**Dynamical Modeling**](./bin/Model.md).
 
 
-# Citation
+## Citation
 If you are planning on using Sorotoki in your academic work, please consider to cite the toolkit:
 ```
 @misc{Caasenbrood2018,
@@ -42,7 +42,7 @@ If you are planning on using Sorotoki in your academic work, please consider to 
   }
 ```
 
-# Bibliography
+## Bibliography
 [1] B. Caasenbrood, A. Pogromsky, and H. Nijmeijer, *A Computational Design Framework for Pressure-driven Soft Robots through Nonlinear Topology Optimization*, RoboSoft 2019 - 2019 IEEE International Conference on Soft Robotics, 2020.
 
 [2] B. Caasenbrood, A. Pogromsky, and H. Nijmeijer, *Dynamic modeling of hyper-elastic soft robots using spatial curves,* IFAC World Congress, 2020.
