@@ -28,10 +28,8 @@ mdl = Model();   % dynamical model class
 * [**Graphics and Rendering**](./bin/Gmodel.md).
 * [**Dynamical Modeling**](./bin/Model.md).
 
-# Citation
 
-
-# Bibliography
+## Citation
 If you are planning on using Sorotoki in your academic work, please consider to cite the toolkit:
 ```
 @misc{Caasenbrood2018,
@@ -44,14 +42,15 @@ If you are planning on using Sorotoki in your academic work, please consider to 
   }
 ```
 
+## Bibliography
 [1] B. Caasenbrood, A. Pogromsky, and H. Nijmeijer, *A Computational Design Framework for Pressure-driven Soft Robots through Nonlinear Topology Optimization*, RoboSoft 2019 - 2019 IEEE International Conference on Soft Robotics, 2020.
 
 [2] B. Caasenbrood, A. Pogromsky, and H. Nijmeijer, *Dynamic modeling of hyper-elastic soft robots using spatial curves,* IFAC World Congress, 2020.
 
-[3] C. Talischi, G. H. Paulino, A. Pereira, and I. F. M. Menezes, “PolyMesher: A general-purpose mesh generator for polygonal elements written in Matlab,” Struct. Multidiscip. Optim., vol. 45, no. 3, pp. 309–328, 2012.
+[3] C. Talischi, G. H. Paulino, A. Pereira, and I. F. M. Menezes, *PolyMesher: A general-purpose mesh generator for polygonal elements written in Matlab*, Struct. Multidiscip. Optim., vol. 45, no. 3, pp. 309–328, 2012.
 
-[3] N. Kim, *Introduction Analysis Finite Element to Nonlinear*. 2018.
+[4] N. Kim, *Introduction Analysis Finite Element to Nonlinear*. 2018.
 
-[4] M. Bendsoe and O. Sigmund, *Topology Optimization. Theory, Methods and Applications*. 2003.
+[5] M. Bendsoe and O. Sigmund, *Topology Optimization. Theory, Methods and Applications*. 2003.
 
 
