@@ -11,7 +11,7 @@ sorotoki();
 ```
 
 # Getting started
-**Sorotoki** consists of a library of objected-oriented functions for modeling and developing soft robots. The classes integrate perfectly with each other and, to some extent, bridges between diffirent scientific disciplines. For instance, *Mesh()* and *Fem()* provide numerical tools to deals with the continuum mechanical behavior of soft materials, whose extrapolted material models can be integrated seamlessly into the state-space description with the class *Model()*. The four core Classes of Sorotoki are shown below:
+The Matlab toolkit consists of a library of objected-oriented functions for modeling and developing soft robots. Each object-oriented function integrate seamlessly with one another and, to some extent, bridges the gaps between different scientific disciplines. For instance, *Mesh()* and *Fem()* provide numerical tools to deals with the continuum mechanical behavior of soft materials, whose extrapolated material models can be integrated into the dynamic model description with the class *Model()*. The main Classes of Sorotoki are shown below:
 
 ```matlab
 % list of classes
