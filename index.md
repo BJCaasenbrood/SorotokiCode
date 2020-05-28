@@ -21,6 +21,12 @@ obj = Gmodel();  % graphics model class
 mdl = Model();   % dynamical model class
 ```
 
+To get started, type the following line in the command window:
+```matlab
+% installation command
+sorotoki('demo');
+```
+
 # Documentation and libary usage
 * [**Mesh generation**](./bin/Mesh.md). 
 * [**Finite Element Method**](./bin/Fem.md).
@@ -30,7 +36,7 @@ mdl = Model();   % dynamical model class
 
 
 ## Citation
-If you are planning on using Sorotoki in your academic work, please consider to cite the toolkit:
+If you are using Sorotoki in your academic work, please consider to cite the toolkit:
 ```
 @misc{Caasenbrood2018,
   author = {Caasenbrood, Brandon},
