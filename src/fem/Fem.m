@@ -553,7 +553,7 @@ Fem.SolverPlot     = false;
 Fem.IterationMMA   = 0;
 Fem.SolverStartMMA = true;
 flag               = true;
-Visual             =  'ISO';
+Visual             = 'E';
 
 % draw initial visual
 Fem.show(Visual); drawnow;

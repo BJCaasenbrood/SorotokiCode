@@ -61,7 +61,7 @@ function obj = Model(Table,varargin)
     obj.Grav = 9.81;
     obj.Movie = false;
     obj.MovieStart = false;
-    obj.MovieAxis = 1.5*[-.5 .5 -.5 .5 -1 0.5];
+    obj.MovieAxis = [];
     obj.Density = 0.01;
     
     obj.Radius = 1e-2;
@@ -134,11 +134,6 @@ fileID = fopen(out,'w');
 fprintf(fileID,'%d\n',Model.q0);
 fclose(fileID);
 %//////////////////////////////////
-out = fullfile(dir_path,'gain.log');
-fileID = fopen(out,'w');
-fprintf(fileID,'%d\n',Model.gain);
-fclose(fileID);
-%//////////////////////////////////
 out = fullfile(dir_path,'point.log');
 fileID = fopen(out,'w');
 fprintf(fileID,'%d\n',Model.point);
@@ -208,7 +203,8 @@ end
 %------------------------------------------------------------ show 3D model
 function showModel(Model)
     
-figure(101); hold all; %cla;
+figure(101); 
+hold all; 
 N = Model.Nq;
 Model.Length = Model.Length0;
 X = linspace(0,1,200);
@@ -227,12 +223,15 @@ mshgr.Texture = Model.Texture;
 
 msh = msh.bake();
 mshgr = mshgr.bake();
-msh = msh.render();
+msh   = msh.render();
 mshgr = mshgr.render();
 axis equal; 
 
 LinkID = knnsearch(X(:),msh.Node(:,3));
-if ~isempty(Model.MovieAxis), axis(Model.MovieAxis); end
+if isempty(Model.MovieAxis), 
+    Model.MovieAxis = boxhull(msh.Node); 
+end
+axis(Model.MovieAxis);
 drawnow;
 %axis([-.5 .5 -.5 .5 -1 .5])
 view(30,15);
@@ -262,17 +261,20 @@ for ii = i0:FPS:length(Model.t)
     msh.reset();
     mshgr.reset();
 
-    Model.q(:,1) = Model.g(ii,1:N).';
-    Model.dq(:,1) = 0*Model.q(:,1);
+    Model.q(:,1)   = Model.g(ii,1:N).';
+    Model.dq(:,1)  = 0*Model.q(:,1);
     Model.ddq(:,1) = 0*Model.q(:,1);
+    
     ee = Model.Ba*Model.Phi(Model.Length)*Model.q;
+    
     Model.Length = ee(4);
+    
     g0 = [1,0,0,0,0,0,0];
     eta0 = [0,0,0,0,0,0];
     deta0 = [0,0,0,0,0,0];
     
-    [~,yf] = ode45(@(t,x) ForwardODE(Model,t,x,Model.q(:,1),Model.q(:,1)*0,...
-        Model.q(:,1)*0),X,[g0 eta0 deta0]);
+    [~,yf] = ode23t(@(t,x) ForwardODE(Model,t,x,Model.q(:,1),...
+        Model.q(:,1)*0, Model.q(:,1)*0),X,[g0 eta0 deta0]);
 
     SweepSE3 = yf(:,1:7);
     
@@ -298,8 +300,9 @@ for ii = i0:FPS:length(Model.t)
 %         h0 = plotvector(p,[0.2;0;0],'Color',col(4),'linewidth',2,'MaxHeadSize',0.75);
 %         h1 = plotvector(p,[0;0.2;0],'Color',col(4),'linewidth',2,'MaxHeadSize',0.75);
 %         h2 = plotvector(p,[0;0;0.2],'Color',col(4),'linewidth',2,'MaxHeadSize',0.75);
-         h = plot3(SweepSE3(:,7),SweepSE3(:,6),SweepSE3(:,5),'linewidth',1.5,...
+        h = plot3(SweepSE3(:,7),SweepSE3(:,6),SweepSE3(:,5),'linewidth',1.5,...
         'Color',col(1));
+    
         hm = plot3(SweepSE3(end,7),SweepSE3(end,6),SweepSE3(end,5),'.',...
            'markersize',10,'Color',col(1));
     end
