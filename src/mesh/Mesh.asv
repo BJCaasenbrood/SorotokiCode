@@ -100,8 +100,8 @@ end
 %---------------------------------------------------------------------- get     
 function varargout = get(Mesh,varargin)
 % gets any variable(s) in Class hierarchy.
-% example usage: 
-%  
+% example: 
+%   [n,m] = msh.get('NNode','NElem')
 %   [n,m] = msh.get('NNode','NElem')
 
     if nargin > 1
@@ -116,10 +116,6 @@ end
         
 %---------------------------------------------------------------------- set
 function Mesh = set(Mesh,varargin)
-% sets any variable(s) in Class hierarchy.
-% example usage: 
-%  
-%   msh = msh.set('NNode',20,'NElem',42)
     for ii = 1:2:length(varargin)
         if strcmp(varargin{ii},'Quads')
             N = num2cell(varargin{ii+1});

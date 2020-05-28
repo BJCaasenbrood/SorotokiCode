@@ -12,8 +12,6 @@ b_ = ceil((a - b)/c2);
 c = mod(b,c3);
 c_ = ceil((b - c)/c3);
 
-
 ver = [num2str(a_),'.0',num2str(b_),'.0',num2str(c_)];
-
 end
 
