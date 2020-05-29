@@ -596,7 +596,7 @@ if nargin < 2
     tmp(2) = Gmodel.BdBox(2)+a*( Gmodel.BdBox(2) - Gmodel.BdBox(1)); 
     tmp(3) = Gmodel.BdBox(3)-a*( Gmodel.BdBox(4) - Gmodel.BdBox(3)); 
     tmp(4) = Gmodel.BdBox(4)+a*( Gmodel.BdBox(4) - Gmodel.BdBox(3)); 
-    tmp(5) = Gmodel.BdBox(5)-0*( Gmodel.BdBox(6) - Gmodel.BdBox(5)); 
+    tmp(5) = Gmodel.BdBox(5)-0*( Gmodel.BdBox(6) - Gmodel.BdBox(5))-1e-3; 
     tmp(6) = Gmodel.BdBox(6)+a*( Gmodel.BdBox(6) - Gmodel.BdBox(5)); 
 else
     tmp = gnd;

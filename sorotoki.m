@@ -53,11 +53,11 @@ DisplayLogo;
 fprintf(['* Thank you for installing SOROTOKI, we will',...
     ' start the installation/update shortly \n']); pause(1.0);
 
-if exist('BuildVersion.m','file')
-     % File exists.
-else
-     % File does not exist.
-end
+% if exist('BuildVersion.m','file')
+%      % File exists.
+% else
+%      % File does not exist.
+% end
 
 fprintf('* Starting installation - SOROTOKI');
 verFolder = 'config';
