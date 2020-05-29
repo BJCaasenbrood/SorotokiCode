@@ -3,7 +3,7 @@
 # Dynamic modeling 
 [**Sorotoki**](https://bjcaasenbrood.github.io/SorotokiCode/) **Still under developement!** We have some interesting simulations though.
 
-## Two-link Soft robot manipulator dynamics
+## Soft robot manipulator dynamic simulation
 <div align="center"> <img src="./src/SoftArm.gif" width="500"> </div>
 
 ## Pneu-net spatial tracking (model-based controller)
