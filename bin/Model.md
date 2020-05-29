@@ -4,7 +4,7 @@
 [**Sorotoki**](https://bjcaasenbrood.github.io/SorotokiCode/) **Still under developement!** We have some interesting simulations though.
 
 ## Two-link Soft robot manipulator dynamics
-<div align="center"> <img src="./src/Pneunet_tracking.gif" width="500"> </div>
+<div align="center"> <img src="./src/SoftArm.gif" width="500"> </div>
 
 ## Pneu-net spatial tracking (model-based controller)
 <div align="center"> <img src="./src/Pneunet_tracking.gif" width="500"> </div>
