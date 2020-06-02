@@ -49,7 +49,7 @@ If you are using Sorotoki in your academic work, please consider to cite the too
 ```
 
 ## Bibliography
-[1] B. Caasenbrood, A. Pogromsky, and H. Nijmeijer, *A Computational Design Framework for Pressure-driven Soft Robots through Nonlinear Topology Optimization*, RoboSoft 2019 - 2019 IEEE International Conference on Soft Robotics, 2020.
+[1] B. Caasenbrood, A. Pogromsky, and H. Nijmeijer, *A Computational Design Framework for Pressure-driven Soft Robots through Nonlinear Topology Optimization*, RoboSoft 2020 - IEEE International Conference on Soft Robotics, 2020.
 
 [2] B. Caasenbrood, A. Pogromsky, and H. Nijmeijer, *Dynamic modeling of hyper-elastic soft robots using spatial curves,* IFAC World Congress, 2020.
 
