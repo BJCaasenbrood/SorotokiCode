@@ -14,7 +14,7 @@ figure(101);
 subplot(1,2,1); obj0.bake().render(); 
 subplot(1,2,2); obj1.bake().render(); 
 
-%% signed distance fucntion (3D)
+%% signed distance function (3D)
 function Dist = SDF(x)
        C1 = dCube(x,0,1,0,1,0,1);
        S1 = dSphere(x,0,0,1,.5);
