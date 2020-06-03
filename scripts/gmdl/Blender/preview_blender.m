@@ -8,7 +8,7 @@ obj.bake().render().update;
 obj.ground();
 
 %% transform
-Blender(obj,'Twist',{'z',30});
+Blender(obj,'Twist',{'z',25});
     subplot(2,3,3); obj.bake().render(); obj.ground();
 
 Blender(obj.reset(),'Scale',{'z',0.5}); 
