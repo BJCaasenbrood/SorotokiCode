@@ -22,11 +22,11 @@ function Dist = SDF(x)
        Dist = dIntersect(dDiff(C1,S1),S2);
 end
 ```
-<div align="center"> <img src="./src/gmodel_show.png" width="250"> </div>
+<div align="center"> <img src="./src/gmodel_show.png" width="450"> </div>
 
 ## Transformations
 
-<div align="center"> <img src="./src/blender_opt.png" width="250"> </div>
+<div align="center"> <img src="./src/blender_opt.png" width="450"> </div>
 
 
 ## Rendering
