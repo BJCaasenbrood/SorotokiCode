@@ -3,10 +3,16 @@
 # Graphics and Implicit Modeling
 [Go back to home page](https://bjcaasenbrood.github.io/SorotokiCode/)
 
-## Rendering
-Sorotoki is equipped with a wide range of material rendering options. 
+## Loading graphical models
+```matlab
+%% import stl
+obj = Gmodel('Bunny.stl');
+obj.bake().render(); 
+```
 
-### Material captures
+## Rendering
+
+### Materials
 ```matlab
 %% preview
 obj = Gmodel(@(x) dSphere(x,0,0,0,1),[-1,1,-1,1,-1,1]);
