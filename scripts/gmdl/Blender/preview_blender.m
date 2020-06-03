@@ -5,7 +5,8 @@ obj = Gmodel('Cube.stl');
 %% set texture
 figure(101);
 subplot(2,3,1);
-obj.bake().render().update;  obj.ground();
+obj.bake().render().update; 
+obj.ground();
 
 %% transform
 Blender(obj,'Twist',{'z',30});
