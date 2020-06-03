@@ -9,4 +9,5 @@ Blender(obj,'Rotate',{'y',-90});
 
 %% show
 obj.bake().render(); 
+obj.reset().bake().render(); 
 axis tight;
