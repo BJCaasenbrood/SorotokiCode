@@ -1,10 +1,7 @@
-clc; clear; close all;
-
+clr;
 %% model
-tic
 Dist = @(x) SDF(x);
 obj = Gmodel(Dist,domain(-0.1,1.1,3),'Quality',50);
-toc
 
 %% set texture
 obj.Texture = base;

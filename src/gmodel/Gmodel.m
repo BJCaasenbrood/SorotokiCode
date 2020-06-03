@@ -62,7 +62,7 @@ methods
 %---------------------------------------------------------------- Fem Class
 function obj = Gmodel(varargin) 
     
-    obj.Texture = studioclay;
+    obj.Texture = base;
     obj.TextureStretch = 1.0;
     obj.Quality = 80;
     obj.FlipNormals = false;
