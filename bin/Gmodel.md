@@ -22,7 +22,7 @@ function Dist = SDF(x)
        Dist = dIntersect(dDiff(C1,S1),S2);
 end
 ```
-<div align="center"> <img src="./src/gmodel_show.png" width="450"> </div>
+<div align="center"> <img src="./src/gmodel_show.png" width="550"> </div>
 
 ## Transformations
 ```matlab
