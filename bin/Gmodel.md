@@ -22,7 +22,7 @@ function Dist = SDF(x)
        Dist = dIntersect(dDiff(C1,S1),S2);
 end
 ```
-<div align="center"> <img src="./src/gmodel_show.png" width="550"> </div>
+<div align="center"> <img src="./src/gmodel_show.png" width="500"> </div>
 
 ## Transformations
 ```matlab
@@ -50,7 +50,7 @@ Blender(obj.reset(),'Translate',{'3D',0.5,0.5,0});
 Blender(obj.reset(),'Curve',{'PCC',30,0});
     subplot(2,3,6); obj.bake().render(); obj.ground();    
 ```
-<div align="center"> <img src="./src/blender_opt.png" width="450"> </div>
+<div align="center"> <img src="./src/blender_opt.png" width="500"> </div>
 
 
 ## Rendering
