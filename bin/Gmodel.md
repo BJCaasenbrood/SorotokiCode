@@ -22,12 +22,14 @@ function Dist = SDF(x)
        Dist = dIntersect(dDiff(C1,S1),S2);
 end
 ```
-<div align="center"> <img src="./src/bunny_show.png" width="250"> </div>
+<div align="center"> <img src="./src/gmodel_show.png" width="250"> </div>
+
+## Transformations
+
+<div align="center"> <img src="./src/blender_opt.png" width="250"> </div>
 
 
 ## Rendering
-
-### Materials
 ```matlab
 %% loading graphical model
 obj = Gmodel(@(x) dSphere(x,0,0,0,1),[-1,1,-1,1,-1,1]);
