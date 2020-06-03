@@ -5,7 +5,7 @@
 
 ## Graphical models from .stl or SDF's
 ```matlab
-%% generating graphical models
+%% loading graphical models
 obj0 = Gmodel('Bunny.stl');
 obj1 = Gmodel(@(x) SDF(x),domain(0,1,3),'Quality',50);
 
@@ -29,7 +29,7 @@ end
 
 ### Materials
 ```matlab
-%% preview
+%% loading graphical model
 obj = Gmodel(@(x) dSphere(x,0,0,0,1),[-1,1,-1,1,-1,1]);
 
 %% material list
@@ -54,7 +54,7 @@ end
 
 ### Ambient occlusion (AO)
 ```matlab
-%% preview
+%% loading graphical model
 obj = Gmodel('Bunny.stl');
 
 %% set texture settings
@@ -71,7 +71,7 @@ view(90,15); axis tight;
 
 ### Sub-Surface Scattering (SSS)
 ```matlab
-%% preview
+%% loading graphical model
 obj = Gmodel('Bunny.stl');
 
 %% set texture settings
