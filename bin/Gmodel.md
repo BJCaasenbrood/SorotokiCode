@@ -7,7 +7,7 @@
 ```matlab
 %% loading graphical models
 obj0 = Gmodel('Bunny.stl');
-obj1 = Gmodel(@(x) SDF(x),domain(0,1,3));
+obj1 = Gmodel(@(x) SDF(x),domain(-0.1,1.1,3));
 
 %% rendering models
 figure(101);
