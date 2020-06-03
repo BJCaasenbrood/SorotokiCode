@@ -3,7 +3,7 @@
 # Graphics and Implicit Modeling
 [Go back to home page](https://bjcaasenbrood.github.io/SorotokiCode/)
 
-## Graphical models from .stl or SDF's
+## Graphical models from .stl or SDF
 ```matlab
 %% loading graphical models
 obj0 = Gmodel('Bunny.stl');
