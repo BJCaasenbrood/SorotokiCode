@@ -46,6 +46,7 @@ addpath('src');
 addpath('src/__version__');
 addpath('src/__base__');
 
+skipUpdate = false;
 Path = getPath;
 DisplayLogo;
 
@@ -76,8 +77,15 @@ if exist([Path,'/config/vernum.m'], 'file')
     delete([Path,'/config/vernum.m']); 
 end
 
-if ~pingserver, error('No internet connection! '); end
+if ~pingserver
+    cout('err','No internet connection! '); 
+    str = action({'(y)es, continue without connection',...
+            '(n)o, stop installation'},'s');
+    if strcmp(str,'N'), return; end
+    skipUpdate = true;
+end
 
+if ~skipUpdate
 fprintf('* Getting version_file_check from Git repository config/vernum.m \n');
 url = ['https://raw.githubusercontent.com/BJCaasenbrood/',...
     'SorotokiCode/master/config/vernum.m'];
@@ -85,7 +93,7 @@ filename = [verFolder,'/vernum.m'];
 websave(filename,url);
 
 fprintf(['* Succesfully downloaded contents', filename, '\n']);
-
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 libs(1) = IncludeBase(Path,0);
 libs(2) = IncludeGraphicsModel(Path,0);

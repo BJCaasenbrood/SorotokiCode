@@ -62,7 +62,7 @@ methods
 %---------------------------------------------------------------- Fem Class
 function obj = Gmodel(varargin) 
     
-    obj.Texture = grey;
+    obj.Texture = studioclay;
     obj.TextureStretch = 1.0;
     obj.Quality = 80;
     obj.FlipNormals = false;
@@ -214,6 +214,10 @@ function Gmodel = reset(Gmodel)
     Gmodel.Element = Gmodel.Element0;
 end
 
+function Gmodel = center(Gmodel)
+    Gmodel.BdBox = boxhull(Gmodel.Node); 
+end
+
 %--------------------------------------------------------------------- show
 function Gmodel = updateNode(Gmodel,varargin)
     
@@ -315,8 +319,14 @@ function Gmodel = bake(Gmodel)
 end
 
 %---------------------------------------------------------------- export
-function export(Gmodel,type)
-if nargin == 1, type = 'stl'; end
+function export(Gmodel,filename,type)
+if nargin < 3, type = 'stl'; end
+if nargin < 2
+    filename = string(['gmodel','_', char(datetime(now,...
+                'ConvertFrom','datenum')),'.stl']);
+    filename = erase(filename,[":"," "]);
+    type = 'stl'; 
+end
 
 fv = struct;
 f = Gmodel.Element;
@@ -328,7 +338,7 @@ f = indexn(f);
 if strcmp(type,'stl')
 fv.vertices = v;
 fv.faces = f;
-stlwriter('test.stl',fv);
+stlwriter(char(filename),fv);
 elseif strcmp(type,'obj')
 fv.vertices = v;
 fv.faces = f;

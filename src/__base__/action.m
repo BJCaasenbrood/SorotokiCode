@@ -1,11 +1,14 @@
-function output = action(list)
+function output = action(list,varargin)
 
 CommandSymbol = '*';
-
 fprintf('* Please, make a selection: \n');
 
 for i = 1:length(list)
-   cprintf('Green',['\t','  ','[',num2str(i),'] ',list{i}]);
+   if isempty(varargin),
+       cprintf('Green',['\t','  ','[',num2str(i),'] ',list{i}]);
+   else
+       cprintf('Green',['\t','  ',list{i}]);
+   end
    fprintf('\n'); 
 end
 
@@ -13,7 +16,9 @@ fprintf(CommandSymbol);
 fprintf('  '); 
 
 cprintf('Text','>> ');
-output = input('');
+if isempty(varargin), output = input('');
+else output = input('','s');
+end
 end
 
 

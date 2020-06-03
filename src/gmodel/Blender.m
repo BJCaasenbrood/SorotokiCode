@@ -46,6 +46,10 @@ Node = Node0;
 if strcmp(Ax,'x'),     Node(:,1) = Node0(:,1) + Move;
 elseif strcmp(Ax,'y'), Node(:,2) = Node0(:,2) + Move;
 elseif strcmp(Ax,'z'), Node(:,3) = Node0(:,3) + Move;
+elseif strcmp(Ax,'3D')
+    dx  = Arg{2}; Node(:,1) = Node0(:,1) + dx;
+    dy  = Arg{3}; Node(:,2) = Node0(:,2) + dy;
+    dz  = Arg{4}; Node(:,3) = Node0(:,3) + dz;  
 else, Node(:,3) = Node0(:,3) + Move;
 end
 

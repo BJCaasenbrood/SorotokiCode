@@ -1132,7 +1132,9 @@ if Fem.PrescribedDisplacement
             for ii = 1:Fem.Dim
                 pd = reshape(Fem.Dim*Fem.Load(:,1)+(ii-Fem.Dim),NLoad,1);
                 F(pd) = Fem.Load(1:NLoad,1+ii);
-                pDof = [pDof;pd];
+                if norm(Fem.Load(1:NLoad,1+ii)) > 0
+                    pDof = [pDof;pd];
+                end
             end
         else
             R = reshape(Fem.Load(1,2:end),[Fem.Dim,Fem.Dim]);

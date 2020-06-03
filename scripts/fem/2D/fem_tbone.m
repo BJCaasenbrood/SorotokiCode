@@ -1,13 +1,13 @@
 clc;  clear; close all;
 %% generate mesh from sdf
-sdf = @(x) TensileBone(x,8,2,2,1,2);
+sdf = @(x) TensileBone(x,10,2,4,1,1);
 %% 
-msh = Mesh(sdf);
-msh = msh.set('BdBox',[0,10,0,10],'NElem',150);
+msh = Mesh(sdf,'BdBox',[0,10,0,10],'NElem',150);
 msh = msh.generate();
 
 %% generate fem model from mesh
-fem = Fem(msh,'TimeStep',1/50,'PrescribedDisplacement',true);
+fem = Fem(msh,'TimeStep',1/50,'PrescribedDisplacement',true,...
+         'Linestyle','none');
 
 %% add boundary conditions
 fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,0]);
@@ -15,10 +15,19 @@ fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[0,1]);
 fem = fem.AddConstraint('Load',fem.FindNodes('Top'),[0,8]);
 fem = fem.AddConstraint('Output',fem.FindNodes('Location',[1,4]),[0,1]);
 
-fem.Material = Dragonskin10A;
+fem.Material = Dragonskin10A();
 
 %% solving
 fem.solve();
+
+%% plotting
+figure(101);
+subplot(2,1,2); fem.show('Svm'); view(90,90); axis tight;
+subplot(2,1,1); plot(fem.Log{2,2},fem.Log{7,2},'linewidth',2,...
+    'Color',col(1)); axis tight; 
+xlabel('Displacement (mm)','interpreter','latex','fontsize',12);
+ylabel('Von mises (MPa)','interpreter','latex','fontsize',12);
+grid on; set(gca,'linewidth',1);
 
 function D = TensileBone(P,H,W,T,D,R)
 dD = 0.5*(W-D);
