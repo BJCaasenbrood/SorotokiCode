@@ -3,11 +3,11 @@ ver_ = vernum(lib);
 % if length(lib) > 7
 % cprintf('Keyword',['* \t -',lib,spc,'version: ',ver,spc]);
 % else
-cprintf('Keyword',['* \t -',lib,spc,'version: ',ver,spc]);
+cout('Keyword',['* \t -',lib,spc,'version: ',ver,spc]);
 % end
 
 if strcmp(ver,ver_)
-cprintf('Green', '[ok]') 
+cout('Green', '[ok]') 
 LatestRelease = true;
 else
 cprintf('UnterminatedStrings', 'outdated...')
