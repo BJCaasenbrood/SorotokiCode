@@ -34,13 +34,13 @@ figure(101); subplot(2,3,1);
 obj.bake().render().update; 
 obj.ground();
 
-%% transform
+%% transformations
+Blender(obj.reset(),'Scale',{'z',0.5}); 
+    subplot(2,3,2); obj.bake().render(); obj.ground();
+
 Blender(obj,'Twist',{'z',30});
     subplot(2,3,3); obj.bake().render(); obj.ground();
 
-Blender(obj.reset(),'Scale',{'z',0.5}); 
-    subplot(2,3,2); obj.bake().render(); obj.ground();
-    
 Blender(obj.reset(),'Rotate',{'3D',30,20,30});
     subplot(2,3,4); obj.bake().render(); obj.ground();
 
