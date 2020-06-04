@@ -45,6 +45,7 @@ clc; clear; close all; warning off; beep off;
 addpath('src');
 addpath('src/__version__');
 addpath('src/__base__');
+addpath('src/__base__/fnc');
 
 skipUpdate = false;
 Path = getPath;
@@ -104,7 +105,7 @@ libs(5) = IncludeDynamicModel(Path,0);
 if min(libs) == 1
 fprintf('\n* Libary check completed - all libaries are up-to-date - \n');
 else
-cprintf('err','\n* Libary check completed - some libaries are outdated!\n');
+cout('err','\n* Libary check completed - some libaries are outdated!\n');
 fprintf('* Get the latest version at: ');
 
 fprintf(['<a href="https://github.com/BJCaasenbrood/SorotokiCode">',...
