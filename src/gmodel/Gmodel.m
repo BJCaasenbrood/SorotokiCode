@@ -158,8 +158,8 @@ function Gmodel = render(Gmodel,varargin)
         Gmodel.LineStyle,'edgecolor',Gmodel.LineColor,'FaceVertexCData',...
         Gmodel.TextureMap,'FaceColor',shading);
     
-    set(gcf,'color',[255, 255, 255]/255); material dull;
-    axis equal; axis(Gmodel.BdBox); axis off;
+    set(gcf,'color',gitpage); material dull;
+    axis equal; axis(Gmodel.BdBox); axis off; %view(30,15);
     daspect([1,1,1]);
     
     ax = gca; ax.Clipping = 'off';    
