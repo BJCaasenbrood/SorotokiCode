@@ -22,10 +22,10 @@ mdl = mdl.csolve();
 %% show simulation
 % figure(14); hold on;
 % subplot(2,1,1);
-t = mdl.get('t');
-q = mdl.g;
-u = mdl.tau;
-ge = mdl.ge;
+% t = mdl.get('t');
+% q = mdl.g;
+% u = mdl.tau;
+% ge = mdl.ge;
 % plot(t,q,'-','linewidth',1.0);
 % 
 % subplot(2,1,2);
@@ -38,14 +38,11 @@ ge = mdl.ge;
 % t = state(:,1);
 % z = state(:,2:end);
 % plot(t,z);
-% l0 = 0.064;
-% g(:,3) = (l0 - q(:,1))/l0;
-% g(:,1) = q(:,2)*l0;
-% g(:,2) = q(:,3)*l0;
-% 
-% mdl = mdl.set('t',t);
-% mdl = mdl.set('g',g);
-% 
+
+g(:,3) = q(:,1)/0.064;
+g(:,1) = q(:,2);
+g(:,3) = q(:,3);
+
 mdl.showModel();
 
 

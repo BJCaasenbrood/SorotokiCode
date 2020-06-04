@@ -1,7 +1,7 @@
 clr;
 %% preview
 obj = Gmodel('Cube.stl');
-
+obj.Texture = copper;
 %% set texture
 figure(101); subplot(2,3,1);
 obj.bake().render().update; 

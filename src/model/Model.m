@@ -211,11 +211,12 @@ X = linspace(0,1,200);
 
 %msh = Gmodel('SlenderRod.stl');
 %msh = Gmodel('SoftActuatorRedux.stl');
-msh = Gmodel('Pneulink.stl'); 
-mshgr = Gmodel('SoftGripperRedux.stl');
+msh = Gmodel('Pneulink.stl'); assignin('base','msh',msh);
+mshgr = Gmodel('SoftGripperRedux.stl'); assignin('base','mshgr',mshgr);
 %mshgr = Gmodel([]);
-mshgr = mshgr.set('Node0',mshgr.Node*1.75);
-mshgr = mshgr.set('Node',mshgr.Node*1.75);
+%msh = msh.set('Node0',mshgr.Node);
+mshgr = mshgr.set('Node0',mshgr.Node*2.0);
+mshgr = mshgr.set('Node',mshgr.Node*2.0);
 
 % set texture
 msh.Texture = Model.Texture;
@@ -239,7 +240,7 @@ msh.update();
 mshgr.update();
 msh.ground(Model.MovieAxis);
 
-if length(Model.t) > 2, FPS = round((1/8)/(mean(diff(Model.t)))); i0 = 1;
+if length(Model.t) > 2, FPS = round((1/25)/(mean(diff(Model.t)))); i0 = 1;
 else, FPS = 1; i0 = 1;
 end
 
@@ -279,10 +280,10 @@ for ii = i0:FPS:length(Model.t)
     SweepSE3 = yf(:,1:7);
     
     msh = Blender(msh,'Rotate',{'z',-30});
-    %mshgr = Blender(mshgr,'Rotate',{'z',-30});
+    mshgr = Blender(mshgr,'Rotate',{'z',-30});
     msh = Blender(msh,'Sweep', {LinkID,SweepSE3});
     %msh = Blender(msh,'Scale',{'z',-1});
-    %mshgr = Blender(mshgr,'SE3',yf(end,1:7));
+    mshgr = Blender(mshgr,'SE3',yf(end,1:7));
     %mshgr = Blender(mshgr,'Scale',{'z',-1});
 
     if ii == 1      
@@ -314,10 +315,10 @@ for ii = i0:FPS:length(Model.t)
 %     plotvector([0;0;0]+r(:),R.'*[0;0.2;0],'Color',col(2),'linewidth',2,'MaxHeadSize',0.75);
 %     plotvector([0;0;0]+r(:),R.'*[0;0;0.2],'Color',col(3),'linewidth',2,'MaxHeadSize',0.75);
     
-   % mshgr.updateNode();
+    mshgr.updateNode();
     msh.updateNode();
     msh.update();
-    %mshgr.update();
+    mshgr.update();
     
     title(['T = ',num2str(Model.t(ii),3)]);
         

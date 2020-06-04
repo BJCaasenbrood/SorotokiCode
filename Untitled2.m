@@ -5,8 +5,8 @@ obj1 = Gmodel(@(x) SDF(x),domain(-0.1,1.1,3));
 
 %% rendering models
 figure(101);
-subplot(1,2,1); obj0.bake().render(); 
-subplot(1,2,2); obj1.bake().render(); 
+subplot(1,2,1); obj0 = obj0.bake().render(); 
+subplot(1,2,2); obj1 = obj1.bake().render(); 
 
 %% signed distance fucntion (3D)
 function Dist = SDF(x)

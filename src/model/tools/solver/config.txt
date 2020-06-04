@@ -13,7 +13,7 @@ K3 = 1
 [model]
 NMODE   = 1
 SDOMAIN = 1
-TDOMAIN = 6
+TDOMAIN = 2
 
 [solver]
 SPACESTEP = 10

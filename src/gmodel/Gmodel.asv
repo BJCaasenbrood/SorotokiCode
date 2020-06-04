@@ -20,7 +20,6 @@ classdef Gmodel < handle
         
         Figure;
         FigHandle;
-        FigAxis;
         TextureMap;
         TextureStretch;
         Shading;
@@ -179,7 +178,7 @@ function Gmodel = render(Gmodel,varargin)
     function myprecallback(src,evnt)
         class = whoClasses('Gmodel');
         for i = 1:length(class)
-        	r = update(class{i},'tex');
+        	update(class{i});
         end
     end
 
@@ -202,11 +201,10 @@ function vargout = update(Gmodel,varargin)
     else, shading = 'interp';
     end
     
-    if nargout < 1 || strcmp(varargin ,'tex')
+    if nargout < 1
     set(Gmodel.FigHandle,'FaceVertexCData',Gmodel.TextureMap,...
         'Facecolor',shading);
     drawnow;
-    vargout = [];
     else
        vargout{1} = Gmodel.FigHandle;
        vargout{2} = Gmodel.TextureMap;
@@ -479,11 +477,8 @@ function Gmodel = BakeCubemap(Gmodel,Cubemap)
     Ny = size(Cubemap,1); 
     Nx = size(Cubemap,2);
     
-    if ishandle(101)
-        Phi = view;
-    else, 
-        Phi = eye(4); 
-    end
+    if ishandle(101), Phi = view;
+    else, Phi = eye(4); end
     
     Phi = transpose(Phi(1:3,1:3));
     
