@@ -15,24 +15,18 @@ function showDemo
 clr;
 set = {'Meshing a 2D-circle',...
        'Rendering stanford bunny',...
-       'Rendering dragon model',...
-       'advanced FV-mesh preview demo',...
-       'implicit meshing demo',...
-       'linear fem demo',...
-       'nonlinear fem demo',...
-       'topology design demo'};
+       'Nonlinear finite element',...
+       '3D nonlinear finite element',...
+       'Topology optimization of Pneu-net'};
 
 request = action(set);
 
 switch(request)
     case(1); open mesh_circle; mesh_circle;
     case(2); open preview_bunny; preview_bunny;
-    case(3); open preview_dragon; preview_dragon;
-    case(4); open preview_; preview_demo;
-    case(5); mesh_demo;
-    case(6); fem_demo;
-    case(7); nlfem_demo;
-    case(8); design_demo;
+    case(3); open fem_bellow; fem_bellow;
+    case(4); open fem_twist; fem_twist;
+    case(5); open opt_pneunet; opt_pneunet;
     otherwise; warning('Please select a demo from the list above.');
 end
 

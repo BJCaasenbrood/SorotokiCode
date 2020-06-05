@@ -7,13 +7,13 @@ msh = Mesh(sdf,'BdBox',[0,25,0,25],'NElem',500);
 msh = msh.generate();
 
 %% generate fem model from mesh
-fem = Fem(msh,'TimeStep',1/50,'PrescribedDisplacement',true,...
+fem = Fem(msh,'TimeStep',1/15,'PrescribedDisplacement',true,...
     'SigmoidFactor',0.5);
 
 %% add constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[1,1]);
 fem = fem.AddConstraint('Support',fem.FindNodes('Top'),[1,0]);
-fem = fem.AddConstraint('Load',fem.FindNodes('Top'),[0,5]);
+fem = fem.AddConstraint('Load',fem.FindNodes('Top'),[0,-5]);
 
 %% add logger nodes
 fem = fem.AddConstraint('Output',fem.FindNodes('Location',[6,22]),[0,0]);
@@ -25,15 +25,7 @@ fem.Material = Dragonskin10A;
 fem.solve();
 
 %% plot nonlinear stiffness
-figure(101);
-uy = mean(fem.Log{3,2},2);
-fy = mean(fem.Log{6,2},2)*1e3;
-
-subplot(1,2,1); fem.show();
-subplot(1,2,2); plot(uy,diff([0;fy])./diff([0;uy]),'linewidth',2,'Color',col(2));
-xlabel('Displacement (mm)','interpreter','latex','fontsize',12);
-ylabel('Reaction force (mN)','interpreter','latex','fontsize',12);
-grid on; set(gca,'linewidth',1); axis square;
+fem.show('Svm');
 
 function Dist = Bellow(P,r0,r1,r2,r3,r4,x,t)
   C1 = dCircle(P,r2+r0,0,r1);
