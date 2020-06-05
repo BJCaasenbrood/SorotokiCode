@@ -13,7 +13,7 @@ K3 = 1
 [model]
 NMODE   = 1
 SDOMAIN = 1
-TDOMAIN = 2
+TDOMAIN = 5
 
 [solver]
 SPACESTEP = 10
@@ -26,8 +26,8 @@ MAX_ITER  = 1e5
 SPEEDUP   = 1.0
 
 [physics]
-RHO      = 0.02
-EMOD     = 2e3
+RHO      = 0.06
+EMOD     = 6e3
 NU       = 0.4
 MU       = 0.2
 PRS_AREA = 1e-5

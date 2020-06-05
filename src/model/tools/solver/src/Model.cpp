@@ -56,8 +56,6 @@ Model::Model(const char* str){
 	Bc = tableConstraints(tab,false);
 	NDof = Ba.cols();
 
-	cout << Ba << endl;
-
 	NState = NDof * NMODE;
 
 	Phi.set(NMODE,NDof,"chebyshev");
@@ -80,6 +78,7 @@ Model::Model(const char* str){
 
 	// read input
 	read("state.log",q);
+	read("state_dt.log",dq);
 	read("input.log",tau);
 	read("point.log",z0);
 
@@ -950,7 +949,7 @@ void Model::buildInertiaTensor(){
 //---------------------------------------------------
 //--------------------------- build stiffness tensor
 //---------------------------------------------------
-void Model::buildStiffnessTensor( ){
+void Model::buildStiffnessTensor(){
 
 	Ktt = M6f::Zero(6,6);
 

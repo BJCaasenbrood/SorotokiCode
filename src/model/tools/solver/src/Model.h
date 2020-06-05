@@ -54,6 +54,9 @@ class Model
   	int E1,E2,E3;
   	int K1,K2,K3; 
 
+  	float E11, E22, E33;
+  	float G11, G22, G33;
+
   	int NMODE; 
 	float SDOMAIN; 
 	float TDOMAIN; 

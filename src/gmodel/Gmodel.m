@@ -387,14 +387,12 @@ fprintf('\n');
 A = GaussianFilter(reshape(INC,[N,N]),1);
 A(A < 0.5) = nan;
 
-%img = image(A);
-%set(img,'AlphaData', ~isnan(A));
-
 hold on;
 colormap(autumn(6));
 
 Gmodel.Slice = surf(X,Y,zeros(N,N) + s,'cData',A,'linestyle','-',...
     'AlphaData',~isnan(A),'facecolor','interp','Edgecolor','interp');
+
 caxis([-15 10]);
 
 Gmodel.Node(J,3) = s;

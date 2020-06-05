@@ -5,17 +5,19 @@ mdl = Model([0,1,1,1,0,0],'NModal',1);
 mdl = mdl.set('tspan',2,...
               'Grav',9.81,...
               'Jacobian',true,...
-              'MovieAxis',[-1 1 -1 1 0 1.5]*0.85);
+              'MovieAxis',[-1 1 -1 1 0 1.85]*0.85);
 
 %% generate dynamic model
 mdl = mdl.generate();
 
 %% assign controllers
 mdl.gain = [3e-4,2e-5];
-mdl.point = [0,0,0,.8,0,0.5];
+mdl.point = [];%[0,0,0,.8,0,0.5];
 mdl.Pressure = @(t) 0*[2;0;0];
 mdl.q0 = zeros(mdl.NDof*mdl.NModal);
-mdl.q0(2) = 1.0;
+mdl.dq0 = zeros(mdl.NDof*mdl.NModal);
+mdl.q0(3) = .1;
+mdl.dq0(2) = 0;
 %% simulate soft robot
 mdl = mdl.csolve(); 
 

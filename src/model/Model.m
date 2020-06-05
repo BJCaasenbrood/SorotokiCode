@@ -15,6 +15,7 @@ classdef Model
         Pressure;
         Texture;
         q0;
+        dq0;
         gain;
         point;
     end
@@ -134,6 +135,11 @@ fileID = fopen(out,'w');
 fprintf(fileID,'%d\n',Model.q0);
 fclose(fileID);
 %//////////////////////////////////
+out = fullfile(dir_path,'state_dt.log');
+fileID = fopen(out,'w');
+fprintf(fileID,'%d\n',Model.dq0);
+fclose(fileID);
+%//////////////////////////////////
 out = fullfile(dir_path,'point.log');
 fileID = fopen(out,'w');
 fprintf(fileID,'%d\n',Model.point);
@@ -240,7 +246,7 @@ msh.update();
 mshgr.update();
 msh.ground(Model.MovieAxis);
 
-if length(Model.t) > 2, FPS = round((1/25)/(mean(diff(Model.t)))); i0 = 1;
+if length(Model.t) > 2, FPS = round((1/8)/(mean(diff(Model.t)))); i0 = 1;
 else, FPS = 1; i0 = 1;
 end
 
