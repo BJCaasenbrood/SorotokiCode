@@ -11,13 +11,9 @@ mdl = mdl.set('tspan',2,...
 mdl = mdl.generate();
 
 %% assign controllers
-mdl.gain = [3e-4,2e-5];
-mdl.point = [];%[0,0,0,.8,0,0.5];
-mdl.Pressure = @(t) 0*[2;0;0];
-mdl.q0 = zeros(mdl.NDof*mdl.NModal);
-mdl.dq0 = zeros(mdl.NDof*mdl.NModal);
-mdl.q0(3) = .1;
-mdl.dq0(2) = 0;
+mdl.point = [];
+mdl.Pressure = @(t) [5;0;0];
+mdl.q0(1) = 0;
 %% simulate soft robot
 mdl = mdl.csolve(); 
 
@@ -26,10 +22,12 @@ t = mdl.get('t');
 q = mdl.g;
 u = mdl.tau;
 ge = mdl.ge;
-% plot(t,q,'-','linewidth',1.0);
-% 
-% subplot(2,1,2);
-% plot(t,u,'-','linewidth',1.0);
+
+subplot(2,1,1);
+plot(t,q,'-','linewidth',1.0);
+
+subplot(2,1,2);
+plot(t,u,'-','linewidth',1.0);
 
 
 % figure(15);

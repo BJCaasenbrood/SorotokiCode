@@ -217,12 +217,16 @@ X = linspace(0,1,200);
 
 %msh = Gmodel('SlenderRod.stl');
 %msh = Gmodel('SoftActuatorRedux.stl');
-msh = Gmodel('Pneulink.stl'); assignin('base','msh',msh);
-mshgr = Gmodel('SoftGripperRedux.stl'); assignin('base','mshgr',mshgr);
+msh = Gmodel('Pneulink.stl'); 
+mshgr = Gmodel('Pneurod.stl'); 
 %mshgr = Gmodel([]);
 %msh = msh.set('Node0',mshgr.Node);
-mshgr = mshgr.set('Node0',mshgr.Node*2.0);
-mshgr = mshgr.set('Node',mshgr.Node*2.0);
+% mshgr = mshgr.set('Node0',mshgr.Node*2.0);
+% mshgr = mshgr.set('Node',mshgr.Node*2.0);
+mshgr = mshgr.set('Shading','Face');
+mshgr = mshgr.set('Shading','Face');
+assignin('base','msh',msh);
+assignin('base','mshgr',mshgr);
 
 % set texture
 msh.Texture = Model.Texture;
