@@ -22,8 +22,6 @@ mdl.dq0(2) = 0;
 mdl = mdl.csolve(); 
 
 %% show simulation
-% figure(14); hold on;
-% subplot(2,1,1);
 t = mdl.get('t');
 q = mdl.g;
 u = mdl.tau;
@@ -37,7 +35,7 @@ ge = mdl.ge;
 % figure(15);
 % plot3(ge(:,7),ge(:,6),-ge(:,5),'-','linewidth',1.0);
 % axis equal;
-% t = state(:,1);
+% t = state(:,1);s
 % z = state(:,2:end);
 % plot(t,z);
 % l0 = 0.064;
