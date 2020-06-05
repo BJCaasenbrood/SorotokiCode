@@ -183,7 +183,7 @@ while flag == 0
   
   Anew = sum(abs(A));
   
-  Mesh.Convergence = append(Mesh.Convergence,sqrt(sum((A.^2).*sum((Pc-P)...
+  Mesh.Convergence = vappend(Mesh.Convergence,sqrt(sum((A.^2).*sum((Pc-P)...
       .*(Pc-P),2)))*Mesh.NElem/(Anew^1.5));
   
   [flag,Mesh] = CheckConvergence(Mesh);

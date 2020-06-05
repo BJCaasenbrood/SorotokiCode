@@ -1,4 +1,4 @@
-function y = append(vec,x)
+function y = vappend(vec,x)
 [s1,s2] = size(vec);
 
 if (s2 == 1) && (length(x) == 1), y = zeros(s1+1,1); flag = 1;

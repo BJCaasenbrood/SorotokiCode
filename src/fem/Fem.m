@@ -461,13 +461,13 @@ while true
         else, Delta(FreeDofs,1) = DeltaU(:,1); B = Fem.ResidualNorm; end
         
         % evaluate convergence criteria
-        Fem.SolverResidual = append(Fem.SolverResidual,...
+        Fem.SolverResidual = vappend(Fem.SolverResidual,...
             max(abs(Fem.Residual(FreeDofs))));
         
-        Fem.SolverVonMises = append(Fem.SolverVonMises,...
+        Fem.SolverVonMises = vappend(Fem.SolverVonMises,...
             max(Fem.s(:,1)));
         
-        Fem.SolverDisplace = append(Fem.SolverDisplace,...
+        Fem.SolverDisplace = vappend(Fem.SolverDisplace,...
             max(DeltaU(:,1)));
         
         % check convergence
@@ -520,16 +520,16 @@ while true
            Fem.Log{9,1} = 'Syy'; Fem.Log{9,2} = Fem.syyNodal(idNodes);
            Fem.Log{10,1} = 'Sxy'; Fem.Log{10,2} = Fem.sxyNodal(idNodes);
        else
-           Fem.Log{1,2} = append(Fem.Log{1,2},ux(idNodes));
-           Fem.Log{2,2} = append(Fem.Log{2,2},uy(idNodes));
-           Fem.Log{3,2} = append(Fem.Log{3,2},un(idNodes));
-           Fem.Log{4,2} = append(Fem.Log{4,2},fx(idNodes));
-           Fem.Log{5,2} = append(Fem.Log{5,2},fy(idNodes));
-           Fem.Log{6,2} = append(Fem.Log{6,2},fn(idNodes));
-           Fem.Log{7,2} = append(Fem.Log{7,2},Fem.VonMisesNodal(idNodes));
-           Fem.Log{8,2} = append(Fem.Log{8,2},Fem.sxxNodal(idNodes));
-           Fem.Log{9,2} = append(Fem.Log{9,2},Fem.syyNodal(idNodes));
-           Fem.Log{10,2} = append(Fem.Log{10,2},Fem.sxyNodal(idNodes));
+           Fem.Log{1,2} = vappend(Fem.Log{1,2},ux(idNodes));
+           Fem.Log{2,2} = vappend(Fem.Log{2,2},uy(idNodes));
+           Fem.Log{3,2} = vappend(Fem.Log{3,2},un(idNodes));
+           Fem.Log{4,2} = vappend(Fem.Log{4,2},fx(idNodes));
+           Fem.Log{5,2} = vappend(Fem.Log{5,2},fy(idNodes));
+           Fem.Log{6,2} = vappend(Fem.Log{6,2},fn(idNodes));
+           Fem.Log{7,2} = vappend(Fem.Log{7,2},Fem.VonMisesNodal(idNodes));
+           Fem.Log{8,2} = vappend(Fem.Log{8,2},Fem.sxxNodal(idNodes));
+           Fem.Log{9,2} = vappend(Fem.Log{9,2},Fem.syyNodal(idNodes));
+           Fem.Log{10,2} = vappend(Fem.Log{10,2},Fem.sxyNodal(idNodes));
        end
     end
     
@@ -592,8 +592,8 @@ while flag
     Fem.Density = Fem.Density + Fem.Change;
     
     % evaluate fitness
-    Fem.Objective  = append(Fem.Objective,f);       
-    Fem.Constraint = append(Fem.Constraint,g);
+    Fem.Objective  = vappend(Fem.Objective,f);       
+    Fem.Constraint = vappend(Fem.Constraint,g);
     
     % check convergence
     [flag,Fem] = CheckConvergenceOpt(Fem);
