@@ -7,12 +7,12 @@ msh = msh.generate();
 msh = msh.show();
 
 %% generate fem model from mesh
-fem = Fem(msh,'TimeStep',1/50,'PrescribedDisplacement',false);
+fem = Fem(msh,'TimeStep',1/50,'PrescribedDisplacement',true);
 
 %% add constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[1,1,1]);
-fem = fem.AddConstraint('Support',fem.FindNodes('Top'),so3([0,0,pi/2]));
-fem = fem.AddConstraint('Load',fem.FindNodes('Top'),[0,1e-1,0]);
+fem = fem.AddConstraint('Support',fem.FindNodes('Top'),[0,0,1]);
+fem = fem.AddConstraint('Load',fem.FindNodes('Top'),so3([0,0,pi/2]));
 
 %% select material
 fem.Material =  TPU90();
