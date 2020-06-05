@@ -1,6 +1,0 @@
-TensorOperation.obj
-TensorOperation_initialize.obj
-TensorOperation_terminate.obj
-rtGetInf.obj
-rtGetNaN.obj
-rt_nonfinite.obj

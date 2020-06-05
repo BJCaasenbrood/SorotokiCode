@@ -1,6 +1,0 @@
-minv.obj
-minv_initialize.obj
-minv_terminate.obj
-rtGetInf.obj
-rtGetNaN.obj
-rt_nonfinite.obj
