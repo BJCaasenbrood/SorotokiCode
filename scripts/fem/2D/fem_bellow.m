@@ -7,13 +7,13 @@ msh = Mesh(sdf,'BdBox',[0,25,0,25],'NElem',500);
 msh = msh.generate();
 
 %% generate fem model from mesh
-fem = Fem(msh,'TimeStep',1/15,'PrescribedDisplacement',true,...
-    'SigmoidFactor',0.5);
+fem = Fem(msh,'TimeStep',1/5,'PrescribedDisplacement',true,...
+    'SigmoidFactor',0.5,'Linestyle','none');
 
 %% add constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[1,1]);
 fem = fem.AddConstraint('Support',fem.FindNodes('Top'),[1,0]);
-fem = fem.AddConstraint('Load',fem.FindNodes('Top'),[0,-5]);
+fem = fem.AddConstraint('Load',fem.FindNodes('Top'),[0,-10]);
 
 %% add logger nodes
 fem = fem.AddConstraint('Output',fem.FindNodes('Location',[6,22]),[0,0]);
