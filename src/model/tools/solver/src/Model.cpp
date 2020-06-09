@@ -28,6 +28,7 @@ Model::Model(const char* str){
 
 	tab << K1,K2,K3,E1,E2,E3;
 
+	NDISC   = static_cast<int>(cf.Value("model","NDISC"));
 	NMODE   = static_cast<int>(cf.Value("model","NMODE"));
   	SDOMAIN = cf.Value("model","SDOMAIN");
   	TDOMAIN = cf.Value("model","TDOMAIN");
@@ -55,10 +56,20 @@ Model::Model(const char* str){
 	Ba = tableConstraints(tab,true);
 	Bc = tableConstraints(tab,false);
 	NDof = Ba.cols();
-
 	NState = NDof * NMODE;
 
-	Phi.set(NMODE,NDof,"chebyshev");
+	Vxi sa(NDISC), stab(NState);
+	sa.setZero();
+	sa(0) = 1;
+	stab = sa.replicate(NMODE,1);
+
+	Sa = tableConstraints(stab,true);
+	Sc = tableConstraints(stab,false);
+
+	Sa.transposeInPlace();
+	Sc.transposeInPlace();
+
+	Phi.set(NMODE,NDof,NDISC,"chebyshev");
 
 	buildInertiaTensor();
 	buildStiffnessTensor();
@@ -69,7 +80,7 @@ Model::Model(const char* str){
 	dq  = Vxf::Zero(NState);
 	ddq = Vxf::Zero(NState);
 	qd  = Vxf::Zero(NState);
-	tau = Vxf::Zero(6);
+	tau = Vxf::Zero(NState);
 	u   = Vxf::Zero(6);
 	z0  = Vxf::Zero(6);
 
@@ -146,64 +157,94 @@ void Model::cleanup(){
 	myfile3.close();
 }
 
-//--------------------------------------------------
-//----------- transformation to task-space dynamics
-//--------------------------------------------------
-void Model::operationalSpaceDynamics(Mxf &J, Mxf &Jt, 
-	Vxf &dq, Mxf &M, Vxf &C, Vxf &G, Mxf &Mx, Vxf &Cx, 
-	Vxf &Gx){
+// //--------------------------------------------------
+// //----------- transformation to task-space dynamics
+// //--------------------------------------------------
+// void Model::operationalSpaceDynamics(Mxf &J, Mxf &Jt, 
+// 	Vxf &dq, Mxf &M, Vxf &C, Vxf &G, Mxf &Mx, Vxf &Cx, 
+// 	Vxf &Gx){
 
-	int n = NState;
-	int k = Mx.rows();
+// 	int n = NState;
+// 	int k = Mx.rows();
 
-	Mxf Mi(n,n), Li(k,k), Jg(n,k);
+// 	Mxf Mi(n,n), Li(k,k), Jg(n,k);
 
-	// compute task-space inertia matrix
-	Mi.noalias() = M.householderQr().solve(Mxf::Identity(n,n));
-	Li.noalias() = J*(Mi*J.transpose());
-	Mx.noalias() = Li.householderQr().solve(Mxf::Identity(k,k));
+// 	// compute task-space inertia matrix
+// 	Mi.noalias() = M.householderQr().solve(Mxf::Identity(n,n));
+// 	Li.noalias() = J*(Mi*J.transpose());
+// 	Mx.noalias() = Li.householderQr().solve(Mxf::Identity(k,k));
 		
-	// build generalized inverse
-	Jg.noalias() = Mi*J.transpose()*Mx;
-	//Jg.transposeInPlace();
+// 	// build generalized inverse
+// 	Jg.noalias() = Mi*J.transpose()*Mx;
+// 	//Jg.transposeInPlace();
 	
-	// residual Lagrangian forces in task-space
-	Cx.noalias() = Jg.transpose()*C - Mx*Jt*dq;
-	Gx.noalias() = Jg.transpose()*G;	
+// 	// residual Lagrangian forces in task-space
+// 	Cx.noalias() = Jg.transpose()*C - Mx*Jt*dq;
+// 	Gx.noalias() = Jg.transpose()*G;	
 
-}
+// }
 
-//--------------------------------------------------
-//----- dynamically consistent null-space projector
-//--------------------------------------------------
-void Model::dynamicProjector(Mxf &J, Mxf &M, Mxf &S,
-	Mxf &P){
+// //--------------------------------------------------
+// //----- dynamically consistent null-space projector
+// //--------------------------------------------------
+// void Model::dynamicProjector(Mxf &J, Mxf &M, Mxf &S,
+// 	Mxf &P){
 
-	int n = NState;
-	int m = J.rows();
-	int k = S.cols();
+// 	int n = NState;
+// 	int m = J.rows();
+// 	int k = S.cols();
 
-	Mxf Mi(n,n), X(m,k), Xpv(k,m);
+// 	Mxf Mi(n,n), X(m,k), Xpv(k,m);
 
-	// precompute inverse inertia
-	Mi.noalias() = M.householderQr().solve(Mxf::Identity(n,n));
-	Xpv.noalias() = (J*Mi*S).completeOrthogonalDecomposition().pseudoInverse();
+// 	// precompute inverse inertia
+// 	Mi.noalias() = M.householderQr().solve(Mxf::Identity(n,n));
+// 	Xpv.noalias() = (J*Mi*S).completeOrthogonalDecomposition().pseudoInverse();
 
-	// build dynamically consistent projector
-	P.noalias() = Xpv*J*Mi;
+// 	// build dynamically consistent projector
+// 	P.noalias() = Xpv*J*Mi;
 
-}
+// }
+// //---------------------------------------------------
+// //----------- controller wrench at end-effector level
+// //---------------------------------------------------
+// void Model::controllerWrench(float t, Mxf &J, Vxf &f){
+
+// 	V6f z, dz, dz0, tmp;
+// 	M6f Adg;
+
+// 	dz0.setZero();
+
+// 	// get configuration-space in R6
+// 	SE3toR6(g,z);
+// 	Admap(g,Adg);
+
+// 	dz.noalias() = eta;
+// 	z0.block(0,0,3,1).noalias() = z.block(0,0,3,1);
+// 	dz0.block(0,0,3,1).noalias() = eta.block(0,0,3,1);
+
+// 	// compute wrench
+// 	f = KP*(z - z0) + KD*(dz - dz0);
+// 	f *= smoothstep(0.2*t,0,1);
+// }
+
 //---------------------------------------------------
-//----------- controller wrench at end-effector level
+//-- passivity-based controller for end-effector
 //---------------------------------------------------
-void Model::controllerWrench(float t, Mxf &J, Vxf &f){
+void Model::controllerPassive(float t, Mxf &M, Vxf &Qv,
+Vxf &Qa, Mxf &J, Vxf &f){
 
-	V6f z, dz, dz0, tmp;
+	int na,nc;
+	na = NDof*NDISC;
+	nc = NState - na;
+
+	Mxf T(n)
+	V6f z, dz, dz0;
+	Vxf u_(na);
 	M6f Adg;
 
 	dz0.setZero();
 
-	// get configuration-space in R6
+	// // get configuration-space in R6
 	SE3toR6(g,z);
 	Admap(g,Adg);
 
@@ -211,9 +252,31 @@ void Model::controllerWrench(float t, Mxf &J, Vxf &f){
 	z0.block(0,0,3,1).noalias() = z.block(0,0,3,1);
 	dz0.block(0,0,3,1).noalias() = eta.block(0,0,3,1);
 
-	// compute wrench
-	f = KP*(z - z0) + KD*(dz - dz0);
-	f *= smoothstep(0.2*t,0,1);
+	// // compute wrench
+	u_ = Sa*J.transpose()*(KP*(z - z0) + KD*(dz - dz0));
+	// f *= smoothstep(0.1*t,0,1);
+
+	Mxf M11(na,na), M12(na,nc);
+	Mxf M21(nc,na), M22(nc,nc); 
+	Mxf Ms(NState,NState);
+	Mxf M22_(na,na);
+	Mxf S(NState,NState);
+
+	S.block(0,0,na,NState).noalias()  = Sc;
+	S.block(na,0,nc,NState).noalias() = Sa;
+
+	// repartition mass matrix;
+	Ms.noalias() = S*M*S.transpose();
+	M11.noalias() = Ms.block(0,0,nc,nc);
+	M12.noalias() = Ms.block(0,nc,nc,na);
+	M21.noalias() = Ms.block(nc,0,na,nc);
+	M22.noalias() = Ms.block(nc,nc,na,na);
+
+	M22_.noalias() = M22 - M21*M11.householderQr().solve(M12);
+
+	f.noalias() = M22_*(-KP*Sa*q - KD*Sa*dq);
+
+	//sleep(1200);
 }
 
 /*
@@ -419,12 +482,6 @@ Vxf Model::implicit_simulate(){
 			output(glog,t,g);
 		}
 
-		// #ifdef SOLVER_OUTPUT
-		// cout << "*/-------------/ " << endl;
-		// cout << "tim =" << t << endl;
-		// cout << "inc =" << j << endl;
-		// #endif 
-
   		x.noalias() += dx;
   		t += dt;
   		i++;
@@ -487,10 +544,11 @@ void Model::dynamicODE(float t, Vxf x, Vxf &dx){
 		int m = 4; // dimension of input-space
 		int k = 6; // dimension of task-space
 
-		Mxf S(n,m), Prj(k,n);
+		//Mxf S(n,m), Prj(k,n);
 		Mxf J(k,n), Jt(k,n);
-		Mxf Mz(k,k);
-		Vxf Cz(k), Pz(k), f(6);
+		//Mxf Mz(k,k);
+		//Vxf Cz(k), Pz(k), f(6);
+		Vxf u(NDof*NDISC);
 		M6f Adg;
 
 		// recover task-space Jacobian 
@@ -498,26 +556,34 @@ void Model::dynamicODE(float t, Vxf x, Vxf &dx){
 		J.noalias()  = Adg*J2;
 		Jt.noalias() = Adg*J2t;
 
-		S.block(0,0,n,l).noalias() = J1.transpose()*Ba;
-  		S.block(0,l,n,l).noalias() = (J2 - J1).transpose()*Ba;
+		//S.block(0,0,n,l).noalias() = J1.transpose()*Ba;
+  		//S.block(0,l,n,l).noalias() = (J2 - J1).transpose()*Ba;
   		//S.noalias() = J2.transpose()*Ba;
 
   		// compute operational space dynamics
 		//operationalSpaceDynamics(J,Jt,x2,Mee,Qv,Qa,Mz,Cz,Pz);
 
 		// compute null space projection
-		dynamicProjector(J,Mee,S,Prj);
+		//dynamicProjector(J,Mee,S,Prj);
 
 		// compute control-action in operational space
-		controllerWrench(t,J,f);
+		//controllerWrench(t,J,f);
+		
+		controllerPassive(t,Mee,Qv,Qa,J,u);
+
+		Qu.noalias() = Sa.transpose()*u;
 
 		// project torques
-		Qu.noalias() = S*Prj*J.transpose()*(f);
-		u.noalias() = Prj*J.transpose()*(f);
+		//Qu.noalias() = S*Prj*J.transpose()*(f);
+		//u.noalias() = Prj*J.transpose()*(f);
 	}
 
-	Qu.noalias() += (J2.transpose()*H)*tau.block(0,0,3,1);
+	//Qu.noalias() += (J1.transpose()*H)*tau.block(0,0,3,1);
 	//Qu.noalias() += ((J2 - J1).transpose()*H)*tau.block(3,0,3,1);
+	//
+	//Qu.noalias() += ((float)PRS_AREA)*tau;
+
+	//sleep(1200);
 
 	#ifdef FULL_CONTROLLER
 		float kp = 25;
@@ -715,6 +781,7 @@ void Model::buildInertia(Vxf v, Mxf &M){
 	}
 }
 
+
 //---------------------------------------------------
 //------------------------------ forward integration
 //---------------------------------------------------
@@ -869,25 +936,27 @@ void Model::inertiaODE(float s, V7f x, Mxf J,
 //---------------------------------------------------
 //----------- convert table to active/constraint set
 //---------------------------------------------------
-Mxf Model::tableConstraints(V6i table, bool set){
+Mxf Model::tableConstraints(Vxi table, bool set){
 	int k = 0;
-	int na;
+	int na,N;
 
-	M6f Id;
-	Id = M6f::Identity();
+	N = table.rows();
+
+	Mxf Id;
+	Id = Mxf::Identity(N,N);
 
 	if(set == true){na = (table>0).count();}
 	else{na = (table==0).count();}
 
-	Mxf B(6,na);
+	Mxf B(N,na);
 
 	// construct matrix of active DOF's
 	if(set == true){
-	for (int i = 0; i < 6; ++i)
+	for (int i = 0; i < N; ++i)
 	{
 		if (table(i) == true) 
 		{
-			B.block(0,k,6,1) = Id.block(0,i,6,1);
+			B.block(0,k,N,1) = Id.block(0,i,N,1);
 			k++;
 		}
 	}
@@ -895,11 +964,11 @@ Mxf Model::tableConstraints(V6i table, bool set){
 
 	// construct matrix of constraint DOF's
 	if(set == false){
-	for (int i = 0; i < 6; ++i)
+	for (int i = 0; i < N; ++i)
 	{
 		if (table(i) == false) 
 		{
-			B.block(0,k,6,1) = Id.block(0,i,6,1);
+			B.block(0,k,N,1) = Id.block(0,i,N,1);
 			k++;
 		}
 	}	
@@ -1011,7 +1080,6 @@ void Model::buildGlobalSystem(){
 	Mee = Mee.cast<float> ();
 	Kee = Kee.cast<float> ();
 	Dee = Dee.cast<float> ();
-
 }
 
 //---------------------------------------------------
@@ -1024,6 +1092,7 @@ void Model::systemMatODE(float s,
 
 	// evaluate strain-field
 	Phi.eval(s,PMat);
+
 	K.noalias() = ((Ba*PMat).transpose())*Ktt*(Ba*PMat);
 	M.noalias() = ((Ba*PMat).transpose())*Mtt*(Ba*PMat);
 	D.noalias() = ((Ba*PMat).transpose())*Dtt*(Ba*PMat);

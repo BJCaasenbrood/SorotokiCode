@@ -5,6 +5,7 @@ classdef Model
         Dof;
         NDof;
         NModal;
+        NDisc;
         NLink = 1;
         tspan = 1;
         Table;
@@ -71,6 +72,7 @@ function obj = Model(Table,varargin)
     obj.mu = 0.3;
     obj.Length = 1;
     obj.NModal = 2;
+    obj.NDisc = 2;
     obj.Chebyshev = false;
     obj.PressureArea = 5e-5;
     obj.Texture = studioclay;
@@ -145,7 +147,7 @@ fileID = fopen(out,'w');
 fprintf(fileID,'%d\n',Model.point);
 fclose(fileID);
 tic
-system('cd src/model/tools/solver && main.exe');
+system('cd src/model/tools/solver && main.exe config.txt');
 toc
 y = load('src/model/tools/solver/state.log');
 Model.g = y(:,2:end);
@@ -216,13 +218,13 @@ Model.Length = Model.Length0;
 X = linspace(0,1,200);
 
 %msh = Gmodel('SlenderRod.stl');
-%msh = Gmodel('SoftActuatorRedux.stl');
-msh = Gmodel('Pneulink.stl'); assignin('base','msh',msh);
+msh = Gmodel('SoftActuatorRedux.stl');
+%msh = Gmodel('Pneulink.stl'); assignin('base','msh',msh);
 mshgr = Gmodel('SoftGripperRedux.stl'); assignin('base','mshgr',mshgr);
 %mshgr = Gmodel([]);
 %msh = msh.set('Node0',mshgr.Node);
-mshgr = mshgr.set('Node0',mshgr.Node*2.0);
-mshgr = mshgr.set('Node',mshgr.Node*2.0);
+%mshgr = mshgr.set('Node0',mshgr.Node*2.0e-5);
+%mshgr = mshgr.set('Node',mshgr.Node*2.0e-5);
 
 % set texture
 msh.Texture = Model.Texture;
@@ -241,7 +243,7 @@ end
 axis(Model.MovieAxis);
 drawnow;
 %axis([-.5 .5 -.5 .5 -1 .5])
-view(30,15);
+view(30,10);
 msh.update();
 mshgr.update();
 msh.ground(Model.MovieAxis);
@@ -263,6 +265,8 @@ h1 = plotvector(p,[0;0.2;0],'Color',col(4),'linewidth',2,'MaxHeadSize',0.75);
 h2 = plotvector(p,[0;0;0.2],'Color',col(4),'linewidth',2,'MaxHeadSize',0.75);
 end
 
+vline = [];
+
 for ii = i0:FPS:length(Model.t)
 
     msh.reset();
@@ -280,7 +284,7 @@ for ii = i0:FPS:length(Model.t)
     eta0 = [0,0,0,0,0,0];
     deta0 = [0,0,0,0,0,0];
     
-    [~,yf] = ode23t(@(t,x) ForwardODE(Model,t,x,Model.q(:,1),...
+    [~,yf] = ode45(@(t,x) ForwardODE(Model,t,x,Model.q(:,1),...
         Model.q(:,1)*0, Model.q(:,1)*0),X,[g0 eta0 deta0]);
 
     SweepSE3 = yf(:,1:7);
@@ -288,18 +292,22 @@ for ii = i0:FPS:length(Model.t)
     msh = Blender(msh,'Rotate',{'z',-30});
     mshgr = Blender(mshgr,'Rotate',{'z',-30});
     msh = Blender(msh,'Sweep', {LinkID,SweepSE3});
-    %msh = Blender(msh,'Scale',{'z',-1});
+    msh = Blender(msh,'Scale',{'z',-1});
     mshgr = Blender(mshgr,'SE3',yf(end,1:7));
-    %mshgr = Blender(mshgr,'Scale',{'z',-1});
+    mshgr = Blender(mshgr,'Scale',{'z',-1});
+    
+    %vline = [vline; SweepSE3(end,7),SweepSE3(end,6),SweepSE3(end,5),Model.t(ii)];
 
     if ii == 1      
-       h = plot3(SweepSE3(:,7),SweepSE3(:,6),SweepSE3(:,5),'linewidth',1.5,...
+       h = plot3(SweepSE3(:,7),SweepSE3(:,6),-SweepSE3(:,5),'linewidth',1.5,...
        'Color',col(1));
-       hm = plot3(SweepSE3(end,7),SweepSE3(end,6),SweepSE3(end,5),'.',...
+       hm = plot3(SweepSE3(end,7),SweepSE3(end,6),-SweepSE3(end,5),'.',...
            'markersize',10,'Color',col(1));
+        
     else 
         delete(h);
         delete(hm);
+       % if size(vline,1) > 4, delete(hvm); end
 %         delete(h0);delete(h1);delete(h2);
 %         p = Model.point(4:6).';
 %         p = [p(3);p(2);-p(1)];
@@ -307,11 +315,18 @@ for ii = i0:FPS:length(Model.t)
 %         h0 = plotvector(p,[0.2;0;0],'Color',col(4),'linewidth',2,'MaxHeadSize',0.75);
 %         h1 = plotvector(p,[0;0.2;0],'Color',col(4),'linewidth',2,'MaxHeadSize',0.75);
 %         h2 = plotvector(p,[0;0;0.2],'Color',col(4),'linewidth',2,'MaxHeadSize',0.75);
-        h = plot3(SweepSE3(:,7),SweepSE3(:,6),SweepSE3(:,5),'linewidth',1.5,...
+        h = plot3(SweepSE3(:,7),SweepSE3(:,6),-SweepSE3(:,5),'linewidth',1.5,...
         'Color',col(1));
     
-        hm = plot3(SweepSE3(end,7),SweepSE3(end,6),SweepSE3(end,5),'.',...
+        hm = plot3(SweepSE3(end,7),SweepSE3(end,6),-SweepSE3(end,5),'.',...
            'markersize',10,'Color',col(1));
+       
+        %if size(vline,1) > 3
+        %    colmap = inferno(size(vline,1));
+          %  vline(1:floor(0.5*length(colmap)),:) = nan;
+            %colmap(1:floor(0.5*length(colmap)),:) = Inf;
+          %  hvm = line3(vline(:,1),vline(:,2),vline(:,3),colmap); 
+      %  end
     end
     
     %     
@@ -356,32 +371,49 @@ xc = setdiff(set,xa);
 Model.Ba = I6(:,xa);
 Model.Bc = I6(:,xc);
 Model.NDof = size(Model.Ba,2);
-Model.Phi = ShapeFunction(Model,sym('X'));
-Ha = Model.Ba.'*StrainTensor(Model)*Model.Ba;
-Ma = Model.Ba.'*MassTensor(Model)*Model.Ba;
-Model.Kee = double(int(Model.Phi.'*Ha*Model.Phi,sym('X'),0,1));
-Model.Mee = double(int(Model.Phi.'*Ma*Model.Phi,sym('X'),0,1));
-Model.Dee = Model.mu*Model.Kee;
-Model.Phi = matlabFunction(Model.Phi);
+Model.Phi = @(x) ShapeFunction(Model,x);
+% Ha = Model.Ba.'*StrainTensor(Model)*Model.Ba;
+% Ma = Model.Ba.'*MassTensor(Model)*Model.Ba;
+% Model.Kee = double(int(Model.Phi.'*Ha*Model.Phi,sym('X'),0,1));
+% Model.Mee = double(int(Model.Phi.'*Ma*Model.Phi,sym('X'),0,1));
+% Model.Dee = Model.mu*Model.Kee;
+% Model.Phi = matlabFunction(Model.Phi);
 Model.Nq = Model.NDof*Model.NModal;
-Model.q0 = zeros(Model.NDof*Model.NModal);
-Model.dq0 = zeros(Model.NDof*Model.NModal);
+Model.q0 = zeros(Model.NDof*Model.NModal,1);
+Model.dq0 = zeros(Model.NDof*Model.NModal,1);
 end
 
 %---------------------------------------------------------------------- set
 function P = ShapeFunction(Model,X)
 
-%P = sym(zeros(Model.NModal,1));
 Pc = cell(Model.NDof,1);
-   
-if Model.Chebyshev
-    for ii = 1:Model.NModal, P(1,ii) = X.^(ii-1); end
-else
-    for ii = 1:Model.NModal, P(1,ii) = chebyshev(X,ii-1); end
+X = double(X);
+
+P11 = zeros(1,Model.NDisc);
+P22 = zeros(1,Model.NDisc);
+
+for ii = 1:Model.NDisc
+    P11(1,ii) = sign(z1(X)).*chebyshev(z1(X),ii-1);
+    P22(1,ii) = sign(z2(X)).*chebyshev(z2(X),ii-1);
 end
-for ii = 1:Model.NDof, Pc{ii,1} = P; end
+
+P = horzcat(P11,P22);
+
+for ii = 1:Model.NDof 
+    Pc{ii,1} = P; 
+end
 
 P = blkdiag(Pc{:})+ 1e-16*X;
+
+
+function y = z1(x)
+y = 2*max((sign(-2.0*x+1.0)),0.0)*x;
+end
+
+function y = z2(x)
+y = max((2.0*(x)-1.0+1e-6),0.0);
+end
+
 end
 
 %---------------------------------------------------------------------- set

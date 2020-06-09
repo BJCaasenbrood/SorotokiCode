@@ -11,16 +11,17 @@ clear; clc; close all;
 ShowSimulation = true;
 %% init. states
 l0   = 0.064;               % undeformed length (m)
-q0   = [0.063,25,0];       % initial deformations
+q0   = [0.064,25,0];      % initial deformations
 dq0  = [0,0,1500];          % initial deform. rates
 lam0 = [0,0];               % initial creep strains
 
 %% ordinary diff. solver (4th order runge kutta)
 dt = 1e-3; 
-tspan = 0:dt:1.5; 
+tspan = 0:dt:3.5; 
 
 disp('* simulating dynamics...')
 [t,x] = ode45(@(t,x) DifferentialEq(t,x),tspan,[q0 dq0,lam0]);
+%[t,x] = oderk(@(t,x) DifferentialEq(t,x),tspan,[q0 dq0,lam0]);
 
 %% strip solution matrix x
 Elong = (l0 - x(:,1))/l0;
@@ -41,7 +42,7 @@ xlabel('time (s)')
 
 function dx = DifferentialEq(t,x)
 m   = 0.0494;
-beta0 = 1e-2;
+beta0 = 1e-3;
 g   = 9.81;
 r   = 0.02;
 l0  = 0.064;
@@ -77,6 +78,11 @@ M = zeros(3,3);
 C = zeros(3,3);
 N = zeros(3,1);
 F = zeros(3,1);
+
+% if (kx^2 + ky^2) < 0.01
+%     kx = abs(kx) + 0.01; 
+%     ky = abs(ky) + 0.01; 
+% end
 
 M(1,1) = (2*m)/(kx^2 + ky^2) - (2*m*sin(l*(kx^2 + ky^2)^(1/2)))/(l*(kx^2 + ky^2)^(3/2));
 M(1,2) = (3*kx*m*sin(l*(kx^2 + ky^2)^(1/2)))/(l*(kx^2 + ky^2)^(5/2)) - (kx*m*cos(l*(kx^2 + ky^2)^(1/2)))/(kx^2 + ky^2)^2 - (2*kx*m)/(kx^2 + ky^2)^2;
@@ -127,4 +133,28 @@ p = (1./kappa).*[(1-cos(kappa.*sigma)).*cos(theta),...
     (1-cos(kappa.*sigma)).*sin(theta),...
     sin(kappa.*sigma)];
 
+end
+
+%----------------------------------------- ODE solver // runge kutta method
+function [t,dx] = oderk(f,t,y0)
+N = length(t);
+F = @(x,y) f(x,y);
+y = zeros(length(y0),N);
+y(:,1) = y0(:);
+h = mean(diff(t));
+
+for i = 1:(N-1)  
+    ti = t(i);
+    yi = y(:,i);
+    
+    k1 = F(ti,yi);
+    k2 = F(ti+0.5*h,yi+0.5*h*k1);
+    k3 = F(ti+0.5*h,yi+0.5*h*k2);
+    k4 = F(ti+h,yi+k3*h);
+    
+    y(:,i+1) = yi + (1/6)*(k1+2*k2+2*k3+k4)*h;  
+end
+
+dx = transpose(y);
+t = t(:);
 end

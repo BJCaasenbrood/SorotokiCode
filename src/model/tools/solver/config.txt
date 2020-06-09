@@ -3,7 +3,7 @@ ENERGY_CONTROLLER = 0
 WRITE_OUTPUT      = 1
 
 [cosserat]
-E1 = 1
+E1 = 0
 E2 = 0
 E3 = 0
 K1 = 0
@@ -11,12 +11,13 @@ K2 = 1
 K3 = 1
 
 [model]
-NMODE   = 1
+NMODE   = 4
+NDISC   = 2
 SDOMAIN = 1
-TDOMAIN = 5
+TDOMAIN = 10
 
 [solver]
-SPACESTEP = 10
+SPACESTEP = 23
 TIMESTEP  = 0.01
 INTSTEP   = 900
 ATOL      = 1e-8
@@ -26,14 +27,14 @@ MAX_ITER  = 1e5
 SPEEDUP   = 1.0
 
 [physics]
-RHO      = 0.06
-EMOD     = 6e3
+RHO      = 0.02
+EMOD     = 4e2
 NU       = 0.4
-MU       = 1.4
+MU       = 0.4
 PRS_AREA = 1e-5
 GRAVITY  = 9.81
 RADIUS   = 0.01
 
 [control]
-KP = 1e-3
-KD = 2e-4
+KP = 7e2
+KD = 7e2

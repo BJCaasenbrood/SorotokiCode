@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <unistd.h>
 #include "liegroup.h"
-#include "shapes.cpp"
+#include "shapesx.cpp"
 #include "qprog.hpp"
 #include "pinv.cpp"
 #include "tictoc.h"
@@ -28,6 +28,7 @@
 #define PRECISION 5
 #define PI 3.1415926
 
+typedef Eigen::Array<int, Dynamic, 1> Vxi;
 typedef Eigen::Array<int, 6, 1> V6i;
 typedef Eigen::Matrix<float, 6, 6> M6f;
 typedef Eigen::Matrix<float, 4, 4> M4f;
@@ -58,6 +59,7 @@ class Model
   	float G11, G22, G33;
 
   	int NMODE; 
+  	int NDISC;
 	float SDOMAIN; 
 	float TDOMAIN; 
 	int SPACESTEP;
@@ -85,6 +87,7 @@ class Model
   	Mxf Hess;
 
   	Mxf Ba,Bc;
+  	Mxf Sa,Sc;
   	M6f Mtt, Ktt, Dtt;
   	Mxf Mee, Kee, Dee;
   	Vxf q, dq, ddq;
@@ -108,10 +111,12 @@ class Model
 	void read(const char* str, Vxf &x);
 	void cleanup();
 
-	void operationalSpaceDynamics(Mxf &J, Mxf &Jt, Vxf &dq, 
-	Mxf &M, Vxf &C, Vxf &G, Mxf &Mx, Vxf &Cx, Vxf &Gx);
-	void dynamicProjector(Mxf &J, Mxf &M, Mxf &S, Mxf &P);
-	void controllerWrench(float t, Mxf &J, Vxf &f);
+	//void operationalSpaceDynamics(Mxf &J, Mxf &Jt, Vxf &dq, 
+	//Mxf &M, Vxf &C, Vxf &G, Mxf &Mx, Vxf &Cx, Vxf &Gx);
+	//void dynamicProjector(Mxf &J, Mxf &M, Mxf &S, Mxf &P);
+	//void controllerWrench(float t, Mxf &J, Vxf &f);
+	void controllerPassive(float t, Mxf &M, Vxf &Qv,
+ 	Vxf &Qa, Mxf &J, Vxf &f);
 
 	/*
 	Vxf solve();
@@ -136,7 +141,7 @@ class Model
 	void systemMatODE(float s, 
 	Mxf &K, Mxf &M, Mxf &D);
 
-	Mxf tableConstraints(V6i table, bool set = true);
+	Mxf tableConstraints(Vxi table, bool set = true);
 	void hessianInverse(float dt, Vxf R, Vxf &dx);
 
 	void buildInertiaTensor();

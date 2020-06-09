@@ -147,6 +147,7 @@ function obj = Fem(Mesh,varargin)
     obj.Residual = zeros(obj.Dim*obj.NNode,1);
     obj.Utmp     = zeros(obj.Dim*obj.NNode,1);
     obj.SigmoidFactor  = 0;
+    obj.Load     = zeros([1,0,0]);
        
     for ii = 1:2:length(varargin)
         obj.(varargin{ii}) = varargin{ii+1};
