@@ -1,5 +1,5 @@
 [options]
-ENERGY_CONTROLLER = 0
+ENERGY_CONTROLLER = 1
 WRITE_OUTPUT      = 1
 
 [cosserat]
@@ -17,7 +17,7 @@ SDOMAIN = 1
 TDOMAIN = 10
 
 [solver]
-SPACESTEP = 23
+SPACESTEP = 11
 TIMESTEP  = 0.01
 INTSTEP   = 900
 ATOL      = 1e-8
@@ -32,9 +32,10 @@ EMOD     = 4e2
 NU       = 0.4
 MU       = 0.4
 PRS_AREA = 1e-5
-GRAVITY  = 9.81
+GRAVITY  = 9.8
 RADIUS   = 0.01
 
 [control]
-KP = 7e2
-KD = 7e2
+KP = 3e3
+KD = 1e3
+KE = 0

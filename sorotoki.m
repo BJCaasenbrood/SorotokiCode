@@ -95,6 +95,7 @@ libs(2) = IncludeGraphicsModel(Path,0);
 libs(3) = IncludeMesh(Path,0);
 libs(4) = IncludeFiniteElement(Path,0);
 libs(5) = IncludeDynamicModel(Path,0);
+libs(6) = IncludeBalloonDog(Path,0);
 
 if min(libs) == 1
 fprintf('\n* Libary check completed - all libaries are up-to-date - \n');
@@ -135,6 +136,7 @@ if bool == 1
     if libs(3), IncludeMesh(Path,1); end
     if libs(4), IncludeFiniteElement(Path,1); end
     if libs(5), IncludeDynamicModel(Path,1); end
+    if libs(6), IncludeBalloonDog(Path,1); end
     
     fclose('all');
 end
@@ -276,6 +278,24 @@ addpath([Path,'\src\model']);
 addpath([Path,'\src\model\tools']);
 pause(.3);
 x = modelPathConfirm;
+end
+end
+
+% -------------------------------------------------------------- BALLOONDOG
+function x = IncludeBalloonDog(Path,Request)
+global FID
+
+if Request == 1
+fprintf(FID,'%% bdog.lib \n');
+WriteToFile([Path,'\src\bdog']);
+WriteToFile([Path,'\src\bdog\tools']);
+WriteToFile([Path,'\src\bdog\tools\SSH']);
+else
+addpath([Path,'\src\bdog']);
+addpath([Path,'\src\bdog\tools']);
+addpath([Path,'\src\bdog\tools\SSH']);
+pause(.3);
+x = bdogPathConfirm;
 end
 end
 

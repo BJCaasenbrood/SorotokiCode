@@ -3,9 +3,10 @@
 using namespace std;
 using namespace Eigen;
 
-ofstream statelog;
-ofstream taulog;
-ofstream glog;
+ofstream statelog;	// log of states
+ofstream taulog;	// log of control inputs
+ofstream glog;		// log of configuration
+ofstream elog;		// log of energy variables
 
 //---------------------------------------------------
 //-------------------------------- class constructor
@@ -52,6 +53,7 @@ Model::Model(const char* str){
 
   	KP = cf.Value("control","KP");
   	KD = cf.Value("control","KD");
+  	KE = cf.Value("control","KE");
 
 	Ba = tableConstraints(tab,true);
 	Bc = tableConstraints(tab,false);
@@ -81,7 +83,7 @@ Model::Model(const char* str){
 	ddq = Vxf::Zero(NState);
 	qd  = Vxf::Zero(NState);
 	tau = Vxf::Zero(NState);
-	u   = Vxf::Zero(6);
+	u   = Vxf::Zero(NMODE);
 	z0  = Vxf::Zero(6);
 
 	Xi0 << 0.0, 0.0, 0.0, 1.0, 0.0, 0.0;
@@ -94,14 +96,26 @@ Model::Model(const char* str){
 	read("point.log",z0);
 
 	#ifdef FULL_CONTROLLER
-	read("state.log",qd);
-	q = Vxf::Constant(NState,ATOL);
+		read("state.log",qd);
+		qd = Vxf::Constant(NState,ATOL);
 	#endif
 
 	#ifdef CONSTRAINED_CONTROLLER
-	read("state.log",qd);
-	q = Vxf::Constant(NState,ATOL);
+		read("state.log",qd);
+		q = Vxf::Constant(NState,ATOL);
 	#endif
+
+	// if(ENERGY_CONTROLLER){
+	// 	read("state.log",qd);
+
+	// 	// compute desired energy variable;
+	// 	inverseDynamics(qd, qd*0, qd*0, q);
+	// 	Ec = Hamil(0) + Hamil(1);
+
+	// 	cout << "Desired H:=T+V: " << Ec << endl;
+
+	// 	q = Vxf::Constant(NState,ATOL);
+	// }
 
 	// clean up 
 	cleanup();
@@ -109,6 +123,7 @@ Model::Model(const char* str){
 	statelog.open("state.log", ios_base::app | ios::binary);
 	taulog.open("tau.log", ios_base::app | ios::binary);
 	glog.open("g.log", ios_base::app | ios::binary);
+	elog.open("e.log", ios_base::app | ios::binary);
 
 	cout << setprecision(PRECISION) << endl;
 }	
@@ -148,13 +163,15 @@ void Model::read(const char* str, Vxf &x){
 //--------------------------------------- clean file
 //---------------------------------------------------
 void Model::cleanup(){
-	ofstream myfile1, myfile2, myfile3;
+	ofstream myfile1, myfile2, myfile3, myfile4;
 	myfile1.open("state.log", ofstream::out | ofstream::trunc);
 	myfile2.open("tau.log", ofstream::out | ofstream::trunc);
 	myfile3.open("g.log", ofstream::out | ofstream::trunc);
+	myfile4.open("e.log", ofstream::out | ofstream::trunc);
 	myfile1.close();
 	myfile2.close();
 	myfile3.close();
+	myfile4.close();
 }
 
 // //--------------------------------------------------
@@ -237,35 +254,35 @@ Vxf &Qa, Mxf &J, Vxf &f){
 	na = NDof*NDISC;
 	nc = NState - na;
 
-	Mxf T(n)
-	V6f z, dz, dz0;
+	//V6f z, dz, dz0;
 	Vxf u_(na);
-	M6f Adg;
+	//M6f Adg;
 
-	dz0.setZero();
+	//dz0.setZero();
 
 	// // get configuration-space in R6
-	SE3toR6(g,z);
-	Admap(g,Adg);
+	//SE3toR6(g,z);
+	//Admap(g,Adg);
 
-	dz.noalias() = eta;
-	z0.block(0,0,3,1).noalias() = z.block(0,0,3,1);
-	dz0.block(0,0,3,1).noalias() = eta.block(0,0,3,1);
+	//dz.noalias() = eta;
+	//z0.block(0,0,3,1).noalias() = z.block(0,0,3,1);
+	//dz0.block(0,0,3,1).noalias() = eta.block(0,0,3,1);
 
 	// // compute wrench
-	u_ = Sa*J.transpose()*(KP*(z - z0) + KD*(dz - dz0));
+	//u_ = Sa*J.transpose()*(KP*(z - z0) + KD*(dz - dz0));
 	// f *= smoothstep(0.1*t,0,1);
 
 	Mxf M11(na,na), M12(na,nc);
 	Mxf M21(nc,na), M22(nc,nc); 
 	Mxf Ms(NState,NState);
 	Mxf M22_(na,na);
+	Vxf H2_(na);
 	Mxf S(NState,NState);
 
 	S.block(0,0,na,NState).noalias()  = Sc;
 	S.block(na,0,nc,NState).noalias() = Sa;
 
-	// repartition mass matrix;
+	// partition of inertia matrix;
 	Ms.noalias() = S*M*S.transpose();
 	M11.noalias() = Ms.block(0,0,nc,nc);
 	M12.noalias() = Ms.block(0,nc,nc,na);
@@ -273,10 +290,14 @@ Vxf &Qa, Mxf &J, Vxf &f){
 	M22.noalias() = Ms.block(nc,nc,na,na);
 
 	M22_.noalias() = M22 - M21*M11.householderQr().solve(M12);
+	H2_.noalias() = Sa*Qa - M21*M11.householderQr().solve(Sc*Qa);
 
-	f.noalias() = M22_*(-KP*Sa*q - KD*Sa*dq);
+	// energy shaping
+	float E_;
+	E_ = (Hamil(0) + Hamil(1)) - Ec;
 
-	//sleep(1200);
+	f.noalias() = M22_*(-KP*Sa*(q - qd) - KD*Sa*dq) + H2_;
+	f *= smoothstep(t,0,1);
 }
 
 /*
@@ -480,6 +501,7 @@ Vxf Model::implicit_simulate(){
 			output(statelog,t,x.block(0,0,n,1));
 			output(taulog,t,u);
 			output(glog,t,g);
+			output(elog,t,Hamil);
 		}
 
   		x.noalias() += dx;
@@ -548,7 +570,7 @@ void Model::dynamicODE(float t, Vxf x, Vxf &dx){
 		Mxf J(k,n), Jt(k,n);
 		//Mxf Mz(k,k);
 		//Vxf Cz(k), Pz(k), f(6);
-		Vxf u(NDof*NDISC);
+		//Vxf u(NDof*NDISC);
 		M6f Adg;
 
 		// recover task-space Jacobian 
@@ -638,7 +660,7 @@ void Model::kinematicODE(float t, Vxf x, Vxf &dx){
 //----------------------- inverse dynamics algorithm
 //---------------------------------------------------
 void Model::inverseDynamics(Vxf v, Vxf dv, Vxf ddv, Vxf &Q){
-	int n = 25 + NState;
+	int n = 27 + NState;
 	Vff x;
 	Vff K1f,K2f;
 	double ds, s;
@@ -683,8 +705,11 @@ void Model::inverseDynamics(Vxf v, Vxf dv, Vxf ddv, Vxf &Q){
   		s += ds;
 	}
 
+	// write Hamiltonian function (minus for back-integration)
+	Hamil.noalias() = -y.block(25,0,2,1);
+
 	// return force-vector
-	Q.noalias() = y.block(25,0,NState,1);
+	Q.noalias() = y.block(27,0,NState,1);
 }
 
 //---------------------------------------------------
@@ -859,7 +884,9 @@ void Model::backwardODE(float s, Vxf x, Vxf &dx){
 	(dx.block(7,0,6,1)).noalias()  = -adxi*eta + dxi;
 	(dx.block(13,0,6,1)).noalias() = -adxi*deta - addxi*eta + ddxi;
 	(dx.block(19,0,6,1)).noalias() = adxi.transpose()*lam - (adeta.transpose()*Mtt)*eta + Mtt*deta - Fg;
-	(dx.block(25,0,n,1)).noalias() = -(Ba*PMat).transpose()*lam;
+	(dx.block(25,0,1,1)).noalias() = 0.5*(eta.transpose()*Mtt)*eta;	// kinetic energy
+	(dx.block(26,0,1,1)).noalias() = lam.transpose()*xi;			// potential energy
+	(dx.block(27,0,n,1)).noalias() = -(Ba*PMat).transpose()*lam;	// force projection
 }
 
 //---------------------------------------------------

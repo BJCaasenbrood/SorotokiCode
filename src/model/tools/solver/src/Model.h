@@ -38,6 +38,7 @@ typedef Eigen::Matrix<float, 13, 1> V13f;
 typedef Eigen::Matrix<float, 6, 1> V6f;
 typedef Eigen::Matrix<float, 4, 1> V4f;
 typedef Eigen::Matrix<float, 3, 1> V3f;
+typedef Eigen::Matrix<float, 2, 1> V2f;
 typedef Eigen::VectorXf Vxf;
 typedef Eigen::MatrixXf Mxf;
 typedef Eigen::VectorXd Vxd;
@@ -80,11 +81,13 @@ class Model
 	float NU; 
 	float MU; 
 
-  	float KP, KD;
+  	float KP, KD, KE;
+  	float Ec;
   	int NDof, NState;
   	Shapes Phi;
 
   	Mxf Hess;
+  	V2f Hamil; // H:=[T,V]
 
   	Mxf Ba,Bc;
   	Mxf Sa,Sc;

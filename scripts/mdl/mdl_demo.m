@@ -5,17 +5,19 @@ mdl = Model([0,1,1,0,0,0],'NModal',4,'NDisc',2);
 mdl = mdl.set('tspan',2,...
               'Grav',9.81,...
               'Jacobian',true,...
-              'Movie',true,...
-              'MovieAxis',[-0.75 0.75 -0.75 0.75 -1.75 .25]*0.85);
+              'Movie',false,...
+              'MovieAxis',[-1.0 0.5 -0.75 0.75 -1.75 .25]*0.85);
 
 %% generate dynamic model
 mdl = mdl.generate();
 
 %% assign controllers
-mdl.point = [];%[0,0,0,0.4,0.,0.7];
+mdl.point = [0,0,0,0.5746,-0.3417,-0.5613];
 mdl.Pressure = @(t) 0*[0,0,0,0,0.5,0,0,0];
-% 
+
 mdl.q0(1) = 5;
+mdl.q0(3) = 0;
+mdl.q0(7) = 0;
 
 %% simulate soft robot
 mdl = mdl.csolve(); 
@@ -26,12 +28,13 @@ t = mdl.get('t');
 q = mdl.g;
 u = mdl.tau;
 ge = mdl.ge;
-
-subplot(2,1,1);
+TV = mdl.H;
+% 
+% subplot(2,1,1);
 plot(t,q,'-','linewidth',1.0);
 
-subplot(2,1,2);
-plot(t,u,'-','linewidth',1.0);
+% subplot(2,1,2);
+% plot(t,u,'-','linewidth',1.0);
 
 % figure(15);
 % plot3(ge(:,7),ge(:,6),-ge(:,5),'-','linewidth',1.0);

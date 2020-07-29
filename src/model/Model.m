@@ -12,6 +12,7 @@ classdef Model
         g;
         ge;
         tau;
+        H;
         Controller;
         Pressure;
         Texture;
@@ -156,6 +157,8 @@ y = load('src/model/tools/solver/tau.log');
 Model.tau = y(:,2:end);
 y = load('src/model/tools/solver/g.log');
 Model.ge = y(:,2:end);
+y = load('src/model/tools/solver/e.log');
+Model.H = y(:,2:end);
 end
 
 %----------------------------------------------------------------- simulate
@@ -243,7 +246,7 @@ end
 axis(Model.MovieAxis);
 drawnow;
 %axis([-.5 .5 -.5 .5 -1 .5])
-view(30,10);
+view(30,15);
 msh.update();
 mshgr.update();
 msh.ground(Model.MovieAxis);
@@ -252,16 +255,16 @@ if length(Model.t) > 2, FPS = round((1/8)/(mean(diff(Model.t)))); i0 = 1;
 else, FPS = 1; i0 = 1;
 end
 
-plotvector([0;0;0],[0.2;0;0],'Color',col(1),'linewidth',2,'MaxHeadSize',0.75);
-plotvector([0;0;0],[0;0.2;0],'Color',col(2),'linewidth',2,'MaxHeadSize',0.75);
+plotvector([0;0;0],-[0.2;0;0],'Color',col(1),'linewidth',2,'MaxHeadSize',0.75);
+plotvector([0;0;0],-[0;0.2;0],'Color',col(2),'linewidth',2,'MaxHeadSize',0.75);
 plotvector([0;0;0],[0;0;0.2],'Color',col(3),'linewidth',2,'MaxHeadSize',0.75);
 
 if ~isempty(Model.point)
 p = Model.point(4:6).';
 p = [p(3);p(2);-p(1)];
 
-h0 = plotvector(p,[0.2;0;0],'Color',col(4),'linewidth',2,'MaxHeadSize',0.75);
-h1 = plotvector(p,[0;0.2;0],'Color',col(4),'linewidth',2,'MaxHeadSize',0.75);
+h0 = plotvector(p,-[0.2;0;0],'Color',col(4),'linewidth',2,'MaxHeadSize',0.75);
+h1 = plotvector(p,-[0;0.2;0],'Color',col(4),'linewidth',2,'MaxHeadSize',0.75);
 h2 = plotvector(p,[0;0;0.2],'Color',col(4),'linewidth',2,'MaxHeadSize',0.75);
 end
 

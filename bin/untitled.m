@@ -2,16 +2,16 @@ clr
 %%
 x = linspace(0+1e-6,1-1e-6,1e3);
 % 
-for ii = 1:3
+for ii = 1:4
 y1 = sign(z1(x)).*chebyshev(z1(x),ii-1);
 y2 = sign(k2(x)).*chebyshev(k2(x),ii-1);
 
 hold on;
-subplot(3,2,2*ii-1);
+subplot(4,2,2*ii-1);
 shade(x,y1,'Color',col(1),'Linewidth',1.5);
 axis([0 1 -1 1]); grid on;
 set(gca,'linewidth',0.75)
-subplot(3,2,2*ii);
+subplot(4,2,2*ii);
 shade(x,y2,'Color',col(2),'Linewidth',1.5);
 axis([0 1 -1 1]); grid on;
 set(gca,'linewidth',0.75)
