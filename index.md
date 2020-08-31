@@ -15,10 +15,11 @@ The Sorotoki toolkit includes a library of class-oriented functions for designin
 
 ```matlab
 % list of classes
-msh = Mesh();	 % meshing class
+msh = Mesh();	   % meshing class
 fem = Fem();   	 % finite elements class
 obj = Gmodel();  % graphics model class
 mdl = Model();   % dynamical model class
+ctr = Control(); % (real-time) control class
 ```
 
 To get started, type the following line in the command window:
