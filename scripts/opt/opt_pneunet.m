@@ -6,33 +6,33 @@ msh = Mesh(sdf,'BdBox',[0,20,0,40],'Quads',[25 50]);
 msh = msh.generate();
 
 %% show generated mesh
-fem = Fem(msh,'VolumeInfill',0.2,'Penal',4,'FilterRadius',4,...
+fem = Fem(msh,'VolumeInfill',0.3,'Penal',4,'FilterRadius',4,...
               'Nonlinear',false,'TimeStep',1/3,...
               'OptimizationProblem','Compliant',...
               'MaxIterationMMA',70);
 
 %% set spatial settings
-fem = fem.set('Periodic',[1/2, 0],'Repeat',[]);
+fem = fem.set('Periodic',[1/2, 0],'Repeat',ones(7,1));
 
 %% add boundary condition
 id = fem.FindNodes('Left'); 
 fem = fem.AddConstraint('Support',id,[1,1]);
 
 id = fem.FindNodes('Right'); 
-fem = fem.AddConstraint('Spring',id,[1,0]);
-fem = fem.AddConstraint('Output',id,[1,0]);
+fem = fem.AddConstraint('Spring',id,[0,1]);
+fem = fem.AddConstraint('Output',id,[0,-1]);
 
-%id = fem.FindNodes('Bottom'); 
-%fem = fem.AddConstraint('Spring',id,[1,0]);
+id = fem.FindNodes('Bottom'); 
+fem = fem.AddConstraint('Spring',id,[1,0]);
 
 id = fem.FindElements('Location',[10,25],1);
 fem = fem.AddConstraint('PressureCell',id,[1e-3,0]);
 
 %% set density
-fem = fem.initialTopology('Hole',[10,25],1);
+fem = fem.initialTopology('Hole',[10,25],0.5);
 
 %% material
-fem.Material = TPU90;
+fem.Material = Dragonskin10A;
 
 %% solving
 fem.optimize();

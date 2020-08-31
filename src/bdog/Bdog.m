@@ -13,25 +13,6 @@ classdef Bdog < handle
     
 %--------------------------------------------------------------------------
 methods  
-% function x = BalloonDog(x,Request,Arg)
-% 
-% switch(Request)
-%     case('Find');       x = FindBoards();
-%     case('Connect');    x = Connect(x);
-%     case('Disconnect'); x = Disconnect(x);
-%     case('Command');    x = Command(x,Arg);
-%     case('Monitor');    x = SerialMonitor(x,Arg);
-%     case('ps');         x = Command(x,'ps a');
-%     case('Read');       x = ReadLogFile(x,Arg);
-%     case('Read');       x = ReadLogFile(x,Arg);
-%     case('Run');        x = RunSorotoki(x);
-%     case('ls');         x = Command(x,'ls');
-%     case('kill');       x = CommandArg(x,'sudo kill',Arg);
-%     case('Data');       x = GetData(x);
-%     otherwise;          x = CommandShell(x,Request,1);
-% end
-% 
-% end
 
 function obj = Bdog(Ip,User,Password)
     
