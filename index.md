@@ -11,7 +11,7 @@ sorotoki();
 ```
 
 # Getting started
-The Sorotoki toolkit includes a library of class-oriented functions for designing, modeling, and controlling a wide variety of soft robots. the toolkit is designed to solve particular sub-problem within the field of soft robotics and to build a large soft robotic model from smaller sub-modules. For instance, the classes *Mesh()* and *Fem()* provide numerical tools to numerically model the continuum mechanical behavior of soft structures, whose extrapolated material models can be used in the dynamic model with *Model()*. The main classes of Sorotoki are listed below:
+The Sorotoki toolkit includes a library of class-oriented functions for designing, modeling, and controlling a wide variety of soft robots. the toolkit is designed to solve particular sub-problem within soft robotics such that complex systems can be decomposed in smaller sub-modules. For instance, the classes *Mesh()* and *Fem()* provide numerical tools to numerically model the continuum mechanical behavior of soft structures, whose extrapolated material models can later be used in the dynamic modelling part with *Model()*. The main classes of Sorotoki are listed below:
 
 ```matlab
 % list of classes
@@ -37,7 +37,7 @@ sorotoki('demo');
 
 
 ## Citation
-If you are using Sorotoki in your academic work, please consider to cite the toolkit:
+If you are using Sorotoki in your (academic) work, please consider citing the toolkit:
 ```
 @misc{Caasenbrood2018,
   author = {Caasenbrood, Brandon},
