@@ -1,19 +1,15 @@
 clc; clear; close all;
 
 %% model
-Dist = @(X) dSphere(X,0,0,0,1);
-BdBox = [-1,1,-1,1,-1,1];
-
-%obj = Gmodel(Dist,BdBox);
-obj = Gmodel('Manifold.stl');
-
-%obj = Blender(obj,'Scale',{'z',1.5});
-%obj = Blender(obj,'Rotate',{'3D',10,20,0});
+Dist = @(x) SDF(x);
+obj = Gmodel(Dist,domain(0,1,3),'Quality',150);
 
 %% set texture
-%obj.set('TextureStretch',.75);
-obj.Texture = 1.25*grey;
-obj.bake();
+obj.Texture = clean;
 
 %% show
-obj.render(); 
+obj.bake().render(); 
+
+function Dist = SDF(x)
+Dist = dCube(x,0,1,0,1,0,0.01);
+end

@@ -1,5 +1,7 @@
 function Pc = Quads(BdBox,Nx,Ny)
-if nargin < 3, Ny = Nx; end
+if nargin < 3, Ny = Nx; 
+else, Nx = Nx^2; Ny = Ny^2;
+end
 
 Nx = ceil(sqrt(Nx));
 Ny = ceil(sqrt(Ny));

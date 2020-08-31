@@ -4,20 +4,16 @@ clear; close all; clc;
 sdf = @(x) SoftLeg(x);
 
 %% generate mesh
-msh = Mesh(sdf,'BdBox',[0,30,0,50],'NElem',1200);
-msh = msh.generate();
+msh = Mesh(sdf,'BdBox',[0,30,0,50],'Quads',650);
+msh = msh.generate().show(); pause(3.0)
 
 %% show generated mesh
-fem = Fem(msh,'VolumeInfill',0.3,...
-              'Penal',4,...
-              'FilterRadius',3,...
-              'Nonlinear',false,...
-              'MaxIterationMMA',50,...
-              'OptimizationProblem','Compliant',...
-              'Movie',false);
+fem = Fem(msh,'VolumeInfill',0.3,'Penal',4,'FilterRadius',3,...
+              'Nonlinear',false,'MaxIterationMMA',50,...
+              'OptimizationProblem','Compliant','ChangeMax',0.05);
           
 %% set spatial settings
-fem = fem.set('Repeat',ones(14,1),'Periodic',[1/2,0]);
+fem = fem.set('Repeat',ones(5,1),'Periodic',[1/2,0]);
 
 %% add constraint
 % id = fem.FindNodes('Location',[30,12]);
@@ -43,10 +39,11 @@ fem = fem.AddConstraint('PressureCell',id,[-1e-3,0]);
 fem = fem.initialTopology('Hole',[10,30],5);
 
 %% material
-fem.Material = Ecoflex0030;
+fem.Material = Dragonskin10A;
 
 %% linear solving
 fem.optimize();
+fem.show('ISO');
 
 % %% proceed nonlinear
 % fem = fem.reset('fem');

@@ -7,8 +7,21 @@ function x = pingserver
 %       https://github.com/BJCaasenbrood/SorotokiCode
 
 %   Copyright 2018-2023 B.J.Caasenbrood 
-[~,b] = dos('ping -n 1 www.google.com');
-n=strfind(b,'Lost');
-n1=b(n+7);
+if ismac
+    % Code to run on Mac platform
+elseif isunix
+    % Code to run on Linux platform
+    [~,b] = system('ping -c 1 www.google.com');
+    n=strfind(b,'loss');
+    n1=b(n-10);
+elseif ispc
+    [~,b] = system('ping -n 1 www.google.com');
+    n=strfind(b,'Lost');
+    n1=b(n+7);
+else
+    disp('Platform not supported')
+end
+
 if(n1=='0'), x=true; else, x=false; end
+
 end

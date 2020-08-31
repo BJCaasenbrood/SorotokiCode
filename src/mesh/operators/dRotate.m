@@ -16,15 +16,6 @@ if nargin == 3
 y = y + repmat(point(:)',length(x),1);
 end
 
-
 end
 %-------------------------------------------------------------------------%
-
-function d = RotateOperation(x,y,k)
-R = [cos(k),-sin(k);...
-     sin(k), cos(k)];
-
-d = R*[x;y];
-d = d(:).';
-end
 

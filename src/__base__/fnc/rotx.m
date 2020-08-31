@@ -30,7 +30,7 @@
 %
 % https://github.com/petercorke/spatial-math
 
-function R = rotz(t, deg)
+function R = rotx(t, deg)
     
     assert((isreal(t) & isscalar(t)) | isa(t, 'sym'), ...
         'SMTB:rotz:badarg', 'theta must be a real scalar or symbolic');
@@ -53,5 +53,5 @@ function R = rotz(t, deg)
     end
     
     % create the rotation matrix
-    R = [ct, -st,  0; st, ct, 0; 0, 0, 1];
+    R = [1, 0, 0; 0, ct, -st;  0, st, ct];
 end

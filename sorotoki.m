@@ -66,7 +66,7 @@ fprintf(['* Directory ',verFolder, ' added to path \n']);
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-addpath([Path,verFolder]);
+AddPath([Path,verFolder]);
 
 if exist([Path,'/config/vernum.m'], 'file')
     delete([Path,'/config/vernum.m']); 
@@ -86,7 +86,7 @@ url = ['https://raw.githubusercontent.com/BJCaasenbrood/',...
     'SorotokiCode/master/config/vernum.m'];
 filename = [verFolder,'/vernum.m'];
 websave(filename,url);
-
+%AddPath(verFolder);
 fprintf(['* Succesfully downloaded contents', filename, '\n']);
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -95,7 +95,6 @@ libs(2) = IncludeGraphicsModel(Path,0);
 libs(3) = IncludeMesh(Path,0);
 libs(4) = IncludeFiniteElement(Path,0);
 libs(5) = IncludeDynamicModel(Path,0);
-libs(6) = IncludeBalloonDog(Path,0);
 
 if min(libs) == 1
 fprintf('\n* Libary check completed - all libaries are up-to-date - \n');
@@ -136,7 +135,6 @@ if bool == 1
     if libs(3), IncludeMesh(Path,1); end
     if libs(4), IncludeFiniteElement(Path,1); end
     if libs(5), IncludeDynamicModel(Path,1); end
-    if libs(6), IncludeBalloonDog(Path,1); end
     
     fclose('all');
 end
@@ -188,17 +186,17 @@ WriteToFile([Path,'\data\matcap']);
 WriteToFile([Path,'\data\matcap\img']);
 WriteToFile([Path,'\data\stl']);
 else
-addpath(Path);
-addpath([Path,'\config\']);
-addpath([Path,'\src\__version__']);
-addpath([Path,'\src\__base__']);
-addpath([Path,'\src\__base__\fnc']);
-addpath([Path,'\scripts\']);
-addpath([Path,'\data\color']);
-addpath([Path,'\data\colormap']);
-addpath([Path,'\data\matcap']);
-addpath([Path,'\data\matcap\img']);
-addpath([Path,'\data\stl']);
+AddPath(Path);
+AddPath([Path,'\config\']);
+AddPath([Path,'\src\__version__']);
+AddPath([Path,'\src\__base__']);
+AddPath([Path,'\src\__base__\fnc']);
+AddPath([Path,'\scripts\']);
+AddPath([Path,'\data\color']);
+AddPath([Path,'\data\colormap']);
+AddPath([Path,'\data\matcap']);
+AddPath([Path,'\data\matcap\img']);
+AddPath([Path,'\data\stl']);
 pause(.3);
 x = basePathConfirm;
 end
@@ -213,8 +211,8 @@ fprintf(FID,'%% gmodel.lib \n');
 WriteToFile([Path,'\src\gmodel']);
 WriteToFile([Path,'\src\gmodel\tools\']);
 else
-addpath([Path,'\src\gmodel']);
-addpath([Path,'\src\gmodel\tools\']);
+AddPath([Path,'\src\gmodel']);
+AddPath([Path,'\src\gmodel\tools\']);
 pause(.3);
 x = graphicsmodelPathConfirm;
 end
@@ -231,10 +229,10 @@ WriteToFile([Path,'\src\mesh\tools\']);
 WriteToFile([Path,'\src\mesh\shapes\']);
 WriteToFile([Path,'\src\mesh\operators\']);
 else
-addpath([Path,'\src\mesh']);
-addpath([Path,'\src\mesh\tools\']);
-addpath([Path,'\src\mesh\shapes\']);
-addpath([Path,'\src\mesh\operators\']);
+AddPath([Path,'\src\mesh']);
+AddPath([Path,'\src\mesh\tools\']);
+AddPath([Path,'\src\mesh\shapes\']);
+AddPath([Path,'\src\mesh\operators\']);
 pause(.3);
 x = meshPathConfirm;
 end
@@ -253,12 +251,12 @@ WriteToFile([Path,'\src\fem\tools\mma']);
 WriteToFile([Path,'\src\fem\materials\']);
 WriteToFile([Path,'\src\fem\materials\samples']);
 else
-addpath([Path,'\src\fem']);
-addpath([Path,'\src\fem\tools\']);
-addpath([Path,'\src\fem\tools\tpswarp']);
-addpath([Path,'\src\fem\tools\mma']);
-addpath([Path,'\src\fem\materials\']);
-addpath([Path,'\src\fem\materials\samples']);
+AddPath([Path,'\src\fem']);
+AddPath([Path,'\src\fem\tools\']);
+AddPath([Path,'\src\fem\tools\tpswarp']);
+AddPath([Path,'\src\fem\tools\mma']);
+AddPath([Path,'\src\fem\materials\']);
+AddPath([Path,'\src\fem\materials\samples']);
 pause(.3);
 x = femPathConfirm;
 end
@@ -274,28 +272,10 @@ WriteToFile([Path,'\src\model']);
 WriteToFile([Path,'\src\model\tools']);
 WriteToFile([Path,'\src\model\tools\solver']);
 else
-addpath([Path,'\src\model']);
-addpath([Path,'\src\model\tools']);
+AddPath([Path,'\src\model']);
+AddPath([Path,'\src\model\tools']);
 pause(.3);
 x = modelPathConfirm;
-end
-end
-
-% -------------------------------------------------------------- BALLOONDOG
-function x = IncludeBalloonDog(Path,Request)
-global FID
-
-if Request == 1
-fprintf(FID,'%% bdog.lib \n');
-WriteToFile([Path,'\src\bdog']);
-WriteToFile([Path,'\src\bdog\tools']);
-WriteToFile([Path,'\src\bdog\tools\SSH']);
-else
-addpath([Path,'\src\bdog']);
-addpath([Path,'\src\bdog\tools']);
-addpath([Path,'\src\bdog\tools\SSH']);
-pause(.3);
-x = bdogPathConfirm;
 end
 end
 

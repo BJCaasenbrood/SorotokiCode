@@ -147,7 +147,7 @@ function obj = Fem(Mesh,varargin)
     obj.Residual = zeros(obj.Dim*obj.NNode,1);
     obj.Utmp     = zeros(obj.Dim*obj.NNode,1);
     obj.SigmoidFactor  = 0;
-    obj.Load     = zeros([1,0,0]);
+    %obj.Load     = zeros(1,0,0);
        
     for ii = 1:2:length(varargin)
         obj.(varargin{ii}) = varargin{ii+1};
@@ -600,7 +600,9 @@ while flag
     [flag,Fem] = CheckConvergenceOpt(Fem);
     
     % draw visual
-    Fem.show(Visual); drawnow;
+    if mod(Fem.IterationMMA,10) == 0
+        Fem.show(Visual); drawnow;
+    end
 end
 
 Fem.SolverStartMMA = false;
@@ -609,7 +611,13 @@ end
 
 %----------------------------------------------------- form smooth topology
 function Fem = former(Fem, Thickness)
-Res = 300;    
+    
+if Fem.SolverStartMMA
+    Res = 100;
+else
+    Res = 300;
+end
+    
 Layers = 40;
 Patch = 5;
 
@@ -763,7 +771,7 @@ I = GaussianFilter((SDF >= varargin{1})*255,3);
 [XX,YY] = meshgrid(linspace(Uxx(1),Uxx(2),size(I,1)),...
                    linspace(Uyy(1),Uyy(2),size(I,2)));
 
-image(rescale(Uxx),...
+I = image(rescale(Uxx),...
     ((max(Uyy)-min(Uyy))/(max(Uxx) - min(Uxx)))*rescale(Uyy),I);
 
 axis equal; axis off; 
@@ -1046,6 +1054,7 @@ for el = 1:Fem.NElem
     index    = index + NDof^2;
     subindex = subindex + NDof/Fem.Dim;
 end
+
 end
 
 Fem.AssembledSystem = true;
@@ -1174,7 +1183,7 @@ if Fem.PrescribedDisplacement
         Ktmp(pDof,:) = I(pDof,:);
         Ktmp(:,pDof) = I(:,pDof);
         F = -beta*K*F;
-        if isempty(Fem.Contact), F(pDof) = beta*Fem.Load(1:NLoad,id+1);
+        if isempty(Fem.Contact), %F(pDof) = beta*Fem.Load(1:NLoad,id+1);
         else, F(pDof) = beta*fDof;
         end
             
@@ -1225,24 +1234,24 @@ if Fem.VolumetricPressure
     W(idnull) = 0;
     Ft = beta*sparse(Fem.i,1,W(Fem.e).*Fem.ft);
     
-    if Fem.SolverStartMMA || Fem.Nonlinear
+    if (Fem.SolverStartMMA || Fem.Nonlinear) 
         z0 = Fem.Density;
         dz = Fem.ChangeMax;
         Fem.dFdE = zeros(2*Fem.NNode,Fem.NElem);
         bnd = boundary(Pc(id,1),Pc(id,2));
         idbound = id(bnd);
-        for ii = idbound
-            ze = z0;
-            ze(ii) = ze(ii) + dz;
-            Fem.Density = ze;
-            id = FindElements(Fem,'FloodFill',Fem,Fem.Density);
-            idnull = setdiff(1:Fem.NElem,id);
-            W = ones(Fem.NElem,1);
-            W(idnull) = 0;
-            fe = sparse(Fem.i,1,W(Fem.e).*Fem.ft);
-            Fem.dFdE(:,ii) = ((fe - Ft)/(dz));
-        end
-        Fem.Density = z0;
+%         for ii = idbound
+%             ze = z0;
+%             ze(ii) = ze(ii) + dz;
+%             id = FindElements(Fem,'FloodFill',Fem,Fem.Density);
+%             idnull = setdiff(1:Fem.NElem,id);
+%             W = ones(Fem.NElem,1);
+%             W(idnull) = 0;
+%             SS = dot(W(Fem.e),Fem.ft);
+%             fe = sparse(Fem.i,1,SS);
+%             Fem.dFdE(:,ii) = ((fe - Ft)/(dz));
+%         end
+%         Fem.Density = z0;
     end
 else
     Ft = sparse(Fem.NNode*Fem.Dim,1);

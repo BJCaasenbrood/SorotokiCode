@@ -12,10 +12,11 @@ classdef Model
         g;
         ge;
         tau;
-        H;
         Controller;
         Pressure;
         Texture;
+        q;
+        dq;
         q0;
         dq0;
         gain;
@@ -24,9 +25,8 @@ classdef Model
     
     properties (Access = private)
         Nq;
-        q; 
-        dq;
-        ddq;
+        xd;
+        
         t;
         E;
         nu = 0.45;
@@ -76,7 +76,7 @@ function obj = Model(Table,varargin)
     obj.NDisc = 2;
     obj.Chebyshev = false;
     obj.PressureArea = 5e-5;
-    obj.Texture = studioclay;
+    obj.Texture = prusa;
     obj.Jacobian = true;
     
     for ii = 1:2:length(varargin)
@@ -111,12 +111,11 @@ end
 
 %---------------------------------------------------------------------- set
 function Model = solve(Model)   
-q0 = zeros(Model.NModal*Model.NDof,1);
+x0 = zeros(Model.NModal*Model.NDof,1);
 dt = 1e-1;
-T = 0:dt:Model.tspan;
 opts = optimoptions('fsolve','Display','none','TolFun',1e-3,...
     'Algorithm','levenberg-marquardt');
-ys = fsolve(@(x) KinematicODE(Model,Model.tspan,x),q0,opts);
+ys = fsolve(@(x) KinematicODE(Model,Model.tspan,x),x0,opts);
 
 % opt = odeset('RelTol',1e-1,'AbsTol',1e-1);
 % [~,ys] = oderk(@(t,x) KinematicODE(Model,Model.tspan,x),T,q0);
@@ -125,40 +124,51 @@ Model.g = ys(:).';
 Model.t = 1;
 end
 
+%--------------------------------------------------------------------- make
+function Model = make(Model)
+tic
+CMD = 'cd src/model/tools/solver/build && make';
+system(CMD);
+toc    
+end
+
 %---------------------------------------------------------------------- set
 function Model = csolve(Model)   
-dir_path = './src/model/tools/solver';
-out = fullfile(dir_path,'input.log');
-fileID = fopen(out,'w');
-fprintf(fileID,'%d\n',Model.Pressure(Model.tspan));
-fclose(fileID);
+dir_path = './src/model/tools/solver/build';
+%out = fullfile(dir_path,'input.log');
+% fileID = fopen(out,'w');
+% fprintf(fileID,'%d\n',Model.Pressure(Model.tspan));
+% fclose(fileID);
 %//////////////////////////////////
-out = fullfile(dir_path,'state.log');
+out = fullfile(dir_path,'log/state.log');
 fileID = fopen(out,'w');
 fprintf(fileID,'%d\n',Model.q0);
 fclose(fileID);
 %//////////////////////////////////
-out = fullfile(dir_path,'state_dt.log');
+out = fullfile(dir_path,'log/state_dt.log');
 fileID = fopen(out,'w');
 fprintf(fileID,'%d\n',Model.dq0);
 fclose(fileID);
 %//////////////////////////////////
-out = fullfile(dir_path,'point.log');
-fileID = fopen(out,'w');
-fprintf(fileID,'%d\n',Model.point);
-fclose(fileID);
+% fileID = fopen(out,'w');
+% fprintf(fileID,'%d\n',Model.point);
+% fclose(fileID);
 tic
-system('cd src/model/tools/solver && main.exe config.txt');
+CMD = 'cd src/model/tools/solver/build && ./solver config.txt';
+system(CMD);
 toc
-y = load('src/model/tools/solver/state.log');
-Model.g = y(:,2:end);
+y = load('src/model/tools/solver/build/log/state.log');
+Model.q = y(:,2:end);
 Model.t = y(:,1);
-y = load('src/model/tools/solver/tau.log');
+y = load('src/model/tools/solver/build/log/tau.log');
 Model.tau = y(:,2:end);
-y = load('src/model/tools/solver/g.log');
+y = load('src/model/tools/solver/build/log/g.log');
 Model.ge = y(:,2:end);
-y = load('src/model/tools/solver/e.log');
-Model.H = y(:,2:end);
+y = load('src/model/tools/solver/build/log/statelog_dt.log');
+Model.dq = y(:,2:end);
+y = load('src/model/tools/solver/build/log/xd.log');
+Model.xd = y(:,2:end);
+
 end
 
 %----------------------------------------------------------------- simulate
@@ -184,9 +194,9 @@ end
 %--------------------------------------------------------------------- show
 function show(Model)
 N = Model.Nq;
-X = linspace(0,1,200);
+X = linspace(0,1,20);
 
-if length(Model.t) > 2, FPS = round((1/24)/(mean(diff(Model.t))));
+if length(Model.t) > 2, FPS = round((1/13)/(mean(diff(Model.t))));
 else, FPS = 1;
 end
 
@@ -220,14 +230,17 @@ N = Model.Nq;
 Model.Length = Model.Length0;
 X = linspace(0,1,200);
 
-%msh = Gmodel('SlenderRod.stl');
-msh = Gmodel('SoftActuatorRedux.stl');
-%msh = Gmodel('Pneulink.stl'); assignin('base','msh',msh);
+msh = Gmodel('SlenderRod.stl');
+%msh = Gmodel('SoftActuatorRedux.stl');
+%msh = Gmodel('SoftActuatorPlanarRedux.stl');
+%msh = Gmodel('Pneulink.stl'); 
+%msh = Gmodel('Pneunet.stl'); 
+assignin('base','msh',msh);
 mshgr = Gmodel('SoftGripperRedux.stl'); assignin('base','mshgr',mshgr);
 %mshgr = Gmodel([]);
 %msh = msh.set('Node0',mshgr.Node);
-%mshgr = mshgr.set('Node0',mshgr.Node*2.0e-5);
-%mshgr = mshgr.set('Node',mshgr.Node*2.0e-5);
+mshgr = mshgr.set('Node0',mshgr.Node*1.0e-5);
+mshgr = mshgr.set('Node',mshgr.Node*1.0e-5);
 
 % set texture
 msh.Texture = Model.Texture;
@@ -240,46 +253,47 @@ mshgr = mshgr.render();
 axis equal; 
 
 LinkID = knnsearch(X(:),msh.Node(:,3));
-if isempty(Model.MovieAxis), 
+if isempty(Model.MovieAxis)
     Model.MovieAxis = boxhull(msh.Node); 
 end
 axis(Model.MovieAxis);
 drawnow;
 %axis([-.5 .5 -.5 .5 -1 .5])
-view(30,15);
+view(50,10);
 msh.update();
 mshgr.update();
-msh.ground(Model.MovieAxis);
+%msh.ground(Model.MovieAxis);
 
-if length(Model.t) > 2, FPS = round((1/8)/(mean(diff(Model.t)))); i0 = 1;
+%background('k');
+
+if length(Model.t) > 2, FPS = max(round((1/12)/(mean(diff(Model.t)))),1); i0 = 1;
 else, FPS = 1; i0 = 1;
 end
 
-plotvector([0;0;0],-[0.2;0;0],'Color',col(1),'linewidth',2,'MaxHeadSize',0.75);
-plotvector([0;0;0],-[0;0.2;0],'Color',col(2),'linewidth',2,'MaxHeadSize',0.75);
+plotvector([0;0;0],[0.2;0;0],'Color',col(1),'linewidth',2,'MaxHeadSize',0.75);
+plotvector([0;0;0],[0;0.2;0],'Color',col(2),'linewidth',2,'MaxHeadSize',0.75);
 plotvector([0;0;0],[0;0;0.2],'Color',col(3),'linewidth',2,'MaxHeadSize',0.75);
 
-if ~isempty(Model.point)
-p = Model.point(4:6).';
-p = [p(3);p(2);-p(1)];
-
-h0 = plotvector(p,-[0.2;0;0],'Color',col(4),'linewidth',2,'MaxHeadSize',0.75);
-h1 = plotvector(p,-[0;0.2;0],'Color',col(4),'linewidth',2,'MaxHeadSize',0.75);
-h2 = plotvector(p,[0;0;0.2],'Color',col(4),'linewidth',2,'MaxHeadSize',0.75);
+if ~isempty(Model.xd)
+% p = Model.point(4:6).';
+p = Model.xd(end,5:7);
+R = quat2rot(Model.xd(end,1:4));
+fr = [p(1,3);p(1,2);-p(1,1)];
+% % 
+f0 = plotvector(fr,R*[0.2;0;0],'Color',col(1),'linewidth',2,'MaxHeadSize',0.75);
+f1 = plotvector(fr,R*[0;0.2;0],'Color',col(2),'linewidth',2,'MaxHeadSize',0.75);
+f2 = plotvector(fr,R*[0;0;0.2],'Color',col(3),'linewidth',2,'MaxHeadSize',0.75);
 end
 
 vline = [];
 
-for ii = i0:FPS:length(Model.t)
+for ii = [1:FPS:length(Model.t),length(Model.t)]
 
     msh.reset();
     mshgr.reset();
 
-    Model.q(:,1)   = Model.g(ii,1:N).';
-    Model.dq(:,1)  = 0*Model.q(:,1);
-    Model.ddq(:,1) = 0*Model.q(:,1);
-    
-    ee = Model.Ba*Model.Phi(Model.Length)*Model.q;
+    Qtmp = Model.q(ii,1:N).';
+    ee = Model.Ba*Model.Phi(Model.Length)*Qtmp;
     
     Model.Length = ee(4);
     
@@ -287,15 +301,18 @@ for ii = i0:FPS:length(Model.t)
     eta0 = [0,0,0,0,0,0];
     deta0 = [0,0,0,0,0,0];
     
-    [~,yf] = ode45(@(t,x) ForwardODE(Model,t,x,Model.q(:,1),...
-        Model.q(:,1)*0, Model.q(:,1)*0),X,[g0 eta0 deta0]);
+    [~,yf] = ode23(@(t,x) ForwardODE(Model,t,x,Qtmp,...
+         Qtmp*0, Qtmp*0),X,[g0 eta0 deta0]);
 
     SweepSE3 = yf(:,1:7);
     
-    msh = Blender(msh,'Rotate',{'z',-30});
+    %msh = Blender(msh,'Rotate',{'z',-30});
+    msh = Blender(msh,'Scale',{'y',3});
     mshgr = Blender(mshgr,'Rotate',{'z',-30});
     msh = Blender(msh,'Sweep', {LinkID,SweepSE3});
     msh = Blender(msh,'Scale',{'z',-1});
+    %msh = Blender(msh,'Rotate',{'y',90});
+    %msh = Blender(msh,'Rotate',{'z',180});
     mshgr = Blender(mshgr,'SE3',yf(end,1:7));
     mshgr = Blender(mshgr,'Scale',{'z',-1});
     
@@ -306,45 +323,56 @@ for ii = i0:FPS:length(Model.t)
        'Color',col(1));
        hm = plot3(SweepSE3(end,7),SweepSE3(end,6),-SweepSE3(end,5),'.',...
            'markersize',10,'Color',col(1));
+       
+    if ~isempty(Model.xd)
+       p = Model.xd(:,4:6);
+       h0 = plot3(p(:,3),p(:,2),-p(:,1),'k--');
+    end
         
-    else 
+    else
+        
+ 
         delete(h);
+         if ~isempty(Model.xd)
         delete(hm);
-       % if size(vline,1) > 4, delete(hvm); end
-%         delete(h0);delete(h1);delete(h2);
-%         p = Model.point(4:6).';
-%         p = [p(3);p(2);-p(1)];
-% 
-%         h0 = plotvector(p,[0.2;0;0],'Color',col(4),'linewidth',2,'MaxHeadSize',0.75);
-%         h1 = plotvector(p,[0;0.2;0],'Color',col(4),'linewidth',2,'MaxHeadSize',0.75);
-%         h2 = plotvector(p,[0;0;0.2],'Color',col(4),'linewidth',2,'MaxHeadSize',0.75);
+        delete(h0);
+        end
+       if size(vline,1) > 4, delete(hvm); end
+       
+        
+        if ~isempty(Model.xd)
+        delete(h0);
+        delete(f0);
+        delete(f1);
+        delete(f2);
+        %delete(h1);
+        %delete(h2);
+        p = Model.xd(ii,5:7);
+        R = quat2rot(Model.xd(ii,1:4));
+        fr = [p(1,3);p(1,2);-p(1,1)];
+
+         f0 = plotvector(fr,R*[0.2;0;0],'Color',col(1),'linewidth',2,'MaxHeadSize',0.75);
+         f1 = plotvector(fr,R*[0;0.2;0],'Color',col(2),'linewidth',2,'MaxHeadSize',0.75);
+         f2 = plotvector(fr,R*[0;0;0.2],'Color',col(3),'linewidth',2,'MaxHeadSize',0.75);
+        end
+        
         h = plot3(SweepSE3(:,7),SweepSE3(:,6),-SweepSE3(:,5),'linewidth',1.5,...
         'Color',col(1));
     
-        hm = plot3(SweepSE3(end,7),SweepSE3(end,6),-SweepSE3(end,5),'.',...
-           'markersize',10,'Color',col(1));
+        %hm = plot3(SweepSE3(end,7),SweepSE3(end,6),-SweepSE3(end,5),'.',...
+        %   'markersize',10,'Color',col(1));
        
-        %if size(vline,1) > 3
-        %    colmap = inferno(size(vline,1));
-          %  vline(1:floor(0.5*length(colmap)),:) = nan;
-            %colmap(1:floor(0.5*length(colmap)),:) = Inf;
-          %  hvm = line3(vline(:,1),vline(:,2),vline(:,3),colmap); 
-      %  end
+        %h0 = plot3(p(:,3),p(:,2),-p(:,1),'k--');
+
     end
-    
-    %     
-%     R = Quat2Rot(yf(end,1:4));
-%     r = yf(end,5:7);
-%     plotvector([0;0;0]+r(:),R.'*[0.2;0;0],'Color',col(1),'linewidth',2,'MaxHeadSize',0.75);
-%     plotvector([0;0;0]+r(:),R.'*[0;0.2;0],'Color',col(2),'linewidth',2,'MaxHeadSize',0.75);
-%     plotvector([0;0;0]+r(:),R.'*[0;0;0.2],'Color',col(3),'linewidth',2,'MaxHeadSize',0.75);
-    
-    mshgr.updateNode();
-    msh.updateNode();
+      
+    %mshgr.updateNode();
+    %msh.updateNode();
     msh.update();
     mshgr.update();
     
-    title(['T = ',num2str(Model.t(ii),3)]);
+    %title(['T = ',num2str(Model.t(ii),3)]);
+    title(['iterations = ',num2str(ii,3)]);
         
     if ~isempty(Model.MovieAxis), axis(Model.MovieAxis); end
     
@@ -356,6 +384,8 @@ for ii = i0:FPS:length(Model.t)
             MovieMaker(Model);
         end
     end
+    
+    %drawnow;
 
 end
     
@@ -390,31 +420,56 @@ end
 function P = ShapeFunction(Model,X)
 
 Pc = cell(Model.NDof,1);
-X = double(X);
+X = single(X);
 
-P11 = zeros(1,Model.NDisc);
-P22 = zeros(1,Model.NDisc);
-
-for ii = 1:Model.NDisc
-    P11(1,ii) = sign(z1(X)).*chebyshev(z1(X),ii-1);
-    P22(1,ii) = sign(z2(X)).*chebyshev(z2(X),ii-1);
+if Model.NDisc>1
+    P11 = zeros(1,Model.NModal/Model.NDisc);
+    P22 = zeros(1,Model.NModal/Model.NDisc);
+else
+    P11 = zeros(1,Model.NModal);
 end
 
-P = horzcat(P11,P22);
+
+if Model.NDisc>1
+    for ii = 1:(Model.NModal/Model.NDisc)
+         P11(1,ii) = sign(z1(X)).*legendre(z1(X),ii-1);
+         P22(1,ii) = sign(z2(X)).*legendre(z2(X),ii-1);
+         %P11(1,ii) = w1(X)*chebyshev(z1(X),ii-1);
+         %P22(1,ii) = w2(X)*chebyshev(z2(X),ii-1);
+
+    end
+    P = horzcat(P11,P22);
+else
+    for ii = 1:Model.NModal
+        P11(1,ii) = legendre(X,ii-1);
+    end
+    P = P11;
+end
 
 for ii = 1:Model.NDof 
     Pc{ii,1} = P; 
 end
 
-P = blkdiag(Pc{:})+ 1e-16*X;
-
+P = blkdiag(Pc{:})+ 1e-26*X;
 
 function y = z1(x)
 y = 2*max((sign(-2.0*x+1.0)),0.0)*x;
 end
 
 function y = z2(x)
-y = max((2.0*(x)-1.0+1e-6),0.0);
+y = max((2.0*(x)-1.0),0.0);
+end
+
+function y = w1(x)
+if(x>0.5), y=0;
+else, y = 1;
+end
+end
+
+function y = w2(x)
+if(x<=0.5), y=0;
+else, y = 1;
+end
 end
 
 end
@@ -465,8 +520,6 @@ qd_ = q_*0;
 qd_(1) = 1.0;
 
 Qs = 1e-5*(q_ - qd_) - Model.Kee*qd_;
-
-
 Qa = Qc + Qs;
 
 dx(:,1) = Model.Dee\(-Qa - Model.Kee*q_);
@@ -667,11 +720,12 @@ for i = 1:(N-1)
     yi = y(:,i);
     
     k1 = F(ti,yi);
-    k2 = F(ti+0.5*h,yi+0.5*h*k1);
-    k3 = F(ti+0.5*h,yi+0.5*h*k2);
-    k4 = F(ti+h,yi+k3*h);
+    k2 = F(ti+(2/3)*h,yi+(2/3)*h*k1);
+    %k3 = F(ti+0.5*h,yi+0.5*h*k2);
+    %k4 = F(ti+h,yi+k3*h);
     
-    y(:,i+1) = yi + (1/6)*(k1+2*k2+2*k3+k4)*h;  
+    %y(:,i+1) = yi + (1/6)*(k1+2*k2+2*k3+k4)*h;  
+    y(:,i+1) = yi + (1/4)*(k1+3*k2)*h;  
 end
 
 dx = transpose(y);

@@ -1,61 +1,50 @@
 clr;
 %% assign free DOF
-mdl = Model([0,1,1,0,0,0],'NModal',4,'NDisc',2);
-
-mdl = mdl.set('tspan',2,...
-              'Grav',9.81,...
-              'Jacobian',true,...
-              'Movie',false,...
-              'MovieAxis',[-1.0 0.5 -0.75 0.75 -1.75 .25]*0.85);
+mdl = Model([1,1,1,0,0,0],'NModal',5,'NDisc',1);
+mdl = mdl.set('MovieAxis',[-0.05 0.75 -0.05 0.75 -.85 .1]*0.85,'Movie',0);
+mdl = mdl.set('Texture',base);
 
 %% generate dynamic model
 mdl = mdl.generate();
-
-%% assign controllers
-mdl.point = [0,0,0,0.5746,-0.3417,-0.5613];
-mdl.Pressure = @(t) 0*[0,0,0,0,0.5,0,0,0];
-
-mdl.q0(1) = 5;
-mdl.q0(3) = 0;
-mdl.q0(7) = 0;
-
+mdl.q0 = rand(length(mdl.q0),1);
 %% simulate soft robot
 mdl = mdl.csolve(); 
 
-%% show simulation
+%% show sim
 figure(102)
 t = mdl.get('t');
-q = mdl.g;
+q = mdl.q;
 u = mdl.tau;
 ge = mdl.ge;
-TV = mdl.H;
-% 
-% subplot(2,1,1);
-plot(t,q,'-','linewidth',1.0);
+dq = mdl.dq;
+xd = mdl.get('xd');
 
-% subplot(2,1,2);
-% plot(t,u,'-','linewidth',1.0);
+subplot(3,4,[1 2 5 6]);
+plot(t,(q),'linewidth',1.0);
+subplot(3,4,[3 4 7 8]);
 
-% figure(15);
-% plot3(ge(:,7),ge(:,6),-ge(:,5),'-','linewidth',1.0);
-% axis equal;
-% t = state(:,1);s
-% z = state(:,2:end);
-%plot(t,z);
-% l0 = 0.064;
-% g(:,3) = (l0 - x(:,1))/l0;
-% g(:,1) = x(:,2)*l0;
-% g(:,2) = x(:,3)*l0;
-% % 
-% mdl = mdl.set('t',t);
-% mdl = mdl.set('g',g);
-% % % 
+plot(t,ge(:,5:end),'linewidth',1.0); hold on;
+plot(t,xd(:,5:end),'k--','linewidth',1.0); hold on;
+subplot(3,4,9:12);
+plot(u,'linewidth',1.0); 
+
 mdl.showModel();
 
+%% show strain field
+figure;
 
+P = mdl.get('Phi');
+s = linspace(0,1,101);
+Q = mdl.q(end,:);
+v = [];
 
-function tau = Controller(t,g)
-kp = 1e-4;
-tau = zeros(6,1);
-tau(4:6) = kp*(g - [0.3;0.5;0.5]*clamp(t/5,1e-2,1));
+for ii = 1:length(s)
+   A = P(s(ii));
+   v = vappend(v,(A*Q.').');
 end
+
+for jj = 1:size(v,2)    
+   subplot(size(v,2),1,jj);
+   shade(s,v(:,jj),'Color',col(jj))
+end
+

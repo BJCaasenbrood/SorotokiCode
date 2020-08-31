@@ -64,7 +64,7 @@ methods
 function obj = Gmodel(varargin) 
     
     obj.Texture = base;
-    obj.TextureStretch = 1.0;
+    obj.TextureStretch = 0.75;
     obj.Quality = 80;
     obj.FlipNormals = false;
     obj.AOBias = 0.01;
@@ -187,7 +187,6 @@ end
 
 %--------------------------------------------------------------------- show
 function vargout = update(Gmodel,varargin)
-    
     
     if nargout < 1 && isempty(Gmodel.Slice)
         Gmodel = updateNode(Gmodel);
@@ -438,10 +437,27 @@ function Gmodel = GenerateObject(Gmodel,varargin)
        
        [f,v,~] = MarchingCubes(single(X),single(Y),...
           single(Z),single(D),1e-6);
- 
+
     elseif length(msh) == 2
        v = msh{1};
-       f = msh{2};        
+       f = msh{2};       
+    elseif isa(msh{1},'Fem')
+       E = msh{1}.Mesh.get('ElemMat');
+       v = msh{1}.Node;
+       f_ = num2cell(E(:,1:end-1),2);
+       V = cellfun(@(x) quad2tri(x),f_,'UniformOutput',false);
+       f = vertcat(V{:});
+       
+    elseif  isa(msh{1},'Mesh')
+       v = msh{1}.Node;
+       f = msh{1}.Element;
+    elseif  isa(msh{1},'Mmesh')
+       myGhostFigure = figure("Visible",false);
+       [x,y,z] = tubeplot(msh{1}.Node.',msh{1}.get('WireThickness'));
+       h = mesh(x,y,z);
+       fv = surf2patch(h);
+       v = fv.vertices;
+       f = fv.faces;
     end
     
     [vn,fn] = TriangleNormal(v,f);
@@ -454,7 +470,7 @@ function Gmodel = GenerateObject(Gmodel,varargin)
     Gmodel.Normal = fn;  
     Gmodel.RMatrix = eye(4);
     Gmodel.BdBox = boxhull(Gmodel.Node); 
-    Gmodel.TextureStretch = 1.0;
+    Gmodel.TextureStretch = 0.9;
     
     fprintf(['* Vertices  = ', num2str(length(v)/1e3,4), 'k \n']); 
     pause(0.01);
@@ -524,7 +540,6 @@ end
 
 %-------------------------------------------------------- bake texture maps
 function Gmodel = BakeAmbientOcclusion(Gmodel)
-
 Bias = Gmodel.AOBias;
 Res = round(2.^Gmodel.AOBit);
 BB = BoundingBox(Gmodel.Node); 

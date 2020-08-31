@@ -30,7 +30,7 @@
 %
 % https://github.com/petercorke/spatial-math
 
-function R = rotz(t, deg)
+function R = roty(t, deg)
     
     assert((isreal(t) & isscalar(t)) | isa(t, 'sym'), ...
         'SMTB:rotz:badarg', 'theta must be a real scalar or symbolic');

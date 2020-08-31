@@ -154,19 +154,24 @@ id = id(logical(x));
 end
 
 function list = FloodFillOne(m,v0)
+
 [n,~]=size(m);
+L = 1:n;
 list=zeros(n,1);
 list(v0)=1;
-neigh=(m(:,v0) & ~list);
+neigh=m(:,v0).*(~list);%(m(:,v0) & ~list);
 stack = find(neigh);
 
 while(~isempty(stack))
     v0 = stack(end);
     stack(end) = [];
     list(v0)=1;
-    neigh=(m(:,v0) & ~list);
-    stack = unique( [stack; find(neigh)]); 
+    neigh= m(:,v0).*(~list);
+     %neigh= (m(:,v0) & ~list);
+    stack = sort([stack; find(neigh)]); 
+    stack = stack(diff(stack(:))>0);
 end
+
 end
 
 function BdBox = BoundingBox(Node)

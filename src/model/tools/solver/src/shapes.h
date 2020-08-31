@@ -17,10 +17,9 @@ class Shapes{
 
   	Shapes();
 
-  	void set(int nmode = 3, int ndof = 6, const char* str = "polynomial");
+  	void set(int nmode = 3, int ndof = 6, const char* str = "chebyshev");
   	void eval(float X, Mxf &Phi);
   	void phi(float X, Vxf &p);  	
-  	
 };
 
 #endif

@@ -3,14 +3,25 @@
 
 #include <algorithm>
 #include <cmath>
+#include "Eigen/Dense"
+using namespace Eigen;
 
 using namespace std;
+typedef Eigen::VectorXf Vxf;
+typedef Eigen::MatrixXf Mxf;
 
 float clamp(float x, float lowerlimit, float upperlimit) {
   if (x < lowerlimit)
     x = lowerlimit;
   if (x > upperlimit)
     x = upperlimit;
+  return x;
+}
+
+Vxf clampmag(Vxf x, float d) {
+  if (x.norm() > d)
+    x = d*(x/x.norm());
+	
   return x;
 }
 

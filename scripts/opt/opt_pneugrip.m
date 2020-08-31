@@ -3,15 +3,14 @@ clr;
 sdf = @(x) PneuGrip(x);
 
 %% generate mesh
-msh = Mesh(sdf,'BdBox',[-5,13,0,5],'NElem',800);
+msh = Mesh(sdf,'BdBox',[-5,13,0,5],'Quads',[50 25]);
 msh = msh.generate();
 
 %% generate fem model
 fem = Fem(msh,'Nonlinear',false,'ReflectionPlane',[0 -1]);
 fem = fem.set('VolumeInfill',0.3,'FilterRadius',0.5,...
               'MaxIterationMMA',50,'TimeStep',1/5,...
-              'Penal',4,'OptimizationProblem','Compliant',...
-              'Movie',true);
+              'Penal',4,'OptimizationProblem','Compliant');
 
 %% add constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,1]);
@@ -22,10 +21,10 @@ fem = fem.AddConstraint('Output',id,[0,1]);
 fem = fem.AddConstraint('Spring',id,[0,1e-3]);
 
 id = fem.FindElements('Location',[-5,5],1);
-fem = fem.AddConstraint('PressureCell',id,[1e-4,0]);
+fem = fem.AddConstraint('PressureCell',id,[-1e-4,0]);
 
 %% set density
-fem = fem.initialTopology('Hole',[-5,5],2);
+fem = fem.initialTopology('Hole',[-5,5],3);
 
 %% material
 fem.Material = Ecoflex0030;

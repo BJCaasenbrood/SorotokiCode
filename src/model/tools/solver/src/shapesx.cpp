@@ -97,18 +97,15 @@ void Shapes::phi(float s, Vxf &p)
 void Shapes::eval(float s, Mxf &Phi)
 {
 
-	Vxf p1(Nx), p2(Nx), p(NMode);
+	Vxf p1(NMode/Nx), p2(NMode/Nx), p(NMode);
 	Phi.setZero();
 
 	// discontinuity mapping
 	float s1 = 0.0;
 	float s2 = 0.0;
 
-	// if (s <= 0.5){s1 = 2*s;	}
-	// else if (s > 0.5){s2 = 2*(s-1);	}
-
-	if (s <= 0.5){s1 = 2*maxf(sgn(-2.0*s+1.0),0.0)*s;	}
-	else if (s > 0.5){s2 = maxf(2.0*(s)-1.0,0.0);	}
+	if (s <= 0.5){s1 = 2.0*maxf(sgn(-2.0*s+1.0),0.0)*s;}
+	else if (s > 0.5){s2 = maxf(2.0*(s)-1.0,0.0);}
 
 	// evaluate shape at sigma
 	phi(s1,p1);
