@@ -7,6 +7,7 @@ switch(Request)
     case('fem.lib');        x = '3.0';
     case('model.lib');      x = '3.0';
     case('bdog.lib');       x = '3.0';
+    case('mfem.lib');       x = '3.0';
     otherwise;              x = 0;
 end
 
