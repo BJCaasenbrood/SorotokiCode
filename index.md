@@ -5,7 +5,7 @@
 
 # Installation
 Download the latest stable version ([.zip](https://github.com/BJCaasenbrood/SorotokiCode/zipball/master) or [.tar](https://github.com/BJCaasenbrood/SorotokiCode/tarball/master)), or clone the repository
-```cpp
+```git
 git clone https://github.com/BJCaasenbrood/SorotokiCode.git
 ```
 
