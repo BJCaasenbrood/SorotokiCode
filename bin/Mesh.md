@@ -16,7 +16,7 @@ $$ s_\Omega =
 \end{cases}
 $$
 
-where $$s_\Omega(x)$$ representing a sign function, and $$\partial \Omega$$ the boundary of the domain $$\Omega$$. The sign of the distance function determines if the coordinate is inside or outside the bounded domain. 
+where $$s_\Omega(x)$$ representing a sign function, and $$\partial \Omega$$ the boundary of the domain $$\Omega$$. The sign of the distance function determines if the coordinate is located inside or outside the bounded domain. 
 
 ### Preset SDF
 ```matlab
