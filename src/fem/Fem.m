@@ -146,8 +146,9 @@ function obj = Fem(Mesh,varargin)
     obj.Density  = ones(obj.NElem,1);
     obj.Residual = zeros(obj.Dim*obj.NNode,1);
     obj.Utmp     = zeros(obj.Dim*obj.NNode,1);
+    
     obj.SigmoidFactor  = 0;
-    %obj.Load     = zeros(1,0,0);
+    
        
     for ii = 1:2:length(varargin)
         obj.(varargin{ii}) = varargin{ii+1};
@@ -355,12 +356,10 @@ if flag == 3
         if nargin < 3, ISOVALUE = 0.2; else, ISOVALUE = varargin{2};
         end
         showISO(Fem,ISOVALUE,0.5);
-        %showISOPlus(Fem,ISOVALUE,0.5);
     case('ISO+')
         clf; former(Fem,10);
         if nargin < 3, ISOVALUE = 0.2; else, ISOVALUE = varargin{2};
         end
-        %showISO(Fem,ISOVALUE,0.5);
         showISOPlus(Fem,ISOVALUE,0.5);
     end    
 end
@@ -510,15 +509,15 @@ while true
        idNodes = Fem.Output(:,1);
        if isempty(Fem.Log)
            Fem.Log = cell(10,2);
-           Fem.Log{1,1} = 'ux'; Fem.Log{1,2} = ux(idNodes); 
-           Fem.Log{2,1} = 'uy'; Fem.Log{2,2} = uy(idNodes);
-           Fem.Log{3,1} = 'un'; Fem.Log{3,2} = un(idNodes);
-           Fem.Log{4,1} = 'fx'; Fem.Log{4,2} = fx(idNodes); 
-           Fem.Log{5,1} = 'fy'; Fem.Log{5,2} = fy(idNodes);
-           Fem.Log{6,1} = 'fy'; Fem.Log{6,2} = fn(idNodes);
-           Fem.Log{7,1} = 'Svm'; Fem.Log{7,2} = Fem.VonMisesNodal(idNodes);
-           Fem.Log{8,1} = 'Sxx'; Fem.Log{8,2} = Fem.sxxNodal(idNodes);
-           Fem.Log{9,1} = 'Syy'; Fem.Log{9,2} = Fem.syyNodal(idNodes);
+           Fem.Log{1,1} = 'ux';   Fem.Log{1,2} = ux(idNodes); 
+           Fem.Log{2,1} = 'uy';   Fem.Log{2,2} = uy(idNodes);
+           Fem.Log{3,1} = 'un';   Fem.Log{3,2} = un(idNodes);
+           Fem.Log{4,1} = 'fx';   Fem.Log{4,2} = fx(idNodes); 
+           Fem.Log{5,1} = 'fy';   Fem.Log{5,2} = fy(idNodes);
+           Fem.Log{6,1} = 'fy';   Fem.Log{6,2} = fn(idNodes);
+           Fem.Log{7,1} = 'Svm';  Fem.Log{7,2} = Fem.VonMisesNodal(idNodes);
+           Fem.Log{8,1} = 'Sxx';  Fem.Log{8,2} = Fem.sxxNodal(idNodes);
+           Fem.Log{9,1} = 'Syy';  Fem.Log{9,2} = Fem.syyNodal(idNodes);
            Fem.Log{10,1} = 'Sxy'; Fem.Log{10,2} = Fem.sxyNodal(idNodes);
        else
            Fem.Log{1,2} = vappend(Fem.Log{1,2},ux(idNodes));
@@ -688,7 +687,6 @@ if Fem.VolumetricPressure
     for ii = 1:Patch
         ZFiller(:,:,ii) = lerp(SDF2+0.01*ii,SDF0,cos((1/Patch)*pi));
     end
-    %SDF(:,:,2:Patch+1) = ZFiller;
 end
 
 % zero padding

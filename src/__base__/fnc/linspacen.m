@@ -1,15 +1,14 @@
 function C = linspacen(A,B,n)
 
-N = size(A); %Store size
+N = size(A);
 
 if ~all(size(A)==size(B)), error('A and B should be the same size'); end
 
-if n==1 %Same behaviour as linspace
+if n==1
     C=B;
 else
     logicReshape=~isvector(A);
-    
-    %Make columns
+   
     A = A(:);
     B = B(:);
     

@@ -1,5 +1,5 @@
 function jpg2mov(workingDir,file,fps)
-
+%JPG2MOV converts a folder of jpg files into mp4-formatted video
 imageNames = dir(fullfile(workingDir,'*.png'));
 imageNames = {imageNames.name}';
 
@@ -14,8 +14,7 @@ open(outputVideo)
 for ii = 1:length(I)
    [x,map] = imread(fullfile(workingDir,imageNames{I(ii)}),'png');
    img = ind2rgb(x, map);
-   %imshow(fullfile(workingDir,imageNames{I(ii)}));
-   %gif;
+
    writeVideo(outputVideo,img);
    cout('written frame: ');
    cout([num2str(ii),'\n']);

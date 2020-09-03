@@ -136,6 +136,13 @@ if bool == 1
     if libs(4), IncludeFiniteElement(Path,1); end
     if libs(5), IncludeDynamicModel(Path,1); end
     
+    Request = input(['\n* Do you want to setup the SorotokiCode folder',...
+        ' as the main directory (y/n)'],'s');
+
+    switch(Request)
+        case('y'), fprintf(FID,'cdsoro \n');
+    end
+    
     fclose('all');
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -149,8 +156,8 @@ pause(.01);
 cout(['* The documentation can be found in doc/SorotokiManual.pdf',...
     '. For more in-\nformation on the Soft Robotics Toolkit, visit',...
     ' the GitHub repository at: \n\n']) 
-fprintf(['<a href="https://github.com/BJCaasenbrood/SorotokiCode">',...
-    'https://github.com/BJCaasenbrood/SorotokiCode</a> \n'])
+fprintf(['<a href="https://bjcaasenbrood.github.io/SorotokiCode">',...
+    'https://bjcaasenbrood.github.io/SorotokiCode</a> \n'])
 cout('Text', '\n');
 cout('Text', '* To get started with demonstrations, type ');
 cout('String', 'sorotoki(''demo'') \n');

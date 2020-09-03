@@ -1,4 +1,5 @@
 function gif(varargin)
+% MathExchange! Thanks to Chad A. Greene of the University of Texas 
 % gif is the simplest way to make gifs. Simply call
 % 
 %   gif('myfile.gif') 

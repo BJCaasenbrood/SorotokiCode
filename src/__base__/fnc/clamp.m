@@ -1,4 +1,4 @@
 function y = clamp(x,low,upp)
-% return bounded value clipped between bl and bu
+%CLAMP.m return bounded value clipped between lower bound and upper bound
 y=min(max(x,low),upp);
 end
