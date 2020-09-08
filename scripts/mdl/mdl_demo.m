@@ -1,12 +1,11 @@
 clr;
 %% assign free DOF
-mdl = Model([1,1,1,0,0,0],'NModal',5,'NDisc',1);
-mdl = mdl.set('MovieAxis',[-0.05 0.75 -0.05 0.75 -.85 .1]*0.85,'Movie',0);
+mdl = Model([0,1,1,0,0,0],'NModal',4,'NDisc',2);
+mdl = mdl.set('MovieAxis',[-0.75 0.75 -0.75 0.75 -1.75 .1]*0.85,'Movie',0);
 mdl = mdl.set('Texture',base);
 
 %% generate dynamic model
 mdl = mdl.generate();
-mdl.q0 = rand(length(mdl.q0),1);
 %% simulate soft robot
 mdl = mdl.csolve(); 
 

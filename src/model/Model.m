@@ -230,8 +230,8 @@ N = Model.Nq;
 Model.Length = Model.Length0;
 X = linspace(0,1,200);
 
-msh = Gmodel('SlenderRod.stl');
-%msh = Gmodel('SoftActuatorRedux.stl');
+%msh = Gmodel('SlenderRod.stl');
+msh = Gmodel('SoftActuatorRedux.stl');
 %msh = Gmodel('SoftActuatorPlanarRedux.stl');
 %msh = Gmodel('Pneulink.stl'); 
 %msh = Gmodel('Pneunet.stl'); 
@@ -239,8 +239,8 @@ assignin('base','msh',msh);
 mshgr = Gmodel('SoftGripperRedux.stl'); assignin('base','mshgr',mshgr);
 %mshgr = Gmodel([]);
 %msh = msh.set('Node0',mshgr.Node);
-mshgr = mshgr.set('Node0',mshgr.Node*1.0e-5);
-mshgr = mshgr.set('Node',mshgr.Node*1.0e-5);
+%mshgr = mshgr.set('Node0',mshgr.Node*1.0e-5);
+%mshgr = mshgr.set('Node',mshgr.Node*1.0e-5);
 
 % set texture
 msh.Texture = Model.Texture;
@@ -262,7 +262,7 @@ drawnow;
 view(50,10);
 msh.update();
 mshgr.update();
-%msh.ground(Model.MovieAxis);
+msh.ground(Model.MovieAxis);
 
 %background('k');
 
@@ -306,8 +306,8 @@ for ii = [1:FPS:length(Model.t),length(Model.t)]
 
     SweepSE3 = yf(:,1:7);
     
-    %msh = Blender(msh,'Rotate',{'z',-30});
-    msh = Blender(msh,'Scale',{'y',3});
+    msh = Blender(msh,'Rotate',{'z',-30});
+    %msh = Blender(msh,'Scale',{'y',3});
     mshgr = Blender(mshgr,'Rotate',{'z',-30});
     msh = Blender(msh,'Sweep', {LinkID,SweepSE3});
     msh = Blender(msh,'Scale',{'z',-1});
@@ -331,7 +331,6 @@ for ii = [1:FPS:length(Model.t),length(Model.t)]
         
     else
         
- 
         delete(h);
          if ~isempty(Model.xd)
         delete(hm);
@@ -349,7 +348,7 @@ for ii = [1:FPS:length(Model.t),length(Model.t)]
         %delete(h2);
         p = Model.xd(ii,5:7);
         R = quat2rot(Model.xd(ii,1:4));
-        fr = [p(1,3);p(1,2);-p(1,1)];
+        fr = [p(3);p(2);-p(1)];
 
          f0 = plotvector(fr,R*[0.2;0;0],'Color',col(1),'linewidth',2,'MaxHeadSize',0.75);
          f1 = plotvector(fr,R*[0;0.2;0],'Color',col(2),'linewidth',2,'MaxHeadSize',0.75);
@@ -384,9 +383,6 @@ for ii = [1:FPS:length(Model.t),length(Model.t)]
             MovieMaker(Model);
         end
     end
-    
-    %drawnow;
-
 end
     
 end
@@ -405,12 +401,6 @@ Model.Ba = I6(:,xa);
 Model.Bc = I6(:,xc);
 Model.NDof = size(Model.Ba,2);
 Model.Phi = @(x) ShapeFunction(Model,x);
-% Ha = Model.Ba.'*StrainTensor(Model)*Model.Ba;
-% Ma = Model.Ba.'*MassTensor(Model)*Model.Ba;
-% Model.Kee = double(int(Model.Phi.'*Ha*Model.Phi,sym('X'),0,1));
-% Model.Mee = double(int(Model.Phi.'*Ma*Model.Phi,sym('X'),0,1));
-% Model.Dee = Model.mu*Model.Kee;
-% Model.Phi = matlabFunction(Model.Phi);
 Model.Nq = Model.NDof*Model.NModal;
 Model.q0 = zeros(Model.NDof*Model.NModal,1);
 Model.dq0 = zeros(Model.NDof*Model.NModal,1);
