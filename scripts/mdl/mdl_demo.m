@@ -1,10 +1,10 @@
 clr;
 %% assign free DOF
-mdl = Model([0,1,1,0,0,0],'NModal',4,'NDisc',2);
+mdl = Model([0,0,1,0,0,0],'NModal',4,'NDisc',2);
 mdl = mdl.set('MovieAxis',[-0.75 0.75 -0.75 0.75 -1.75 .1]*0.85,'Movie',0);
 mdl = mdl.set('Texture',base);
 
-mdl = mdl.set('Point',[1,0,0,0,1,0,0]);
+mdl = mdl.set('Point',[1,0,0,0,0.8,0,0],'TimeSim');
 
 %% generate dynamic model
 mdl = mdl.generate();

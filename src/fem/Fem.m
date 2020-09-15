@@ -599,9 +599,9 @@ while flag
     [flag,Fem] = CheckConvergenceOpt(Fem);
     
     % draw visual
-    if mod(Fem.IterationMMA,10) == 0
+    %if mod(Fem.IterationMMA,10) == 0
         Fem.show(Visual); drawnow;
-    end
+    %end
 end
 
 Fem.SolverStartMMA = false;
