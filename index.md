@@ -22,7 +22,7 @@ The Sorotoki toolkit includes a library of class-oriented functions for designin
 % list of classes
 msh = Mesh();	    % meshing class
 fem = Fem();   	    % finite elements class
-mag = Mfem();   	  % magnetics finite elements class
+mag = Mfem();   	 % magnetics finite elements class
 obj = Gmodel();     % graphics model class
 mdl = Model();      % dynamical model class
 ctr = Control();    % (real-time) control class
