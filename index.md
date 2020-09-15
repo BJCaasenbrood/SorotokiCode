@@ -9,7 +9,7 @@ Download the latest stable version ([.zip](https://github.com/BJCaasenbrood/Soro
 git clone https://github.com/BJCaasenbrood/SorotokiCode.git
 ```
 
- To install the toolkit, simply run the command below. That's it, the soft robotics toolkit is now ready-to-use.
+To install the toolkit, simply run the command below. That's it, the soft robotics toolkit is now ready-to-use.
 ```matlab
 % installation command
 sorotoki();
@@ -20,7 +20,7 @@ The Sorotoki toolkit includes a library of class-oriented functions for designin
 
 ```matlab
 % list of classes
-msh = Mesh();	   % meshing class
+msh = Mesh();	 % meshing class
 fem = Fem();   	 % finite elements class
 obj = Gmodel();  % graphics model class
 mdl = Model();   % dynamical model class
