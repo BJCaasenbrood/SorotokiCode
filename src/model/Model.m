@@ -17,6 +17,7 @@ classdef Model
         Gain;
         Point;
         Controller;
+        Area, Jxx, Jyy, Jzz;
     end
     
     properties (Access = private)
@@ -61,22 +62,26 @@ function obj = Model(Table,varargin)
     
     obj.NModal    = 2;
     obj.NDisc     = 2;
-    obj.SpaceStep = 21;
-    obj.TimeStep  = 0.03;
+    obj.SpaceStep = 11;
+    obj.TimeStep  = 0.01;
     obj.Tdomain   = 25;
     obj.Sdomain   = 1;
     
     obj.Density = 0.01;
     obj.Radius  = 0.01;
-    obj.E       = 1e6;
+    obj.E       = 1e5;
     obj.Nu      = 0.4;
-    obj.Mu      = 0.5;
+    obj.Mu      = 0.1;
     obj.Length  = 1;
-    obj.Gravity = -9.81;
+    obj.Gravity = 0;
     obj.PArea   = 5e-5;
+    obj.Area    = pi*obj.Radius^2;
+    obj.Jxx     = 0.5*obj.Density*obj.Radius^2;
+    obj.Jyy     = 0.25*obj.Density*obj.Radius^2;
+    obj.Jzz     = 0.25*obj.Density*obj.Radius^2;
     
     obj.Point = [1,0,0,0,1,0,0];
-    obj.Gain = [5e-4,0.0];
+    obj.Gain = [1e-7,0.15];
 
     obj.Texture = prusa;
     
@@ -187,6 +192,14 @@ Model.g = ys;
 Model.t = ts;
 end
 
+%----------------------------------------------------------------- simulate
+function Model = inertia(Model)
+    Model.Area    = pi*Model.Radius^2;
+    Model.Jxx     = 0.5*Model.Density*Model.Radius^2;
+    Model.Jyy     = 0.25*Model.Density*Model.Radius^2;
+    Model.Jzz     = 0.25*Model.Density*Model.Radius^2; 
+end
+
 %--------------------------------------------------------------------- show
 function show(Model)
 N = Model.Nq;
@@ -223,20 +236,22 @@ function showModel(Model)
 figure(101); 
 hold all; 
 N = Model.Nq;
-Model.Length = Model.Length0;
-X = linspace(0,1,200);
+%Model.Length = Model.Length0;
+X = linspace(0,Model.Sdomain,200);
 
 %msh = Gmodel('SlenderRod.stl');
-msh = Gmodel('SoftActuatorRedux.stl');
+%msh = Gmodel('SoftActuatorRedux.stl');
 %msh = Gmodel('SoftActuatorPlanarRedux.stl');
-%msh = Gmodel('Pneulink.stl'); 
+msh = Gmodel('Pneulink.stl'); 
 %msh = Gmodel('Pneunet.stl'); 
 assignin('base','msh',msh);
 mshgr = Gmodel('SoftGripperRedux.stl'); assignin('base','mshgr',mshgr);
 %mshgr = Gmodel([]);
 %msh = msh.set('Node0',mshgr.Node);
-%mshgr = mshgr.set('Node0',mshgr.Node*1.0e-5);
-%mshgr = mshgr.set('Node',mshgr.Node*1.0e-5);
+mshgr = mshgr.set('Node0',mshgr.Node*1.0e-5);
+mshgr = mshgr.set('Node',mshgr.Node*1.0e-5);
+msh = msh.set('Node0',msh.Node*0.064);
+msh = msh.set('Node',msh.Node*0.064);
 
 % set texture
 msh.Texture = Model.Texture;
@@ -303,7 +318,7 @@ for ii = [1:FPS:length(Model.t),length(Model.t)]
     SweepSE3 = yf(:,1:7);
     
     msh = Blender(msh,'Rotate',{'z',-30});
-    %msh = Blender(msh,'Scale',{'y',3});
+    %msh = Blender(msh,'Scale',0.064);
     mshgr = Blender(mshgr,'Rotate',{'z',-30});
     msh = Blender(msh,'Sweep', {LinkID,SweepSE3});
     msh = Blender(msh,'Scale',{'z',-1});
@@ -462,10 +477,10 @@ fprintf(FID,['MU       = ', num2str(Model.Mu), '\n']);
 fprintf(FID,['PRS_AREA = ', '1e-5', '\n']);
 fprintf(FID,['GRAVITY  = ', num2str(Model.Gravity), '\n']);
 fprintf(FID,['RADIUS   = ', '0.01', '\n']);
-fprintf(FID,['AREA     = ', '3.0000e-04', '\n']);
-fprintf(FID,['J_XX     = ', '2.7250e-10', '\n']);
-fprintf(FID,['J_YY     = ', '2.2500e-11', '\n']);
-fprintf(FID,['J_ZZ     = ', '2.5000e-10', '\n']);
+fprintf(FID,['AREA     = ', num2str(Model.Area), '\n']); %'3.0000e-04'
+fprintf(FID,['J_XX     = ', num2str(Model.Jxx), '\n']); % '2.7250e-10'
+fprintf(FID,['J_YY     = ', num2str(Model.Jyy), '\n']); % '2.2500e-11'
+fprintf(FID,['J_ZZ     = ', num2str(Model.Jzz), '\n']); %'2.5000e-10'
 
 fprintf(FID,'\n[control] \n');
 fprintf(FID,['KP = ', num2str(Model.Gain(1)), '\n']);
@@ -567,10 +582,8 @@ dg(14:19) = -admap(ee)*deta - admap(dee)*eta + ddee;
 
 end
 
-
 end
 end
-
 
 %---------------------------------------- isomorhphism between SO(3) and R6
 function y = isomSO3(x)

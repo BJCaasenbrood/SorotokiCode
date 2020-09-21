@@ -134,6 +134,7 @@ Model::Model(const char* str){
 
 	// read input
 	read("log/state.log",q);
+	read("log/state_dt.log",dq);
 
 	// clean up 
 	cleanup();
@@ -559,6 +560,13 @@ void Model::buildLagrange(Vxf v, Vxf dv,
   		C.noalias()  += (ds/4.0)*(K1C+3.0*K2C);
   		G.noalias()  += (ds/4.0)*(K1G+3.0*K2G);
   		Mt.noalias() += (ds/4.0)*(K1Mt+3.0*K2Mt);
+  		// x.noalias()  += ds*(K1);  
+  		// J.noalias()  += ds*(K1J);
+  		// Jt.noalias() += ds*(K1Jt);
+  		// M.noalias()  += ds*(K1M);
+  		// C.noalias()  += ds*(K1C);
+  		// G.noalias()  += ds*(K1G);
+  		// Mt.noalias() += ds*(K1Mt);
 	}
 }
 
@@ -653,6 +661,7 @@ void Model::lagrangianODE(float s, V13f x, Mxf J, Mxf Jt,
 	// compute local time-derivative of G-inertia matrix
 	dMt.noalias() = (Adg_*Jt).transpose()*Mtt*(Adg_*J) + (Adg_*J).transpose()*Mtt*(Adg_*Jt);
 }
+	// compute local D-inertia matrix
 
 //---------------------------------------------------
 //--------------------------- compute Hessian matrix
