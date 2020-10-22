@@ -1,7 +1,7 @@
 clear; close all; clc;
 
 %% set signed distance function
-W = 3;
+W = 2.5;
 H = 5;
 sdf = @(x) Bellow(x,W,H);
 
@@ -12,10 +12,10 @@ msh.show(); pause(2);
 
 %% show generated mesh
 fem = Fem(msh);
-fem = fem.set('TimeStep',1/3,'ResidualNorm',1e-3,'VolumeInfill',0.3,...
+fem = fem.set('TimeStep',1/3,'ResidualNorm',1e-3,'VolumeInfill',0.2,...
               'Penal',4,'VolumetricPressure',true,'FilterRadius',0.65,...
               'Nonlinear',0,'ReflectionPlane',[1,1],'Repeat',[1 1 2 2],...
-              'MaxIterationMMA',125,'OptimizationProblem','Compliant','Movie',1);
+              'MaxIterationMMA',125,'OptimizationProblem','Compliant','Movie',0);
 
 %% add constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[0,1]);
@@ -25,9 +25,9 @@ id = fem.FindNodes('Location',[0.01*W,H]);
 fem = fem.AddConstraint('Output',id,[0,-1]);
 fem = fem.AddConstraint('Spring',id,[0,.1]);
 
-% id = fem.FindNodes('Location',[W,0.01*H]);
-% fem = fem.AddConstraint('Output',id,[.05,0]);
-% fem = fem.AddConstraint('Spring',id,[.1,0]);
+id = fem.FindNodes('Location',[W,0.01*H]);
+fem = fem.AddConstraint('Output',id,[.01,0]);
+fem = fem.AddConstraint('Spring',id,[.1,0]);
 
 id = fem.FindElements('Location',[0,0],1);
 fem = fem.AddConstraint('PressureCell',id,[1e-3,0]);

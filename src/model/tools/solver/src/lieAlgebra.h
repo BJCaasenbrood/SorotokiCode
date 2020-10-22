@@ -378,12 +378,14 @@ void logmapSE3(M4f X, V6f &Y){
 	logmapSO3(R,Wh);
 	isoSO3_(Wh,W);
 
+	// IS THIS CORRECT?
 	Y.block(0,0,3,1).noalias() = W;
 
 	tmapInvSO3(W,Wh);
 
 	W << X(0,3),X(1,3),X(2,3);
 
+	// IS THIS CORRECT?
 	Y.block(3,0,3,1).noalias() = Wh.transpose()*W;
 
 }

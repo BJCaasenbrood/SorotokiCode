@@ -17,6 +17,14 @@ Shapes::Shapes(){
 //---------------------------------------------------
 //--------------------------------- initialize class
 //---------------------------------------------------
+void Shapes::setNorm(float x){
+	Normalize = x;
+}
+
+
+//---------------------------------------------------
+//--------------------------------- initialize class
+//---------------------------------------------------
 void Shapes::set(int nmode, int ndof, const char* str) 
 {
 	NMode = max(0,min(nmode,10));
@@ -82,11 +90,14 @@ void Shapes::phi(float s, Vxf &p)
 //---------------------------------------------------
 //---------------------------- evaluate shape-matrix
 //---------------------------------------------------
-void Shapes::eval(float s, Mxf &Phi)
+void Shapes::eval(float s0, Mxf &Phi)
 {
 
 	Vxf p(NMode);
 	Phi.setZero();
+
+	// normalize
+	float s = s0/Normalize;
 
 	// evaluate shape at sigma
 	phi(s,p);

@@ -21,8 +21,8 @@ typedef Eigen::MatrixXf Mxf;
 
 #define OMEGA 0.75
 
-float a = 0.3;
-float b = 0.1;
+float a = 0.01;
+float b = 0.05;
 
 //---------------------------------------------------
 //----------------- isomorphism between R3 and so(3)
@@ -36,9 +36,13 @@ void pathSolve(float t, V7f &yd)
 
 	y0 = yd;
 
-	yt(5) = a*sin(OMEGA*t);
-	//yt(4) = b*sin(OMEGA*t + 1.5*PI);
-	yt(6) = a*cos(OMEGA*t);
+	float r;
+
+	r = a*(1.0 + (1.0/8)*sin(2*OMEGA*t)*sin(2*OMEGA*t));
+
+	//yt(4) = a*sin(OMEGA*t);
+	//yt(5) = b*sin(OMEGA*t);
+	//yt(6) = b*cos(OMEGA*t);
 
 	yd.noalias() = y0 + yt;
 }

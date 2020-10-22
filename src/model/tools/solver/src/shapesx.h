@@ -13,6 +13,7 @@ class Shapes{
 
 	bool cheby, poly, cubic, legen;
   	int  NMode, NDof, Nx;
+  	float Normalize;
 
   public:
 
@@ -20,6 +21,7 @@ class Shapes{
 
   	void set(int nmode = 3, int ndof = 6, 
   			 int nx = 2, const char* str = "chebyshev");
+  	void setNorm(float x);
   	void eval(float X, Mxf &Phi);
   	void phi(float X, Vxf &p);  	
   	

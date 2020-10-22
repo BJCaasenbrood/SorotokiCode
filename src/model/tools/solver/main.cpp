@@ -1,12 +1,11 @@
-//#define EIGEN_NO_DEBUG
-//#define DISCONTINIOUS
+#define EIGEN_NO_DEBUG
+#define IMPLICIT
+#define DISCONTINIOUS
 #define SOLVER_OUTPUT
 #define TICTOC
 
 #include "src/Model_ph.cpp"
 using namespace std;
-
-V7f g0;
 
 int main(int argc, char** argv)
 {
@@ -15,15 +14,20 @@ int main(int argc, char** argv)
 
 	if(mdl.KINEMATIC_CONTROLLER){
 		mdl.inverse_kinematics();
-		cout << "qd=" << mdl.qd.transpose().format(matlab) << endl;
 	}
 	else if(mdl.ENERGY_CONTROLLER){
-		mdl.implicit_simulate();
+		#ifdef IMPLICIT
+			mdl.implicit_simulate();
+		#else
+			mdl.simulate();
+		#endif
 	}
 	else{
-		//mdl.tau = mdl.q;
-		//mdl.q.setZero();
-		mdl.implicit_simulate();
+		#ifdef IMPLICIT
+			mdl.implicit_simulate();
+		#else
+			mdl.simulate();
+		#endif
 	}
 
 	return 0;

@@ -7,12 +7,12 @@
 #include <fstream>
 #include <algorithm>
 #include <unistd.h>
+
 #include "lieAlgebra.h"
 #include "table.h"
 #include "tictoc.h"
 #include "smoothstep.h"
 #include "trajectory.h"
-#include "pinv.h"
 #include "Config/ConfigFile.cpp"
 #include "Config/Chameleon.cpp"
 
@@ -78,6 +78,8 @@ class Model
 	float NU; 
 	float MU; 
 
+	float ADAMP;
+
   	float KP, KD;
   	int NDof, NState;
   	Shapes Phi;
@@ -88,8 +90,10 @@ class Model
   	Mxf Sa, Sc;
   	M6f Mtt, Ktt, Dtt;
   	Mxf Mtee, Mee, Cee, Kee, Dee;
+  	Mxf Mbee, Cbee;
   	Vxf Gee;
   	Vxf q, dq, ddq;
+  	Vxf dq_;
   	Vxf Qa, Qv, Qu, Qd;
   	Vxf qd;
   	V6f Xi0;
@@ -113,16 +117,19 @@ class Model
 	void controllerPassive(float t, Vxf &Hq, Vxf &Hp, Vxf &f);
 
 	void inverse_kinematics(float t = 1.0);
+	Vxf simulate();
 	Vxf implicit_simulate();
 
 	void buildJacobian(float se, Mxf &J, Mxf &Jt);
-	void buildLagrange(Vxf v, Vxf dv, Mxf &M, Mxf &C, Vxf &dG, Mxf &Mt);
+	void buildLagrange(Vxf v, Vxf dv, Mxf &M, Mxf &C,
+	Vxf &dG, Mxf &Mt, Mxf &Me, Mxf &Ce);
 	
 	void dynamicODE(float t, Vxf x, Vxf &dx);
 	void jacobiODE(float s, V13f x, V13f &dx, Mxf &dJ, Mxf &dJt);
 	void systemMatODE(float s,Mxf &K, Mxf &M, Mxf &D);
 	void lagrangianODE(float s, V13f x, Mxf J, Mxf Jt,
-	V13f &dx, Mxf &dJ, Mxf &dJt, Mxf &dM, Mxf &dC, Vxf &dG, Mxf &dMt);
+	V13f &dx, Mxf &dJ, Mxf &dJt, Mxf &dM, Mxf &dC,
+	Vxf &dG, Mxf &dMt, Mxf &dMe, Mxf &dCe);
 
 	void hessianInverse(float alpha, Vxf R, Vxf &dx);
 
@@ -130,6 +137,7 @@ class Model
 	void buildStiffnessTensor();
 	void buildDampingTensor();
 	void buildGlobalSystem();
+	void buildNonlinearElastic(Vxf x, Vxf &N);
 
 	Mxf pressureMapping();
 };

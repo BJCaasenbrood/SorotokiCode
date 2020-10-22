@@ -13,6 +13,8 @@ C = C{1};
 path = erase(C,'%!INSTALDIR:');
 path = path{1};
 
+path = strrep(path,'\','/');
+
 if nargout > 0, varargout{1} = path;
 else, cd(path); end
 

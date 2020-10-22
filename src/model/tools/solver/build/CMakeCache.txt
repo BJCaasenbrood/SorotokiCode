@@ -212,6 +212,9 @@ CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 //Value Computed by CMake
 solver_BINARY_DIR:STATIC=/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/build
 
+//Dependencies for the target
+solver_LIB_DEPENDS:STATIC=general;src;
+
 //Value Computed by CMake
 solver_SOURCE_DIR:STATIC=/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver
 

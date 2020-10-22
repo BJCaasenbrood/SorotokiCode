@@ -1,6 +1,9 @@
 function handle = plotvector(p,n,varargin)
 %n = n*norm(p)*0.3; % end position of normal vector
 
+s = mean(abs(axis));
+n = 1.25*n*s;
+
 if numel(p) == 3
 %quiver3 syntax: quiver3(x,y,z,u,v,w)
 hold on;

@@ -8,6 +8,7 @@ classdef Gmodel < handle
         Texture;
         Emission;
         Occlusion;
+        Alpha;
     end
     
     properties (Access = private)
@@ -75,6 +76,7 @@ function obj = Gmodel(varargin)
     obj.Colormap = turbo;
     obj.LineStyle = 'none';
     obj.LineColor = col(1);
+    obj.Alpha = 1.0;
             
     obj.AO = false;
     obj.SSS = false;
@@ -157,7 +159,7 @@ function Gmodel = render(Gmodel,varargin)
     
     hp = patch('Vertices',Gmodel.Node,'Faces',Gmodel.Element,'linestyle',...
         Gmodel.LineStyle,'edgecolor',Gmodel.LineColor,'FaceVertexCData',...
-        Gmodel.TextureMap,'FaceColor',shading);
+        Gmodel.TextureMap,'FaceColor',shading,'FaceAlpha',Gmodel.Alpha);
     
     set(gcf,'color',gitpage); material dull;
     axis equal; axis(Gmodel.BdBox); axis off; %view(30,15);

@@ -1,21 +1,21 @@
 clr;
 %% generate mesh from sdf
-sdf = @(x) dCube(x,-10,10,-10,10,-10,10);
-msh = Mesh(sdf,'BdBox',[-10,10,-10,10,-10,10],'Hexahedron',[10,10,10]);
+sdf = @(x) dCube(x,-3,3,-1,1,0,50);
+msh = Mesh(sdf,'BdBox',[-3,3,-1,1,0,50],'Hexahedron',[3,3,15]);
 
 msh = msh.generate();
 msh = msh.show();
 
 %% generate fem model from mesh
-fem = Fem(msh,'Nonlinear',true,'TimeStep',1/5,'PrescribedDisplacement',true);
+fem = Fem(msh,'Nonlinear',true,'TimeStep',1/50,'PrescribedDisplacement',true);
 
 %% add constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[1,1,1]);
 fem = fem.AddConstraint('Support',fem.FindNodes('Top'),[0,0,1]);
-fem = fem.AddConstraint('Load',fem.FindNodes('Top'),so3([0,0,pi]));
+fem = fem.AddConstraint('Load',fem.FindNodes('Top'),so3([0,0,1.5*pi]));
 
 %% select material
-fem.Material =  Ecoflex0030();
+fem.Material =  TPU90();
 
 %% solving
 fem.solve();

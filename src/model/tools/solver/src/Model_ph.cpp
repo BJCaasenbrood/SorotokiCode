@@ -11,7 +11,7 @@ ofstream taulog;
 ofstream glog;
 ofstream xdlog;
 
-//---------------------------------------------------
+//--------------------------------------------------
 //-------------------------------- class constructor
 //---------------------------------------------------
 Model::Model(const char* str){
@@ -63,6 +63,7 @@ Model::Model(const char* str){
   	RTOL      = cf.Value("solver","RTOL");
   	SPEEDUP   = cf.Value("solver","SPEEDUP");
   	TIMESTEP  = cf.Value("solver","TIMESTEP");
+  	ADAMP     = cf.Value("solver","ADAMPING");
 
   	RHO      = cf.Value("physics","RHO");
   	EMOD     = cf.Value("physics","EMOD");
@@ -96,17 +97,20 @@ Model::Model(const char* str){
 	stab(0) = 1;
 
 	#ifdef DISCONTINIOUS
-		sa.setZero();
-		sa(0) = 1;
+		sa.setConstant(1.0);
+		//sa(0) = 1;
 		sc = sa.replicate(NDISC,1);
 		Phi.set(NMODE,NDof,NDISC,"legendre");
-		cout << "DISCONTINIOUS = true" << endl;
+		//cout << "DISCONTINIOUS = true" << endl;
 	#else
 		sc.setZero();
 		sc(0) = 1.0;
 		Phi.set(NMODE,NDof,"legendre");
-		cout << "CONTINIOUS = true" << endl;
+		//cout << "CONTINIOUS = true" << endl;
 	#endif
+
+	// normalize domain
+	Phi.setNorm(SDOMAIN);
 
 	stab = sc.replicate(NDof,1);
 	Sa = tableConstraints(stab,true);
@@ -123,6 +127,7 @@ Model::Model(const char* str){
 	q   = Vxf::Constant(NState,ATOL);
 	dq  = Vxf::Zero(NState);
 	ddq = Vxf::Zero(NState);
+	dq_ = Vxf::Zero(NState);
 	qd  = Vxf::Zero(NState);
 	tau = Vxf::Zero(NState);
 	u   = Vxf::Zero(6);
@@ -146,10 +151,9 @@ Model::Model(const char* str){
 	statelog_dt.open("log/statelog_dt.log", ios_base::app | ios::binary);
 
 	// pre build lagrangian system
-	buildLagrange(q,dq,Mee,Cee,Gee,Mtee);
+	buildLagrange(q,dq,Mee,Cee,Gee,Mtee,Mbee,Cbee);
 
 	cout << setprecision(PRECISION) << endl;
-	cout <<  "generated cosserat model" << endl;
 }	
 
 //---------------------------------------------------
@@ -159,8 +163,7 @@ void Model::output(ofstream &file, float t, Vxf x){
 
 	  file << t;
 
-	  for (int i = 0; i < x.size(); ++i)
-	  {
+	  for (int i = 0; i < x.size(); ++i){
 	  	file << ", " << x(i);
 	  }
 
@@ -232,7 +235,7 @@ void Model::inverse_kinematics(float t){
 	while (i < MAX_IK && abs(dx.norm()) > ATOL ){
 
 		// compute jacobian matrix
-		buildJacobian(1.0, J, Jt);
+		buildJacobian((float)SDOMAIN, J, Jt);
 
 		// compute eta desired
 		SE3(g,G);
@@ -311,23 +314,22 @@ void Model::controllerPassive(float t, Vxf &Hq, Vxf &Hp, Vxf &f){
 	K.setZero();
 	xd.setZero();
 
-	k << 1e-6,1e-6,1e-6,1,1,1;
+	k << 1e-3,1e-3,1e-3,1,1,1;
 	K.diagonal() = k;
 
 	// end-effector jacobian
-	buildJacobian(1.0, J, Jt);
+	buildJacobian((float)SDOMAIN, J, Jt);
 
 	// compute eta desired
 	SE3(g,G);
 	SE3Inv(gd,Gi);
 	logmapSE3(Gi*G,Phi);
 	tmapSE3(Phi,T);
-	R.noalias() = K*T*Phi*smoothstep(t,0.0,1.0);
+	R.noalias() = K*T*Phi*smoothstep(t,0.0,3.0);
 
-	dx.noalias() = J.transpose()*(J*J.transpose() + LAMBDA*Mxf::Identity(6,6)).householderQr().solve(K*R);
-	//dx.noalias() = J.transpose()*(K*R);
-	
-	//f.noalias() = Sa*(Hq - KP*Kee*(q-qd)) - KD*Sa*Dee*Hp;
+	dx.noalias() = J.transpose()*(J*J.transpose() + 
+		LAMBDA*Mxf::Identity(6,6)).householderQr().solve(K*R);
+
 	f.noalias() = Sa*(Hq - KP*dx - KD*Dee*Hp);
 }
 
@@ -398,6 +400,8 @@ Vxf Model::implicit_simulate(){
 			output(xdlog,t,gd);
 		}
 
+		// update parameters
+
 		// state/time update
   		x.noalias() += dx;
   		t += dt;
@@ -405,6 +409,78 @@ Vxf Model::implicit_simulate(){
   		// recover d-configuration
   		gd.noalias() = gtmp;
   		j = 0.0;
+	}
+
+	#ifdef TICTOC
+		toc((float)TDOMAIN);
+		cout <<"Frequency rate: "<< 1.0/dt << " Hz\n";
+	#endif
+
+	// return solutions q* = q(t_eq)
+	return x.block(0,0,n,1);
+}
+
+//--------------------------------------------------
+//------------------ implicit solve dynamic problem
+//--------------------------------------------------
+Vxf Model::simulate(){
+	int n = NState;
+	int i = 0;
+	float t = 0; 
+	float dt = (1.0*(TIMESTEP));
+	float alpha;
+
+	Vxf K1(2*n), K2(2*n), K3(2*n), K4(2*n);
+	Vxf x(2*n),dx(2*n);
+	V7f gtmp;
+
+	x.setZero();
+	dx.setZero();
+
+	x.block(0,0,n,1) = q;
+	x.block(n,0,n,1) = dq;
+
+	#ifdef TICTOC
+		tic();
+	#endif
+
+	// backup desired configuration
+	gtmp.noalias() = gd;
+
+	// update parameter	
+	alpha = (1.0/2.0)*dt;		
+
+	// do time integration
+	while (t < TDOMAIN && i < MAX_ITER){
+
+		// update trajectory
+		pathSolve(t,gd);
+
+		dynamicODE(t,x,K1);
+ 		dynamicODE(t+alpha, x+alpha*K1, K2);
+ 		dynamicODE(t+alpha, x+alpha*K2, K3);
+ 		dynamicODE(t+dt, x+dt*K3, K4);
+
+  		dx = (dt/6.0)*(K1+2.0*K2+2.0*K3+K4);
+
+  		if(isnan(dx.norm())){
+  			i = MAX_ITER; 
+  		}
+
+  		if(WRITE_OUTPUT){
+			output(statelog,t,x.block(0,0,n,1));
+			output(statelog_dt,t,x.block(n,0,n,1));
+			output(taulog,t,tau);
+			output(glog,t,g);
+			output(xdlog,t,gd);
+		}
+
+  		// state/time update
+  		x.noalias() += dx;
+  		t += dt;
+
+  		// recover d-configuration
+  		gd.noalias() = gtmp;
 	}
 
 	#ifdef TICTOC
@@ -424,10 +500,13 @@ void Model::dynamicODE(float t, Vxf x, Vxf &dx){
 	int n = NState;
 	Vxf x1(n), x2(n);
 	Vxf dHdp, dHdq;
-	Vxf Q(n), Qa(n), Qv(n), Qu(n);
+	Vxf Q(n), Qa(n), Qu(n);
+	V6f eta0, deta0;
+	M6f Adg, AdgInv;
+	Mxf J(6,n);
+	Mxf Jt(6,n);
 
 	Qa.setZero();
-	Qv.setZero();
 	Qu.setZero();
 
 	// extract the generalized coordinates 
@@ -437,21 +516,26 @@ void Model::dynamicODE(float t, Vxf x, Vxf &dx){
 	dHdp.noalias() = Mee.householderQr().solve(x.block(n,0,n,1));	
 
 	// compute Lagrangian model
-	buildLagrange(x1,dHdp,Mee,Cee,Gee,Mtee);
+	buildLagrange(x1,dHdp,Mee,Cee,Gee,Mtee,Mbee,Cbee);
 
 	// compute part-diff q Hamiltonian
 	dHdq.noalias() = -(Mtee - Cee)*dHdp + Gee + Kee*x1;
 
 	if(ENERGY_CONTROLLER){
+
 		controllerPassive(t,dHdq,dHdp,tau);
+		
 		Qu.noalias() = Sa.transpose()*tau;
 	}
+
 	else{
+
 		Qu.noalias() = tau;
+
 	}
 
 	(dx.block(0,0,n,1)).noalias() = dHdp;
-	(dx.block(n,0,n,1)).noalias() = -dHdq - Dee*dHdp + Qu;
+	(dx.block(n,0,n,1)).noalias() = -dHdq - Dee*dHdp + Qu + Qa;
 }
 
 //---------------------------------------------------
@@ -510,7 +594,7 @@ void Model::buildJacobian(float se, Mxf &J, Mxf &Jt){
 //--------------------------  build lagrangian model
 //---------------------------------------------------
 void Model::buildLagrange(Vxf v, Vxf dv, 
-	Mxf &M, Mxf &C, Vxf &G, Mxf &Mt){
+	Mxf &M, Mxf &C, Vxf &G, Mxf &Mt, Mxf &Me, Mxf &Ce){
 
 	int n = NState;
 	double ds,s;
@@ -521,6 +605,8 @@ void Model::buildLagrange(Vxf v, Vxf dv,
 	Mxf K1Mt(n,n), K2Mt(n,n);
 	Mxf K1C(n,n), K2C(n,n);
 	Vxf K1G(n), K2G(n);
+	Mxf K1Me(n,6), K2Me(n,6);
+	Mxf K1Ce(n,6), K2Ce(n,6);
 	V13f K1, K2;
 	V13f x, dx;
 
@@ -531,6 +617,8 @@ void Model::buildLagrange(Vxf v, Vxf dv,
 	Mt.setZero();
 	C.setZero();
 	G.setZero();
+	Ce.setZero();
+	Me.setZero();
 	x.setZero();
 	x(0) = 1.0;
 
@@ -545,12 +633,13 @@ void Model::buildLagrange(Vxf v, Vxf dv,
 	// do spatial integration
 	for (int i = 0; i < SPACESTEP; i++){
 
-  		lagrangianODE(s,x,J,Jt,K1,K1J,K1Jt,K1M,K1C,K1G,K1Mt);
+  		lagrangianODE(s,x,J,Jt,K1,K1J,K1Jt,K1M,K1C,K1G,K1Mt,K1Me,K1Ce);
+
  		lagrangianODE(s+(2.0/3.0)*ds,
  				x+(2.0/3.0)*ds*K1, 
  				J+(2.0/3.0)*ds*K1J,
  				Jt+(2.0/3.0)*ds*K1Jt,
- 				K2,K2J,K2Jt,K2M,K2C,K2G,K2Mt);
+ 				K2,K2J,K2Jt,K2M,K2C,K2G,K2Mt,K2Me,K2Ce);
 
  		s += ds;
   		x.noalias()  += (ds/4.0)*(K1+3.0*K2);  
@@ -560,13 +649,9 @@ void Model::buildLagrange(Vxf v, Vxf dv,
   		C.noalias()  += (ds/4.0)*(K1C+3.0*K2C);
   		G.noalias()  += (ds/4.0)*(K1G+3.0*K2G);
   		Mt.noalias() += (ds/4.0)*(K1Mt+3.0*K2Mt);
-  		// x.noalias()  += ds*(K1);  
-  		// J.noalias()  += ds*(K1J);
-  		// Jt.noalias() += ds*(K1Jt);
-  		// M.noalias()  += ds*(K1M);
-  		// C.noalias()  += ds*(K1C);
-  		// G.noalias()  += ds*(K1G);
-  		// Mt.noalias() += ds*(K1Mt);
+  		Me.noalias() += (ds/4.0)*(K1Me+3.0*K2Me);
+  		Ce.noalias() += (ds/4.0)*(K1Ce+3.0*K2Ce);
+
 	}
 }
 
@@ -612,7 +697,7 @@ void Model::jacobiODE(float s, V13f x, V13f &dx,
 //---------------------------------------------------
 void Model::lagrangianODE(float s, V13f x, Mxf J, Mxf Jt,
 	V13f &dx, Mxf &dJ, Mxf &dJt, Mxf &dM, Mxf &dC, Vxf &dG,
-	Mxf &dMt){
+	Mxf &dMt, Mxf &dMe, Mxf &dCe){
 
 	Mxf PMat(NDof, NState);
 	M6f Adg, Adg_;
@@ -660,8 +745,11 @@ void Model::lagrangianODE(float s, V13f x, Mxf J, Mxf Jt,
 
 	// compute local time-derivative of G-inertia matrix
 	dMt.noalias() = (Adg_*Jt).transpose()*Mtt*(Adg_*J) + (Adg_*J).transpose()*Mtt*(Adg_*Jt);
+
+	// compute local moving-base at \eta_0: Me and Ce matrix
+	dMe.noalias() = (Adg_*J).transpose()*Mtt;
+	dCe.noalias() = (Adg_*J).transpose()*(Mtt*adeta - adeta.transpose()*Mtt);
 }
-	// compute local D-inertia matrix
 
 //---------------------------------------------------
 //--------------------------- compute Hessian matrix
@@ -684,17 +772,51 @@ void Model::hessianInverse(float alpha, Vxf R, Vxf &dr){
 }
 
 //---------------------------------------------------
+//---------------- build nonlinear elastic potential
+//---------------------------------------------------
+void Model::buildNonlinearElastic(Vxf x, Vxf &N){
+
+	int n = NState;;
+	float Ne1,Ne2,Ne3;
+	float Nb1,Nb2,Nb3;
+
+	// float l0 = ((float)SDOMAIN);
+	// float l = x(2)*((float)SDOMAIN);
+	// float kx = x(0);
+	// float ky = x(1);
+	// float eps = x(2);
+
+	float ke1 = 2.23e3;
+	float ke2 = 1.73e3;
+	float ke3 = -4.55e2;
+
+	float kb1 = 4.23e-1;
+	float kb2 = 3.99e-1;
+	float kb3 = -2.29e-1;
+
+	// float k = sqrt(kx*kx + ky*ky);
+
+	// Ne1 = 0.0;
+	// Ne2 = 0.0;
+	// Ne3 = (ke1 + ke2*(pow(tanh(ke3*(l - l0)),2) - 1))*x(3);
+
+	// Nb1 = eps*eps*kx*l0*l0*(kb1 + kb2*(pow(tanh(kb3*l*k),2) - 1));
+	// Nb2 = eps*eps*ky*l0*l0*(kb1 + kb2*(pow(tanh(kb3*l*k),2) - 1));
+	// Nb3 = eps*l0*l0*(kb1 + kb2*(pow(tanh(eps*kb3*l0*k),2) - 1))*k*k;
+
+	// N(0) = Ne1 + Nb1;
+	// N(1) = Ne2 + Nb2;
+	// N(2) = Ne3 + Nb3;
+
+}
+
+//---------------------------------------------------
 //----------------------------- build inertia tensor
 //---------------------------------------------------
 void Model::buildInertiaTensor(){
 
 	Mtt.setZero();
 
-	// float A  = PI*pow(RADIUS,2);
-	// float J1 = 0.5*PI*pow(RADIUS,4);
-	// float J2 = 0.25*PI*pow(RADIUS,4);
-	// float J3 = 0.25*PI*pow(RADIUS,4);
-	
 	V6f v;
 	v << J11,J22,J33,A11,A11,A11;
 	Mtt.diagonal() = ((float)RHO)*v;
@@ -707,18 +829,12 @@ void Model::buildStiffnessTensor(){
 
 	Ktt.setZero();
 
-	// float A  = PI*pow(RADIUS,2);
-	// float J1 = 0.5*PI*pow(RADIUS,4);
-	// float J2 = 0.25*PI*pow(RADIUS,4);
-	// float J3 = 0.25*PI*pow(RADIUS,4);
-	
 	float E0 = ((float) EMOD);
 	float G0 = ((float) EMOD)/(2*(1+((float) NU)));
 
 	V6f v;
-	v << G0*J11,E0*J22,E0*J33,1e-4*E0*A11,G0*A11,G0*A11;
+	v << G0*J11,E0*J22,E0*J33,E0*A11,G0*A11,G0*A11;
 	Ktt.diagonal() = v;
-
 }
 
 //---------------------------------------------------
@@ -747,6 +863,8 @@ void Model::buildGlobalSystem(){
 	Dee  = Mxf::Zero(NState,NState);
 	Cee  = Mxf::Zero(NState,NState);
 	Mtee = Mxf::Zero(NState,NState);
+	Mbee = Mxf::Zero(NState,6);
+	Cbee = Mxf::Zero(NState,6);
 	Gee  = Vxf::Zero(NState);
 
 	s = 0.0;

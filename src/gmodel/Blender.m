@@ -117,7 +117,6 @@ end
 function mesh = SE3Mesh(mesh,Arg)
 
 Node0 = [mesh.Node, ones(mesh.NNode,1)]; 
-%Node0(:,4) = 1;
 
 R = Quat2Rot(Arg(1:4));
 r = Arg(5:7);
@@ -153,6 +152,11 @@ elseif strcmp(Ax,'y')
 elseif strcmp(Ax,'z')
     Node(:,3) = Scale*Node0(:,3);
     Node(:,3) = Node(:,3);% - min(Node0(:,3));
+elseif strcmp(Ax,'axi')
+    Node(:,1) = Scale*Node0(:,1);
+    Node(:,1) = Node(:,1);  
+    Node(:,2) = Scale*Node0(:,2);
+    Node(:,2) = Node(:,2);
 elseif strcmp(Ax,'uniform')
     Node = Scale*Node;
 else 

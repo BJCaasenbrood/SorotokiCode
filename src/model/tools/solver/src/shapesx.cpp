@@ -23,6 +23,7 @@ Shapes::Shapes(){
 	cheby = false;
 	cubic = false;
 	legen = false;
+	Normalize = 1.0;
 }
 
 //---------------------------------------------------
@@ -47,6 +48,13 @@ void Shapes::set(int nmode, int ndof, int nx, const char* str)
 		legen = true;
 	}
 
+}
+
+//---------------------------------------------------
+//--------------------------------- initialize class
+//---------------------------------------------------
+void Shapes::setNorm(float x){
+	Normalize = x;
 }
 
 //---------------------------------------------------
@@ -94,7 +102,7 @@ void Shapes::phi(float s, Vxf &p)
 //---------------------------------------------------
 //---------------------------- evaluate shape-matrix
 //---------------------------------------------------
-void Shapes::eval(float s, Mxf &Phi)
+void Shapes::eval(float s0, Mxf &Phi)
 {
 
 	Vxf p1(NMode/Nx), p2(NMode/Nx), p(NMode);
@@ -103,6 +111,9 @@ void Shapes::eval(float s, Mxf &Phi)
 	// discontinuity mapping
 	float s1 = 0.0;
 	float s2 = 0.0;
+
+	// normalize
+	float s = s0/Normalize;
 
 	if (s <= 0.5){s1 = 2.0*maxf(sgn(-2.0*s+1.0),0.0)*s;}
 	else if (s > 0.5){s2 = maxf(2.0*(s)-1.0,0.0);}

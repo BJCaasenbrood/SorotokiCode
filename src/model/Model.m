@@ -15,6 +15,7 @@ classdef Model
         q0;
         dq0;
         Gain;
+        Lambda;
         Point;
         Controller;
         Area, Jxx, Jyy, Jzz;
@@ -55,7 +56,6 @@ function obj = Model(Table,varargin)
     
     obj.Table  = Table;
     obj.Controller = 1;
-    %obj.NLink = size(Table,1);
     obj.Movie      = false;
     obj.MovieStart = false;
     obj.MovieAxis  = [];
@@ -63,8 +63,8 @@ function obj = Model(Table,varargin)
     obj.NModal    = 2;
     obj.NDisc     = 2;
     obj.SpaceStep = 11;
-    obj.TimeStep  = 0.01;
-    obj.Tdomain   = 25;
+    obj.TimeStep  = 1e-1;
+    obj.Tdomain   = 15;
     obj.Sdomain   = 1;
     
     obj.Density = 0.01;
@@ -81,7 +81,7 @@ function obj = Model(Table,varargin)
     obj.Jzz     = 0.25*obj.Density*obj.Radius^2;
     
     obj.Point = [1,0,0,0,1,0,0];
-    obj.Gain = [1e-7,0.15];
+    obj.Gain = [1e-2,0.05];
 
     obj.Texture = prusa;
     
@@ -193,6 +193,26 @@ Model.t = ts;
 end
 
 %----------------------------------------------------------------- simulate
+function [g, X] = string(Model,k,Quality)
+    
+    N = Model.Nq;
+    Qtmp = Model.q(k,1:N).';
+    X = linspace(0,Model.Sdomain,Quality);
+    ee = Model.Ba*Model.Phi(Model.Length)*Qtmp;
+    
+    Model.Length = ee(4);
+    
+    g0 = [1,0,0,0,0,0,0];
+    eta0 = [0,0,0,0,0,0];
+    deta0 = [0,0,0,0,0,0];
+    
+    [~,yf] = ode23(@(t,x) ForwardODE(Model,t,x,Qtmp,...
+         Qtmp*0, Qtmp*0),X,[g0 eta0 deta0]);
+
+    g = yf(:,1:7);
+end
+
+%----------------------------------------------------------------- simulate
 function Model = inertia(Model)
     Model.Area    = pi*Model.Radius^2;
     Model.Jxx     = 0.5*Model.Density*Model.Radius^2;
@@ -239,28 +259,31 @@ N = Model.Nq;
 %Model.Length = Model.Length0;
 X = linspace(0,Model.Sdomain,200);
 
-%msh = Gmodel('SlenderRod.stl');
+msh = Gmodel('SlenderRod.stl');
 %msh = Gmodel('SoftActuatorRedux.stl');
 %msh = Gmodel('SoftActuatorPlanarRedux.stl');
-msh = Gmodel('Pneulink.stl'); 
+%msh = Gmodel('Pneulink.stl'); 
 %msh = Gmodel('Pneunet.stl'); 
 assignin('base','msh',msh);
 mshgr = Gmodel('SoftGripperRedux.stl'); assignin('base','mshgr',mshgr);
 %mshgr = Gmodel([]);
 %msh = msh.set('Node0',mshgr.Node);
-mshgr = mshgr.set('Node0',mshgr.Node*1.0e-5);
-mshgr = mshgr.set('Node',mshgr.Node*1.0e-5);
-msh = msh.set('Node0',msh.Node*0.064);
-msh = msh.set('Node',msh.Node*0.064);
+msh = Blender(msh,'Scale',{'x',3});
+mshgr = mshgr.set('Node0',mshgr.Node*Model.Sdomain*1e-6);
+mshgr = mshgr.set('Node',mshgr.Node*Model.Sdomain*1e-6);
+msh = msh.set('Node0',msh.Node*Model.Sdomain);
+msh = msh.set('Node',msh.Node*Model.Sdomain);
+
 
 % set texture
 msh.Texture = Model.Texture;
 mshgr.Texture = Model.Texture;
 
-msh = msh.bake();
+msh   = msh.bake();
 mshgr = mshgr.bake();
 msh   = msh.render();
 mshgr = mshgr.render();
+
 axis equal; 
 
 LinkID = knnsearch(X(:),msh.Node(:,3));
@@ -269,16 +292,13 @@ if isempty(Model.MovieAxis)
 end
 axis(Model.MovieAxis);
 drawnow;
-%axis([-.5 .5 -.5 .5 -1 .5])
-view(50,10);
+view(-45-90,10);
 msh.update();
 mshgr.update();
 msh.ground(Model.MovieAxis);
 
-%background('k');
-
-if length(Model.t) > 2, FPS = max(round((1/12)/(mean(diff(Model.t)))),1); i0 = 1;
-else, FPS = 1; i0 = 1;
+if length(Model.t) > 2, FPS = max(round((1/12)/(mean(diff(Model.t)))),1); 
+else, FPS = 1; 
 end
 
 plotvector([0;0;0],[0.2;0;0],'Color',col(1),'linewidth',2,'MaxHeadSize',0.75);
@@ -286,7 +306,6 @@ plotvector([0;0;0],[0;0.2;0],'Color',col(2),'linewidth',2,'MaxHeadSize',0.75);
 plotvector([0;0;0],[0;0;0.2],'Color',col(3),'linewidth',2,'MaxHeadSize',0.75);
 
 if ~isempty(Model.xd)
-% p = Model.point(4:6).';
 p = Model.xd(end,5:7);
 R = quat2rot(Model.xd(end,1:4));
 fr = [p(1,3);p(1,2);-p(1,1)];
@@ -327,7 +346,6 @@ for ii = [1:FPS:length(Model.t),length(Model.t)]
     mshgr = Blender(mshgr,'SE3',yf(end,1:7));
     mshgr = Blender(mshgr,'Scale',{'z',-1});
     
-    %vline = [vline; SweepSE3(end,7),SweepSE3(end,6),SweepSE3(end,5),Model.t(ii)];
 
     if ii == 1      
        h = plot3(SweepSE3(:,7),SweepSE3(:,6),-SweepSE3(:,5),'linewidth',1.5,...
@@ -366,13 +384,17 @@ for ii = [1:FPS:length(Model.t),length(Model.t)]
          f2 = plotvector(fr,R*[0;0;0.2],'Color',col(3),'linewidth',2,'MaxHeadSize',0.75);
         end
         
+%         P = Model.Phi;
+%         xi_ = zeros(length(X),1);
+%         
+%         for ii = 1:length(X)
+%             xi_(ii) = sum((P(X(ii))*Qtmp).^2); 
+%         end
+        
         h = plot3(SweepSE3(:,7),SweepSE3(:,6),-SweepSE3(:,5),'linewidth',2,...
-        'Color',col(2));
-    
-        %hm = plot3(SweepSE3(end,7),SweepSE3(end,6),-SweepSE3(end,5),'.',...
-        %   'markersize',10,'Color',col(1));
-       
-        %h0 = plot3(p(:,3),p(:,2),-p(:,1),'k--');
+            'color',col(2));
+%         h = patch(SweepSE3(:,7),SweepSE3(:,6),-SweepSE3(:,5),xi_,'FaceColor',...
+%             'none','EdgeColor','interp');
 
     end
       
@@ -382,7 +404,6 @@ for ii = [1:FPS:length(Model.t),length(Model.t)]
     mshgr.update();
     
     title(['T = ',num2str(Model.t(ii),3)]);
-    %title(['iterations = ',num2str(ii,3)]);
         
     if ~isempty(Model.MovieAxis), axis(Model.MovieAxis); end
     
@@ -454,7 +475,7 @@ fprintf(FID,['E3 = ', num2str(Model.Table(6)), '\n']);
 fprintf(FID,'\n[model] \n');
 fprintf(FID,['NMODE   = ', num2str(Model.NModal), '\n']);
 fprintf(FID,['NDISC   = ', num2str(Model.NDisc), '\n']);
-fprintf(FID,['SDOMAIN = ', num2str(Model.Length), '\n']);
+fprintf(FID,['SDOMAIN = ', num2str(Model.Sdomain), '\n']);
 fprintf(FID,['TDOMAIN = ', num2str(Model.Tdomain), '\n']);
 
 fprintf(FID,'\n[solver] \n');
@@ -463,11 +484,12 @@ fprintf(FID,['TIMESTEP  = ', num2str(Model.TimeStep), '\n']);
 fprintf(FID,['INTSTEP   = ', '100', '\n']);
 fprintf(FID,['ATOL      = ', '1e-2', '\n']);
 fprintf(FID,['RTOL      = ', '1e-2', '\n']);
-fprintf(FID,['LAMBDA    = ', '1e-2', '\n']);
+fprintf(FID,['LAMBDA    = ', num2str(Model.Lambda), '\n']);
 fprintf(FID,['MAX_IMPL  = ', '-1', '\n']);
 fprintf(FID,['MAX_ITER  = ', '1', '\n']);
 fprintf(FID,['MAX_IK    = ', '1500', '\n']);
 fprintf(FID,['SPEEDUP   = ', '80', '\n']);
+fprintf(FID,['ADAMPING  = ', '1', '\n']);
 
 fprintf(FID,'\n[physics] \n');
 fprintf(FID,['RHO      = ', num2str(Model.Density), '\n']);
@@ -503,7 +525,7 @@ end
 function P = ShapeFunction(Model,X)
 
 Pc = cell(Model.NDof,1);
-X = single(X);
+X = single(X)/Model.Sdomain;
 
 if Model.NDisc>1
     P11 = zeros(1,Model.NModal/Model.NDisc);
@@ -515,8 +537,8 @@ end
 
 if Model.NDisc>1
     for ii = 1:(Model.NModal/Model.NDisc)
-         P11(1,ii) = sign(z1(X)).*legendre(z1(X),ii-1);
-         P22(1,ii) = sign(z2(X)).*legendre(z2(X),ii-1);
+         P11(1,ii) = w1(X)*sign(z1(X)).*legendre(z1(X),ii-1);
+         P22(1,ii) = w2(X)*sign(z2(X)).*legendre(z2(X),ii-1);
          %P11(1,ii) = w1(X)*chebyshev(z1(X),ii-1);
          %P22(1,ii) = w2(X)*chebyshev(z2(X),ii-1);
 

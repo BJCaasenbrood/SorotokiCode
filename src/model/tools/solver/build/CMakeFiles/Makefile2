@@ -53,6 +53,7 @@ CMAKE_BINARY_DIR = /home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/s
 # Directory level rules for the build root directory
 
 # The main recursive "all" target.
+all: CMakeFiles/Model_ph.dir/all
 all: CMakeFiles/solver.dir/all
 
 .PHONY : all
@@ -63,23 +64,51 @@ preinstall:
 .PHONY : preinstall
 
 # The main recursive "clean" target.
+clean: CMakeFiles/Model_ph.dir/clean
 clean: CMakeFiles/solver.dir/clean
 
 .PHONY : clean
 
 #=============================================================================
+# Target rules for target CMakeFiles/Model_ph.dir
+
+# All Build rule for target.
+CMakeFiles/Model_ph.dir/all:
+	$(MAKE) -f CMakeFiles/Model_ph.dir/build.make CMakeFiles/Model_ph.dir/depend
+	$(MAKE) -f CMakeFiles/Model_ph.dir/build.make CMakeFiles/Model_ph.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/build/CMakeFiles --progress-num=1,2 "Built target Model_ph"
+.PHONY : CMakeFiles/Model_ph.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/Model_ph.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/build/CMakeFiles 2
+	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/Model_ph.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/build/CMakeFiles 0
+.PHONY : CMakeFiles/Model_ph.dir/rule
+
+# Convenience name for target.
+Model_ph: CMakeFiles/Model_ph.dir/rule
+
+.PHONY : Model_ph
+
+# clean rule for target.
+CMakeFiles/Model_ph.dir/clean:
+	$(MAKE) -f CMakeFiles/Model_ph.dir/build.make CMakeFiles/Model_ph.dir/clean
+.PHONY : CMakeFiles/Model_ph.dir/clean
+
+#=============================================================================
 # Target rules for target CMakeFiles/solver.dir
 
 # All Build rule for target.
-CMakeFiles/solver.dir/all:
+CMakeFiles/solver.dir/all: CMakeFiles/Model_ph.dir/all
 	$(MAKE) -f CMakeFiles/solver.dir/build.make CMakeFiles/solver.dir/depend
 	$(MAKE) -f CMakeFiles/solver.dir/build.make CMakeFiles/solver.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/build/CMakeFiles --progress-num=1,2 "Built target solver"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/build/CMakeFiles --progress-num=3,4 "Built target solver"
 .PHONY : CMakeFiles/solver.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/solver.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/build/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/build/CMakeFiles 4
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/solver.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/build/CMakeFiles 0
 .PHONY : CMakeFiles/solver.dir/rule

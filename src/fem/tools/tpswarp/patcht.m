@@ -33,6 +33,7 @@ function patcht(FF,VV,TF,VT,I,Options)
 
 % FaceColor is a texture
 Options.FaceColor='texturemap';
+Options.EdgeColor='none';
 
 % Size of texture image used for every triangle
 if(isfield(Options,'PSize'))
@@ -71,7 +72,7 @@ else
 end
 
 % Calculate the texture interpolation values
-[lambda1 lambda2 lambda3 jind]=calculateBarycentricInterpolationValues(sizep);
+[lambda1, lambda2, lambda3, jind]=calculateBarycentricInterpolationValues(sizep);
  
 % Split texture-image in r,g,b to allow fast 1D index 
 Ir=I(:,:,1); if(iscolor), Ig=I(:,:,2); Ib=I(:,:,3); end
@@ -117,23 +118,16 @@ for i=1:size(FF,1)
     end
     
     % Show the surface
-    surface(x,y,z,J,...
-    'FaceColor','texturemap',...
-    'EdgeColor','none',...
-    'CDataMapping','direct',...
-    'Linestyle','none');
+    surface(x,y,z,J,Options)
 end
+
 hold off; 
 
-function [lambda1 lambda2 lambda3 jind]=calculateBarycentricInterpolationValues(sizep)
+function [lambda1, lambda2, lambda3, jind]=calculateBarycentricInterpolationValues(sizep)
 % Define a triangle in the upperpart of an square, because only that
 % part is used by the surface function
-x1=sizep; y1=sizep; x2=sizep; y2=0; x3=0 ;y3=0; % original
-version_str = version;
-index_year = regexp(version_str,'(R');
-if str2double(version_str(index_year+2:end-2))>2013
-y3=sizep; %new
-end
+%x1=sizep; y1=sizep; x2=sizep; y2=0; x3=0 ;y3=0;
+x1=sizep; y1=sizep; x2=sizep; y2=0; x3=0 ;y3=sizep;
 % Calculate the bary centric coordinates (instead of creating a 2D image
 % with the interpolation values, we map them directly to an 1D vector)
 detT = (x1-x3)*(y2-y3) - (x2-x3)*(y1-y3);

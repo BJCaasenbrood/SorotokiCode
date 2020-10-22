@@ -79,6 +79,7 @@ solver_EXTERNAL_OBJECTS =
 
 solver: CMakeFiles/solver.dir/main.cpp.o
 solver: CMakeFiles/solver.dir/build.make
+solver: libModel_ph.a
 solver: CMakeFiles/solver.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable solver"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/solver.dir/link.txt --verbose=$(VERBOSE)
