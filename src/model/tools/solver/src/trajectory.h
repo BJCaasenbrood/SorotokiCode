@@ -42,7 +42,7 @@ void pathSolve(float t, V7f &yd)
 
 	//yt(4) = a*sin(OMEGA*t);
 	//yt(5) = b*sin(OMEGA*t);
-	//yt(6) = b*cos(OMEGA*t);
+	//yt(6) = b*sin(OMEGA*t);
 
 	yd.noalias() = y0 + yt;
 }

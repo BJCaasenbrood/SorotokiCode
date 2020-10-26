@@ -28,6 +28,7 @@ Model::Model(const char* str){
 	WRITE_OUTPUT = static_cast<bool>(cf.Value("options","WRITE_OUTPUT"));
 	ENERGY_CONTROLLER = static_cast<bool>(cf.Value("options","ENERGY_CONTROLLER"));
 	KINEMATIC_CONTROLLER = static_cast<bool>(cf.Value("options","KINEMATIC_CONTROLLER"));
+	ACTUATION_SPACE = static_cast<int>(cf.Value("options","ACTUATION_SPACE"));
 
 	if(KINEMATIC_CONTROLLER & ENERGY_CONTROLLER){
 		cout << "error: both controllers active. Switchting to kinematic controller." << endl;
@@ -96,17 +97,29 @@ Model::Model(const char* str){
 	stab.setZero();
 	stab(0) = 1;
 
+	// building actuation space
 	#ifdef DISCONTINIOUS
-		sa.setConstant(1.0);
-		//sa(0) = 1;
+		if (ACTUATION_SPACE == -1){
+			sa.setConstant(1.0);
+		}
+		else{
+			sa(0) = 1;
+		}
+
 		sc = sa.replicate(NDISC,1);
 		Phi.set(NMODE,NDof,NDISC,"legendre");
-		//cout << "DISCONTINIOUS = true" << endl;
+		
 	#else
-		sc.setZero();
-		sc(0) = 1.0;
+		if (ACTUATION_SPACE == -1){
+			sc.setConstant(1.0);
+		}
+		else{
+			sc.setZero();
+			sc(0) = 1.0;
+		}
+
 		Phi.set(NMODE,NDof,"legendre");
-		//cout << "CONTINIOUS = true" << endl;
+		
 	#endif
 
 	// normalize domain
@@ -152,6 +165,9 @@ Model::Model(const char* str){
 
 	// pre build lagrangian system
 	buildLagrange(q,dq,Mee,Cee,Gee,Mtee,Mbee,Cbee);
+
+	cout << "Sa=" << Sa.format(matlab) << endl;
+	cout << "Sc=" << Sc.format(matlab) << endl;
 
 	cout << setprecision(PRECISION) << endl;
 }	

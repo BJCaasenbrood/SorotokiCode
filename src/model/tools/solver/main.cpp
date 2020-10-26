@@ -1,6 +1,6 @@
 #define EIGEN_NO_DEBUG
 #define IMPLICIT
-#define DISCONTINIOUS
+//#define DISCONTINIOUS
 #define SOLVER_OUTPUT
 #define TICTOC
 

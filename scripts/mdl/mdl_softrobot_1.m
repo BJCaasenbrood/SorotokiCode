@@ -1,7 +1,7 @@
 clr;
 %% assign free DOF
-mdl = Model([0,1,1,0,0,0],'NModal',6,'NDisc',2);
-mdl = setupSoftRobot(mdl);
+mdl = Model([0,1,1,0,0,0],'NModal',5,'NDisc',1);
+mdl = setupSoftRobot(mdl,1e-7,0.25);
 
 %% generate and solve dynamic model
 mdl = mdl.generate();
@@ -12,6 +12,7 @@ figure(102)
 t = mdl.get('t');
 q = mdl.q;
 ge = mdl.ge;
+u = mdl.get('tau');
 xd = mdl.get('xd');
 
 subplot(3,4,[1 2 5 6]);
@@ -39,35 +40,34 @@ for ii = 1:FPS:length(mdl.q)
     sph = Blender(sph,'SE3',xd(ii,:));
     sph.update();
 
-    axis(0.11*[-0.75 0.75 -0.75...
-    0.75 -.1 1.75]*0.85);
+    axis([-0.05 0.05 -0.05 0.05 .009 0.1]);
 end
 
-%% FUNCTIONS
+%% BACK-END FUNCTIONS
 % setup model
-function mdl = setupSoftRobot(mdl)
+function mdl = setupSoftRobot(mdl,K,X)
 mdl = mdl.set('Controller',1);
 
 mdl = mdl.set('Tdomain',    25); 
 mdl = mdl.set('TimeStep',   1/12);
 mdl = mdl.set('Sdomain',    0.12);
-mdl = mdl.set('SpaceStep',  100);
-mdl = mdl.set('Density',    50);
+mdl = mdl.set('SpaceStep',  50);
+mdl = mdl.set('Density',    500);
 mdl = mdl.set('Radius',     0.02);
-mdl = mdl.set('Gravity',    -9.81);
-mdl = mdl.set('E',          10);
+mdl = mdl.set('Gravity',    9.81);
+mdl = mdl.set('E',          50);
 mdl = mdl.set('Mu',         0.1);
-mdl = mdl.set('Gain',       [1e-3,0.0]);
-mdl = mdl.set('Lambda',     1e-1);
+mdl = mdl.set('Gain',       [K,0]);
+mdl = mdl.set('Lambda',     K/X);
 
 mdl = mdl.set('Point',...
-    [1,0,0,0,0.05,0.0,0.05]);
+    [1,0,0,0,0.05,0.025,0.025]);
 end
 
 % setup rig
 function rig = setupRig(mdl)
 gmdl = Gmodel('Arm.stl');
-gmdl.Alpha = 0.3;
+gmdl.Alpha = 1.0;
 
 mus1 = Gmodel('Cylinder.stl');
 mus1 = Blender(mus1,'Scale',{'axi',0.015});
@@ -113,13 +113,14 @@ rig = rig.parent(4,0,0.1);
 rig = rig.parent(4,1,0.9);
 rig = rig.parent(5,0,0.1);
 rig = rig.parent(5,1,0.9);
-rig = rig.texture(1,skin);
+rig = rig.texture(1,redwax);
 rig = rig.texture(2:3,redgloss);
 rig = rig.texture(4:5,metal);
+rig = rig.hide(2,3,4,5);
 rig = rig.render();
-gmdl.ground([-0.05 0.05 -0.05, 0.05 -1e-3 1.75]);
+gmdl.ground([-0.015 0.015 -0.015, 0.015 0]);
 
-axis([-0.07 0.07 -0.07 0.07 .009 0.16]);
+axis([-0.05 0.05 -0.05 0.05 .009 0.1]);
 end
 
 

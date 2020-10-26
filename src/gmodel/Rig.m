@@ -9,6 +9,7 @@ classdef Rig < handle
     
     properties (Access = private)
         Domain;
+        ListDraw;
         AutoScale;
         RigHandle;
     end
@@ -62,6 +63,7 @@ function Rig = add(Rig,varargin)
         end
 
         Rig.List{end+1,1} = gmdl;
+        Rig.ListDraw{end+1} = true;
     end
 end
 
@@ -93,6 +95,12 @@ function Rig = texture(Rig,Child,TexMap)
     end
 end
 
+%---------------------------------------------------------------------- rig
+function Rig = hide(Rig,varargin)
+    for ii = 1:length(varargin)
+        Rig.ListDraw{varargin{ii}} = false;
+    end
+end
 
 %----------------------------------------------------------- compute ik rig
 function Rig = compute(Rig,t)
@@ -147,7 +155,9 @@ end
 function Rig = render(Rig) 
     
    for ii = 1:length(Rig.List)
-       Rig.List{ii}.bake().render();
+       if Rig.ListDraw{ii}
+        Rig.List{ii}.bake().render();
+       end
    end
    
 end
@@ -156,7 +166,9 @@ end
 function Rig = update(Rig) 
     
    for ii = 1:length(Rig.List)
-       Rig.List{ii}.update();
+       if Rig.ListDraw{ii}
+        Rig.List{ii}.update();
+       end
    end
 end
 

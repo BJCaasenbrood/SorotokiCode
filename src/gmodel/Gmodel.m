@@ -176,7 +176,7 @@ function Gmodel = render(Gmodel,varargin)
     Gmodel.Figure.UserData = Gmodel;
     
     update(Gmodel);
-    drawnow;
+    %drawnow;
     
     function myprecallback(src,evnt)
         class = whoClasses('Gmodel');
@@ -206,7 +206,7 @@ function vargout = update(Gmodel,varargin)
     if nargout < 1 || strcmp(varargin ,'tex')
     set(Gmodel.FigHandle,'FaceVertexCData',Gmodel.TextureMap,...
         'Facecolor',shading);
-    drawnow;
+    %drawnow;
     vargout = [];
     else
        vargout{1} = Gmodel.FigHandle;
@@ -237,6 +237,8 @@ function Gmodel = updateNode(Gmodel,varargin)
         Gmodel.Element);
 
     set(Gmodel.FigHandle,'Vertices',Gmodel.Node);
+    
+    drawnow limitrate;
 end
 
 %--------------------------------------------------------------------- show
@@ -300,7 +302,7 @@ function showMap(Gmodel,Request)
     
     set(Gmodel.FigHandle,'FaceVertexCData',P,'facecolor','interp');
     colormap(Gmodel.Colormap);
-    drawnow;
+    %drawnow;
 end
 
 %--------------------------------------------------------------------- bake

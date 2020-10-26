@@ -52,6 +52,7 @@ class Model
   	bool KINEMATIC_CONTROLLER;
   	bool WRITE_OUTPUT;
   	bool POINT_INPUT;
+  	int  ACTUATION_SPACE;
 
   	float A11, J11, J22, J33;
  	float E11, E22, E33;
