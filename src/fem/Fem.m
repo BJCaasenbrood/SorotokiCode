@@ -601,6 +601,7 @@ while flag
     % draw visual
     %if mod(Fem.IterationMMA,10) == 0
         Fem.show(Visual); drawnow;
+        colormap(turbo);
     %end
 end
 

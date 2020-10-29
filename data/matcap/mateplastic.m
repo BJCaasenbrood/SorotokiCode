@@ -1,4 +1,4 @@
-function mcap = matteplastic
-mcap = imread('matteplastic.jpg');
+function mcap = mateplastic
+mcap = imread('matteplastic.png');
 end
 

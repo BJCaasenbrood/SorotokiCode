@@ -9,4 +9,4 @@ obj.bake().render().update();
 %% set AO map object
 obj_ = obj.copy('Translate',{'y',100});
 obj_.render().showMap('AO');
-view(90,15); axis tight;
+view(-60,15); axis tight;

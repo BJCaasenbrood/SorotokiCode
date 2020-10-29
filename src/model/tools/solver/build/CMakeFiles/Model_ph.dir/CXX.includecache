@@ -61,6 +61,8 @@ smoothstep.h
 /home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/src/smoothstep.h
 trajectory.h
 /home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/src/trajectory.h
+readFile.h
+/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/src/readFile.h
 Config/ConfigFile.cpp
 /home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/src/Config/ConfigFile.cpp
 Config/Chameleon.cpp
@@ -74,6 +76,16 @@ shapes.cpp
 cmath
 -
 math.h
+-
+Eigen/Dense
+-
+
+/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/src/readFile.h
+iostream
+-
+fstream
+-
+string
 -
 Eigen/Dense
 -

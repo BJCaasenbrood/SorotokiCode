@@ -14,6 +14,7 @@ classdef Model
         dq;
         q0;
         dq0;
+        u0;
         Gain;
         Lambda;
         Point;
@@ -42,6 +43,7 @@ classdef Model
         SimTime;
         DistLoad;
         PArea;
+        ActuationSpace;
         
         Movie;
         MovieStart;
@@ -79,6 +81,9 @@ function obj = Model(Table,varargin)
     obj.Jxx     = 0.5*obj.Density*obj.Radius^2;
     obj.Jyy     = 0.25*obj.Density*obj.Radius^2;
     obj.Jzz     = 0.25*obj.Density*obj.Radius^2;
+    
+    obj.ActuationSpace = -1;
+%    obj.GravityDirection = 1;
     
     obj.Point = [1,0,0,0,1,0,0];
     obj.Gain = [1e-2,0.05];
@@ -133,15 +138,28 @@ end
 
 %--------------------------------------------------------------------- make
 function Model = make(Model)
+
+if Model.NDisc > 1
+    dir_path = './src/model/tools/solver/build';
+else
+    dir_path = './src/model/tools/solver/build_continious';
+end
+
 tic
-CMD = 'cd src/model/tools/solver/build && make';
+CMD = ['cd ',dir_path, ' && make'];
+cout('green',['* buidling current dir: ', dir_path, '\n']); pause(1);
 system(CMD);
 toc    
 end
 
 %---------------------------------------------------------------------- set
 function Model = csolve(Model)   
-dir_path = './src/model/tools/solver/build';
+
+if Model.NDisc > 1
+    dir_path = './src/model/tools/solver/build';
+else
+    dir_path = './src/model/tools/solver/build_continious';
+end
 
 %//////////////////////////////////
 out = fullfile(dir_path,'log/state.log');
@@ -153,21 +171,38 @@ out = fullfile(dir_path,'log/state_dt.log');
 fileID = fopen(out,'w');
 fprintf(fileID,'%d\n',Model.dq0);
 fclose(fileID);
+%//////////////////////////////////
+out = fullfile(dir_path,'log/grav_vector.log');
+fileID = fopen(out,'w');
+fprintf(fileID,'%d\n',[zeros(3,1);Model.Gravity(:)]);
+fclose(fileID);
+%//////////////////////////////////
+out = fullfile(dir_path,'log/tau_vector.log');
+fileID = fopen(out,'w');
+fprintf(fileID,'%d\n',Model.u0);
+fclose(fileID);
+
+% A = magic(4);
+% 
+% out = fullfile(dir_path,'log/Amat.log');
+% fileID = fopen(out,'w');
+% fprintf(fileID,[repmat('%5d ',1,size(A,2)-1),'%5d\n'],A);
+% fclose(fileID);
 
 tic
-CMD = 'cd src/model/tools/solver/build && ./solver config.m';
+CMD = ['cd ',dir_path, ' && ./solver config.m'];
 system(CMD);
-toc
-y = load('src/model/tools/solver/build/log/state.log');
+toc;
+y = load([dir_path ,'/log/state.log']);
 Model.q = y(:,2:end);
 Model.t = y(:,1);
-y = load('src/model/tools/solver/build/log/tau.log');
+y = load([dir_path ,'/log/tau.log']);
 Model.tau = y(:,2:end);
-y = load('src/model/tools/solver/build/log/g.log');
+y = load([dir_path ,'/log/g.log']);
 Model.ge = y(:,2:end);
-y = load('src/model/tools/solver/build/log/statelog_dt.log');
+y = load([dir_path ,'/log/statelog_dt.log']);
 Model.dq = y(:,2:end);
-y = load('src/model/tools/solver/build/log/xd.log');
+y = load([dir_path ,'/log/xd.log']);
 Model.xd = y(:,2:end);
 
 end
@@ -437,13 +472,20 @@ Model.Phi  = @(x) ShapeFunction(Model,x);
 Model.Nq   = Model.NDof*Model.NModal;
 Model.q0   = zeros(Model.NDof*Model.NModal,1);
 Model.dq0  = zeros(Model.NDof*Model.NModal,1);
+Model.u0  = zeros(Model.NDof*Model.NModal,1);
 end
 
 %---------------------------------------------------------------------- set
 function Model = GenerateConfigFile(Model)
    
 global FID;
-File = [cdsoro,'/src/model/tools/solver/build/config.m'];
+if Model.NDisc > 1
+    dir_path = '/src/model/tools/solver/build';
+else
+    dir_path = '/src/model/tools/solver/build_continious';
+end
+
+File = [cdsoro,dir_path,'/config.m'];
 delete(File);
 FID = fopen(File,'w');
 
@@ -456,7 +498,8 @@ else
     fprintf(FID,'ENERGY_CONTROLLER    = 0 \n');
 end
 fprintf(FID,'WRITE_OUTPUT         = 1 \n');
-%fprintf(FID,'POINT_INPUT          = 0 \n');
+fprintf(FID,['ACTUATION_SPACE =', num2str(Model.ActuationSpace), '\n']);
+%fprintf(FID,['GRAV_VECTOR =', num2str(Model.GravityDirection), '\n']);
 
 if(Model.NDisc > 1)
     fprintf(FID,'DISCONTINIOUS        = 1 \n');

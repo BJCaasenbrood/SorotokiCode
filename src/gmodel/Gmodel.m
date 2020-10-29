@@ -65,7 +65,7 @@ methods
 function obj = Gmodel(varargin) 
     
     obj.Texture = base;
-    obj.TextureStretch = 0.75;
+    obj.TextureStretch = .75;
     obj.Quality = 80;
     obj.FlipNormals = false;
     obj.AOBias = 0.01;
@@ -206,7 +206,7 @@ function vargout = update(Gmodel,varargin)
     if nargout < 1 || strcmp(varargin ,'tex')
     set(Gmodel.FigHandle,'FaceVertexCData',Gmodel.TextureMap,...
         'Facecolor',shading);
-    %drawnow;
+    
     vargout = [];
     else
        vargout{1} = Gmodel.FigHandle;
@@ -214,6 +214,7 @@ function vargout = update(Gmodel,varargin)
        vargout{3} = shading;
        vargout{4} = Gmodel.Node;
     end
+    
 end
 
 %--------------------------------------------------------------------- show
@@ -238,7 +239,7 @@ function Gmodel = updateNode(Gmodel,varargin)
 
     set(Gmodel.FigHandle,'Vertices',Gmodel.Node);
     
-    drawnow limitrate;
+    %drawnow limitrate;
 end
 
 %--------------------------------------------------------------------- show
@@ -302,7 +303,7 @@ function showMap(Gmodel,Request)
     
     set(Gmodel.FigHandle,'FaceVertexCData',P,'facecolor','interp');
     colormap(Gmodel.Colormap);
-    %drawnow;
+    drawnow;
 end
 
 %--------------------------------------------------------------------- bake
@@ -363,7 +364,7 @@ end
 end
 
 %---------------------------------------------------------------- slice
-function slice(Gmodel,dim,s)
+function Gmodel = slice(Gmodel,dim,s)
     
 if ~isempty(Gmodel.Slice), delete(Gmodel.Slice); end
 
@@ -394,7 +395,7 @@ hold on;
 colormap(autumn(6));
 
 Gmodel.Slice = surf(X,Y,zeros(N,N) + s,'cData',A,'linestyle','-',...
-    'AlphaData',~isnan(A),'facecolor','interp','Edgecolor','interp');
+    'AlphaData',single(~isnan(A)),'facecolor','interp','Edgecolor','interp');
 
 caxis([-15 10]);
 
@@ -474,7 +475,6 @@ function Gmodel = GenerateObject(Gmodel,varargin)
     Gmodel.Normal = fn;  
     Gmodel.RMatrix = eye(4);
     Gmodel.BdBox = boxhull(Gmodel.Node); 
-    Gmodel.TextureStretch = 0.9;
     
     fprintf(['* Vertices  = ', num2str(length(v)/1e3,4), 'k \n']); 
     pause(0.01);

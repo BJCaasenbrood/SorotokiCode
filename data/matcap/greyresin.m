@@ -1,4 +1,4 @@
 function mcap = greyresin
-mcap = imread('greyresin.png');
+mcap = imread('greyresin.jpg');
 end
 

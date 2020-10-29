@@ -22,6 +22,7 @@ Model::Model(const char* str){
   	int K1,K2,K3; 
   	float Xd, Yd, Zd;
   	float Q1d, Q2d, Q3d, Q4d;
+  	int ACTUATION_SPACE;
 
 	ConfigFile cf(str);
 
@@ -29,16 +30,11 @@ Model::Model(const char* str){
 	ENERGY_CONTROLLER = static_cast<bool>(cf.Value("options","ENERGY_CONTROLLER"));
 	KINEMATIC_CONTROLLER = static_cast<bool>(cf.Value("options","KINEMATIC_CONTROLLER"));
 	ACTUATION_SPACE = static_cast<int>(cf.Value("options","ACTUATION_SPACE"));
-
+	
 	if(KINEMATIC_CONTROLLER & ENERGY_CONTROLLER){
 		cout << "error: both controllers active. Switchting to kinematic controller." << endl;
 		ENERGY_CONTROLLER = false;
 	}
-
-	// if(!KINEMATIC_CONTROLLER & !ENERGY_CONTROLLER){
-	// 	cout << "error: no controllers active. Switchting to kinematic controller." << endl;
-	// 	KINEMATIC_CONTROLLER = true;
-	// }
 
 	K1 = static_cast<int>(cf.Value("cosserat","K1"));	// e_xy
 	K2 = static_cast<int>(cf.Value("cosserat","K2"));	// e_xz
@@ -137,22 +133,24 @@ Model::Model(const char* str){
 	buildDampingTensor();
 	buildGlobalSystem();
 
-	q   = Vxf::Constant(NState,ATOL);
-	dq  = Vxf::Zero(NState);
-	ddq = Vxf::Zero(NState);
-	dq_ = Vxf::Zero(NState);
-	qd  = Vxf::Zero(NState);
-	tau = Vxf::Zero(NState);
-	u   = Vxf::Zero(6);
-	z0  = Vxf::Zero(6);
+	q    = Vxf::Constant(NState,ATOL);
+	dq   = Vxf::Zero(NState);
+	ddq  = Vxf::Zero(NState);
+	dq_  = Vxf::Zero(NState);
+	qd   = Vxf::Zero(NState);
+	tau  = Vxf::Zero(NState);
+	u    = Vxf::Zero(6);
+	z0   = Vxf::Zero(6);
+	gvec = Vxf::Zero(6);
 
 	Xi0 << 0.0, 0.0, 0.0, 1.0, 0.0, 0.0;
-	gvec << 0.0, 0.0, 0.0, GRAVITY, 0.0, 0.0;
 	gd << Q1d, Q2d, Q3d, Q4d, Xd, Yd, Zd;
 
 	// read input
-	read("log/state.log",q);
-	read("log/state_dt.log",dq);
+	q    = readVecXf("log/state.log");
+	dq   = readVecXf("log/state_dt.log");
+	gvec = readVecXf("log/grav_vector.log");
+	tau  = readVecXf("log/tau_vector.log");
 
 	// clean up 
 	cleanup();
@@ -166,9 +164,6 @@ Model::Model(const char* str){
 	// pre build lagrangian system
 	buildLagrange(q,dq,Mee,Cee,Gee,Mtee,Mbee,Cbee);
 
-	cout << "Sa=" << Sa.format(matlab) << endl;
-	cout << "Sc=" << Sc.format(matlab) << endl;
-
 	cout << setprecision(PRECISION) << endl;
 }	
 
@@ -179,9 +174,8 @@ void Model::output(ofstream &file, float t, Vxf x){
 
 	  file << t;
 
-	  for (int i = 0; i < x.size(); ++i){
+	  for (int i = 0; i < x.size(); ++i)
 	  	file << ", " << x(i);
-	  }
 
 	  file << "\n";
 }
@@ -341,7 +335,7 @@ void Model::controllerPassive(float t, Vxf &Hq, Vxf &Hp, Vxf &f){
 	SE3Inv(gd,Gi);
 	logmapSE3(Gi*G,Phi);
 	tmapSE3(Phi,T);
-	R.noalias() = K*T*Phi*smoothstep(t,0.0,3.0);
+	R.noalias() = K*T*Phi*smoothstep(t,0.0,5.0);
 
 	dx.noalias() = J.transpose()*(J*J.transpose() + 
 		LAMBDA*Mxf::Identity(6,6)).householderQr().solve(K*R);
@@ -546,7 +540,7 @@ void Model::dynamicODE(float t, Vxf x, Vxf &dx){
 
 	else{
 
-		Qu.noalias() = tau;
+		Qu.noalias() = Sa.transpose()*tau;
 
 	}
 
@@ -564,7 +558,7 @@ void Model::buildJacobian(float se, Mxf &J, Mxf &Jt){
 
 	Mxf K1J(6,n), K2J(6,n);
 	Mxf K1Jt(6,n), K2Jt(6,n);
-	M6f adeta, AdgInv;
+	M6f AdgInv;
 	V13f K1, K2;
 	V13f x, dx;
 
@@ -584,8 +578,8 @@ void Model::buildJacobian(float se, Mxf &J, Mxf &Jt){
  		jacobiODE(s+(2.0/3.0)*ds, x+(2.0/3.0)*ds*K1, K2, K2J, K2Jt);
 
   		s += ds;
-  		x.noalias() += (ds/4.0)*(K1+3.0*K2);
-  		J.noalias() += (ds/4.0)*(K1J+3.0*K2J);
+  		x.noalias()  += (ds/4.0)*(K1+3.0*K2);
+  		J.noalias()  += (ds/4.0)*(K1J+3.0*K2J);
   		Jt.noalias() += (ds/4.0)*(K1Jt+3.0*K2Jt);
 	}
 
@@ -595,7 +589,7 @@ void Model::buildJacobian(float se, Mxf &J, Mxf &Jt){
 
 	// compute adjoint actions
 	AdmapInv(g,AdgInv);
-	admap(eta,adeta);
+	//admap(eta,adeta);
 
 	// transform Jacobian to local frame
 	K1J.noalias() = AdgInv*J;
@@ -757,7 +751,7 @@ void Model::lagrangianODE(float s, V13f x, Mxf J, Mxf Jt,
 	 	adeta.transpose()*Mtt)*(Adg_*J) + Mtt*(Adg_*Jt));
 
 	// compute local G-potential vector
-	dG.noalias() = (Adg_*J).transpose()*(Adg).transpose()*Mtt*gvec;
+	dG.noalias() = (Adg_*J).transpose()*Mtt*Adg_*gvec;
 
 	// compute local time-derivative of G-inertia matrix
 	dMt.noalias() = (Adg_*Jt).transpose()*Mtt*(Adg_*J) + (Adg_*J).transpose()*Mtt*(Adg_*Jt);
@@ -796,12 +790,6 @@ void Model::buildNonlinearElastic(Vxf x, Vxf &N){
 	float Ne1,Ne2,Ne3;
 	float Nb1,Nb2,Nb3;
 
-	// float l0 = ((float)SDOMAIN);
-	// float l = x(2)*((float)SDOMAIN);
-	// float kx = x(0);
-	// float ky = x(1);
-	// float eps = x(2);
-
 	float ke1 = 2.23e3;
 	float ke2 = 1.73e3;
 	float ke3 = -4.55e2;
@@ -809,21 +797,6 @@ void Model::buildNonlinearElastic(Vxf x, Vxf &N){
 	float kb1 = 4.23e-1;
 	float kb2 = 3.99e-1;
 	float kb3 = -2.29e-1;
-
-	// float k = sqrt(kx*kx + ky*ky);
-
-	// Ne1 = 0.0;
-	// Ne2 = 0.0;
-	// Ne3 = (ke1 + ke2*(pow(tanh(ke3*(l - l0)),2) - 1))*x(3);
-
-	// Nb1 = eps*eps*kx*l0*l0*(kb1 + kb2*(pow(tanh(kb3*l*k),2) - 1));
-	// Nb2 = eps*eps*ky*l0*l0*(kb1 + kb2*(pow(tanh(kb3*l*k),2) - 1));
-	// Nb3 = eps*l0*l0*(kb1 + kb2*(pow(tanh(eps*kb3*l0*k),2) - 1))*k*k;
-
-	// N(0) = Ne1 + Nb1;
-	// N(1) = Ne2 + Nb2;
-	// N(2) = Ne3 + Nb3;
-
 }
 
 //---------------------------------------------------

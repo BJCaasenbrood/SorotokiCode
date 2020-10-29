@@ -1,4 +1,4 @@
 function mcap = virtual
-mcap = imread('virtual.png');
+mcap = 0.9*imread('virtual.png');
 end
 

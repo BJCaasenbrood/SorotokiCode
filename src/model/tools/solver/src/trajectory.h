@@ -19,10 +19,10 @@ typedef Eigen::Matrix<float, 3, 1> V3f;
 typedef Eigen::VectorXf Vxf;
 typedef Eigen::MatrixXf Mxf;
 
-#define OMEGA 0.75
+#define OMEGA 0.3
 
 float a = 0.01;
-float b = 0.05;
+float b = 0.03;
 
 //---------------------------------------------------
 //----------------- isomorphism between R3 and so(3)
@@ -42,7 +42,7 @@ void pathSolve(float t, V7f &yd)
 
 	//yt(4) = a*sin(OMEGA*t);
 	//yt(5) = b*sin(OMEGA*t);
-	//yt(6) = b*sin(OMEGA*t);
+	//yt(6) = b*cos(OMEGA*t);
 
 	yd.noalias() = y0 + yt;
 }

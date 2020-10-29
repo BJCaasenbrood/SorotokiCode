@@ -13,6 +13,7 @@
 #include "tictoc.h"
 #include "smoothstep.h"
 #include "trajectory.h"
+#include "readFile.h"
 #include "Config/ConfigFile.cpp"
 #include "Config/Chameleon.cpp"
 
@@ -52,7 +53,7 @@ class Model
   	bool KINEMATIC_CONTROLLER;
   	bool WRITE_OUTPUT;
   	bool POINT_INPUT;
-  	int  ACTUATION_SPACE;
+
 
   	float A11, J11, J22, J33;
  	float E11, E22, E33;
@@ -106,7 +107,7 @@ class Model
 	M3f R; 
 	M4f A;
 
-	V6f gvec;
+	Vxf gvec;
 	Vxf z0, tau, u;
 
 	Model(const char* str);

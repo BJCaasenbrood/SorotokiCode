@@ -5,9 +5,12 @@ classdef Rig < handle
         List;
         IKlist;
         Frame;
+        g;
+        g0;
     end
     
     properties (Access = private)
+        SweepHandle;
         Domain;
         ListDraw;
         AutoScale;
@@ -23,6 +26,7 @@ function obj = Rig(mdl,varargin)
     obj.Domain = mdl.get('Sdomain');
     obj.AutoScale = true;
     obj.Frame = 1;
+    obj.g0 = [1,0,0,0,0,0,0];
     
     for ii = 1:2:length(varargin)
         obj.(varargin{ii}) = varargin{ii+1};
@@ -106,7 +110,7 @@ end
 function Rig = compute(Rig,t)
     
     Rig = Rig.reset();
-    [g,X] = Rig.Model.string(t,200);
+    [Rig.g,X] = Rig.Model.string(t,200);
     
     s = Rig.Domain;
     N = length(Rig.List);
@@ -143,10 +147,14 @@ function Rig = compute(Rig,t)
         if strcmp(Instr{ii,1},'Sweep')
            id = Instr{ii,2};
            LinkID = knnsearch(X(id).',Rig.List{ii}.Node(:,3));
-           Rig.List{ii} = Blender(Rig.List{ii},'Sweep', {LinkID,g(id,:)});
+           Rig.List{ii} = Blender(Rig.List{ii},'Sweep', {LinkID,Rig.g(id,:)});
         elseif strcmp(Instr{ii,1},'SE3')
-           Rig.List{ii} = Blender(Rig.List{ii},'SE3', g(Instr{ii,2},:));
+           Rig.List{ii} = Blender(Rig.List{ii},'SE3', Rig.g(Instr{ii,2},:));
         end
+    end
+    
+    for ii = 1:length(Rig.List)
+        Rig.List{ii} = Blender(Rig.List{ii},'SE3', Rig.g0);
     end
        
 end
@@ -167,14 +175,68 @@ function Rig = update(Rig)
     
    for ii = 1:length(Rig.List)
        if Rig.ListDraw{ii}
-        Rig.List{ii}.update();
+         Rig.List{ii}.update();
        end
    end
+   
+end
+
+%---------------------------------------------------------------------- rig
+function Rig = showSweep(Rig)
+    
+    p = Rig.g(:,5:end);
+    R = quat2rot(Rig.g0(1:4));
+    
+    p = (R*p.').' + Rig.g0(5:end);
+    
+    if ~isempty(Rig.SweepHandle)
+       delete(Rig.SweepHandle);
+    end
+    
+    figure(101); hold on;
+    Rig.SweepHandle = plot3(p(:,3),p(:,2),p(:,1),...
+    'Linewidth',2,'Color',col(2));
+    
 end
 
 end
 
 methods (Access = private)
+    
+%----------------------------------------------------- generate groundplane
+function Groundplane(Rig,B)
+Nx = 4;
+Ny = 4;
+
+x = linspace(B(1),B(2),Nx+1);
+y = linspace(B(3),B(4),Ny+1);
+
+[X,Y] = meshgrid(x,y);
+
+v = [tmp(1),tmp(3), tmp(5);  
+     tmp(2),tmp(3), tmp(5);
+     tmp(2),tmp(4), tmp(5);
+     tmp(1),tmp(4), tmp(5)];
+ 
+f = [1,2,3,4];
+
+[I,~] = imread('checker.jpg');
+
+dX = (tmp(2)-tmp(1));
+dY = (tmp(4)-tmp(3));
+
+if dY/dX >= 2, I = vertzcat(I,I);
+elseif dX/dY >= 2, I = horzcat(I,I);
+end
+
+hold all
+warpim(X,Y,X*0 + tmp(5),I);
+hold off;
+
+patch('Faces',f,'Vertices',v,...
+    'Linewidth',1.5,'linestyle','-','FaceColor','none',...
+    'EdgeColor',[1 1 1]*0.5);
+end
 
 end
 end

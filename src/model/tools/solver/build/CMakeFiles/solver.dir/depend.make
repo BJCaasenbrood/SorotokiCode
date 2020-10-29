@@ -9,6 +9,7 @@ CMakeFiles/solver.dir/main.cpp.o: ../src/Config/ConfigFile.h
 CMakeFiles/solver.dir/main.cpp.o: ../src/Model_ph.cpp
 CMakeFiles/solver.dir/main.cpp.o: ../src/Model_ph.h
 CMakeFiles/solver.dir/main.cpp.o: ../src/lieAlgebra.h
+CMakeFiles/solver.dir/main.cpp.o: ../src/readFile.h
 CMakeFiles/solver.dir/main.cpp.o: ../src/shapes.cpp
 CMakeFiles/solver.dir/main.cpp.o: ../src/shapes.h
 CMakeFiles/solver.dir/main.cpp.o: ../src/shapesx.cpp
