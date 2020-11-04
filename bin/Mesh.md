@@ -2,21 +2,21 @@
 <div align="center"> <img src="./src/mesh.png" width="650"> </div>
 
 # Mesh Generation
-[**Sorotoki**](https://bjcaasenbrood.github.io/SorotokiCode/) offers mesh generation for triangular, quadrilateral, and polygonal elements. The restricted material domains for the meshes are defined by so-called *signed distance functions* or *SDF*. The toolkit provides a set of geometeric shape (e.g., circles, rectangles, lines) and boolean operators, e.g., union, difference, and intersect. Together these mathematical operations allow for a wide range of spatial discretization. 
+[**Sorotoki**](https://bjcaasenbrood.github.io/SorotokiCode/) offers mesh generation for triangular, quadrilateral, and polygonal elements. The restricted material domains for the meshes are defined by so-called *signed distance functions* or *SDF*. To define the material domain, the toolkit provides a set of geometric shape (e.g., circles, rectangles, lines) and boolean operators, e.g., union, difference, and intersect. Together these mathematical operations allow for a wide range of spatial discretization in $$\mathbb{R}^2$$ and $$\mathbb{R}^3$$. 
 
 # Signed distance functions
-A signed distance functions (SDF) passes a spatial coordinate and returns the shortest distance to the boundary of a metric domain. Mathematically, the signed distance function $$d_\Omega: \mathbb{R}^n \mapsto \mathbb{R}$$ assosciated with the subset $$\Omega$$ of Euclidean space $$\mathbb{R}^n$$ is defined by
+A signed distance functions (SDF) passes a spatial coordinate and returns the shortest distance to the boundary of a metric domain. Mathematically, the signed distance function $$d_\Omega: \mathbb{R}^n \mapsto \mathbb{R}$$ associated with the subset $$\Omega$$ of Euclidean space $$\mathbb{R}^n$$ is defined by
 
-$$ d_\Omega(x) := s_\Omega(x) \min_{y \in \partial \Omega} \lVert x - y \rVert$$ 
+$$ d_\Omega(x) := s_\Omega(x) \min_{y \in \partial \Omega} \lVert x - y \rVert,$$ 
 
-$$ s_\Omega = 
+$$ s_\Omega(x) = 
 \begin{cases}
--1, & x \in\Omega \\
-+1, & x \in \mathbb{R}^n\setminus \Omega
+-1, & x \in\Omega, \\
++1, & x \in \mathbb{R}^n\setminus \Omega,
 \end{cases}
 $$
 
-where $$s_\Omega(x)$$ representing a sign function, and $$\partial \Omega$$ the boundary of the domain $$\Omega$$. The sign of the distance function determines if the coordinate is located inside or outside the bounded domain. 
+where $$s_\Omega$$ representing the sign function, and $$\partial \Omega$$ is the boundary of the material domain $$\Omega$$. The sign of the distance function determines if the coordinate is located inside or outside the bounded domain. Therefore, evaluation of the SDF function is not only numerically efficient, it allows for an implicit representation of the spatial domain, which can be easily paired with various mathematical operations, like addition, subtraction, and differentiation. The toolkit comes with some preset SDF functions which can be used with off-the-shelf available mathematical operators.
 
 ### Preset SDF
 ```matlab
@@ -29,7 +29,6 @@ d = dRectangle(P,x1,x2,y1,y2);
 d = dCube(P,x1,x2,y1,y2,z1,z2);
 d = dSphere(P,xc,yc,zc,r);
 d = dCuboid(P,a,b,c);
-
 ```
 
 ### Example
