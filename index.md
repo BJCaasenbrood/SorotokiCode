@@ -14,7 +14,7 @@ To install the toolkit, simply run the command below. That's it, the soft roboti
 % installation command
 sorotoki();
 ```
-The command above is also used to update the toolkit. It is recommended occasionally to run 'sorotoki.m' to check for updates. 
+The command above is also used to update the toolkit. It is recommended to run 'sorotoki.m' to check for updates occasionally. 
 
 # Getting started
 The Sorotoki toolkit includes a library of class-oriented functions for designing, modeling, and controlling a wide variety of soft robots. The toolkit is designed to solve particular sub-problem within soft robotics such that complexity can be easily decomposed in smaller sub-modules. For instance, the classes *Mesh()* and *Fem()* provide some numerical tools to model the continuum material behavior of soft structures, whose extrapolated material models can later be used in the dynamic modeling part with *Model()*. The main classes of Sorotoki are listed below:
