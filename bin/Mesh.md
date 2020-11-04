@@ -21,7 +21,6 @@ $$ s_\Omega(x) =
 $$
 
 where $$s_\Omega$$ representing the sign function, and $$\partial \Omega$$ is the boundary of the material domain $$\Omega$$. The sign of the distance function determines if the coordinate is located inside or outside the bounded domain. Therefore, evaluation of the SDF function is not only numerically efficient, it allows for an implicit representation of the spatial domain, which can be easily paired with various mathematical operations, like addition, subtraction, and differentiation. The toolkit comes with some preset SDF functions which can be used with off-the-shelf available mathematical operators.
-{: .text-justify}
 
 ### Preset SDF
 ```matlab
