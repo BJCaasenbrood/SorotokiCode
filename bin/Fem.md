@@ -1,7 +1,9 @@
 <div align="center"> <img src="./src/fem.png" width="650"> </div>
 
 # Finite Element Method
-[**Sorotoki**](https://bjcaasenbrood.github.io/SorotokiCode/) provides a finite element solver for linear and nonlinear (hyper-elasticity and geometric nonlinearity) problems. The *Fem.lib* works coherenly with *Mesh.lib*. The finite element toolkit offers a set of material models (e.g., Hookean, Neo-Hookean, Mooney-Rivlin, and Yeoh) that should allow for a wide modeling range of 'soft materials'. Furthermore, the toolkit also provides some preset materials that are used extensivly in soft robotics, eaxmples included: Ecoflex0030, Dragonskin30, Elastosil, and NinjaFlex.
+[**Sorotoki**](https://bjcaasenbrood.github.io/SorotokiCode/) includes a finite element solver able to deal with linear and nonlinear problems. The *Fem.lib* works coherently with *Mesh.lib*. The finite element toolkit offers a set of material models (e.g., Hookean, Neo-Hookean, Mooney-Rivlin, and Yeoh) that should allow for a wide modeling range of 'soft materials'. Furthermore, we also provides some preset materials that are known to be used extensively in soft robotics research, examples included: Ecoflex0030, Dragonskin30, Elastosil, and NinjaFlex.
+
+For meshing, please check the follows page: [**Mesh generation**](./bin/Mesh.md). 
 
 [**Homepage**](https://bjcaasenbrood.github.io/SorotokiCode/)
 
@@ -44,7 +46,6 @@ fem.solve();
 
 ```
 <div align="center"> <img src="./src/fem_beam.png" width="550"> </div>
-
 
 ### Example: Tensile bone
 ```matlab
@@ -114,7 +115,7 @@ fem.solve();
 %% plot force-displacement relation
 figure(101);
 subplot(2,1,1); fem.show();
-subplot(2,1,2); plot(fem.Log{3},fem.Log{6},'linewidth',2,'Color',col(2));
+subplot(2,1,2); plot(fem.Log{2,3},fem.Log{2,6},'linewidth',2,'Color',col(2));
 xlabel('Displacement (mm)','interpreter','latex','fontsize',12);
 ylabel('Reaction force (N)','interpreter','latex','fontsize',12);
 grid on; set(gca,'linewidth',1);
