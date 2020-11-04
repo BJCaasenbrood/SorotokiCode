@@ -1,7 +1,7 @@
 clr;
 %% assign free DOF
-mdl = Model([0,1,0,1,0,0],'NModal',6,'NDisc',1);
-mdl = setupSoftRobot(mdl,3e-3,1);
+mdl = Model([0,1,0,1,0,0],'NModal',8,'NDisc',1);
+mdl = setupSoftRobot(mdl,1,1);
 
 %% generate and solve dynamic model
 mdl = mdl.generate();
@@ -70,7 +70,7 @@ end
 % setup rig
 function [rig, sph] = setupRig(mdl)
 gmdl1 = Gmodel('SoftActuatorPlanarRedux.stl');
-
+gmdl1.set('TextureStretch',.85);
 assignin('base','gmdl1',gmdl1);
 
 rig = Rig(mdl);
@@ -78,7 +78,7 @@ rig = rig.add(gmdl1);
 rig = rig.parent(1,0,0);
 rig = rig.parent(1,1,0.95);
 
-rig = rig.texture(1,gentle*1.15);
+rig = rig.texture(1,base);
 rig.g0 = [rot2quat(roty(pi)).',0,0,0];
 
 sph = Gmodel('Sphere.stl');

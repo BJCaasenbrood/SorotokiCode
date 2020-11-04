@@ -324,7 +324,7 @@ void Model::controllerPassive(float t, Vxf &Hq, Vxf &Hp, Vxf &f){
 	K.setZero();
 	xd.setZero();
 
-	k << 1e-3,1e-3,1e-3,1,1,1;
+	k << 1e-5,1e-5,1e-5,1,1,1;
 	K.diagonal() = k;
 
 	// end-effector jacobian

@@ -81,7 +81,9 @@ void Shapes::phi(float s, Vxf &p)
 			if(i==3){ p(i) = 0.5*(5*s*s*s - 3*s);};
 			if(i==4){ p(i) = 0.125*(35*s*s*s*s - 30*s*s + 3);};
 			if(i==5){ p(i) = 0.125*(63*s*s*s*s*s - 70*s*s*s + 15*s);};
-			//p(i) = legendre(i,s);
+			if(i==6){ p(i) = 0.0625*(231*s*s*s*s*s*s - 315*s*s*s*s + 105*s*s -5);};
+			if(i==7){ p(i) = 0.0625*(429*s*s*s*s*s*s*s - 693*s*s*s*s*s + 315*s*s*s - 35*s);};
+			if(i==8){ p(i) = 0.0078125*(6435*s*s*s*s*s*s*s*s - 12012*s*s*s*s*s*s + 6930*s*s*s*s - 1260*s*s + 35);};
 		}
 	}
 
