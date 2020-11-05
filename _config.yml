@@ -51,8 +51,8 @@ aux_links:
 aux_links_new_tab: false
 
 # Sort order for navigation links
-# nav_sort: case_insensitive # default, equivalent to nil
-nav_sort: case_sensitive
+nav_sort: case_insensitive # default, equivalent to nil
+# nav_sort: case_sensitive
 
 # Back to top link
 back_to_top: true
