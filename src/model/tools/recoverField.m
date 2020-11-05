@@ -1,5 +1,4 @@
 function [u,X] = recoverField(Model,k)
-
 P = Model.get('Phi');
 X = linspace(0,Model.get('Sdomain'),250);
 Q = Model.q;
