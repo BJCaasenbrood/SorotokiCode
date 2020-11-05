@@ -10,7 +10,7 @@ git clone https://github.com/BJCaasenbrood/SorotokiCode.git
 ```
 
 To install the toolkit, simply run the command below. That's it, the soft robotics toolkit is now ready-to-use.
-```ruby
+```matlab
 % installation command
 sorotoki();
 ```
