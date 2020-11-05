@@ -1,20 +1,23 @@
 ---
 layout: default
-title: Mesh
-parent: Libary
-nav_order: 2
+title: Mesh generation
+parent: Libary and documentation
+nav_order: 1
 ---
 
 <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script> 
-<div align="center"> <img src="./src/mesh.png" width="650"> </div>
 
-# Mesh Generation
-[**Sorotoki**](https://bjcaasenbrood.github.io/SorotokiCode/) offers mesh generation for triangular, quadrilateral, and polygonal elements. The restricted material domains for the meshes are defined by so-called *signed distance functions* or *SDF*. To define the material domain, the toolkit provides a set of geometric shape (e.g., circles, rectangles, lines) and boolean operators, e.g., union, difference, and intersect. Together these mathematical operations allow for a wide range of spatial discretization in $$\mathbb{R}^2$$ and $$\mathbb{R}^3$$. 
+<!-- <div align="center"> <img src="./src/mesh.png" width="650"> </div> -->
 
-# Signed distance functions
-A signed distance functions (SDF) passes a spatial coordinate and returns the shortest distance to the boundary of a metric domain. Mathematically, the signed distance function $$d_\Omega: \mathbb{R}^n \mapsto \mathbb{R}$$ associated with the subset $$\Omega$$ of Euclidean space $$\mathbb{R}^n$$ is defined by
+# Mesh generation
+[**Sorotoki**](https://bjcaasenbrood.github.io/SorotokiCode/) offers mesh generation for triangular, quadrilateral, and polygonal elements. The restricted material domains for the meshes are defined by so-called **signed distance functions**{: .text-purple-000} or **SDF**{: .text-purple-000}. To define the material domain, the toolkit provides a set of geometric shape (e.g., circles, rectangles, lines) and boolean operators (e.g., union, difference, and intersect). These mathematical operations together, allow for a wide range of spatial discretization in $$\mathbb{R}^2$$ and $$\mathbb{R}^3$$. 
+
+## Signed distance functions
+A signed distance functions (SDF) passes a spatial coordinate and returns the shortest distance to the boundaries of a metric domain. Mathematically speaking, the signed distance function $$d_\Omega: \mathbb{R}^n \mapsto \mathbb{R}$$ associated with the subset $$\Omega$$ of Euclidean space $$\mathbb{R}^n$$ is defined as
 
 $$ d_\Omega(x) := s_\Omega(x) \min_{y \in \partial \Omega} \lVert x - y \rVert,$$ 
+
+where $$s_\Omega$$ represents a discontinuous sign function
 
 $$ s_\Omega(x) = 
 \begin{cases}
@@ -23,10 +26,10 @@ $$ s_\Omega(x) =
 \end{cases}
 $$
 
-where $$s_\Omega$$ representing the sign function, and $$\partial \Omega$$ is the boundary of the material domain $$\Omega$$. The sign of the distance function determines if the coordinate is located inside or outside the bounded domain. Therefore, evaluation of the SDF function is not only numerically efficient, it allows for an implicit representation of the spatial domain, which can be easily paired with various mathematical operations, like addition, subtraction, and differentiation. The toolkit comes with some preset SDF functions which can be used with off-the-shelf available mathematical operators.
+and $$\partial \Omega$$ is the boundary of the material domain $$\Omega$$. The sign of the distance function determines if the coordinate is located inside or outside the bounded domain. Therefore, evaluation of the SDF function is not only numerically efficient, it also allows for an implicit representation of the spatial domain, which can be easily paired with various mathematical operations, like addition, subtraction, and differentiation. The toolkit comes with some preset SDF functions which can be used with off-the-shelf available mathematical operators.
 
-### Preset SDF
-```matlab
+### Preset SDF-functions
+```rust
 % two-dimensional
 d = dCircle(P,xc,xy,r);
 d = dLine(P,x1,x2,y1,y2);
@@ -38,21 +41,33 @@ d = dSphere(P,xc,yc,zc,r);
 d = dCuboid(P,a,b,c);
 ```
 
+
+### Mathematical operators
+
+| Operation   | SOROTOKI     | Math  |
+|:-------------|:------------------|:------|
+| Build    | `OMEGA = dCircle(P,a,b,R)` | $$\Omega = \left\{r\in \mathbb{R}^2 \; : \; (r_x-a)^2 + (r_y - b)^2 \le R^2 \right\} $$ |
+| Union    | `D = OMEGA1 + OMEGA2` | $$\mathcal{D} = \Omega_1 \cup \Omega_2$$  |
+| Difference    | `D = OMEGA1 - OMEGA2` | $$\mathcal{D} = \Omega_1  \backslash \Omega_2$$  |
+| Intersection    | `D = OMEGA1\OMEGA2` | $$\mathcal{D} = \Omega_1 \cap \Omega_2$$  |
+| Evaluation    | `y = D.eval(x)` | $$y = d_\Omega(x)$$ with $$x\in \Omega$$ |
+
+
 ### Example
 
-```matlab
+```rust
 %% set signed distance function
 msh = Mesh(@(x) SDF(x,0),'BdBox',[-1 3 -1 3]);
-subplot(2,2,1); msh.showSDF;
+subplot(2,2,1); msh.showSDF();
 
 msh = Mesh(@(x) SDF(x,1),'BdBox',[-2 2 -1 3]);
-subplot(2,2,2); msh.showSDF;
+subplot(2,2,2); msh.showSDF();
 
 msh = Mesh(@(x) SDF(x,2),'BdBox',[-1.5 2.5 -1 3]);
-subplot(2,2,3); msh.showSDF;
+subplot(2,2,3); msh.showSDF();
 
 msh = Mesh(@(x) SDF(x,3),'BdBox',[-1 3 -1 3]);
-subplot(2,2,4); msh.showSDF;
+subplot(2,2,4); msh.showSDF();
 
 function Dist = SDF(x,request)
     R = dRectangle(x,0,2,0,2);
@@ -66,7 +81,3 @@ function Dist = SDF(x,request)
     end
 end
 ```
-
-[**Top of page**](https://bjcaasenbrood.github.io/SorotokiCode/bin/Mesh.html)
-
-[**Homepage**](https://bjcaasenbrood.github.io/SorotokiCode/)

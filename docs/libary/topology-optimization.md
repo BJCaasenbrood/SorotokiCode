@@ -1,8 +1,11 @@
-<div align="center"> <img src="./src/fem.png" width="650"> </div>
+---
+layout: default
+title: Topology optimization
+parent: Libary and documentation
+nav_order: 3
+---
 
-# Nonlinear Topology Optimization
-
-[**Homepage**](https://bjcaasenbrood.github.io/SorotokiCode/)
+# Topology optimization
 
 ### Example: Pneu-net soft robot
 
@@ -52,6 +55,6 @@ Dist = dDiff(dDiff(dDiff(dDiff(R1,R2),R3),C1),C2);
 end
 ```
 
-<div align="center"> <img src="./src/opt_pneunet.gif" width="550"> </div>
+<div align="center"> <img src="./img/opt_pneunet.gif" width="550"> </div>
 
 

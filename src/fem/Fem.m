@@ -66,6 +66,7 @@ classdef Fem < handle
         ShapeFnc;
         U = 0;
         Utmp = 0;
+        Utmp_ = 0;
         
         MaxIteration = 50;
         MaxIterationMMA = 50;
@@ -407,6 +408,10 @@ Fem.TimeStep      = Fem.TimeStep0 + 1e-6;
 Fem.Density       = clamp(Fem.Density,Fem.Ersatz,1);
 Fem.Utmp          = zeros(Fem.Dim*Fem.NNode,1);
 Fem.Node          = Fem.Node0;
+
+if ~isempty(Fem.Contact) && isempty(Fem.Load)
+    %Fem.Load = [1,0,1e-6];
+end
 
 showInformation(Fem,'NonlinearFem');
 
@@ -1166,8 +1171,14 @@ if Fem.PrescribedDisplacement
         KTtmp(pDof,pDof) = -EMod*eye(length(pDof));
         Ktr = KTtmp;
 
-        if isempty(Fem.Contact) || numel(Fem.Load(1,2:end)) >= 6
+        if isempty(Fem.Contact) 
             alpha = Fem.TimeStep*Fem.OptFactor;
+        elseif ~isempty(Fem.Load)
+            if numel(Fem.Load(1,2:end)) >= 6
+                alpha = Fem.TimeStep*Fem.OptFactor;
+            else
+                alpha = 1; 
+            end
         else
             alpha = 1; 
         end

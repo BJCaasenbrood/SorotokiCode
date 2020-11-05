@@ -1,10 +1,14 @@
-<div align="center"> <img src="./src/gmodel.png" width="650"> </div>
+---
+layout: default
+title: Graphics and rendering
+parent: Libary and documentation
+nav_order: 4
+---
 
-# Graphics and Implicit Modeling
-[Go back to home page](https://bjcaasenbrood.github.io/SorotokiCode/) 
+# Graphics and rendering
 
-## Loading graphical models
-```matlab
+## Import/generating graphical models
+```rust
 %% loading graphical models
 obj0 = Gmodel('Bunny.stl');
 obj1 = Gmodel(@(x) SDF(x),domain(-0.1,1.1,3));
@@ -14,15 +18,15 @@ figure(101);
 subplot(1,2,1); obj0.bake().render(); 
 subplot(1,2,2); obj1.bake().render(); 
 
-%% signed distance function (3D)
+%% signed distance in R3
 function Dist = SDF(x)
        C1 = dCube(x,0,1,0,1,0,1);
-       S1 = dSphere(x,0,0,1,.5);
+       S1 = dSphere(x,0,0,1,0.5);
        S2 = dSphere(x,0,0,0.5,1);
        Dist = dIntersect(dDiff(C1,S1),S2);
 end
 ```
-<div align="center"> <img src="./src/gmodel_show.png" width="500"> </div>
+<div align="center"> <img src="./img/gmodel_show.png" width="500"> </div>
 
 ## Transformations
 ```matlab
@@ -76,7 +80,7 @@ for ii = 1:length(mat)
 end
 ```
 
-<div align="center"> <img src="./src/matcap.gif" width="250"> </div>
+<div align="center"> <img src="./img/matcap.gif" width="250"> </div>
 
 ### Ambient occlusion (AO)
 ```matlab
@@ -92,7 +96,7 @@ obj_ = obj.copy('Translate',{'y',100});
 obj_.render().showMap('AO');
 view(90,15); axis tight;
 ```
-<div align="center"> <img src="./src/bunny_AO.png" width="450"> </div>
+<div align="center"> <img src="./img/bunny_AO.png" width="450"> </div>
 
 
 ### Sub-Surface Scattering (SSS)
@@ -111,4 +115,4 @@ obj_ = obj.copy('Translate',{'y',100});
 obj_.render().showMap('SSS');
 view(90,15); axis tight;
 ```
-<div align="center"> <img src="./src/bunny_SSS.png" width="450"> </div>
+<div align="center"> <img src="./img/bunny_SSS.png" width="450"> </div>

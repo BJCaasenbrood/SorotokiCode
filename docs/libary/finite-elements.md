@@ -1,11 +1,14 @@
-<div align="center"> <img src="./src/fem.png" width="650"> </div>
+---
+layout: default
+title: Finite element method
+parent: Libary and documentation
+nav_order: 2
+---
 
-# Finite Element Method
-[**Sorotoki**](https://bjcaasenbrood.github.io/SorotokiCode/) includes a finite element solver able to deal with linear and nonlinear problems. The *Fem.lib* works coherently with *Mesh.lib*. The finite element toolkit offers a set of material models (e.g., Hookean, Neo-Hookean, Mooney-Rivlin, and Yeoh) that should allow for a wide modeling range of 'soft materials'. Furthermore, we also provides some preset materials that are known to be used extensively in soft robotics research, examples included: Ecoflex0030, Dragonskin30, Elastosil, and NinjaFlex.
+# Finite element method
+[**Sorotoki**](https://bjcaasenbrood.github.io/SorotokiCode/) includes a finite element solver able to deal with linear and nonlinear problems. The class [`Fem.m`](./finite-elements.html) works coherently with [`Mesh.m`](./meshing.html). The finite element toolkit offers a set of material models - including Hookean, Neo-Hookean, Mooney-Rivlin, and Yeoh - that should cover for a wide range of soft materials. Furthermore, we also provides some preset material models that are known to be used extensively in soft robotics research. Examples included: Ecoflex-0030, Dragonskin-30A, Elastosil, and NinjaFlex.
 
-For meshing, please check the follows page: [**Mesh generation**](./bin/Mesh.md). 
-
-[**Homepage**](https://bjcaasenbrood.github.io/SorotokiCode/)
+For generating the mesh, we refer the reader to [`Mesh`](./meshing.html). 
 
 ### List of material models:
 ```matlab
@@ -22,52 +25,58 @@ fem.Material = Elastosil();
 fem.Material = TPU90();   	 
 ```
 
+# Numerical examples
+
 ### Example: Clamped beam 
 ```matlab
 %% generate mesh from sdf
-sdf = @(x) dRectangle(x,0,10,0,1);
+sdf = @(x) dRectangle(x,0,20,0,2);
 
-msh = Mesh(sdf,'BdBox',[0,10,0,1],'Quads',[25,5]);
+msh = Mesh(sdf,'BdBox',[0,20,0,2],'Quads',[25 4]);
 msh = msh.generate();
 
 %% generate fem model from mesh
-fem = Fem(msh,'TimeStep',1/15);
+fem = Fem(msh,'TimeStep',1/25);
 
 %% add boundary conditions
 fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,1]);
 fem = fem.AddConstraint('Support',fem.FindNodes('Right'),[1,1]);
-fem = fem.AddConstraint('Load',fem.FindNodes('Bottom'),[0,-2e-2]);
+fem = fem.AddConstraint('Load',fem.FindNodes('Bottom'),[0,-1e-3]);
 
 %% select material
-fem.Material = Dragonskin10A();
+fem.Material =  Dragonskin10A;
 
 %% solving
 fem.solve();
-
 ```
-<div align="center"> <img src="./src/fem_beam.png" width="550"> </div>
+
+<div align="center"> <img src="./img/fem_beam.png" width="550"> </div>
 
 ### Example: Tensile bone
 ```matlab
 %% generate mesh from sdf
-sdf = @(x) TensileBone(x,8,2,3,1,0.75);
+sdf = @(x) TensileBone(x,10,2,4,1,1);
 
-msh = Mesh(sdf,'BdBox',[0,10,0,10],'NElem',500);
+msh = Mesh(sdf,'BdBox',[0,10,0,10],'NElem',150);
 msh = msh.generate();
 
 %% generate fem model from mesh
-fem = Fem(msh,'TimeStep',1/10,'PrescribedDisplacement',true);
+fem = Fem(msh,'TimeStep',1/100,'PrescribedDisplacement');
 
 %% add boundary conditions
 fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,0]);
 fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[0,1]);
-fem = fem.AddConstraint('Load',fem.FindNodes('Top'),[0,4]);
+fem = fem.AddConstraint('Load',fem.FindNodes('Top'),[0,9]);
+fem = fem.AddConstraint('Output',fem.FindNodes('Location',[1,4]),[0,1]);
 
 %% assign material
 fem.Material = Ecoflex0030();
 
 %% solving
 fem.solve();
+
+%% plotting
+fem.show('Svm'); view(90,90);
 
 function D = TensileBone(P,H,W,T,D,R)
 dD = 0.5*(W-D);
@@ -84,7 +93,7 @@ D0 = dDiff(dDiff(dDiff(R1,R2),C1),C2);
 D = dDiff(dDiff(dDiff(D0,R3),C3),C4);
 end
 ```
-<div align="center"> <img src="./src/fem_tensile.png" width="550"> </div>
+<div align="center"> <img src="./img/fem_tensile.png" width="550"> </div>
 
 ### Example: Buckling beam 
 ```matlab
@@ -121,4 +130,4 @@ ylabel('Reaction force (N)','interpreter','latex','fontsize',12);
 grid on; set(gca,'linewidth',1);
 ```
 
-<div align="center"> <img src="./src/fem_buckle.png" width="550"> </div>
+<div align="center"> <img src="./img/fem_buckle.png" width="550"> </div>

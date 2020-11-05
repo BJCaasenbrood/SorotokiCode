@@ -115,6 +115,14 @@ Mid = sqrt((Node(:,1)-(BdBox(1)+BdBox(2))*0.5).^2+...
 [~,Mid] = sort(Mid); id = Mid(1:N);
 end
 
+function id = BottomMid(Node,BdBox,N)
+if nargin < 3, N = 1; end
+Mid = sqrt((Node(:,1)-(BdBox(1)+BdBox(2))*0.5).^2+...
+    (Node(:,2)-BdBox(3)).^2);
+[~,Mid] = sort(Mid); id = Mid(1:N);
+end
+
+
 function eps = BuildTolerance(Node)
 BdBox = BoundingBox(Node);
 eps = 0.1*sqrt((BdBox(2)-BdBox(1))*(BdBox(4)-BdBox(3))/size(Node,1));

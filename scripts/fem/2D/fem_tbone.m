@@ -6,16 +6,17 @@ msh = Mesh(sdf,'BdBox',[0,10,0,10],'NElem',150);
 msh = msh.generate();
 
 %% generate fem model from mesh
-fem = Fem(msh,'TimeStep',1/15,'PrescribedDisplacement',true,...
+fem = Fem(msh,'TimeStep',1/100,'PrescribedDisplacement',true,...
          'Linestyle','none');
 
 %% add boundary conditions
 fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,0]);
 fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[0,1]);
-fem = fem.AddConstraint('Load',fem.FindNodes('Top'),[0,6]);
+fem = fem.AddConstraint('Load',fem.FindNodes('Top'),[0,9]);
 fem = fem.AddConstraint('Output',fem.FindNodes('Location',[1,4]),[0,1]);
 
-fem.Material = LinearMaterial('E',0.1,'Nu',0.4);
+%% assign material
+fem.Material = Ecoflex0030();
 
 %% solving
 fem.solve();
