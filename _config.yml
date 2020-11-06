@@ -1,6 +1,6 @@
-#theme: "just-the-docs"
+theme: "just-the-docs"
 #theme: jekyll-theme-slate
-remote_theme: pmarsceill/just-the-docs
+#remote_theme: pmarsceill/just-the-docs
 
 title: SOROTOKI
 description: A Soft Robotics Toolkit for MATLAB
@@ -9,7 +9,7 @@ show_downloads: true
 baseurl: "/SorotokiCode" # the subpath of your site, e.g. /blog
 url: "https://bjcaasenbrood.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 
-# permalink: pretty
+#permalink: pretty
 # exclude: ["node_modules/", "*.gemspec", "*.gem", "Gemfile", "Gemfile.lock", "package.json", "package-lock.json",  "script/", "LICENSE.txt", "lib/", "bin/", "README.md", "Rakefile"
 # , "docs/tests/"
 # ]
@@ -60,7 +60,7 @@ nav_sort: case_insensitive # default, equivalent to nil
 back_to_top: true
 back_to_top_text: "Back to top"
 
-footer_content: "Copyright &copy; 2018-2020 Brandon Caasenbrood. Distributed by an <a href=\"https://github.com/pmarsceill/just-the-docs/tree/master/LICENSE.txt\">MIT license.</a>"
+footer_content: "Copyright &copy; 2018-2020 Brandon Caasenbrood. Distributed by a <a href=\"https://github.com/BJCaasenbrood/SorotokiCode/tree/master/LICENSE.md\">MIT license.</a>"
 
 # Footer last edited timestamp
 last_edit_timestamp: true # show or hide edit time - page must have `last_modified_date` defined in the frontmatter
