@@ -1,6 +1,6 @@
 clr;
 %% set signed distance function
-R = 3;
+R = 6;
 sdf = @(x) dRectangle(x,-10,10,0,30);
 
 %% generate mesh

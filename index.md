@@ -13,10 +13,10 @@ permalink: /
 {: .fs-6}
 [**Sorotoki**](https://bjcaasenbrood.github.io/SorotokiCode/) is an open-source MATLAB toolkit that includes an array of modeling and designing tools for soft robotics. Due to its scientific diversity, exploring the field of soft robotics can be significantly challenging. With the aim to bridge this multi-disciplinary gap, Sorotoki aims to incorporate several layers of scientific disciplines in one toolkit. Examples include: continuum mechanics, dynamic system- and control theory, topology optimization, computer graphics, and much more! 
 
-[Stable V3.03 (.zip)](https://github.com/BJCaasenbrood/SorotokiCode/zipball/master){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2} [Stable V3.03 (.tar)](https://github.com/BJCaasenbrood/SorotokiCode/tarball/master){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2} [View on Github](https://github.com/BJCaasenbrood/SorotokiCode){: .btn .fs-5 .mb-4 .mb-md-0}  
+[Stable V3.03 (.zip)](https://github.com/BJCaasenbrood/SorotokiCode/zipball/master){: .btn .btn-green .fs-5 .mb-4 .mb-md-0 .mr-2} [Stable V3.03 (.tar)](https://github.com/BJCaasenbrood/SorotokiCode/tarball/master){: .btn .btn-green .fs-5 .mb-4 .mb-md-0 .mr-2} [View on Github](https://github.com/BJCaasenbrood/SorotokiCode){: .btn .fs-5 .mb-4 .mb-md-0}  
 
 ## Quick installation
-Download the latest stable version ([.zip](https://github.com/BJCaasenbrood/SorotokiCode/zipball/master) or [.tar](https://github.com/BJCaasenbrood/SorotokiCode/tarball/master)), and unpack the compressed folder at any desired directory. Alternatively, you can directly clone the repository with the command:
+Download the latest stable version above, and unpack the compressed folder at any desired directory. Alternatively, you can directly clone the repository with the command:
 ```rust
 git clone https://github.com/BJCaasenbrood/SorotokiCode.git
 ```
@@ -26,7 +26,7 @@ To install the toolkit, run the command below. That's it, the soft robotics tool
 % installation command
 sorotoki();
 ```
-It is worth mentioning this command is also used to update the toolkit. It is recommended to run `sorotoki.m` to check for updates occasionally. 
+It is worth mentioning this command is also used to update the toolkit. It is recommended to run `sorotoki.m`{: .text-purple-000} to check for updates occasionally. 
 
 ## Citation and references
 If you are using Sorotoki in your (academic) work, please consider citing the toolkit:

@@ -1,11 +1,11 @@
 ---
 layout: default
-title: Graphics and rendering
+title: Computer graphics
 parent: Documentation
 nav_order: 4
 ---
 
-# Graphics and rendering
+# Computer graphics 
 
 ## Import/generating graphical models
 ```rust
@@ -54,7 +54,7 @@ Blender(obj.reset(),'Translate',{'3D',0.5,0.5,0});
 Blender(obj.reset(),'Curve',{'PCC',30,0});
     subplot(2,3,6); obj.bake().render(); obj.ground();    
 ```
-<div align="center"> <img src="./src/blender_opt.png" width="500"> </div>
+<div align="center"> <img src="./img/blender_opt.png" width="500"> </div>
 
 
 ## Rendering
@@ -87,8 +87,9 @@ end
 %% loading graphical model
 obj = Gmodel('Bunny.stl');
 
-%% set texture settings
+%% set textures and render
 obj.set('Texture',grey,'AO',true,'AOPower',5.0,'AORadius',0.2);
+
 obj.bake().render().update();
 
 %% show AO map 
@@ -104,10 +105,10 @@ view(90,15); axis tight;
 %% loading graphical model
 obj = Gmodel('Bunny.stl');
 
-%% set texture settings
+%% set  textures and render
 obj.set('Texture',grey,'Emission',[0.70 0.70 0.70],...
         'SSS',true,'SSSPower',1.40,'SSSRadius',0.2);
-    
+
 obj.bake().render().update();
 
 %% set AO map object

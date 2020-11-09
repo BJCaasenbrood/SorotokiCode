@@ -1,6 +1,6 @@
-#theme: "just-the-docs"
+theme: "just-the-docs"
 #theme: jekyll-theme-slate
-remote_theme: pmarsceill/just-the-docs
+#remote_theme: pmarsceill/just-the-docs
 
 title: SOROTOKI
 description: A Soft Robotics Toolkit for MATLAB

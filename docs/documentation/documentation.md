@@ -11,7 +11,17 @@ The Sorotoki toolkit includes a library of class-oriented functions for designin
 
 The main classes of Sorotoki are listed below:
 
-```matlab
+| Class   | Matlab command     | Description  |
+| *Mesh.lib* | [`msh = Mesh()`](./documentation/meshing.html) | Meshing class |
+| *Fem.lib* | [`fem = Fem()`](./documentation/meshing.html) | (Nonlinear) finite elements class |
+| *Magnet.lib* | [`mfem = Mfem()`](./documentation/meshing.html) | Magnetics finite elements class |
+| *Model.lib* | [`mdl = Model()`](./documentation/dynamic-modeling.html) | Dynamical modeling class |
+| *Gmodel.lib* | [`obj = Gmodel()`](./documentation/graphics.html) | Computer-graphical model class |
+| *Rig.lib* | [`rig = Rig()`](./documentation/graphics.html) | Inverse-Kinematics (IK) rigging class |
+| *Control.lib* | [`ctr = Control()`](./documentation/graphics.html) | (Real-time) control class |
+
+
+<!-- ```matlab
 % list of classes
 msh = Mesh();	    % meshing class
 fem = Fem();   	    % finite elements class
@@ -20,4 +30,4 @@ obj = Gmodel();     % graphical model class
 mdl = Model();      % dynamical model class
 rig = Rig();        % IK rigging class
 ctr = Control();    % (real-time) control class
-```
+``` -->

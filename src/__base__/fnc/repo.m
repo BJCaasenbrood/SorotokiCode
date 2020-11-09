@@ -73,7 +73,7 @@ end
 
 function DirectoryMaterials
 p = cdsoro;
-dir([p,'\data\matcap\**\*.m']);
+dir([p,'/data/matcap/**/*.m']);
 end
 
 function DirectoryDemos

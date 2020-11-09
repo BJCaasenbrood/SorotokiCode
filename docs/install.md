@@ -7,20 +7,25 @@ nav_order: 2
 # Installation
 {: .no_toc }
 
-Download the latest stable version ([`.zip`](https://github.com/BJCaasenbrood/SorotokiCode/zipball/master) or [`.tar`](https://github.com/BJCaasenbrood/SorotokiCode/tarball/master)), and unpack the compressed folder at any desired directory. Alternatively, you can directly clone the repository with the command:
+The fastest and easiest way to acquire the toolkit is through [**git**](https://git-scm.com/downloads). You can directly clone the repository using the git command:
 
-```rust
+```fortran
  git clone https://github.com/BJCaasenbrood/SorotokiCode.git
 ```
 
-Setting up the toolkit is relatively straightforward. To set-up the toolkit, simply run the command below. That's it, the soft robotics toolkit is now ready-to-use. 
+Alternatively, you can download the latest stable version below, and unpack the compressed folder at any desired directory. 
+
+[Stable V3.03 (.zip)](https://github.com/BJCaasenbrood/SorotokiCode/zipball/master){: .btn .btn-green .fs-5 .mb-4 .mb-md-0 .mr-2} [Stable V3.03 (.tar)](https://github.com/BJCaasenbrood/SorotokiCode/tarball/master){: .btn .btn-green .fs-5 .mb-4 .mb-md-0 .mr-2} [View on Github](https://github.com/BJCaasenbrood/SorotokiCode){: .btn .fs-5 .mb-4 .mb-md-0}  
+
+
+## Getting started
+Before we get started, we first have to configure the toolkit with MATLAB's function paths. Setting up the toolkit is relatively straightforward. To set-up the toolkit, simply run the command below. That's it, the soft robotics toolkit is now ready-to-use. 
 ```rust
 % installation command
 sorotoki();
 ```
-The command above is also used to update the toolkit. It is recommended to run `sorotoki.m` to check for updates occasionally. 
+The command above is also used to update the toolkit. It is recommended to run `sorotoki.m`{: .text-purple-000} to check for updates occasionally. 
 
-# Getting started
 To get started, type the following line in the command window:
 ```rust
 % show demos
