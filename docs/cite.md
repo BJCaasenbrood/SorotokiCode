@@ -18,12 +18,17 @@ If you are using Sorotoki in your (academic) work, please consider citing the to
 ```
 
 ### References
-[**[1]**](https://ieeexplore.ieee.org/abstract/document/9116010/metrics#metrics) B. Caasenbrood, A. Pogromsky and H. Nijmeijer, *A Computational Design Framework for Pressure-driven Soft Robots through Nonlinear Topology Optimization,* 2020 3rd IEEE Inter. Conf. on Soft Robotics (RoboSoft), pp. 633-638, 2020.
+[**[1]**](https://ieeexplore.ieee.org/abstract/document/9116010/metrics#metrics) B. Caasenbrood, A. Pogromsky and H. Nijmeijer, **A Computational Design Framework for Pressure-driven Soft Robots through Nonlinear Topology Optimization**, 2020 3rd IEEE Inter. Conf. on Soft Robotics (RoboSoft), pp. 633-638, 2020.
+{: .fs-3}
 
-[2] B. Caasenbrood, A. Pogromsky, and H. Nijmeijer, *Dynamic modeling of hyper-elastic soft robots using spatial curves,* IFAC World Congress, 2020.
+[2] B. Caasenbrood, A. Pogromsky, and H. Nijmeijer, **Dynamic modeling of hyper-elastic soft robots using spatial curves**, IFAC World Congress, 2020.
+{: .fs-3}
 
-[**[3]**](https://link.springer.com/article/10.1007/s00158-011-0706-z) C. Talischi, G. H. Paulino, A. Pereira, and I. F. M. Menezes, *PolyMesher: A general-purpose mesh generator for polygonal elements written in Matlab*, Struct. Multidiscip. Optim., vol. 45, no. 3, pp. 309–328, 2012.
+[**[3]**](https://link.springer.com/article/10.1007/s00158-011-0706-z) C. Talischi, G. H. Paulino, A. Pereira, and I. F. M. Menezes, **PolyMesher: A general-purpose mesh generator for polygonal elements written in Matlab**, Struct. Multidiscip. Optim., vol. 45, no. 3, pp. 309–328, 2012.
+{: .fs-3}
 
-[**[4]**](https://www.springer.com/gp/book/9781441917454) N. Kim, *Introduction Analysis Finite Element to Nonlinear*. 2018.
+[**[4]**](https://www.springer.com/gp/book/9781441917454) N. Kim, **Introduction Analysis Finite Element to Nonlinear**. Springer, 2018.
+{: .fs-3}
 
-[**[5]**](https://www.springer.com/gp/book/9783540429920) M. Bendsoe and O. Sigmund, *Topology Optimization. Theory, Methods and Applications*. 2003.
+[**[5]**](https://www.springer.com/gp/book/9783540429920) M. Bendsøe and O. Sigmund, **Topology Optimization. Theory, Methods and Applications**. Springer, 2003.
+{: .fs-3}

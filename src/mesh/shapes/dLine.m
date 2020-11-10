@@ -1,4 +1,3 @@
-% d = dLine(P,x1,y1,x2,y2) 
 function d = dLine(P,x1,x2,y1,y2)
 % By convention, a point located at the left hand side of the line
 % is inside the region and it is assigned a negative distance value.

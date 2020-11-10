@@ -21,7 +21,7 @@ Download the latest stable version above, and unpack the compressed folder at an
 git clone https://github.com/BJCaasenbrood/SorotokiCode.git
 ```
 
-To install the toolkit, run the command below. That's it, the soft robotics toolkit is now ready-to-use.
+To install the toolkit, run the command below in the MATLAB command window. That's it, the soft robotics toolkit is now ready-to-use.
 ```matlab
 % installation command
 sorotoki();

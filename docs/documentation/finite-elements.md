@@ -5,6 +5,8 @@ parent: Documentation
 nav_order: 2
 ---
 
+<div align="center"> <img src="./img/fem_beam.png" width="550"> </div>
+
 # Finite element method
 [**Sorotoki**](https://bjcaasenbrood.github.io/SorotokiCode/) includes a finite element solver able to deal with linear and nonlinear problems. The class [`Fem.m`](./finite-elements.html) works coherently with [`Mesh.m`](./meshing.html). The finite element toolkit offers a set of material models - including Hookean, Neo-Hookean, Mooney-Rivlin, and Yeoh - that should cover for a wide range of soft materials. Furthermore, we also provides some preset material models that are known to be used extensively in soft robotics research. Examples included: Ecoflex-0030, Dragonskin-30A, Elastosil, and NinjaFlex.
 
@@ -50,7 +52,6 @@ fem.Material =  Dragonskin10A;
 fem.solve();
 ```
 
-<div align="center"> <img src="./img/fem_beam.png" width="550"> </div>
 
 ### Example: Tensile bone
 ```matlab

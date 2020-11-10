@@ -18,7 +18,7 @@ Alternatively, you can download the latest stable version below, and unpack the 
 [Stable V3.03 (.zip)](https://github.com/BJCaasenbrood/SorotokiCode/zipball/master){: .btn .btn-green .fs-5 .mb-4 .mb-md-0 .mr-2} [Stable V3.03 (.tar)](https://github.com/BJCaasenbrood/SorotokiCode/tarball/master){: .btn .btn-green .fs-5 .mb-4 .mb-md-0 .mr-2} [View on Github](https://github.com/BJCaasenbrood/SorotokiCode){: .btn .fs-5 .mb-4 .mb-md-0}  
 
 
-## Getting started
+## Set-up and getting started
 Before we get started, we first have to configure the toolkit with MATLAB's function paths. Setting up the toolkit is relatively straightforward. To set-up the toolkit, simply run the command below. That's it, the soft robotics toolkit is now ready-to-use. 
 ```rust
 % installation command

@@ -9,6 +9,7 @@ classdef Gmodel < handle
         Emission;
         Occlusion;
         Alpha;
+        View;
     end
     
     properties (Access = private)
@@ -504,6 +505,10 @@ function Gmodel = BakeCubemap(Gmodel,Cubemap)
     end
     
     Phi = transpose(Phi(1:3,1:3));
+    
+    if ~isempty(Gmodel.View)
+       Phi = Phi*Gmodel.View;
+    end
     
     if strcmp(Gmodel.Shading,'Face')
         if Gmodel.FlipNormals, Normals = -Gmodel.Normal*Phi;

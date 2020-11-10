@@ -7,7 +7,7 @@ BdBox = [-3,3,-3,3,-3,3];
 obj = Gmodel(Dist,BdBox);
 
 %% set texture
-obj.Texture = jade;
+obj.set('Texture',greyresin,'TextureStretch',0.85);
 obj.bake();
    
 %% show

@@ -617,7 +617,7 @@ end
 %----------------------------------------------------- form smooth topology
 function Fem = former(Fem, Thickness)
     
-if Fem.SolverStartMMA
+if Fem.SolverStartMMA && ~Fem.MovieStart
     Res = 100;
 else
     Res = 300;
@@ -2059,13 +2059,13 @@ if Fem.Movie
                 'ConvertFrom','datenum')),'.gif']);
             
             filename = erase(filename,[":"," "]);
-            background(gitpage);
+            background('w');
             if ~isempty(Fem.MovieAxis), axis(Fem.MovieAxis); end
             if ~isempty(Fem.MovieCAxis), caxis(Fem.MovieCAxis); end
             drawnow;
             gif(char(filename),'frame',gcf,'nodither');
         otherwise
-            background(gitpage);
+            background('w');
             if ~isempty(Fem.MovieAxis), axis(Fem.MovieAxis); end
             if ~isempty(Fem.MovieCAxis), caxis(Fem.MovieCAxis); end
             drawnow;

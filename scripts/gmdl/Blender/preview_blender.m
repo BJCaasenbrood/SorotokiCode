@@ -1,14 +1,14 @@
 clr;
 %% preview
 obj = Gmodel('Cube.stl');
-obj.Texture = virtual;
+obj.Texture = base;
 %% set texture
 figure(101); subplot(2,3,1);
 obj.bake().render().update; 
 obj.ground();
 
 %% transform
-Blender(obj,'Twist',{'z',25});
+Blender(obj,'Twist',{'z',30});
     subplot(2,3,3); obj.bake().render(); obj.ground();
 
 Blender(obj.reset(),'Scale',{'z',0.5}); 

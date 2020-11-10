@@ -1,6 +1,7 @@
 clr;
 %% model
 obj = Gmodel('Pneunet.stl');
+obj.set('TextureStretch',0.95);
 
 %% deform
 Blender(obj,'Translate',{'y',-0.4});

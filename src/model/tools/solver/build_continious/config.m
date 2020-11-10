@@ -21,7 +21,7 @@ TDOMAIN = 20
 
 [solver] 
 SPACESTEP = 25
-TIMESTEP  = 0.1
+TIMESTEP  = 0.01
 INTSTEP   = 100
 ATOL      = 1e-2
 RTOL      = 1e-2
