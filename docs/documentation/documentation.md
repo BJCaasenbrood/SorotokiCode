@@ -19,7 +19,7 @@ The main classes of Sorotoki are listed below:
 | *Gmodel.lib* | [`obj = Gmodel()`](./documentation/graphics.html) | Computer-graphical model class |
 | *Rig.lib* | [`rig = Rig()`](./documentation/graphics.html) | Inverse-Kinematics (IK) rigging class |
 | *Control.lib* | [`ctr = Control()`](./documentation/graphics.html) | (Real-time) control class |
-
+{: .fs-3}
 
 <!-- ```matlab
 % list of classes
