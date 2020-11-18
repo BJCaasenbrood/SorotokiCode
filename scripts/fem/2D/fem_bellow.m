@@ -13,13 +13,13 @@ fem = Fem(msh,'TimeStep',1/5,'PrescribedDisplacement',true,...
 %% add constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[1,1]);
 fem = fem.AddConstraint('Support',fem.FindNodes('Top'),[1,0]);
-fem = fem.AddConstraint('Load',fem.FindNodes('Top'),[0,-10]);
+fem = fem.AddConstraint('Load',fem.FindNodes('Top'),[0,-12]);
 
 %% add logger nodes
 fem = fem.AddConstraint('Output',fem.FindNodes('Location',[6,22]),[0,0]);
 
 %% assign material
-fem.Material = Dragonskin10A;
+fem.Material = Dragonskin10;
 
 %% solving
 fem.solve();

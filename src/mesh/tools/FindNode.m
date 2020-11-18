@@ -25,6 +25,7 @@ switch(Request)
     case('SDFE');       x = SignedFunctionEdge(Node,varargin{2:end},tol);
     case('SDF');        x = SignedFunction(Node,varargin{2:end},tol);
     case('Line');       x = Line(Node,varargin{2:end},tol);
+    case('Box');        x = BoxSelect(Node,varargin{2:end},tol);
     case('FloodFill');  x = FloodFill(Node,varargin{2:end});
 end
 
@@ -141,9 +142,15 @@ end
 end
 
 function id = Line(Node,Line,tol)
+d = dLine(Node,Line(1)-eps,Line(2)+eps,Line(3)-eps,Line(4)+eps);
+id = find(abs(d(:,end))<tol);
+end
+
+function id = BoxSelect(Node,Line,tol)
 d = dRectangle(Node,Line(1)-eps,Line(2)+eps,Line(3)-eps,Line(4)+eps);
 id = find(abs(d(:,end))<tol);
 end
+
 
 function id = FloodFill(Node,Fem,rho)
 

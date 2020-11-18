@@ -230,7 +230,7 @@ end
 %----------------------------------------------------------------- simulate
 function [g, X] = string(Model,k,Quality)
     
-    N = Model.Nq;
+    N = Model.Nq; 
     Qtmp = Model.q(k,1:N).';
     X = linspace(0,Model.Sdomain,Quality);
     ee = Model.Ba*Model.Phi(Model.Length)*Qtmp;
@@ -490,9 +490,12 @@ delete(File);
 FID = fopen(File,'w');
 
 fprintf(FID,'[options] \n');
-if(Model.Controller)
+if(Model.Controller == 1)
     fprintf(FID,'KINEMATIC_CONTROLLER = 0 \n');
     fprintf(FID,'ENERGY_CONTROLLER    = 1 \n');
+elseif(Model.Controller == -1)
+    fprintf(FID,'KINEMATIC_CONTROLLER = 1 \n');
+    fprintf(FID,'ENERGY_CONTROLLER    = 0 \n');
 else
     fprintf(FID,'KINEMATIC_CONTROLLER = 0 \n');
     fprintf(FID,'ENERGY_CONTROLLER    = 0 \n');

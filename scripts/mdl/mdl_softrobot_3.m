@@ -1,6 +1,6 @@
 clr;
 %% assign free DOF
-mdl = Model([0,1,0,1,0,0],'NModal',8,'NDisc',1);
+mdl = Model([0,1,0,1,0,0],'NModal',2,'NDisc',1);
 mdl = setupSoftRobot(mdl,1,1);
 
 %% generate and solve dynamic model
@@ -28,6 +28,7 @@ plot(t,u,'linewidth',1.0);
 [rig, sph] = setupRig(mdl);
 
 for ii = 1:fps(t,12):length(mdl.q)
+    
     rig = rig.compute(ii);
     rig = rig.update();
       
@@ -86,11 +87,13 @@ sph = Blender(sph,'Scale',5e-3);
 sph.Texture = diffuse(0.93);
 sph = sph.fix();
 
+sph = sph.render();
+rig = rig.render();
+
 axis([-0.05 0.05 -0.03 0.03 -0.1 0]);
 view(30,10); 
 
-sph = sph.render();
-rig = rig.render();
+assignin('base','sph',sph);
 end
 
 % compute possible desired trajectory

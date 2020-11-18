@@ -336,7 +336,7 @@ if flag == 2
     
     for ii = 1:length(Sprg)
         id = Sprg(ii);
-        text(V(id,1),V(id,2),symbol,'fontname',font,'fontsize',10,'Color','g');
+        %text(V(id,1),V(id,2),symbol,'fontname',font,'fontsize',10,'Color','g');
     end
     
         
@@ -779,7 +779,7 @@ I = image(rescale(Uxx),...
     ((max(Uyy)-min(Uyy))/(max(Uxx) - min(Uxx)))*rescale(Uyy),I);
 
 axis equal; axis off; 
-colormap(noir(-1)); 
+colormap(barney(-1)); 
 caxis([0 1]);
 background('w');
 end

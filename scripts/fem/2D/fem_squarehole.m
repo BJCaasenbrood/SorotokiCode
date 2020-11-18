@@ -2,14 +2,12 @@ clr;
 %% generate mesh from sdf
 sdf = @(x) SquareHole(x,2,.5);
 
-msh = Mesh(sdf,'BdBox',[0,5,0,5],'NElem',50);
+msh = Mesh(sdf,'BdBox',[0,5,0,5],'NElem',150);
 msh = msh.generate();
 
 %% generate fem model from mesh
-fem = Fem(msh,'TimeStep',1/50,'ResidualNorm',1e-4,'DisplaceNorm',1e-4,...
-              'PrescribedDisplacement',true,...
-              'Linestyle','-',...
-              'Colormap',inferno);
+fem = Fem(msh,'TimeStep',1/50,'PrescribedDisplacement',true,...
+              'Linestyle','none','Colormap',turbo);
 
 %% add boundary condition
 fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,0]);
@@ -17,7 +15,7 @@ fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[0,1]);
 fem = fem.AddConstraint('Load',fem.FindNodes('Top'),[0,1]);
 
 %% assign material
-fem.Material = TPU90();
+fem.Material = TPU90;
 
 %% solving
 fem.solve();

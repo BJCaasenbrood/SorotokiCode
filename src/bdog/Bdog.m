@@ -5,282 +5,147 @@ classdef Bdog < handle
         usr;
         pwd;
         prt;
+        out;
     end
     
     properties (Access = private)
+        cppFile;
+        outFile;
+        conFile;
+        autoConnect;
+        autoCompile;
         SSH;
     end
     
 %--------------------------------------------------------------------------
 methods  
-
-function obj = Bdog(Ip,User,Password)
-    
+%---------------------------------------------------------------------- get   
+function obj = Bdog(Ip,User,Password,varargin)
     obj.prt = '22';
     obj.ip  = Ip;
     obj.usr = User;
     obj.pwd = Password;
     
+    obj.cppFile = 'main.cpp';
+    obj.outFile = 'soro.log';
+    obj.conFile = 'config.txt';
+    obj.autoCompile = false;
+    obj.autoConnect = false;
+    
+    for ii = 1:2:length(varargin)
+        obj.(varargin{ii}) = varargin{ii+1};
+    end
+    
+    if obj.autoConnect, obj = connect(obj); end
+end
+
+%---------------------------------------------------------------------- get     
+function varargout = get(Bdog,varargin)
+    if nargin > 1
+        varargout{nargin-1,1} = [];
+        for ii = 1:length(varargin)
+            varargout{ii,1} = Bdog.(varargin{ii});
+        end
+    else
+        varargout = Bdog.(varargin);
+    end
+end
+        
+%---------------------------------------------------------------------- set
+function Bdog = set(Bdog,varargin)
+    for ii = 1:2:length(varargin)
+        Bdog.(varargin{ii}) = varargin{ii+1};
+    end
 end
 
 %------------------------------------------------------------ CONNECT BOARD
 function Bdog = connect(Bdog)
 
-FILENAME = 'main.cpp';
-
-str = action({'(y)es, continue with SSH connection',...
+    if ~Bdog.autoConnect
+        str = action({'(y)es, continue with SSH connection',...
             '(n)o, stop connection'},'s');
-
-if strcmp(str,'n'), return; 
-elseif strcmp(str,'y'), pause(0.1);
-else, error('terminated'); 
-end
+        
+        if strcmp(str,'n'), return;
+        elseif strcmp(str,'y'), pause(0.1);
+        else, error('terminated');
+        end
+    end
     
-fprintf('setting board connection... \n');
+    fprintf('* establishing board connection... \n');
+    
+    Bdog.SSH = connectBoard(Bdog);
 
-Bdog.SSH = ConnectBoard(Bdog);
+    if checkexist(Bdog,Bdog.cppFile) && Bdog.autoCompile
+        str = action({'(y)es, recompile executable file',...
+                '(n)o'},'s');
+    %     CallExecuted([FILENAME,' found!']);
+    %     request = CallRequest('recompile executable file?','y/n');
+    %     if strcmp(request,'y')
+    %         brd = CommandShell(brd,'chmod 755 Soro*',0);
+    %         CallExecuted(['compiled ',FILENAME,'!']);
+    %     end
+    %     if existsFile(brd,'soro.log')
+    %         CallExecuted('cleared log file');
+    %         brd = CommandShell(brd,'rm soro.log',0);
+    %     end
+    % else
+    %     CallExecuted([FILENAME,' not found! File is required!'])
+    end
+end
 
-% setup
-% CallDisplay(['locating ',FILENAME,'...']); 
-% if existsFile(brd,FILENAME)
-%     CallExecuted([FILENAME,' found!']);
-%     request = CallRequest('recompile binary file?','y/n');
-%     if strcmp(request,'y')
-%         brd = CommandShell(brd,'chmod 755 Soro*',0);
-%         CallExecuted(['compiled ',FILENAME,'!']);
-%     end
-%     if existsFile(brd,'soro.log')
-%         CallExecuted('cleared log file');
-%         brd = CommandShell(brd,'rm soro.log',0);
-%     end
-% else
-%     CallExecuted([FILENAME,' not found! File is required!'])
-% end
+%---------------------------------------------------------------------- get   
+function Bdog = disconnect(Bdog)
+    fprintf('* disconnecting...\n ');
+    Bdog.SSH = ssh2_close(Bdog.SSH);
+    Bdog.SSH = [];
+    cout('green','* boards disconnected!\n');
+end
 
+%----------------------------------------------------------------- command    
+function Bdog = command(Bdog,Arg)
+    [Bdog.SSH, Bdog.out] = ssh2_command(Bdog.SSH, Arg, 1);
+end
+
+%----------------------------------------------------------------- command    
+function Bdog = shell(Bdog,Arg)
+    [Bdog.SSH, Bdog.out] = ssh2_command(Bdog.SSH, Arg, 0);
+end
+
+%---------------------------------------------------------------------- get  
+function bool = checkexist(Bdog,name)
+    Bdog = shell(Bdog,['[ -f ',name,' ] && echo "1" || echo "0"']);
+    bool = str2double(Bdog.out{end});
+end
+
+%---------------------------------------------------------------------- get  
+function A = read(Bdog,filename)
+    if checkexist(Bdog,filename)
+        Bdog = shell(Bdog,'tail soro.log -n 50000');
+        A = (cellfun(@str2num,Bdog.out(1:end),'un',0));
+        A = vertcat(A{:});
+    else
+        A = [];
+        cout('error','* log file does not exist!\n');
+    end
+end
+
+%---------------------------------------------------------------------- get   
+function Bdog = run(Bdog)
+    if checkexist(Bdog,'soro.log')
+        Bdog = shell(Bdog,'rm soro.log');
+    end
+    pause(0.1);
+    %Bdog = command(Bdog,['sudo nohup ./main config.txt >soro.log',...
+    %    '</dev/null 2>/dev/null& && \n']);
+    cprintf('error', '>> running executable on real-time target... \n');
+    efile = ['./',erase(Bdog.cppFile,'.cpp')];
+    %CMD = ['sudo nohup ',efile,' ',Bdog.conFile, ' >',Bdog.outFile];
+    CMD = ['sudo ',efile,' ',Bdog.conFile];
+
+    Bdog = command(Bdog,CMD);
+    cprintf('green', '>> done!\n');
+    cout(['* log file - ', Bdog.outFile, '\n']);
 end
 
 end
-
 end
-
-%-------------------------------------------------------- DISCONNECT BOARDS
-% function brd = Disconnect()
-% 
-% CallDisplay('disconnecting...')
-% 
-% brd.SSH = ssh2_close(brd.SSH);
-% 
-% CallExecuted('boards disconnected!')
-% 
-% end
-% 
-% %------------------------------------------------------ SEND SERIAL COMMAND
-% function brd = CommandShell(brd,Arg,PrintEnable)
-% SSH = brd.SSH;
-% 
-% [ssh, cmd] = ssh2_command(SSH, Arg, PrintEnable);
-% brd.SSH = ssh;
-% brd.CMD = cmd;
-% end
-% 
-% %------------------------------------------------------ SEND SERIAL COMMAND
-% function brd = CommandArg(brd,Arg1,Arg2)
-% SSH = brd.SSH;
-% if isa(Arg1,'double'), Arg1 = num2str(Arg1); end
-% if isa(Arg2,'double'), Arg2 = num2str(Arg2); end
-% [ssh, cmd] = ssh2_command(SSH, [Arg1,' ',Arg2], 0);
-% brd.SSH = ssh;
-% brd.CMD = cmd;
-% end
-% 
-% %------------------------------------------------------ SEND SERIAL COMMAND
-% function brd = Command(brd,Arg)
-% SSH = brd.SSH;
-% [ssh, cmd] = ssh2_command(SSH, Arg, 1);
-% brd.SSH = ssh;
-% brd.CMD = cmd;
-% 
-% end
-% 
-% %------------------------------------------------------ SEND SERIAL COMMAND
-% function bool = existsFile(brd,name)
-% brd = CommandShell(brd,['[ -f ',name,' ] && echo "1" || echo "0"'],0); 
-% bool = str2double(brd.CMD{end}); 
-% end
-% 
-% %------------------------------------------------------ SEND SERIAL COMMAND
-% function brd = ReadLogFile(brd,Arg)
-% if existsFile(brd,'soro.log')
-%     brd = CommandShell(brd,'tail soro.log -n 1',Arg);
-% else
-%     CallExecuted('log file does not exist');
-% end
-% end
-% 
-% %------------------------------------------------------ SEND SERIAL COMMAND
-% function brd = RunSorotoki(brd)
-% if existsFile(brd,'soro.log')
-%     brd = CommandShell(brd,'rm soro.log',0);
-%     %brd = CommandShell(brd,'tail soro.log -n 2',1);
-% end
-% pause(0.1);
-% brd = CommandShell(brd,['sudo nohup ./Soro.bin.bplus.bin >soro.log',...
-%     '</dev/null 2>/dev/null& && \n'],1);
-% end
-% 
-% %--------------------------------------------------- DISPLAY SERIAL MONITOR
-% function brd = SerialMonitor(brd,Arg)
-% 
-% ID = Arg{1};
-% PrintOpt = Arg{2};
-% SaveOpt = Arg{3};
-% 
-% device = brd.SerialCom{ID};
-% 
-% %wait for the buffer to receive data
-% while device.bytesavailable == 0
-%     pause(1e-6);
-% end
-% 
-% % wait for buffer to fill
-% k = 1;
-% while k < 10
-%    pause(1e-6);
-%    k = k+1;
-% end
-% 
-% [data, ~] = SerialRead(device);
-% 
-% if SaveOpt
-% if isfield(brd,'Data') 
-% N = brd.NData; brd.NData = N+1;
-% brd.Data{N+1} = data;
-% else
-% brd.NData = 1;
-% brd.Data{1} = data;    
-% end
-% end
-% 
-% if PrintOpt, Print(data); end
-% 
-% end
-% 
-% %-------------------------------------------------------------- SERIAL READ 
-% function [Data, N] = SerialRead(Device)
-% 
-% N = Device.bytesavailable;
-% 
-% if N > 0
-%     Data = fread(Device, N,'char');
-%     Data = num2str(Data,'%c');
-%     sscanf(Data,'%s');
-% else
-%     Data = [];
-% end
-% 
-% end
-% 
-% %--------------------------------------------------------------- PRINT DATA
-% function Print(list)
-% 
-% N = length(list);
-% cprintf('Green',''); 
-% for i = 1:N
-%    if uint8(list(i)) == 13
-%        
-%    elseif uint8(list(i)) == 10
-%        fprintf('\n');
-%    else
-%        fprintf(list(i));
-%    end
-% end
-% 
-% cprintf('Text',''); 
-% 
-% end
-% 
-% %---------------------------------------------- FIND ALL COMPATIBLE DEVICES
-% function [Devices, ID] = FindBoards()
-% 
-% CallDisplay('searching for serial devices...');
-% pause(1);
-% 
-% no_devices = 0;
-% Attempt = 0;
-% 
-% while no_devices == 0
-%     
-%     Skey = 'HKEY_LOCAL_MACHINE\HARDWARE\DEVICEMAP\SERIALCOMM';
-%     
-%     % Find connected serial devices and clean up the output
-%     [~, list] = dos(['REG QUERY ' Skey]);
-%     list = strread(list,'%s','delimiter',' ');
-%     coms = 0;
-%     
-%     for i = 1:numel(list)
-%         if strcmp(list{i}(1:3),'COM')
-%             if ~iscell(coms)
-%                 
-%                 coms = list(i);
-%                 
-%             else; coms{end+1} = list{i};
-%             end
-%         end
-%         
-%     end
-%     
-%     key = 'HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Enum\USB\';
-%     
-%     % Find all installed USB devices entries and clean up the output
-%     [~, vals] = dos(['REG QUERY ' key ' /s /f "FriendlyName" /t "REG_SZ"']);
-%     vals = textscan(vals,'%s','delimiter','\t');
-%     vals = cat(1,vals{:});
-%     out = 0;
-%     
-%     % Find all friendly name property entries
-%     for i = 1:numel(vals)
-%         if strcmp(vals{i}(1:min(12,end)),'FriendlyName')
-%             if ~iscell(out), out = vals(i);
-%             else, out{end+1} = vals{i}; end
-%         end
-%     end
-%     
-%     % Compare friendly name entries with connected ports and generate output
-%     for i = 1:numel(coms)
-%         match = strfind(out,[coms{i},')']);
-%         ind = 0;
-%         
-%         for j = 1:numel(match)
-%             if ~isempty(match{j}), ind = j; end
-%         end
-%         
-%         if ind ~= 0
-%             com = str2double(coms{i}(4:end));
-%             % Trim the trailing ' (COM##)' from the friendly name - works on ports from 1 to 99
-%             if com > 9, length = 8;
-%             else, length = 7; end
-%             
-%             devs{i,1} = out{ind}(27:end-length);
-%             devs{i,2} = strcat('COM',num2str(com));
-%             
-%             no_devices = 1;
-%         elseif ind == 0
-%             if Attempt > 5, CallWarning('no devices found!'); pause(2); end
-%             
-%             Attempt = Attempt + 1;
-%         end
-%     end
-%     
-% end
-% 
-% N = size(coms,2);
-% Devices = devs;
-% CallExecuted([num2str(N-1), 'compatible devices found']);
-% 
-% ID = 1:N;
-% 
-% end
-% 
-% function Data = GetData(board)
-% Data = str2num(convertCharsToStrings(vertcat(board.Data{end})));
-% end

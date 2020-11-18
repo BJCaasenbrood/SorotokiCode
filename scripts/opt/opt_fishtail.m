@@ -2,11 +2,11 @@ clr;
 %% generate mesh from sdf
 sdf = @(x) Trapzoidal(x,15,20,15);
 
-msh = Mesh(sdf,'BdBox',[0,15,0,20],'NElem',1500);
+msh = Mesh(sdf,'BdBox',[0,15,0,20],'NElem',800);
 msh = msh.generate().show();
 
 %% show generated mesh
-fem = Fem(msh,'VolumeInfill',0.2,'Penal',4,'FilterRadius',1,...
+fem = Fem(msh,'VolumeInfill',0.2,'Penal',4,'FilterRadius',3,...
               'Nonlinear',false,'TimeStep',1/3,...
               'OptimizationProblem','Compliant',...
               'MaxIterationMMA',70,'ChangeMax',1e-2);
@@ -32,7 +32,7 @@ fem = fem.AddConstraint('PressureCell',id,[1e-3,0]);
 fem = fem.initialTopology('Hole',[7,7],1);
 
 %% material
-fem.Material = Dragonskin10A;
+fem.Material = Dragonskin10;
 
 %% solving
 fem.optimize();

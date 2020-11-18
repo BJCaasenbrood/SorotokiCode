@@ -286,4 +286,19 @@ x = modelPathConfirm;
 end
 end
 
+% ---------------------------------------------------------------- DYNAMICS
+function x = IncludeControl(Path,Request)
+global FID
+
+if Request == 1
+fprintf(FID,'%% control.lib \n');
+WriteToFile([Path,'\src\control']);
+WriteToFile([Path,'\src\control\tools']);
+else
+AddPath([Path,'\src\control']);
+AddPath([Path,'\src\control\tools']);
+pause(.3);
+x = modelPathConfirm;
+end
+end
 

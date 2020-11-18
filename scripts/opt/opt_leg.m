@@ -8,9 +8,9 @@ msh = Mesh(sdf,'BdBox',[0,30,0,50],'Quads',650);
 msh = msh.generate().show(); pause(3.0)
 
 %% show generated mesh
-fem = Fem(msh,'VolumeInfill',0.3,'Penal',4,'FilterRadius',3,...
+fem = Fem(msh,'VolumeInfill',0.3,'Penal',3,'FilterRadius',3,...
               'Nonlinear',false,'MaxIterationMMA',50,...
-              'OptimizationProblem','Compliant','ChangeMax',0.05);
+              'OptimizationProblem','Compliant','ChangeMax',0.01);
           
 %% set spatial settings
 fem = fem.set('Repeat',ones(5,1),'Periodic',[1/2,0]);
@@ -33,13 +33,13 @@ fem = fem.AddConstraint('Output',id,[1,0]);
 fem = fem.AddConstraint('Spring',id,[1,0]);
 
 id = fem.FindElements('Location',[10,30]);
-fem = fem.AddConstraint('PressureCell',id,[-1e-3,0]);
+fem = fem.AddConstraint('PressureCell',id,[1e-3,0]);
 
 %% set density
 fem = fem.initialTopology('Hole',[10,30],5);
 
 %% material
-fem.Material = Dragonskin10A;
+fem.Material = Dragonskin10;
 
 %% linear solving
 fem.optimize();

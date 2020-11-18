@@ -32,3 +32,5 @@ If you are using Sorotoki in your (academic) work, please consider citing the to
 
 [**[5]**](https://www.springer.com/gp/book/9783540429920) M. Bendsøe and O. Sigmund, **Topology Optimization. Theory, Methods and Applications**. Springer, 2003.
 {: .fs-3}
+
+[**[6]**](https://doi.org/10.1089/soro.2019.0115) L. Marechal, P. Balland, L. Lindenroth, F. Petrou, C. Kontovounisios and F. Bello **Toward a Common Framework and Database of Materials for Soft Robotics**, Soft Robotics, 2020. https://doi.org/10.1089/soro.2019.0115

@@ -1,8 +1,8 @@
 clear; close all; clc;
 
 %% set signed distance function
-W = 2.5;
-H = 5;
+W = 8;
+H = 4;
 sdf = @(x) Bellow(x,W,H);
 
 %% generate mesh
@@ -11,23 +11,21 @@ msh = msh.generate();
 msh.show(); pause(2);
 
 %% show generated mesh
-fem = Fem(msh);
-fem = fem.set('TimeStep',1/3,'ResidualNorm',1e-3,'VolumeInfill',0.2,...
-              'Penal',4,'VolumetricPressure',true,'FilterRadius',0.65,...
-              'Nonlinear',0,'ReflectionPlane',[1,1],'Repeat',[1 1 2 2],...
-              'MaxIterationMMA',125,'OptimizationProblem','Compliant','Movie',0);
+fem = Fem(msh,'VolumeInfill',0.3,'Penal',4,'FilterRadius',0.75,...
+              'Nonlinear',false,'TimeStep',1/3,'ReflectionPlane',[1,1],...
+              'OptimizationProblem','Compliant','Repeat',[1 2],...
+              'MaxIterationMMA',65,'Movie',true);
 
 %% add constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[0,1]);
 fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,0]);
 
 id = fem.FindNodes('Location',[0.01*W,H]);
-fem = fem.AddConstraint('Output',id,[0,-1]);
+fem = fem.AddConstraint('Output',id,[0,1]);
 fem = fem.AddConstraint('Spring',id,[0,.1]);
 
-id = fem.FindNodes('Location',[W,0.01*H]);
-fem = fem.AddConstraint('Output',id,[.01,0]);
-fem = fem.AddConstraint('Spring',id,[.1,0]);
+id = fem.FindNodes('Line',[0.02*W,W,H,H]);
+fem = fem.AddConstraint('Spring',id,[0,.1]*1e-1);
 
 id = fem.FindElements('Location',[0,0],1);
 fem = fem.AddConstraint('PressureCell',id,[1e-3,0]);
@@ -36,11 +34,10 @@ fem = fem.AddConstraint('PressureCell',id,[1e-3,0]);
 fem = fem.initialTopology('Hole',[0,0],1.0);
 
 %% material
-fem.Material = NinjaFlex;
+fem.Material = Ecoflex0030;
 
 %% solving
 fem.optimize();
-%fem.solve();
 
 function D = Bellow(x,W,H)
 R1 = dRectangle(x,0,W,0,H);

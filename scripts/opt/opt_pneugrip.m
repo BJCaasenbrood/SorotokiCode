@@ -7,10 +7,13 @@ msh = Mesh(sdf,'BdBox',[-5,13,0,5],'Quads',[50 25]);
 msh = msh.generate();
 
 %% generate fem model
-fem = Fem(msh,'Nonlinear',false,'ReflectionPlane',[0 -1]);
-fem = fem.set('VolumeInfill',0.3,'FilterRadius',0.5,...
-              'MaxIterationMMA',50,'TimeStep',1/5,...
-              'Penal',4,'OptimizationProblem','Compliant');
+fem = Fem(msh,'VolumeInfill',0.3,'Penal',3,'FilterRadius',1,...
+              'Nonlinear',false,'TimeStep',1/3,...
+              'OptimizationProblem','Compliant',...
+              'MaxIterationMMA',85,'ChangeMax',0.01,'Movie',true);
+          
+%% set spatial settings
+fem = fem.set('ReflectionPlane',[0 -1]);
 
 %% add constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,1]);
@@ -18,16 +21,16 @@ fem = fem.AddConstraint('Support',fem.FindNodes('Top'),[0,1]);
 
 id = fem.FindNodes('Location',[13,4.5],1);
 fem = fem.AddConstraint('Output',id,[0,1]);
-fem = fem.AddConstraint('Spring',id,[0,1e-3]);
+fem = fem.AddConstraint('Spring',id,[0,1]);
 
-id = fem.FindElements('Location',[-5,5],1);
+id = fem.FindElements('Location',[-3,5],1);
 fem = fem.AddConstraint('PressureCell',id,[-1e-4,0]);
 
 %% set density
-fem = fem.initialTopology('Hole',[-5,5],3);
+fem = fem.initialTopology('Hole',[-3,5],3);
 
 %% material
-fem.Material = Ecoflex0030;
+fem.Material = Dragonskin10;
 
 %% solving
 fem.optimize();
