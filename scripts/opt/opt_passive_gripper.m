@@ -5,33 +5,37 @@ sdf = @(x) Gripper(x);
 msh = Mesh(sdf,'BdBox',[0,80,0,50],'NElem',1e3);
 msh = msh.generate();
 
+msh.show(); pause(2);
+
 %% show generated mesh
-fem = Fem(msh,'VolumeInfill',0.3,'Penal',4,'FilterRadius',7,...
-              'Nonlinear',false,'TimeStep',1/3,'ChangeMax',Inf,...
-              'OptimizationProblem','Compliance',...
+fem = Fem(msh,'VolumeInfill',0.3,'Penal',3,'FilterRadius',4,...
+              'Nonlinear',false,'TimeStep',1/3,'ChangeMax',0.15,...
+              'OptimizationProblem','Compliant',...
               'MaxIterationMMA',50);
 
 %% set spatial settings
 fem = fem.set('ReflectionPlane',[0, 1]);
 
 %% add boundary condition
-id = fem.FindNodes('Left'); 
+id = fem.FindNodes('Box',[0 0 40 50]); 
 fem = fem.AddConstraint('Support',id,[1,1]);
 
-% id = fem.FindNodes('NW'); 
-% fem = fem.AddConstraint('Load',id,[1,0]);
-% % fem = fem.AddConstraint('Spring',id,[1,0]);
+id = fem.FindNodes('SW'); 
+fem = fem.AddConstraint('Load',id,[-1,0]);
+fem = fem.AddConstraint('Spring',id,[0.1,0]);
 
 alpha = atan(40/80);
-Fn = [-sin(alpha),cos(alpha)];
+Fn = -[-sin(alpha),cos(alpha)];
 id = fem.FindNodes('Line',[0 80 0 40]); 
-fem = fem.AddConstraint('Load',id,1e-4*Fn);
+fem = fem.AddConstraint('Output',id,Fn);
+fem = fem.AddConstraint('Spring',id,[0 1]);
+
 
 %% set density
-% fem = fem.initialTopology('Hole',[10,30;30,35;50,40],5);
+fem = fem.initialTopology('Hole',[10,30;30,35;50,40],5);
 
 %% material
-fem.Material = Ecoflex0050;
+fem.Material = TPU90;
 
 %% solving
 fem.optimize();
