@@ -4,6 +4,7 @@ switch(Request)
     case('LoadMesh');     x = LoadMesh(Arg);
     case('Translate');    x = TranslateMesh(x,Arg);
     case('Rotate');       x = RotateMesh(x,Arg);
+    case('Center');       x = CenterMesh(x);
     case('Transform');    x = Transformation(x,Arg);
     case('Scale');        x = ScaleMesh(x,Arg);
     case('Curve');        x = CurveMesh(x,Arg);
@@ -111,6 +112,18 @@ HMat = Arg;
 Node = HMat*Node0.';
 Node = Node(1:3,:).';
 mesh.Node = Node;
+end
+
+%-------------------------------------------------------------- ROTATE MESH
+function mesh = CenterMesh(mesh)
+
+Node0 = mesh.Node; 
+
+X0 = mean(Node0(:,1));
+Y0 = mean(Node0(:,2));
+Z0 = mean(Node0(:,3));
+
+mesh.Node = Node0 - [X0,Y0,Z0];
 end
 
 %-------------------------------------------------------------- ROTATE MESH

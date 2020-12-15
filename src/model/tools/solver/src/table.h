@@ -4,7 +4,6 @@
 #include "Eigen/Dense"
 using namespace Eigen;
 
-
 typedef Eigen::Array<int, Dynamic, 1> Vxi;
 
 //---------------------------------------------------

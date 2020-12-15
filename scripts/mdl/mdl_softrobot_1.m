@@ -64,17 +64,17 @@ plot3(YD(:,3),YD(:,2),YD(:,1),'--');
 %% BACK-END FUNCTIONS
 % setup model
 function mdl = setupSoftRobot(mdl,K,X)
-mdl = mdl.set('Controller', 1);
+mdl = mdl.set('Controller', 0);
 L0 = 0.12;
 
 mdl = mdl.set('Tdomain',    20); 
 mdl = mdl.set('TimeStep',   1e-1);
 mdl = mdl.set('Sdomain',    L0);
 mdl = mdl.set('SpaceStep',  25);
-mdl = mdl.set('Density',    50);
+mdl = mdl.set('Density',    150);
 mdl = mdl.set('Radius',     0.01);
 mdl = mdl.set('Gravity',    [0,0,9.81]);
-mdl = mdl.set('E',          400);
+mdl = mdl.set('E',          200);
 mdl = mdl.set('Mu',         0.2);
 mdl = mdl.set('Gain',       [K,0]);
 mdl = mdl.set('Lambda',     K/X);

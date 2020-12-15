@@ -1,4 +1,5 @@
-clr; X = 0;
+clr; 
+X = 0;
 %% preview
 obj = Gmodel(@(x) dSphere(x,0,0,0,1),[-1,1,-1,1,-1,1]);
 obj.Texture = diffuse(X);

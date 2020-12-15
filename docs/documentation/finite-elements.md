@@ -5,14 +5,14 @@ parent: Documentation
 nav_order: 2
 ---
 
-<div align="center"> <img src="./img/fem_beam.png" width="550"> </div>
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script> 
 
 # Finite element method
-[**Sorotoki**](https://bjcaasenbrood.github.io/SorotokiCode/) includes a finite element solver able to deal with linear and nonlinear problems. The class [`Fem.m`](./finite-elements.html) works coherently with [`Mesh.m`](./meshing.html). The finite element toolkit offers a set of material models - including Hookean, Neo-Hookean, Mooney-Rivlin, and Yeoh - that should cover for a wide range of soft materials. Furthermore, we also provides some preset material models that are known to be used extensively in soft robotics research. Examples included: Ecoflex-0030, Dragonskin-30A, Elastosil, and NinjaFlex.
+SOROTOKI includes a finite element solver able to deal with linear and nonlinear problems. The finite element toolkit offers a set of constitutive material models - including Linear, Neo-Hookean, Mooney-Rivlin, and Yeoh -- covering for a wide range of soft materials. It also provides some preset soft material models that are known to be used extensively in soft robotics research. Examples included: Ecoflex-0030, Dragonskin-30A, Elastosil, and NinjaFlex TPU.
 
-For generating the mesh, we refer the reader to [`Mesh`](./meshing.html). 
+Generating the mesh can also be done in SOROTOKI, we refer the reader to [`Mesh`](./meshing.html). 
 
-### List of material models:
+## List of material models:
 ```matlab
 % different material models
 fem.Material = LinearMaterial('E',-,'Nu',-);           
@@ -27,9 +27,20 @@ fem.Material = Elastosil();
 fem.Material = TPU90();   	 
 ```
 
+### Material models operators
+
+| Material   | SOROTOKI     | Material model  |
+|:-------------|:------------------|:------|
+| Linear   | `LinearMaterial('E',-,'Nu',-)`  | $$\Psi = \lambda I \otimes I + 2\mu I $$ 
+| Neo-Hookean   | `NeoHookeanMaterial('E',-,'Nu',-)`  | $$\Psi = C_1(J_1 - 3)$$ 
+| Mooney-Rivlin   | `MooneyMaterial('C1',-,'C2',-)`  | $$\Psi = C_{1}({J}_1 - 3) + C_{2}({J}_2 - 3)$$ 
+| 3rd-order Yeoh  | `YeohMaterial('C1',-,'C2',-,'C3',-)`  | $$\Psi = \sum_{i=1}^3 C_{i}({J}_1 - 3)^{i}$$ 
+
 # Numerical examples
 
-### Example: Clamped beam 
+<div align="center"> <img src="./img/fem_beam.png" width="350"> </div>
+
+### Example: Double clamped beam 
 ```matlab
 %% generate mesh from sdf
 sdf = @(x) dRectangle(x,0,20,0,2);
@@ -46,14 +57,14 @@ fem = fem.AddConstraint('Support',fem.FindNodes('Right'),[1,1]);
 fem = fem.AddConstraint('Load',fem.FindNodes('Bottom'),[0,-1e-3]);
 
 %% select material
-fem.Material =  Dragonskin10A;
+fem.Material =  Dragonskin10;
 
 %% solving
 fem.solve();
 ```
 
-
-### Example: Tensile bone
+### Example: Tensile bone of silicone elastomer -- Ecoflex-0050
+<div align="center"> <img src="./img/fem_tensile.gif" width="400"> </div>
 ```matlab
 %% generate mesh from sdf
 sdf = @(x) TensileBone(x,10,2,4,1,1);
@@ -65,9 +76,9 @@ msh = msh.generate();
 fem = Fem(msh,'TimeStep',1/100,'PrescribedDisplacement');
 
 %% add boundary conditions
+fem = fem.AddConstraint('Load',fem.FindNodes('Top'),[0,9]);
 fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,0]);
 fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[0,1]);
-fem = fem.AddConstraint('Load',fem.FindNodes('Top'),[0,9]);
 fem = fem.AddConstraint('Output',fem.FindNodes('Location',[1,4]),[0,1]);
 
 %% assign material
@@ -94,9 +105,65 @@ D0 = dDiff(dDiff(dDiff(R1,R2),C1),C2);
 D = dDiff(dDiff(dDiff(D0,R3),C3),C4);
 end
 ```
-<div align="center"> <img src="./img/fem_tensile.png" width="550"> </div>
+
+### Example: Contact mechanics with signed distance functions (SDF)
+<div align="center"> <img src="./img/fem_compress_sdf.gif" width="350"> </div>
+```matlab
+%% generate mesh from sdf
+R = 6;
+sdf = @(x) dRectangle(x,-10,10,0,30);
+
+msh = Mesh(sdf,'BdBox',[-10,10,0,30],'Quads',25^2);
+msh = msh.generate();
+
+%% generate fem model from mesh
+fem = Fem(msh,'TimeStep',1/50,'Linestyle','none');
+
+%% add constraint
+fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[0,1]);
+fem = fem.AddConstraint('Contact',@(x) SDF(x,R),[0,-0.5*R]);
+
+%% assign material
+fem.Material = Dragonskin10A;
+
+%% solving
+fem.solve();
+
+function Dist = SDF(x,R)
+Dist = dCircle(x,0,30+R,R);
+end
+```
+
+### Example: Three-dimensional beam under torsion
+<div align="center"> <img src="./img/fem_twist_3d.gif" width="350"> </div>
+
+```matlab
+%% generate mesh from sdf
+sdf = @(x) dCube(x,-3,3,-3,3,0,20);
+msh = Mesh(sdf,'BdBox',[-3,3,-3,3,0,20],'Hexahedron',[3,3,10]);
+
+msh = msh.generate();
+msh = msh.show();
+
+%% generate fem model from mesh
+fem = Fem(msh,'Nonlinear',true,'TimeStep',1/100,'PrescribedDisplacement',true,...
+    'Movie',true,'MovieAxis',[-5 5 -5 5 0 21]);
+
+%% add constraint
+fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[1,1,1]);
+fem = fem.AddConstraint('Support',fem.FindNodes('Top'),[0,0,1]);
+fem = fem.AddConstraint('Load',fem.FindNodes('Top'),so3([0,0,1.25*pi]));
+
+%% select material
+fem.Material =  TPU90();
+
+%% solving
+fem.solve();
+```
 
 ### Example: Buckling beam 
+<div align="center"> <img src="./img/fem_buckle_.png" width="550"> </div>
+
 ```matlab
 %% generate mesh from sdf
 sdf = @(x) dRectangle(x,0,20,0,2);
@@ -124,11 +191,9 @@ fem.solve();
 
 %% plot force-displacement relation
 figure(101);
-subplot(2,1,1); fem.show();
-subplot(2,1,2); plot(fem.Log{2,3},fem.Log{2,6},'linewidth',2,'Color',col(2));
+subplot(2,1,1); fem.show('Svm');
+subplot(2,1,2); plot(fem.Log{2,3}/1e3,fem.Log{2,6}/1e3,'linewidth',2,'Color',col(2));
 xlabel('Displacement (mm)','interpreter','latex','fontsize',12);
-ylabel('Reaction force (N)','interpreter','latex','fontsize',12);
+ylabel('Reaction force (mN)','interpreter','latex','fontsize',12);
 grid on; set(gca,'linewidth',1);
 ```
-
-<div align="center"> <img src="./img/fem_buckle.png" width="550"> </div>

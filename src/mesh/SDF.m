@@ -3,7 +3,9 @@ classdef SDF
     %   Detailed explanation goes here
     
     properties
-        sdf
+        sdf;
+        BdBox;
+        cmap = viridis;
     end
     
     methods
@@ -14,16 +16,26 @@ classdef SDF
         function r = plus(obj1,obj2)
             fnc = @(x) dUnion(obj1.sdf(x),obj2.sdf(x));
             r = SDF(fnc);
+            B = [box2node(obj1.BdBox); box2node(obj2.BdBox)];
+            r.BdBox = boxhull(B);
         end
         
         function r = minus(obj1,obj2)
             fnc = @(x) dDiff(obj1.sdf(x),obj2.sdf(x));
             r = SDF(fnc);
+            r.BdBox = obj1.BdBox;
         end
         
         function r = mrdivide(obj1,obj2)
             fnc = @(x) dIntersect(obj1.sdf(x),obj2.sdf(x));
             r = SDF(fnc);
+        end
+        
+        function r = transpose(obj1)
+            fnc = @(x) obj1.sdf([x(:,2),x(:,1)]);
+            r = SDF(fnc);
+            B = obj1.BdBox;
+            r.BdBox = [B(3), B(4), B(1), B(2)];
         end
     end
         
@@ -32,46 +44,30 @@ methods (Access = public)
 function d = eval(SDF,x)
     d = SDF.sdf(x);
 end
+
+function show(SDF,Quality)
+    if nargin < 2,
+        Quality = 150;
+    end
+    
+    x = linspace(SDF.BdBox(1),SDF.BdBox(2),Quality);
+    y = linspace(SDF.BdBox(3),SDF.BdBox(4),Quality);
+    [X,Y] = meshgrid(x,y);
+    
+    D = SDF.eval([X(:),Y(:)]);
+%     D = D(:,end);
+%     D(D>0) = NaN;
+%     
+    surf(X,Y,reshape(D(:,end),[Quality Quality]),'linestyle','none');
+    axis equal;
+    axis equal; hold on;
+    contour3(X,Y,reshape(D(:,end),[Quality Quality]),[0 0],'linewidth',...
+        1.5,'Color','w');
+    colormap(SDF.cmap);
+end
 end
     
 methods (Access = private)
-function d = dUnion(d1,d2) 
-    d=[d1(:,1:(end-1)),d2(:,1:(end-1))];
-    d=[d,min(d1(:,end),d2(:,end))];
-end
-
-function d = dDiff(d1,d2) 
-d=[d1(:,1:(end-1)),d2(:,1:(end-1))];
-d=[d,max(d1(:,end),-d2(:,end))];
-end
-
-function d = dIntersect(d1,d2) % max(d1,d2)
-d=[d1(:,1:(end-1)),d2(:,1:(end-1))];
-d=[d,max(d1(:,end),d2(:,end))];
-end
-
-function BdBox = boxhull(Node,eps)
-if nargin < 2, eps = 1e-6; end
-
-if size(Node,2) == 2
-    BdBox = zeros(4,1);
-    BdBox(1) = min(Node(:,1));
-    BdBox(2) = max(Node(:,1));
-    BdBox(3) = min(Node(:,2));
-    BdBox(4) = max(Node(:,2));
-else
-    BdBox = zeros(6,1);
-    BdBox(1) = min(Node(:,1))-eps;
-    BdBox(2) = max(Node(:,1))+eps;
-    BdBox(3) = min(Node(:,2))-eps;
-    BdBox(4) = max(Node(:,2))+eps;
-    BdBox(5) = min(Node(:,3))-eps;
-    BdBox(6) = max(Node(:,3))+eps;
-end
-
-end
-
-
 
 end
 end

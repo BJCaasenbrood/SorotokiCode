@@ -54,7 +54,6 @@ class Model
   	bool WRITE_OUTPUT;
   	bool POINT_INPUT;
 
-
   	float A11, J11, J22, J33;
  	float E11, E22, E33;
   	float G11, G22, G33;
@@ -83,6 +82,7 @@ class Model
 	float ADAMP;
 
   	float KP, KD;
+  	float Hstar;
   	int NDof, NState;
   	Shapes Phi;
 
@@ -142,6 +142,9 @@ class Model
 	void buildNonlinearElastic(Vxf x, Vxf &N);
 
 	Mxf pressureMapping();
+
+	float Hamiltonian(Vxf x1, Vxf x2);
+	void PoissonBracket(Vxf &Hq, Vxf &Hp, Mxf &A);
 };
 
 #endif

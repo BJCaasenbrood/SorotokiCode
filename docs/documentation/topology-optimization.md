@@ -5,7 +5,6 @@ parent: Documentation
 nav_order: 3
 ---
 
-
 # Topology optimization
 
 

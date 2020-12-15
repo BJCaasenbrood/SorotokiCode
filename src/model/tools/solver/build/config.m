@@ -16,23 +16,26 @@ E3 = 0
 [model] 
 NMODE   = 5
 NDISC   = 2
+NDOF   = 1
 SDOMAIN = 0.36
 TDOMAIN = 15
 
 [solver] 
+TDOMAIN = 15
 SPACESTEP = 30
 TIMESTEP  = 0.083333
 INTSTEP   = 100
 ATOL      = 1e-2
 RTOL      = 1e-2
 LAMBDA    = 0.02
-MAX_IMPL  = -1
+MAX_IMPL  = 
 MAX_ITER  = 1
 MAX_IK    = 1500
 SPEEDUP   = 80
 ADAMPING  = 1
 
 [physics] 
+LENGTH   = 0.36
 RHO      = 10
 EMOD     = 250
 NU       = 0.4

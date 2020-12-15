@@ -146,7 +146,7 @@ Model::Model(const char* str){
 	Xi0 << 0.0, 0.0, 0.0, 1.0, 0.0, 0.0;
 	gd << Q1d, Q2d, Q3d, Q4d, Xd, Yd, Zd;
 
-	// read input
+	// read input files
 	q    = readVecXf("log/state.log");
 	dq   = readVecXf("log/state_dt.log");
 	gvec = readVecXf("log/grav_vector.log");
@@ -156,14 +156,20 @@ Model::Model(const char* str){
 	cleanup();
 
 	statelog.open("log/state.log", ios_base::app | ios::binary);
+	statelog_dt.open("log/statelog_dt.log", ios_base::app | ios::binary);
 	taulog.open("log/tau.log", ios_base::app | ios::binary);
 	glog.open("log/g.log", ios_base::app | ios::binary);
 	xdlog.open("log/xd.log", ios_base::app | ios::binary);
-	statelog_dt.open("log/statelog_dt.log", ios_base::app | ios::binary);
 
-	// pre build lagrangian system
+	// pre-build lagrangian system
 	buildLagrange(q,dq,Mee,Cee,Gee,Mtee,Mbee,Cbee);
 
+	// compute desired Hamiltonian
+	// dq(0) = 1.0;
+	// Hstar = Hamiltonian(dq,ddq);
+	// dq.setZero();
+
+	// setting output precision
 	cout << setprecision(PRECISION) << endl;
 }	
 
@@ -175,7 +181,7 @@ void Model::output(ofstream &file, float t, Vxf x){
 	  file << t;
 
 	  for (int i = 0; i < x.size(); ++i)
-	  	file << ", " << x(i);
+	  file << ", " << x(i);
 
 	  file << "\n";
 }
@@ -296,6 +302,7 @@ void Model::inverse_kinematics(float t){
 	qd.noalias() = dx;
 
 }
+
 //---------------------------------------------------
 //-- passivity-based controller for end-effector
 //---------------------------------------------------
@@ -324,22 +331,25 @@ void Model::controllerPassive(float t, Vxf &Hq, Vxf &Hp, Vxf &f){
 	K.setZero();
 	xd.setZero();
 
+	// set virtual stiffness gains
 	k << 1e-5,1e-5,1e-5,1,1,1;
 	K.diagonal() = k;
 
 	// end-effector jacobian
 	buildJacobian((float)SDOMAIN, J, Jt);
 
-	// compute eta desired
+	// relative spatial-twist between g(l) and g*
 	SE3(g,G);
 	SE3Inv(gd,Gi);
 	logmapSE3(Gi*G,Phi);
 	tmapSE3(Phi,T);
 	R.noalias() = K*T*Phi*smoothstep(t,0.0,5.0);
 
+	// compute dq - desired potential energy 
 	dx.noalias() = J.transpose()*(J*J.transpose() + 
 		LAMBDA*Mxf::Identity(6,6)).householderQr().solve(K*R);
 
+	// energy-shaping + damping injection
 	f.noalias() = Sa*(Hq - KP*dx - KD*Dee*Hp);
 }
 
@@ -409,8 +419,6 @@ Vxf Model::implicit_simulate(){
 			output(glog,t,g);
 			output(xdlog,t,gd);
 		}
-
-		// update parameters
 
 		// state/time update
   		x.noalias() += dx;
@@ -511,19 +519,16 @@ void Model::dynamicODE(float t, Vxf x, Vxf &dx){
 	Vxf x1(n), x2(n);
 	Vxf dHdp, dHdq;
 	Vxf Q(n), Qa(n), Qu(n);
-	V6f eta0, deta0;
-	M6f Adg, AdgInv;
-	Mxf J(6,n);
-	Mxf Jt(6,n);
 
 	Qa.setZero();
 	Qu.setZero();
 
 	// extract the generalized coordinates 
-	x1.noalias() = x.block(0,0,n,1);
+	x1.noalias() = x.block(0,0,n,1); 	// q-vector
+	x2.noalias() = x.block(n,0,n,1);	// p-vector
 
 	// compute part-diff p Hamiltonian
-	dHdp.noalias() = Mee.householderQr().solve(x.block(n,0,n,1));	
+	dHdp.noalias() = Mee.householderQr().solve(x2);	
 
 	// compute Lagrangian model
 	buildLagrange(x1,dHdp,Mee,Cee,Gee,Mtee,Mbee,Cbee);
@@ -531,8 +536,12 @@ void Model::dynamicODE(float t, Vxf x, Vxf &dx){
 	// compute part-diff q Hamiltonian
 	dHdq.noalias() = -(Mtee - Cee)*dHdp + Gee + Kee*x1;
 
+	// compute hamiltonian/total energy
+	float H = Hamiltonian(x1,x2);
+
 	if(ENERGY_CONTROLLER){
 
+		//tau.noalias() = KP*(H - Hstar)*Sa*dHdp;
 		controllerPassive(t,dHdq,dHdp,tau);
 		
 		Qu.noalias() = Sa.transpose()*tau;
@@ -541,7 +550,6 @@ void Model::dynamicODE(float t, Vxf x, Vxf &dx){
 	else{
 
 		Qu.noalias() = Sa.transpose()*tau;
-
 	}
 
 	(dx.block(0,0,n,1)).noalias() = dHdp;
@@ -633,7 +641,7 @@ void Model::buildLagrange(Vxf v, Vxf dv,
 	x(0) = 1.0;
 
 	// set states
-	q.noalias() = v;
+	q.noalias()  = v;
 	dq.noalias() = dv;
 
 	// compute forward integration step
@@ -677,7 +685,7 @@ void Model::jacobiODE(float s, V13f x, V13f &dx,
 	// evaluate strain-field
 	Phi.eval(s,PMat);
 	xi.noalias()  = (Ba*PMat)*q + Xi0;
-	dxi.noalias()  = (Ba*PMat)*dq;
+	dxi.noalias() = (Ba*PMat)*dq;
 
 	// decomposition configuration space
 	g.noalias()    = x.block(0,0,7,1);
@@ -913,3 +921,22 @@ Mxf Model::pressureMapping(){
 	return ((float)PRS_AREA)*K;
 }
 
+//---------------------------------------------------
+//------------------------------ compute Hamiltonian
+//---------------------------------------------------
+float Model::Hamiltonian(Vxf x1, Vxf x2){
+
+	float H;
+
+	H =  0.5*x2.transpose()*Mee.householderQr().solve(x2);
+	H =+ 0.5*x1.transpose()*Kee*x1;
+
+	return H;
+}
+
+//---------------------------------------------------
+//------- Poisson bracket [f,g] = (f,q*g,p - f,p*g,q)
+//---------------------------------------------------
+void PoissonBracket(Vxf &Hq, Vxf &Hp, Mxf &A){
+	//A.noalias() = -Hp*Sa.transpose();
+}

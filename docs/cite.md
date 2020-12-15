@@ -4,22 +4,22 @@ title: How to cite?
 nav_order: 4
 ---
 
-# Citation
+# How to cite?
 If you are using Sorotoki in your (academic) work, please consider citing the toolkit:
 ```bibtex
 @misc{Caasenbrood2018,
   author = {Caasenbrood, Brandon},
-  title = {Sorotoki - A Soft Robotics Toolkit for MATLAB},
-  year = {2018},
+  title = {Sorotoki - An open-source soft robotics toolkit for MATLAB},
+  year = {2020},
   publisher = {GitHub},
   journal = {GitHub repository},
   howpublished = {\url{https://github.com/BJCaasenbrood/SorotokiCode}},
 }
 ```
 
-### References
-[**[1]**](https://ieeexplore.ieee.org/abstract/document/9116010/metrics#metrics) B. Caasenbrood, A. Pogromsky and H. Nijmeijer, **A Computational Design Framework for Pressure-driven Soft Robots through Nonlinear Topology Optimization**, 2020 3rd IEEE Inter. Conf. on Soft Robotics (RoboSoft), pp. 633-638, 2020.
-{: .fs-3}
+## References
+[**[1]**](https://ieeexplore.ieee.org/abstract/document/9116010/metrics#metrics) B. Caasenbrood, A. Pogromsky and H. Nijmeijer, **A Computational Design Framework for Pressure-driven Soft Robots through Nonlinear Topology Optimization**, 2020 3rd IEEE Inter. Conf. on Soft Robotics (RoboSoft), pp. 633-638, 2020. [ 10.1109/RoboSoft48309.2020.9116010](https://doi.org/10.1109/RoboSoft48309.2020.9116010)
+{: .fs-3} 
 
 [2] B. Caasenbrood, A. Pogromsky, and H. Nijmeijer, **Dynamic modeling of hyper-elastic soft robots using spatial curves**, IFAC World Congress, 2020.
 {: .fs-3}
@@ -33,4 +33,5 @@ If you are using Sorotoki in your (academic) work, please consider citing the to
 [**[5]**](https://www.springer.com/gp/book/9783540429920) M. Bendsøe and O. Sigmund, **Topology Optimization. Theory, Methods and Applications**. Springer, 2003.
 {: .fs-3}
 
-[**[6]**](https://doi.org/10.1089/soro.2019.0115) L. Marechal, P. Balland, L. Lindenroth, F. Petrou, C. Kontovounisios and F. Bello **Toward a Common Framework and Database of Materials for Soft Robotics**, Soft Robotics, 2020. https://doi.org/10.1089/soro.2019.0115
+[**[6]**](https://doi.org/10.1089/soro.2019.0115) L. Marechal, P. Balland, L. Lindenroth, F. Petrou, C. Kontovounisios and F. Bello **Toward a Common Framework and Database of Materials for Soft Robotics**, Soft Robotics, 2020. [10.1089/soro.2019.0115](https://doi.org/10.1089/soro.2019.0115)
+{: .fs-3}

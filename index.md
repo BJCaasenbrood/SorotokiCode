@@ -6,29 +6,64 @@ permalink: /
 ---
 
 <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script> 
+<div align="center"> <img src="./docs/documentation/img/softrobot_.png" width="650"> </div> <br/>
 
-<div align="center"> <img src="./docs/documentation/img/softrobot.png" width="650"> </div> <br/>
+# **SOROTOKI** - An open-source soft robotics toolkit for MATLAB
+{: .fs-6 .text-purple-000}
 
-# **SOROTOKI** - A soft robotics toolkit for MATLAB
-{: .fs-6}
-[**Sorotoki**](https://bjcaasenbrood.github.io/SorotokiCode/) is an open-source MATLAB toolkit that includes an array of modeling and designing tools for soft robotics. Due to its scientific diversity, exploring the field of soft robotics can be significantly challenging. With the aim to bridge this multi-disciplinary gap, Sorotoki aims to incorporate several layers of scientific disciplines in one toolkit. Examples include: continuum mechanics, dynamic system- and control theory, topology optimization, computer graphics, and much more! 
+*SOROTOKI* is an open-source MATLAB toolkit for soft robotics that includes an array tools for design, modeling, and control. Due to its scientific diversity, it can be challenging for researchers to quickly learn the different disciplines required for soft robotics. With the aim to lower the multi-disciplinary barrier, Sorotoki aims to incorporate multiple layers of scientific disciplines in one toolkit. Examples include: continuum mechanics, dynamic system- and control theory, topology optimization, computer graphics, and much more to come! 
 
-[Stable V3.03 (.zip)](https://github.com/BJCaasenbrood/SorotokiCode/zipball/master){: .btn .btn-green .fs-5 .mb-4 .mb-md-0 .mr-2} [Stable V3.03 (.tar)](https://github.com/BJCaasenbrood/SorotokiCode/tarball/master){: .btn .btn-green .fs-5 .mb-4 .mb-md-0 .mr-2} [View on Github](https://github.com/BJCaasenbrood/SorotokiCode){: .btn .fs-5 .mb-4 .mb-md-0}  
+## List of applications:
+{: .text-purple-000}
+- [x] Modeling of 2D/3D geometries with Signed Distance Functions (SDFs),
+- [x] Performing Finite Element Analysis (FEA) using hyper-elastic materials,
+- [x] Topology optimization-based design of (pressure-driven) soft robots,
+- [x] Dynamic modeling of soft robots through Cosserat-beam theory,
+- [x] Fast and responsive rendering with automatically-updated textures.
 
-## Quick installation
-Download the latest stable version above, and unpack the compressed folder at any desired directory. Alternatively, you can directly clone the repository with the command:
+#### To do:
+{: .text-purple-000}
+- [ ] Real-time control of physical soft robots via BalloonDog interface,
+- [ ] Including class for magnetic fields/inductive sensing,
+- [ ] A pdf-version of the documentation.
+
+### Download the latest stable version
+{: .text-purple-000}
+[Stable V3.03 (.zip)](https://github.com/BJCaasenbrood/SorotokiCode/zipball/master){: .btn .btn-purple .fs-5 .mb-4 .mb-md-0 .mr-2} [Stable V3.03 (.tar)](https://github.com/BJCaasenbrood/SorotokiCode/tarball/master){: .btn .btn-purple .fs-5 .mb-4 .mb-md-0 .mr-2} [View on Github](https://github.com/BJCaasenbrood/SorotokiCode){: .btn .fs-5 .mb-4 .mb-md-0}  
+
+or via git clone
+{: .fs-5 .text-purple-000}
+```fortran
+ git clone https://github.com/BJCaasenbrood/SorotokiCode.git
+```
+
+
+### Citation
+{: .text-purple-000}
+If you are using Sorotoki in your (academic) work, please consider citing the toolkit:
+```bibtex
+@misc{Caasenbrood2018,
+  author = {Caasenbrood, Brandon},
+  title = {Sorotoki - A Soft Robotics Toolkit for MATLAB},
+  year = {2020},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/BJCaasenbrood/SorotokiCode}},
+}
+```
+
+
+<!-- ## Quick installation
+The toolkit is easy to install. Download the latest stable version above, and unpack the compressed folder at any desired directory. Alternatively, you can directly clone the repository with the following terminal command:
 ```rust
 git clone https://github.com/BJCaasenbrood/SorotokiCode.git
 ```
 
-To install the toolkit, run the command below in the MATLAB command window. That's it, the soft robotics toolkit is now ready-to-use.
-```matlab
-% installation command
-sorotoki();
-```
-It is worth mentioning this command is also used to update the toolkit. It is recommended to run `sorotoki.m`{: .text-purple-000} to check for updates occasionally. 
+To install the toolkit, simply run the command [`sorotoki()`]() in the MATLAB command window. That's it, the SOROTOKI toolkit is now ready-to-use.
 
-## Citation and references
+It is worth mentioning this command is also used to update the toolkit. It is recommended to run `sorotoki.m`{: .text-purple-000} to check for updates occasionally.  -->
+
+<!-- ## Citation and references
 If you are using Sorotoki in your (academic) work, please consider citing the toolkit:
 ```bibtex
 @misc{Caasenbrood2018,
@@ -51,4 +86,4 @@ If you are using Sorotoki in your (academic) work, please consider citing the to
 
 [**[5]**](https://www.springer.com/gp/book/9783540429920) M. Bendsøe, M. Philip, O. Sigmund, Topology Optimization. Theory, Methods and Applications. Springer, 2003.
 
-
+ -->

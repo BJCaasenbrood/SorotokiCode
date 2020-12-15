@@ -3,9 +3,9 @@ clr;
 obj = Gmodel('SoftRoboticArm.stl');
 
 %% set texture
-obj.Texture = grey;
+obj.Texture = mateplastic
 obj = obj.bake();
 
 %% show
 obj = obj.render();
-view(130,15);
+view(130,21);

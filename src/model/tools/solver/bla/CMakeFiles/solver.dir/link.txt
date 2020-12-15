@@ -1,0 +1,1 @@
+/usr/bin/c++  -O3  -rdynamic CMakeFiles/solver.dir/main.cpp.o  -o solver  libModel_ph.a 

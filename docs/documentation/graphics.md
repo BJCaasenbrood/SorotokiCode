@@ -28,7 +28,7 @@ end
 ```
 <div align="center"> <img src="./img/gmodel_show.png" width="500"> </div>
 
-## Transformations
+## (Non)-Homogeneous Transformations 
 ```matlab
 %% loading graphical model
 obj = Gmodel('Cube.stl');
@@ -57,7 +57,7 @@ Blender(obj.reset(),'Curve',{'PCC',30,0});
 <div align="center"> <img src="./img/blender_opt.png" width="500"> </div>
 
 
-## Rendering
+## Rendering materials
 ```matlab
 %% loading graphical model
 obj = Gmodel(@(x) dSphere(x,0,0,0,1),[-1,1,-1,1,-1,1]);

@@ -217,9 +217,14 @@ if Request == 1
 fprintf(FID,'%% gmodel.lib \n');
 WriteToFile([Path,'\src\gmodel']);
 WriteToFile([Path,'\src\gmodel\tools\']);
+WriteToFile([Path,'\src\gmodel\matcap\']);
+WriteToFile([Path,'\src\gmodel\matcap\img']);
 else
 AddPath([Path,'\src\gmodel']);
 AddPath([Path,'\src\gmodel\tools\']);
+AddPath([Path,'\src\gmodel\matcap\']);
+AddPath([Path,'\src\gmodel\matcap\img\']);
+AddPath([Path,'\src\gmodel\matcap\tools\']);
 pause(.3);
 x = graphicsmodelPathConfirm;
 end

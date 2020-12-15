@@ -1,4 +1,5 @@
-clr; X = 1;
+%clr; 
+X = 1;
 %% preview
 obj = Gmodel(@(x) dSphere(x,0,0,0,1),[-1,1,-1,1,-1,1]);
 
@@ -9,8 +10,7 @@ mat = {aniso, bluered, bump, chroma, chromium, ...
        redshine, redwax, retro, rim, soft, ...
        skin, studioclay};
    
-
-f = figure(101);
+f = figure(103);
 obj.set('TextureStretch',0.65);
 obj.bake().render();
 
@@ -26,7 +26,7 @@ bl2 = uicontrol('Parent',f,'Style','text','Position',[500,24,23,23],...
           
 b.Callback = @(s,e) updateSphere(s,e,mat);
 
-title(['Diffuse value = ', num2str(X,3)]);
+title(['Material capture number: ', num2str(X,3)]);
 
 function updateSphere(src,~,mat)
     class = whoClasses('Gmodel');
