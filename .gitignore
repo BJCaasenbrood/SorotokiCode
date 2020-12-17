@@ -4,6 +4,10 @@
 .jekyll-cache
 .sass-cache
 _site
+_data
+_includes
+_layouts
+_sass
 Gemfile
 Gemfile.lock
 node_modules
