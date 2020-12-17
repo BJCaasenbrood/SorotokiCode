@@ -1,6 +1,6 @@
 clr;
 %% assign free DOF
-mdl = Model([0,1,1,0,0,0],'NModal',4,'NDisc',2);
+mdl = Model([0,1,1,0,0,0],'NModal',6,'NDisc',2);
 mdl = setupSoftRobot(mdl);
 
 %% generate and solve dynamic model

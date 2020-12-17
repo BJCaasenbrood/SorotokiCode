@@ -22,13 +22,17 @@ Alternatively, you can download the latest stable version of the toolkit below, 
 
 ### Open MATLAB
 {: .text-purple-000}
-Open MATLAB, and navigate to the SOROTOKI directory.
+- MATLAB compatibility: R2018a/R2018b/R2020a.
+- OS compatibility: Windows/Linux.
+
+Please inform the developers if any compatibility issues may occur.
 
 ### Running the installation script
 {: .text-purple-000}
+
 Before you get started, you first have to configure the toolkit with MATLAB's function paths. Setting up these paths is relatively straightforward. Simply run `sorotoki.m`{: .text-purple-000}:
 
-<img src="./documentation/img/installing.gif" width="700"> 
+<img src="./documentation/img/installing.gif" width="725"> 
 
 During the installation, the toolkit will ask you if the SOROTOKI directory should be set to the *main* directory of MATLAB, so every-time you open MATLAB it will automatically go this directory. 
 

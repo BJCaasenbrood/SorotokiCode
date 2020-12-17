@@ -58,6 +58,7 @@ Blender(obj.reset(),'Curve',{'PCC',30,0});
 
 
 ## Rendering materials
+### Assigning material textures
 ```matlab
 %% loading graphical model
 obj = Gmodel(@(x) dSphere(x,0,0,0,1),[-1,1,-1,1,-1,1]);
@@ -82,25 +83,31 @@ end
 
 <div align="center"> <img src="./img/matcap.gif" width="250"> </div>
 
-### Ambient occlusion (AO)
+### Automatic view-based rendering
+<div align="center"> <img src="./img/Figure1.gif" width="500"> </div>
+<div align="center"> <img src="./img/Figure2.gif" width="501"> </div>
+
+### Rendering Ambient Occlusion (AO)
 ```matlab
 %% loading graphical model
 obj = Gmodel('Bunny.stl');
 
 %% set textures and render
 obj.set('Texture',grey,'AO',true,'AOPower',5.0,'AORadius',0.2);
+obj.bake().render();
 
-obj.bake().render().update();
+%% orient view and update material
+view(0,15); obj.update();
 
 %% show AO map 
 obj_ = obj.copy('Translate',{'y',100});
 obj_.render().showMap('AO');
-view(90,15); axis tight;
+axis tight;
 ```
-<div align="center"> <img src="./img/bunny_AO.png" width="450"> </div>
+<div align="center"> <img src="./img/bunny_AO_.png" width="626"> </div>
 
 
-### Sub-Surface Scattering (SSS)
+### Rendering Sub-Surface Scattering (SSS)
 ```matlab
 %% loading graphical model
 obj = Gmodel('Bunny.stl');
@@ -108,12 +115,14 @@ obj = Gmodel('Bunny.stl');
 %% set  textures and render
 obj.set('Texture',grey,'Emission',[0.70 0.70 0.70],...
         'SSS',true,'SSSPower',1.40,'SSSRadius',0.2);
+obj.bake().render();
 
-obj.bake().render().update();
+%% orient view and update material
+view(0,15); obj.update();
 
 %% set AO map object
 obj_ = obj.copy('Translate',{'y',100});
 obj_.render().showMap('SSS');
-view(90,15); axis tight;
+axis tight;
 ```
-<div align="center"> <img src="./img/bunny_SSS.png" width="450"> </div>
+<div align="center"> <img src="./img/bunny_SSS_.png" width="626"> </div>

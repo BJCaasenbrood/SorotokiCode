@@ -9,7 +9,7 @@ msh = msh.generate();
 fem = Fem(msh,'VolumeInfill',0.3,'Penal',4,'FilterRadius',4,...
               'Nonlinear',false,'TimeStep',1/3,...
               'OptimizationProblem','Compliant',...
-              'MaxIterationMMA',35,'ChangeMax',0.01,'Movie',0);
+              'MaxIterationMMA',50,'ChangeMax',0.01,'Movie',0);
 
 %% set spatial settings
 fem = fem.set('Periodic',[1/2, 0],'Repeat',ones(7,1));
@@ -29,7 +29,7 @@ fem = fem.AddConstraint('PressureCell',id,[1e-3,0]);
 fem = fem.initialTopology('Hole',[10,25],0.5);
 
 %% material
-fem.Material = Ecoflex0050;
+fem.Material = Ecoflex0030;
 
 %% solving
 fem.optimize();

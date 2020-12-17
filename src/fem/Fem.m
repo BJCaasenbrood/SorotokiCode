@@ -85,6 +85,7 @@ classdef Fem < handle
         Type = 'PlaneStrain'
         Linestyle = '-';
         Colormap = turbo;
+        ColorAxis = [];
         I3 = eye(3); O3 = zeros(3);
         i; j; m; fi; t; e; c; s; p; v; l; k; fb; ed; fb0; ft;
         
@@ -232,6 +233,11 @@ end
 if flag == 0
 cla; axis equal;     
 axis off; hold on; h{3} = [];
+
+if ~isempty(Fem.ColorAxis)
+   caxis(Fem.ColorAxis); 
+   colorbar;
+end
 
 FaceMatrix  = Fem.Mesh.get('ElemMat');
 BoundMatrix = Fem.Mesh.get('Boundary');

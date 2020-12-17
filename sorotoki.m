@@ -47,7 +47,7 @@ DisplayLogo;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 fprintf(['* Thank you for installing SOROTOKI, we will',...
-    ' start the installation/update shortly \n']); pause(1.0);
+    ' start the installation shortly \n']); pause(1.0);
 
 % if exist('BuildVersion.m','file')
 %      % File exists.
@@ -95,6 +95,7 @@ libs(2) = IncludeGraphicsModel(Path,0);
 libs(3) = IncludeMesh(Path,0);
 libs(4) = IncludeFiniteElement(Path,0);
 libs(5) = IncludeDynamicModel(Path,0);
+libs(6) = IncludeControl(Path,0);
 
 if min(libs) == 1
 fprintf('\n* Libary check completed - all libaries are up-to-date - \n');
@@ -135,6 +136,7 @@ if bool == 1
     if libs(3), IncludeMesh(Path,1); end
     if libs(4), IncludeFiniteElement(Path,1); end
     if libs(5), IncludeDynamicModel(Path,1); end
+    if libs(6), IncludeControl(Path,1); end
     
     Request = input(['\n* Do you want to setup the SorotokiCode folder',...
         ' as the main directory (y/n)'],'s');
@@ -156,7 +158,7 @@ pause(.01);
 cout(['* The documentation can be found in doc/SorotokiManual.pdf',...
     '. For more in-\nformation on the Soft Robotics Toolkit, visit',...
     ' the GitHub repository at: \n\n']) 
-fprintf(['<a href="https://bjcaasenbrood.github.io/SorotokiCode">',...
+cout(['<a href="https://bjcaasenbrood.github.io/SorotokiCode">',...
     'https://bjcaasenbrood.github.io/SorotokiCode</a> \n'])
 cout('Text', '\n');
 cout('Text', '* To get started with demonstrations, type ');
@@ -175,18 +177,19 @@ end
 function x = IncludeBase(Path,Request)
 global FID
 cout(['* Adding SOROTOKI libraries to path, ',...
-    'this might take a minute...\n']);
+    'this might take a minute...\n\n']);
 
 if Request == 1
-str = strrep(Path,'\','\\');
-fprintf(FID,['%%!INSTALDIR:',str,'\n']);
+%str = strrep(Path,'/','\');
+fprintf(FID,['%%!INSTALDIR:',Path,' \n']);
 fprintf(FID,'%% base.lib \n');
-WriteToFile(Path);
+%WriteToFile(Path);
 WriteToFile([Path,'\config\']);
 WriteToFile([Path,'\src\__version__']);
 WriteToFile([Path,'\src\__base__']);
 WriteToFile([Path,'\src\__base__\fnc']);
 WriteToFile([Path,'\scripts\']);
+WriteToFile([Path,'\data\']);
 WriteToFile([Path,'\data\color']);
 WriteToFile([Path,'\data\colormap']);
 WriteToFile([Path,'\data\matcap']);
@@ -296,14 +299,14 @@ function x = IncludeControl(Path,Request)
 global FID
 
 if Request == 1
-fprintf(FID,'%% control.lib \n');
-WriteToFile([Path,'\src\control']);
-WriteToFile([Path,'\src\control\tools']);
+fprintf(FID,'%% bdog.lib \n');
+WriteToFile([Path,'\src\bdog']);
+WriteToFile([Path,'\src\bdog\tools']);
 else
-AddPath([Path,'\src\control']);
-AddPath([Path,'\src\control\tools']);
+AddPath([Path,'\src\bdog']);
+AddPath([Path,'\src\bdog\tools']);
 pause(.3);
-x = modelPathConfirm;
+x = bdogPathConfirm;
 end
 end
 

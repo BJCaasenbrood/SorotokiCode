@@ -4,9 +4,11 @@ obj = Gmodel('Bunny.stl');
 
 %% set texture and render
 obj.set('Texture',grey,'AO',true,'AOPower',5.0,'AORadius',0.2);
-obj.bake().render().update();
+obj.bake().render();
+
+view(0,15); obj.update();
 
 %% set AO map object
-obj_ = obj.copy('Translate',{'y',100});
+obj_ = obj.copy('Translate',{'x',120});
 obj_.render().showMap('AO');
-view(-60,15); axis tight;
+view(0,15); axis tight;

@@ -1,0 +1,17 @@
+# example slider
+- selector: example_slider
+  bullets: false
+  captions: false
+  images:
+    - src: /docs/documentation/img/opt_pneunet.gif
+      alt: image one
+    - src: /docs/documentation/img/opt_bellow.gif
+      alt: Topology optimization of pressure bellows
+    - src: /docs/documentation/img/fem_tensile.gif
+      alt: image one
+    - src: /docs/documentation/img/Figure1.gif
+      alt: image two
+  settings:
+    height: "'auto'"
+    effect: "'slide'"
+    transitionDuration: 700

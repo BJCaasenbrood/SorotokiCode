@@ -1,6 +1,6 @@
 #theme: "just-the-docs"
 #theme: jekyll-theme-slate
-remote_theme: pmarsceill/just-the-docs
+#remote_theme: pmarsceill/just-the-docs
 
 title: SOROTOKI
 description: A Soft Robotics Toolkit for MATLAB
@@ -13,12 +13,6 @@ url: "https://bjcaasenbrood.github.io" # the base hostname & protocol for your s
 # exclude: ["node_modules/", "*.gemspec", "*.gem", "Gemfile", "Gemfile.lock", "package.json", "package-lock.json",  "script/", "LICENSE.txt", "lib/", "bin/", "README.md", "Rakefile"
 # , "docs/tests/"
 # ]
-
-gems:
-  - jekyll-inline-svg
-
-svg:
-  optimize: true
 
 # Enable or disable the site search
 # Supports true (default) or false

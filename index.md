@@ -3,7 +3,16 @@ layout: default
 title: Home
 nav_order: 1
 permalink: /
+image_sliders:
+  - example_slider
 ---
+
+
+<!--
+  https://fontawesome.com/how-to-use/on-the-web/styling/sizing-icons
+-->
+
+{% include slider_styles.html %}
 
 <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script> 
 <div align="center"> <img src="./docs/documentation/img/softrobot_.png" width="650"> </div> <br/>
@@ -27,6 +36,8 @@ permalink: /
 - [ ] Including class for magnetic fields/inductive sensing,
 - [ ] A pdf-version of the documentation.
 
+{% include slider.html selector="example_slider" %}
+
 ### Download the latest stable version
 {: .text-purple-000}
 [Stable V3.03 (.zip)](https://github.com/BJCaasenbrood/SorotokiCode/zipball/master){: .btn .btn-purple .fs-5 .mb-4 .mb-md-0 .mr-2} [Stable V3.03 (.tar)](https://github.com/BJCaasenbrood/SorotokiCode/tarball/master){: .btn .btn-purple .fs-5 .mb-4 .mb-md-0 .mr-2} [View on Github](https://github.com/BJCaasenbrood/SorotokiCode){: .btn .fs-5 .mb-4 .mb-md-0}  
@@ -36,7 +47,6 @@ or via git clone
 ```fortran
  git clone https://github.com/BJCaasenbrood/SorotokiCode.git
 ```
-
 
 ### Citation
 {: .text-purple-000}

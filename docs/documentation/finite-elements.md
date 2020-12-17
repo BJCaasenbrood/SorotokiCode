@@ -64,7 +64,7 @@ fem.solve();
 ```
 
 ### Example: Tensile bone of silicone elastomer -- Ecoflex-0050
-<div align="center"> <img src="./img/fem_tensile.gif" width="400"> </div>
+<div align="center"> <img src="./img/fem_tensile.gif" width="351"> </div>
 ```matlab
 %% generate mesh from sdf
 sdf = @(x) TensileBone(x,10,2,4,1,1);
@@ -107,7 +107,7 @@ end
 ```
 
 ### Example: Contact mechanics with signed distance functions (SDF)
-<div align="center"> <img src="./img/fem_compress_sdf.gif" width="350"> </div>
+<div align="center"> <img src="./img/fem_compress_sdf.gif" width="337"> </div>
 ```matlab
 %% generate mesh from sdf
 R = 6;
@@ -162,7 +162,7 @@ fem.solve();
 ```
 
 ### Example: Buckling beam 
-<div align="center"> <img src="./img/fem_buckle_.png" width="550"> </div>
+<div align="center"> <img src="./img/fem_buckle_.png" width="570"> </div>
 
 ```matlab
 %% generate mesh from sdf

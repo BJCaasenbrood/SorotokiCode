@@ -699,12 +699,12 @@ if Model.Movie
                 'ConvertFrom','datenum')),'.gif']);
             
             filename = erase(filename,[":"," "]);
-            background(metropolis);
+            background('w');
             if ~isempty(Model.MovieAxis), axis(Model.MovieAxis); end
             drawnow;
             gif(char(filename),'frame',gcf,'nodither');
         otherwise
-            background(metropolis);
+            background('w');
             if ~isempty(Model.MovieAxis), axis(Model.MovieAxis); end
             drawnow;
             gif;

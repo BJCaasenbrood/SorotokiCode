@@ -1,4 +1,5 @@
 clc;  clear; close all;
+
 %% generate mesh from sdf
 sdf = @(x) TensileBone(x,10,2,3,1,1);
 %% 

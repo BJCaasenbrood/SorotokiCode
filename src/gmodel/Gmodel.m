@@ -66,7 +66,7 @@ methods
 function obj = Gmodel(varargin) 
     
     obj.Texture = base;
-    obj.TextureStretch = .75;
+    obj.TextureStretch = .85;
     obj.Quality = 80;
     obj.FlipNormals = false;
     obj.AOBias = 0.01;

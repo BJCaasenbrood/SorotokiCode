@@ -7,12 +7,12 @@ msh = msh.generate();
 
 %% generate fem model from mesh
 fem = Fem(msh,'TimeStep',1/25,'PrescribedDisplacement',true,...
-              'Linestyle','none');
+              'Linestyle','none','ColorAxis',[0 1]);
 
 %% add boundary conditions
-fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,1]);
-fem = fem.AddConstraint('Support',fem.FindNodes('Right'),[0,1]);
-fem = fem.AddConstraint('Load',fem.FindNodes('Right'),[2,0]);
+fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,0]);
+fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[0,1]);
+fem = fem.AddConstraint('Load',fem.FindNodes('Right'),[10,0]);
 
 %% assign material
 fem.Material = Ecoflex0050;

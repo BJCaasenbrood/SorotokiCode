@@ -3,7 +3,7 @@ clr;
 obj = Gmodel('SoftRoboticArm.stl');
 
 %% set texture
-obj.Texture = mateplastic
+obj.Texture = mateplastic;
 obj = obj.bake();
 
 %% show

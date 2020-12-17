@@ -61,7 +61,7 @@ mdl = mdl.set('Jzz', (1/12)*(W^2 + H^2));
 mdl = mdl.set('ActuationSpace',-1);
 
 mdl = mdl.set('Point',...
-    [rot2quat(rotx(-0.3*pi)*roty(pi))',0.5,0.0,-0.1]);
+    [rot2quat(rotx(-0.2*pi)*roty(-pi))',0.5,0.0,-0.1]);
 end
 
 % setup rig
