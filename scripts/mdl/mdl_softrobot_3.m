@@ -107,7 +107,7 @@ end
 function setupFigure(ii)
 axis([-0.05 0.05 -0.03 0.03 -0.1 0]);
 box on;
-axis on;
+axis off;
 if (ii == 1)
     view(30,10); 
     drawnow;

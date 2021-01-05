@@ -66,7 +66,7 @@ function obj = Mesh(Input,varargin)
     obj.Iteration    = 0;
     obj.ElemMat      = -1;
     obj.eps          = 1e-6; 
-    obj.eta          = 0.9; %was 0.9
+    obj.eta          = 0.9;
     obj.Triangulate  = false;
     obj.Movie        = false;
     obj.MovieStart   = false;
@@ -86,6 +86,10 @@ function obj = Mesh(Input,varargin)
             N = num2cell(varargin{ii+1});
             obj.Center = Hexahedron(obj.BdBox,N{:});
             obj.Type   = 'C3H8';
+        elseif strcmp(varargin{ii},'Tetrahedron')
+            N = num2cell(varargin{ii+1});
+            obj.Center = Hexahedron(obj.BdBox,N{:});
+            obj.Type   = 'C3T6';
         else
             obj.(varargin{ii}) = varargin{ii+1};
         end

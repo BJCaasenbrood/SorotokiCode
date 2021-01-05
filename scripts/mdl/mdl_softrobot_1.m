@@ -30,16 +30,16 @@ grid on;
 
 G = ge(:,5:end); YD = (roty(-pi/2)*[G(:,1),G(:,2),G(:,3)].').';
 
-figure(103); 
-for ii = 1:fps(t,5):length(mdl.q)
-    [u,X] = recoverField(mdl,ii);
-    figure(105);
-    plot(X,u(:,1),'Color',...
-        lerp([1,1,1],col(1),ii/80),'linewidth',1.5); 
-    hold on;
-
-    axis([0 0.12 -150 150]);
-end
+% figure(103); 
+% for ii = 1:fps(t,5):length(mdl.q)
+%     [u,X] = recoverField(mdl,ii);
+%     figure(105);
+%     plot(X,u(:,1),'Color',...
+%         lerp([1,1,1],col(1),ii/80),'linewidth',1.5); 
+%     hold on;
+% 
+%     axis([0 0.12 -150 150]);
+% end
 
 %% generate rig
 [rig, sph] = setupRig(mdl);
@@ -64,7 +64,7 @@ plot3(YD(:,3),YD(:,2),YD(:,1),'--');
 %% BACK-END FUNCTIONS
 % setup model
 function mdl = setupSoftRobot(mdl,K,X)
-mdl = mdl.set('Controller', 0);
+mdl = mdl.set('Controller', 1);
 L0 = 0.12;
 
 mdl = mdl.set('Tdomain',    20); 

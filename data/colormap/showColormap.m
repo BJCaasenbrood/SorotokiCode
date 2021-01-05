@@ -5,7 +5,7 @@ if nargin < 1, x = viridis; end
 
 surf(X,Y,X,'linestyle','none'); hold on;
 plot3([1,500,500,1,1],[1,1,40,40,1],...
-       600*ones(1,5),'k','linewidth',0.1);
+       600*ones(1,5),'k','linestyle','none');
    
 colormap(gca,x); view(0,90);
 axis tight; axis off;

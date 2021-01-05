@@ -29,6 +29,8 @@ classdef SDF
         function r = mrdivide(obj1,obj2)
             fnc = @(x) dIntersect(obj1.sdf(x),obj2.sdf(x));
             r = SDF(fnc);
+            B = [box2node(obj1.BdBox); box2node(obj2.BdBox)];
+            r.BdBox = boxhull(B);
         end
         
         function r = transpose(obj1)

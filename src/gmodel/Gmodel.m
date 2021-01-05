@@ -154,13 +154,13 @@ function Gmodel = render(Gmodel,varargin)
     h = rotate3d;
     h.Enable = 'on';
     
-    if strcmp(Gmodel.Shading,'Face'), shading = 'flat'; 
-    else, shading = 'interp';
-    end
+%     if strcmp(Gmodel.Shading,'Face'), shd = 'flat'; 
+%     else, shd = 'interp';
+%     end
     
     hp = patch('Vertices',Gmodel.Node,'Faces',Gmodel.Element,'linestyle',...
         Gmodel.LineStyle,'edgecolor',Gmodel.LineColor,'FaceVertexCData',...
-        Gmodel.TextureMap,'FaceColor',shading,'FaceAlpha',Gmodel.Alpha);
+        Gmodel.TextureMap,'FaceColor','flat','FaceAlpha',Gmodel.Alpha);
     
     set(gcf,'color',gitpage); material dull;
     axis equal; axis(Gmodel.BdBox); axis off; %view(30,15);

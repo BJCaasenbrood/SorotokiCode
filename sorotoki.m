@@ -142,13 +142,13 @@ if bool == 1
         ' as the main directory (y/n)'],'s');
 
     switch(Request)
-        case('y'), fprintf(FID,'cdsoro \n');
+        case('y'), fprintf(FID,'cdsoro; \n');
     end
     
     fclose('all');
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-startup;
+%startup;
 cout('Text', '\n');
 cout('green','* INSTALLATION DONE! \n');
 cout('Text', '\n');
@@ -185,6 +185,7 @@ fprintf(FID,['%%!INSTALDIR:',Path,' \n']);
 fprintf(FID,'%% base.lib \n');
 %WriteToFile(Path);
 WriteToFile([Path,'\config\']);
+%WriteToFile([Path,'\src\']);
 WriteToFile([Path,'\src\__version__']);
 WriteToFile([Path,'\src\__base__']);
 WriteToFile([Path,'\src\__base__\fnc']);
