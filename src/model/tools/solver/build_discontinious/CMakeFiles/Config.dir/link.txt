@@ -1,0 +1,2 @@
+/usr/bin/ar qc libConfig.a  CMakeFiles/Config.dir/src/ConfigFile.cpp.o CMakeFiles/Config.dir/src/Chameleon.cpp.o
+/usr/bin/ranlib libConfig.a

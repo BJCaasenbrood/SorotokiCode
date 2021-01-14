@@ -1,0 +1,2 @@
+/usr/bin/ar qc libCosserat.a  CMakeFiles/Cosserat.dir/src/Cosserat.cpp.o
+/usr/bin/ranlib libCosserat.a

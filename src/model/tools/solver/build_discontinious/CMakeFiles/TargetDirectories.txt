@@ -1,0 +1,10 @@
+/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/build_discontinious/CMakeFiles/edit_cache.dir
+/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/build_discontinious/CMakeFiles/rebuild_cache.dir
+/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/build_discontinious/CMakeFiles/ShapeFunctions.dir
+/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/build_discontinious/CMakeFiles/Cosserat.dir
+/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/build_discontinious/CMakeFiles/LieAlgebra.dir
+/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/build_discontinious/CMakeFiles/PortController.dir
+/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/build_discontinious/CMakeFiles/Config.dir
+/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/build_discontinious/CMakeFiles/PortHamiltonian.dir
+/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/build_discontinious/CMakeFiles/AutoDiff.dir
+/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/build_discontinious/CMakeFiles/solver.dir

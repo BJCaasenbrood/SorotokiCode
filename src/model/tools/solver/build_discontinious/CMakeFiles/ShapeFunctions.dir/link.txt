@@ -1,0 +1,2 @@
+/usr/bin/ar qc libShapeFunctions.a  CMakeFiles/ShapeFunctions.dir/src/Shapes.cpp.o
+/usr/bin/ranlib libShapeFunctions.a

@@ -1,0 +1,36 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/src/Chameleon.cpp
+string
+-
+sstream
+-
+Chameleon.h
+/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/src/Chameleon.h
+iostream
+-
+
+/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/src/Chameleon.h
+string
+-
+
+/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/src/ConfigFile.cpp
+ConfigFile.h
+/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/src/ConfigFile.h
+fstream
+-
+
+/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/src/ConfigFile.h
+string
+-
+map
+-
+Chameleon.h
+/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/src/Chameleon.h
+

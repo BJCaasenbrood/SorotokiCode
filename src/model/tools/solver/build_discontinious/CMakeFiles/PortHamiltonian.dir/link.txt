@@ -1,0 +1,2 @@
+/usr/bin/ar qc libPortHamiltonian.a  CMakeFiles/PortHamiltonian.dir/src/PortHamiltonian.cpp.o
+/usr/bin/ranlib libPortHamiltonian.a
