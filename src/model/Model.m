@@ -8,27 +8,30 @@ classdef Model
         Table;
         g;
         ge;
+        gd;
         tau;
         Texture;
         q;
         dq;
         q0;
         dq0;
-        u0;
+        u0;      
+        t;
+        H;
         Gain;
         Lambda;
         Point;
         Controller;
+        Spring;
         Area, Jxx, Jyy, Jzz;
+        Xspline;
     end
     
     properties (Access = private)
         Nq;
-        xd;
-        
-        t;
+
         E, Nu, Mu;
-        xia0 = [0,0,0,1,0,0].';
+        xia0;
         Phi;
         Ba; Bc; 
         SpaceStep;
@@ -81,18 +84,19 @@ function obj = Model(Table,varargin)
     obj.Jxx     = 0.5*obj.Density*obj.Radius^2;
     obj.Jyy     = 0.25*obj.Density*obj.Radius^2;
     obj.Jzz     = 0.25*obj.Density*obj.Radius^2;
+    obj.xia0    = [0,0,0,1,0,0].';
+    obj.Spring  = [1e-9,1];
     
     obj.ActuationSpace = -1;
-%    obj.GravityDirection = 1;
     
     obj.Point = [1,0,0,0,1,0,0];
     obj.Gain = [1e-2,0.05];
-
-    obj.Texture = prusa;
     
     for ii = 1:2:length(varargin)
         obj.(varargin{ii}) = varargin{ii+1};
     end
+    
+    cdsoro;
 end
 
 %---------------------------------------------------------------------- get     
@@ -117,23 +121,11 @@ end
 %---------------------------------------------------------------------- set
 function Model = generate(Model)
     Model.Length0 = Model.Length;
+    Model = inertia(Model);
     Model = GenerateCosserat(Model);
     Model = GenerateConfigFile(Model);
-end
-
-%---------------------------------------------------------------------- set
-function Model = solve(Model)   
-x0 = zeros(Model.NModal*Model.NDof,1);
-dt = 1e-1;
-opts = optimoptions('fsolve','Display','none','TolFun',1e-3,...
-    'Algorithm','levenberg-marquardt');
-ys = fsolve(@(x) KinematicODE(Model,Model.tspan,x),x0,opts);
-
-% opt = odeset('RelTol',1e-1,'AbsTol',1e-1);
-% [~,ys] = oderk(@(t,x) KinematicODE(Model,Model.tspan,x),T,q0);
-
-Model.g = ys(:).';
-Model.t = 1;
+    
+    Model.Xspline = [0,Model.Point(5);Model.Tdomain,Model.Point(5)+1e-6];
 end
 
 %--------------------------------------------------------------------- make
@@ -156,79 +148,58 @@ end
 function Model = csolve(Model)   
 
 if Model.NDisc > 1
-    dir_path = './src/model/tools/solver/build';
+    dir_path = './src/model/tools/solver/build_discontinious';
 else
     dir_path = './src/model/tools/solver/build_continious';
 end
 
 %//////////////////////////////////
-out = fullfile(dir_path,'log/state.log');
-fileID = fopen(out,'w');
-fprintf(fileID,'%d\n',Model.q0);
-fclose(fileID);
-%//////////////////////////////////
-out = fullfile(dir_path,'log/state_dt.log');
-fileID = fopen(out,'w');
-fprintf(fileID,'%d\n',Model.dq0);
-fclose(fileID);
-%//////////////////////////////////
-out = fullfile(dir_path,'log/grav_vector.log');
-fileID = fopen(out,'w');
-fprintf(fileID,'%d\n',[zeros(3,1);Model.Gravity(:)]);
-fclose(fileID);
+writematrix(Model.q0,[dir_path,'/log/state.txt'],'Delimiter','tab');
+writematrix(Model.dq0,[dir_path,'/log/momenta.txt'],'Delimiter','tab');
+writematrix([zeros(3,1);Model.Gravity(:)],...
+    [dir_path,'/log/grav_vector.txt'],'Delimiter','tab');
+writematrix(Model.xia0(:),[dir_path,'/log/xi0_vector.txt'],'Delimiter','tab');
+writematrix(Model.Xspline,[dir_path,'/log/splineXd.txt'],'Delimiter','tab');
+
 %//////////////////////////////////
 out = fullfile(dir_path,'log/tau_vector.log');
 fileID = fopen(out,'w');
 fprintf(fileID,'%d\n',Model.u0);
 fclose(fileID);
-
-% A = magic(4);
-% 
-% out = fullfile(dir_path,'log/Amat.log');
+%//////////////////////////////////
+%out = fullfile(dir_path,'log/splineXd.log');
 % fileID = fopen(out,'w');
-% fprintf(fileID,[repmat('%5d ',1,size(A,2)-1),'%5d\n'],A);
+% fprintf(fileID,'%d\n',Model.Xspline);
 % fclose(fileID);
+%dlmwrite([dir_path,'/log/splineXd.log'],Model.Xspline);
 
+% solving via c++ executable
 tic
 CMD = ['cd ',dir_path, ' && ./solver config.m'];
 system(CMD);
 toc;
-y = load([dir_path ,'/log/state.log']);
+
+% extracting data from log-files
+y = load([dir_path ,'/log/state.txt']);
 Model.q = y(:,2:end);
 Model.t = y(:,1);
-y = load([dir_path ,'/log/tau.log']);
-Model.tau = y(:,2:end);
-y = load([dir_path ,'/log/g.log']);
+
+y = load([dir_path ,'/log/hamiltonian.txt']);
+Model.H = [y(:,2:end), sum(y(:,2:end),2)];
+
+y = load([dir_path ,'/log/endeffector.txt']);
 Model.ge = y(:,2:end);
-y = load([dir_path ,'/log/statelog_dt.log']);
-Model.dq = y(:,2:end);
-y = load([dir_path ,'/log/xd.log']);
-Model.xd = y(:,2:end);
 
-end
-
-%----------------------------------------------------------------- simulate
-function Model = simulate(Model)
-N = Model.NModal*Model.NDof;
-dt = 1e-2;
-T = 0:dt:Model.tspan;
-x0 = zeros(N,1);
-dx0 = zeros(N,1);
-
-x0(1) = 0;
-
-%if ~isempty(Model.q0), x0 = Model.q0; end
-
-opt = odeset('RelTol',1e-1,'AbsTol',1e-1);
-[ts,ys] = ode23tb(@(t,x) DynamicODE(Model,t,x),T,[x0;dx0],opt);
-%[ts,ys] = ode1(@(t,x) DynamicODE(Model,t,x),T,[q0; dq0]);
-
-Model.g = ys;
-Model.t = ts;
+y = load([dir_path ,'/log/setpoint.txt']);
+Model.gd = y(:,2:end);
 end
 
 %----------------------------------------------------------------- simulate
 function [g, X] = string(Model,k,Quality)
+    
+    if nargin < 3
+        Quality = 100;
+    end
     
     N = Model.Nq; 
     Qtmp = Model.q(k,1:N).';
@@ -250,39 +221,9 @@ end
 %----------------------------------------------------------------- simulate
 function Model = inertia(Model)
     Model.Area    = pi*Model.Radius^2;
-    Model.Jxx     = 0.5*Model.Density*Model.Radius^2;
-    Model.Jyy     = 0.25*Model.Density*Model.Radius^2;
-    Model.Jzz     = 0.25*Model.Density*Model.Radius^2; 
-end
-
-%--------------------------------------------------------------------- show
-function show(Model)
-N = Model.Nq;
-X = linspace(0,1,20);
-
-if length(Model.t) > 2, FPS = round((1/13)/(mean(diff(Model.t))));
-else, FPS = 1;
-end
-
-for ii = 1:FPS:length(Model.t)
-    Model.q(:,1) = Model.g(ii,1:N).';
-    Model.dq(:,1) = 0*Model.q(:,1);
-    Model.ddq(:,1) = 0*Model.q(:,1);
-    ee = Model.Ba*Model.Phi(Model.Length)*Model.q;
-    Model.Length = ee(4);
-    g0 = [1,0,0,0,0,0,0];
-    eta0 = [0,0,0,0,0,0];
-    deta0 = [0,0,0,0,0,0];
-    [~,yf] = ode45(@(t,x) ForwardODE(Model,t,x,Model.q(:,1),Model.q(:,1)*0,...
-        Model.q(:,1)*0),X,[g0 eta0 deta0]);
-    G = yf(:,1:7);
-    
-    figure(101);
-    cla;
-    plot3(G(:,6),G(:,7),-G(:,5),'linewidth',2,'Color',col(1));    
-    if ~isempty(Model.MovieAxis), axis equal; axis(Model.MovieAxis); end
-end
-    
+    Model.Jxx     = 0.5*Model.Radius^2;
+    Model.Jyy     = 0.25*Model.Radius^2;
+    Model.Jzz     = 0.25*Model.Radius^2; 
 end
 
 %------------------------------------------------------------ show 3D model
@@ -479,14 +420,18 @@ end
 function Model = GenerateConfigFile(Model)
    
 global FID;
+
 if Model.NDisc > 1
-    dir_path = '/src/model/tools/solver/build';
+    dir_path = './src/model/tools/solver/build_discontinious';
 else
-    dir_path = '/src/model/tools/solver/build_continious';
+    dir_path = './src/model/tools/solver/build_continious';
 end
 
-File = [cdsoro,dir_path,'/config.m'];
-delete(File);
+File = [dir_path,'/config.m'];
+if exist(File,'file')
+    delete(File);
+end
+
 FID = fopen(File,'w');
 
 fprintf(FID,'[options] \n');
@@ -501,7 +446,7 @@ else
     fprintf(FID,'ENERGY_CONTROLLER    = 0 \n');
 end
 fprintf(FID,'WRITE_OUTPUT         = 1 \n');
-fprintf(FID,['ACTUATION_SPACE =', num2str(Model.ActuationSpace), '\n']);
+fprintf(FID,['ACTUSPACE =', num2str(Model.ActuationSpace), '\n']);
 %fprintf(FID,['GRAV_VECTOR =', num2str(Model.GravityDirection), '\n']);
 
 if(Model.NDisc > 1)
@@ -521,16 +466,15 @@ fprintf(FID,['E3 = ', num2str(Model.Table(6)), '\n']);
 fprintf(FID,'\n[model] \n');
 fprintf(FID,['NMODE   = ', num2str(Model.NModal), '\n']);
 fprintf(FID,['NDISC   = ', num2str(Model.NDisc), '\n']);
-fprintf(FID,['SDOMAIN = ', num2str(Model.Sdomain), '\n']);
-fprintf(FID,['TDOMAIN = ', num2str(Model.Tdomain), '\n']);
+fprintf(FID,['NDOF    = ', num2str(sum(Model.Table)), '\n']);
 
 fprintf(FID,'\n[solver] \n');
+fprintf(FID,['TDOMAIN = ', num2str(Model.Tdomain), '\n']);
 fprintf(FID,['SPACESTEP = ', num2str(Model.SpaceStep), '\n']);
 fprintf(FID,['TIMESTEP  = ', num2str(Model.TimeStep), '\n']);
 fprintf(FID,['INTSTEP   = ', '100', '\n']);
 fprintf(FID,['ATOL      = ', '1e-2', '\n']);
 fprintf(FID,['RTOL      = ', '1e-2', '\n']);
-fprintf(FID,['LAMBDA    = ', num2str(Model.Lambda), '\n']);
 fprintf(FID,['MAX_IMPL  = ', '-1', '\n']);
 fprintf(FID,['MAX_ITER  = ', '1', '\n']);
 fprintf(FID,['MAX_IK    = ', '1500', '\n']);
@@ -538,6 +482,7 @@ fprintf(FID,['SPEEDUP   = ', '80', '\n']);
 fprintf(FID,['ADAMPING  = ', '1', '\n']);
 
 fprintf(FID,'\n[physics] \n');
+fprintf(FID,['LENGTH   = ', num2str(Model.Sdomain), '\n']);
 fprintf(FID,['RHO      = ', num2str(Model.Density), '\n']);
 fprintf(FID,['EMOD     = ', num2str(Model.E), '\n']);
 fprintf(FID,['NU       = ', num2str(Model.Nu), '\n']);
@@ -553,6 +498,10 @@ fprintf(FID,['J_ZZ     = ', num2str(Model.Jzz), '\n']); %'2.5000e-10'
 fprintf(FID,'\n[control] \n');
 fprintf(FID,['KP = ', num2str(Model.Gain(1)), '\n']);
 fprintf(FID,['KD = ', num2str(Model.Gain(2)), '\n']);
+fprintf(FID,['KF1 = ', num2str(Model.Spring(1)), '\n']);
+fprintf(FID,['KF2 = ', num2str(Model.Spring(2)), '\n']);
+fprintf(FID,['LAMBDA    = ', num2str(Model.Lambda), '\n']);
+fprintf(FID,['SPLINEORDER    = ',num2str(1),'\n']);
 
 fprintf(FID,'\n[setpoint] \n');
 fprintf(FID,['Q1d = ', num2str(Model.Point(1)), '\n']);
@@ -627,7 +576,7 @@ end
 
 %--------------------------------------- forwards integration of kinematics
 function dg = ForwardODE(Model,t,g,q,dq,ddq)
-ee = Model.Ba*Model.Phi(t)*q + Model.xia0;
+ee = Model.Ba*Model.Phi(t)*q + Model.xia0(:);
 dee = Model.Ba*Model.Phi(t)*dq;
 ddee = Model.Ba*Model.Phi(t)*ddq;
 
@@ -699,12 +648,12 @@ if Model.Movie
                 'ConvertFrom','datenum')),'.gif']);
             
             filename = erase(filename,[":"," "]);
-            background('w');
+            background(metropolis);
             if ~isempty(Model.MovieAxis), axis(Model.MovieAxis); end
             drawnow;
             gif(char(filename),'frame',gcf,'nodither');
         otherwise
-            background('w');
+            background(metropolis);
             if ~isempty(Model.MovieAxis), axis(Model.MovieAxis); end
             drawnow;
             gif;

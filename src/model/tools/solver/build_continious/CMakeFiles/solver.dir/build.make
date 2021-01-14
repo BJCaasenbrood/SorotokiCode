@@ -57,29 +57,35 @@ include CMakeFiles/solver.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/solver.dir/flags.make
 
-CMakeFiles/solver.dir/main.cpp.o: CMakeFiles/solver.dir/flags.make
-CMakeFiles/solver.dir/main.cpp.o: ../main.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/build_continious/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/solver.dir/main.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/solver.dir/main.cpp.o -c /home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/main.cpp
+CMakeFiles/solver.dir/src/_main.cpp.o: CMakeFiles/solver.dir/flags.make
+CMakeFiles/solver.dir/src/_main.cpp.o: ../src/_main.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/build_continious/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/solver.dir/src/_main.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/solver.dir/src/_main.cpp.o -c /home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/src/_main.cpp
 
-CMakeFiles/solver.dir/main.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/solver.dir/main.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/main.cpp > CMakeFiles/solver.dir/main.cpp.i
+CMakeFiles/solver.dir/src/_main.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/solver.dir/src/_main.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/src/_main.cpp > CMakeFiles/solver.dir/src/_main.cpp.i
 
-CMakeFiles/solver.dir/main.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/solver.dir/main.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/main.cpp -o CMakeFiles/solver.dir/main.cpp.s
+CMakeFiles/solver.dir/src/_main.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/solver.dir/src/_main.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/src/_main.cpp -o CMakeFiles/solver.dir/src/_main.cpp.s
 
 # Object files for target solver
 solver_OBJECTS = \
-"CMakeFiles/solver.dir/main.cpp.o"
+"CMakeFiles/solver.dir/src/_main.cpp.o"
 
 # External object files for target solver
 solver_EXTERNAL_OBJECTS =
 
-solver: CMakeFiles/solver.dir/main.cpp.o
+solver: CMakeFiles/solver.dir/src/_main.cpp.o
 solver: CMakeFiles/solver.dir/build.make
-solver: libModel_ph.a
+solver: libAutoDiff.a
+solver: libPortHamiltonian.a
+solver: libPortController.a
+solver: libCosserat.a
+solver: libLieAlgebra.a
+solver: libShapeFunctions.a
+solver: libConfig.a
 solver: CMakeFiles/solver.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/build_continious/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable solver"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/solver.dir/link.txt --verbose=$(VERBOSE)

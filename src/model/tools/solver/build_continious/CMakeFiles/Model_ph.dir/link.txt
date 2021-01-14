@@ -1,2 +1,0 @@
-/usr/bin/ar qc libModel_ph.a  CMakeFiles/Model_ph.dir/src/Model_ph.cpp.o
-/usr/bin/ranlib libModel_ph.a

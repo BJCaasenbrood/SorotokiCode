@@ -1,4 +1,0 @@
-/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/bla/CMakeFiles/rebuild_cache.dir
-/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/bla/CMakeFiles/edit_cache.dir
-/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/bla/CMakeFiles/Model_ph.dir
-/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/bla/CMakeFiles/solver.dir

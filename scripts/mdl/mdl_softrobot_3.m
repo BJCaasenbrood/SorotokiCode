@@ -1,7 +1,8 @@
 clr;
 %% assign free DOF
-mdl = Model([0,1,0,1,0,0],'NModal',2,'NDisc',1);
-mdl = setupSoftRobot(mdl,1,1);
+mdl = Model([0,1,0,1,0,0],'NModal',4,'NDisc',1);
+mdl = setupSoftRobot(mdl,1,0,1e2);
+mdl = mdl.set('Tdomain',25); 
 
 %% generate and solve dynamic model
 mdl = mdl.generate();
@@ -9,21 +10,22 @@ mdl = mdl.csolve();
 
 %% show results
 figure(102)
-t = mdl.get('t');
-q = mdl.q;
-ge = mdl.ge;
-u = mdl.get('tau');
-xd = mdl.get('xd');
+t  = mdl.get('t');
 
-subplot(3,4,[1 2 5 6]); overwrite_colors;
-plot(t,(q),'linewidth',1.5); hold on;
+subplot(3,4,[1 2 5 6]);
+plot(t,mdl.q,'linewidth',1.5); hold on; grid on;
 
 subplot(3,4,[3 4 7 8]);
-plot(t,ge(:,5:end),'linewidth',1.5); hold on;
-plot(t,xd(:,5:end),'k--','linewidth',1.0); hold on;
-% 
+plot(t,mdl.H,'linewidth',1.5);hold on; grid on;
+legend('$\mathcal{T}$','$\mathcal{V}_e$','$\mathcal{V}_g$','$\mathcal{H}$',...
+    'interpreter','latex','FontSize',12);
+
 subplot(3,4,9:12);
-plot(t,u,'linewidth',1.0); 
+plot(t,mdl.ge(:,5:end),'linewidth',1.5); hold on; grid on;
+plot(t,mdl.gd(:,5:end),'k--','linewidth',1); 
+legend('$x$','$y$','$z$',...
+    'interpreter','latex','FontSize',12);
+
 %% generate rig
 [rig, sph] = setupRig(mdl);
 
@@ -33,7 +35,7 @@ for ii = 1:fps(t,12):length(mdl.q)
     rig = rig.update();
       
     sph.reset();
-    sph = Blender(sph,'SE3',xd(ii,:));
+    sph = Blender(sph,'SE3',mdl.Point);
     sph = Blender(sph,'SE3',rig.g0);
     sph.update();
    
@@ -43,29 +45,28 @@ end
 
 %% BACK-END FUNCTIONS
 % setup model
-function mdl = setupSoftRobot(mdl,K,X)
-mdl = mdl.set('Controller', 1);
+function mdl = setupSoftRobot(mdl,Kp,Kd,Lam)
+mdl = mdl.set('Controller',1);
 
 L0 = 0.063;
 
-mdl = mdl.set('Tdomain',    15); 
 mdl = mdl.set('TimeStep',   1/30);
 mdl = mdl.set('Sdomain',    L0);
-mdl = mdl.set('SpaceStep',  5);
-mdl = mdl.set('Density',    10);
+mdl = mdl.set('SpaceStep',  25);
+mdl = mdl.set('Density',    50);
 mdl = mdl.set('Radius',     0.03);
 mdl = mdl.set('Gravity',    [-9.81,0,0]);
-mdl = mdl.set('E',          50);
-mdl = mdl.set('Mu',         0.3);
-mdl = mdl.set('Gain',       [K,0.1]);
-mdl = mdl.set('Lambda',     K/X);
+mdl = mdl.set('E',          250);
+mdl = mdl.set('Mu',         0.05);
+mdl = mdl.set('Gain',       [Kp,Kd]);
+mdl = mdl.set('Lambda',     Kp/Lam);
 
 mdl = mdl.set('ActuationSpace',1);
 
-[px,py] = SpherePosition(15,L0*1.12);
+[px,py] = SpherePosition(-15,L0*1.2);
 
 mdl = mdl.set('Point',...
-    [1,0,0,0,py,0,-px]);
+    [0,0,0,0,py,0,px]);
 end
 
 % setup rig
@@ -77,7 +78,7 @@ assignin('base','gmdl1',gmdl1);
 rig = Rig(mdl);
 rig = rig.add(gmdl1);
 rig = rig.parent(1,0,0);
-rig = rig.parent(1,1,0.95);
+rig = rig.parent(1,1,0.99);
 
 rig = rig.texture(1,base);
 rig.g0 = [rot2quat(roty(pi)).',0,0,0];

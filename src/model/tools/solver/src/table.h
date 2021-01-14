@@ -2,26 +2,33 @@
 #define TABLE_H
 
 #include "Eigen/Dense"
-using namespace Eigen;
+//using namespace Eigen;
+
+//typedef Eigen::Array<int, Dynamic, 1> Vxi;
+//typedef Eigen::Array<int, 6, 1> V6i;
 
 typedef Eigen::Array<int, Dynamic, 1> Vxi;
 
 //---------------------------------------------------
 //----------- convert table to active/constraint set
 //---------------------------------------------------
-Mxf tableConstraints(Vxi table, bool set){
+Eigen::Matrix<double, Dynamic, Dynamic> tableConstraints(
+	Vxi table, 
+	bool set
+)
+{
 	int k = 0;
 	int na, N;
 
 	N = table.rows();
 
-	Mxf Id;
-	Id = Mxf::Identity(N,N);
+	Eigen::MatrixXd Id;
+	Id = Eigen::MatrixXd::Identity(N,N);
 
 	if(set == true){na = (table>0).count();}
 	else{na = (table==0).count();}
 
-	Mxf B(N,na);
+	Eigen::MatrixXd B(N,na);
 
 	// construct matrix of active DOF's
 	if(set == true){

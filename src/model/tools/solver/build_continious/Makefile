@@ -56,17 +56,6 @@ CMAKE_BINARY_DIR = /home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/s
 #=============================================================================
 # Targets provided globally by CMake.
 
-# Special rule for the target rebuild_cache
-rebuild_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/usr/bin/cmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
-.PHONY : rebuild_cache
-
-# Special rule for the target rebuild_cache
-rebuild_cache/fast: rebuild_cache
-
-.PHONY : rebuild_cache/fast
-
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
@@ -77,6 +66,17 @@ edit_cache:
 edit_cache/fast: edit_cache
 
 .PHONY : edit_cache/fast
+
+# Special rule for the target rebuild_cache
+rebuild_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
+	/usr/bin/cmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+.PHONY : rebuild_cache
+
+# Special rule for the target rebuild_cache
+rebuild_cache/fast: rebuild_cache
+
+.PHONY : rebuild_cache/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -111,17 +111,95 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named Model_ph
+# Target rules for targets named ShapeFunctions
 
 # Build rule for target.
-Model_ph: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 Model_ph
-.PHONY : Model_ph
+ShapeFunctions: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ShapeFunctions
+.PHONY : ShapeFunctions
 
 # fast build rule for target.
-Model_ph/fast:
-	$(MAKE) -f CMakeFiles/Model_ph.dir/build.make CMakeFiles/Model_ph.dir/build
-.PHONY : Model_ph/fast
+ShapeFunctions/fast:
+	$(MAKE) -f CMakeFiles/ShapeFunctions.dir/build.make CMakeFiles/ShapeFunctions.dir/build
+.PHONY : ShapeFunctions/fast
+
+#=============================================================================
+# Target rules for targets named Cosserat
+
+# Build rule for target.
+Cosserat: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 Cosserat
+.PHONY : Cosserat
+
+# fast build rule for target.
+Cosserat/fast:
+	$(MAKE) -f CMakeFiles/Cosserat.dir/build.make CMakeFiles/Cosserat.dir/build
+.PHONY : Cosserat/fast
+
+#=============================================================================
+# Target rules for targets named LieAlgebra
+
+# Build rule for target.
+LieAlgebra: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 LieAlgebra
+.PHONY : LieAlgebra
+
+# fast build rule for target.
+LieAlgebra/fast:
+	$(MAKE) -f CMakeFiles/LieAlgebra.dir/build.make CMakeFiles/LieAlgebra.dir/build
+.PHONY : LieAlgebra/fast
+
+#=============================================================================
+# Target rules for targets named PortController
+
+# Build rule for target.
+PortController: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 PortController
+.PHONY : PortController
+
+# fast build rule for target.
+PortController/fast:
+	$(MAKE) -f CMakeFiles/PortController.dir/build.make CMakeFiles/PortController.dir/build
+.PHONY : PortController/fast
+
+#=============================================================================
+# Target rules for targets named Config
+
+# Build rule for target.
+Config: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 Config
+.PHONY : Config
+
+# fast build rule for target.
+Config/fast:
+	$(MAKE) -f CMakeFiles/Config.dir/build.make CMakeFiles/Config.dir/build
+.PHONY : Config/fast
+
+#=============================================================================
+# Target rules for targets named PortHamiltonian
+
+# Build rule for target.
+PortHamiltonian: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 PortHamiltonian
+.PHONY : PortHamiltonian
+
+# fast build rule for target.
+PortHamiltonian/fast:
+	$(MAKE) -f CMakeFiles/PortHamiltonian.dir/build.make CMakeFiles/PortHamiltonian.dir/build
+.PHONY : PortHamiltonian/fast
+
+#=============================================================================
+# Target rules for targets named AutoDiff
+
+# Build rule for target.
+AutoDiff: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 AutoDiff
+.PHONY : AutoDiff
+
+# fast build rule for target.
+AutoDiff/fast:
+	$(MAKE) -f CMakeFiles/AutoDiff.dir/build.make CMakeFiles/AutoDiff.dir/build
+.PHONY : AutoDiff/fast
 
 #=============================================================================
 # Target rules for targets named solver
@@ -136,59 +214,194 @@ solver/fast:
 	$(MAKE) -f CMakeFiles/solver.dir/build.make CMakeFiles/solver.dir/build
 .PHONY : solver/fast
 
-main.o: main.cpp.o
+src/Chameleon.o: src/Chameleon.cpp.o
 
-.PHONY : main.o
-
-# target to build an object file
-main.cpp.o:
-	$(MAKE) -f CMakeFiles/solver.dir/build.make CMakeFiles/solver.dir/main.cpp.o
-.PHONY : main.cpp.o
-
-main.i: main.cpp.i
-
-.PHONY : main.i
-
-# target to preprocess a source file
-main.cpp.i:
-	$(MAKE) -f CMakeFiles/solver.dir/build.make CMakeFiles/solver.dir/main.cpp.i
-.PHONY : main.cpp.i
-
-main.s: main.cpp.s
-
-.PHONY : main.s
-
-# target to generate assembly for a file
-main.cpp.s:
-	$(MAKE) -f CMakeFiles/solver.dir/build.make CMakeFiles/solver.dir/main.cpp.s
-.PHONY : main.cpp.s
-
-src/Model_ph.o: src/Model_ph.cpp.o
-
-.PHONY : src/Model_ph.o
+.PHONY : src/Chameleon.o
 
 # target to build an object file
-src/Model_ph.cpp.o:
-	$(MAKE) -f CMakeFiles/Model_ph.dir/build.make CMakeFiles/Model_ph.dir/src/Model_ph.cpp.o
-.PHONY : src/Model_ph.cpp.o
+src/Chameleon.cpp.o:
+	$(MAKE) -f CMakeFiles/Config.dir/build.make CMakeFiles/Config.dir/src/Chameleon.cpp.o
+.PHONY : src/Chameleon.cpp.o
 
-src/Model_ph.i: src/Model_ph.cpp.i
+src/Chameleon.i: src/Chameleon.cpp.i
 
-.PHONY : src/Model_ph.i
+.PHONY : src/Chameleon.i
 
 # target to preprocess a source file
-src/Model_ph.cpp.i:
-	$(MAKE) -f CMakeFiles/Model_ph.dir/build.make CMakeFiles/Model_ph.dir/src/Model_ph.cpp.i
-.PHONY : src/Model_ph.cpp.i
+src/Chameleon.cpp.i:
+	$(MAKE) -f CMakeFiles/Config.dir/build.make CMakeFiles/Config.dir/src/Chameleon.cpp.i
+.PHONY : src/Chameleon.cpp.i
 
-src/Model_ph.s: src/Model_ph.cpp.s
+src/Chameleon.s: src/Chameleon.cpp.s
 
-.PHONY : src/Model_ph.s
+.PHONY : src/Chameleon.s
 
 # target to generate assembly for a file
-src/Model_ph.cpp.s:
-	$(MAKE) -f CMakeFiles/Model_ph.dir/build.make CMakeFiles/Model_ph.dir/src/Model_ph.cpp.s
-.PHONY : src/Model_ph.cpp.s
+src/Chameleon.cpp.s:
+	$(MAKE) -f CMakeFiles/Config.dir/build.make CMakeFiles/Config.dir/src/Chameleon.cpp.s
+.PHONY : src/Chameleon.cpp.s
+
+src/ConfigFile.o: src/ConfigFile.cpp.o
+
+.PHONY : src/ConfigFile.o
+
+# target to build an object file
+src/ConfigFile.cpp.o:
+	$(MAKE) -f CMakeFiles/Config.dir/build.make CMakeFiles/Config.dir/src/ConfigFile.cpp.o
+.PHONY : src/ConfigFile.cpp.o
+
+src/ConfigFile.i: src/ConfigFile.cpp.i
+
+.PHONY : src/ConfigFile.i
+
+# target to preprocess a source file
+src/ConfigFile.cpp.i:
+	$(MAKE) -f CMakeFiles/Config.dir/build.make CMakeFiles/Config.dir/src/ConfigFile.cpp.i
+.PHONY : src/ConfigFile.cpp.i
+
+src/ConfigFile.s: src/ConfigFile.cpp.s
+
+.PHONY : src/ConfigFile.s
+
+# target to generate assembly for a file
+src/ConfigFile.cpp.s:
+	$(MAKE) -f CMakeFiles/Config.dir/build.make CMakeFiles/Config.dir/src/ConfigFile.cpp.s
+.PHONY : src/ConfigFile.cpp.s
+
+src/Cosserat.o: src/Cosserat.cpp.o
+
+.PHONY : src/Cosserat.o
+
+# target to build an object file
+src/Cosserat.cpp.o:
+	$(MAKE) -f CMakeFiles/Cosserat.dir/build.make CMakeFiles/Cosserat.dir/src/Cosserat.cpp.o
+.PHONY : src/Cosserat.cpp.o
+
+src/Cosserat.i: src/Cosserat.cpp.i
+
+.PHONY : src/Cosserat.i
+
+# target to preprocess a source file
+src/Cosserat.cpp.i:
+	$(MAKE) -f CMakeFiles/Cosserat.dir/build.make CMakeFiles/Cosserat.dir/src/Cosserat.cpp.i
+.PHONY : src/Cosserat.cpp.i
+
+src/Cosserat.s: src/Cosserat.cpp.s
+
+.PHONY : src/Cosserat.s
+
+# target to generate assembly for a file
+src/Cosserat.cpp.s:
+	$(MAKE) -f CMakeFiles/Cosserat.dir/build.make CMakeFiles/Cosserat.dir/src/Cosserat.cpp.s
+.PHONY : src/Cosserat.cpp.s
+
+src/PortController.o: src/PortController.cpp.o
+
+.PHONY : src/PortController.o
+
+# target to build an object file
+src/PortController.cpp.o:
+	$(MAKE) -f CMakeFiles/PortController.dir/build.make CMakeFiles/PortController.dir/src/PortController.cpp.o
+.PHONY : src/PortController.cpp.o
+
+src/PortController.i: src/PortController.cpp.i
+
+.PHONY : src/PortController.i
+
+# target to preprocess a source file
+src/PortController.cpp.i:
+	$(MAKE) -f CMakeFiles/PortController.dir/build.make CMakeFiles/PortController.dir/src/PortController.cpp.i
+.PHONY : src/PortController.cpp.i
+
+src/PortController.s: src/PortController.cpp.s
+
+.PHONY : src/PortController.s
+
+# target to generate assembly for a file
+src/PortController.cpp.s:
+	$(MAKE) -f CMakeFiles/PortController.dir/build.make CMakeFiles/PortController.dir/src/PortController.cpp.s
+.PHONY : src/PortController.cpp.s
+
+src/PortHamiltonian.o: src/PortHamiltonian.cpp.o
+
+.PHONY : src/PortHamiltonian.o
+
+# target to build an object file
+src/PortHamiltonian.cpp.o:
+	$(MAKE) -f CMakeFiles/PortHamiltonian.dir/build.make CMakeFiles/PortHamiltonian.dir/src/PortHamiltonian.cpp.o
+.PHONY : src/PortHamiltonian.cpp.o
+
+src/PortHamiltonian.i: src/PortHamiltonian.cpp.i
+
+.PHONY : src/PortHamiltonian.i
+
+# target to preprocess a source file
+src/PortHamiltonian.cpp.i:
+	$(MAKE) -f CMakeFiles/PortHamiltonian.dir/build.make CMakeFiles/PortHamiltonian.dir/src/PortHamiltonian.cpp.i
+.PHONY : src/PortHamiltonian.cpp.i
+
+src/PortHamiltonian.s: src/PortHamiltonian.cpp.s
+
+.PHONY : src/PortHamiltonian.s
+
+# target to generate assembly for a file
+src/PortHamiltonian.cpp.s:
+	$(MAKE) -f CMakeFiles/PortHamiltonian.dir/build.make CMakeFiles/PortHamiltonian.dir/src/PortHamiltonian.cpp.s
+.PHONY : src/PortHamiltonian.cpp.s
+
+src/Shapes.o: src/Shapes.cpp.o
+
+.PHONY : src/Shapes.o
+
+# target to build an object file
+src/Shapes.cpp.o:
+	$(MAKE) -f CMakeFiles/ShapeFunctions.dir/build.make CMakeFiles/ShapeFunctions.dir/src/Shapes.cpp.o
+.PHONY : src/Shapes.cpp.o
+
+src/Shapes.i: src/Shapes.cpp.i
+
+.PHONY : src/Shapes.i
+
+# target to preprocess a source file
+src/Shapes.cpp.i:
+	$(MAKE) -f CMakeFiles/ShapeFunctions.dir/build.make CMakeFiles/ShapeFunctions.dir/src/Shapes.cpp.i
+.PHONY : src/Shapes.cpp.i
+
+src/Shapes.s: src/Shapes.cpp.s
+
+.PHONY : src/Shapes.s
+
+# target to generate assembly for a file
+src/Shapes.cpp.s:
+	$(MAKE) -f CMakeFiles/ShapeFunctions.dir/build.make CMakeFiles/ShapeFunctions.dir/src/Shapes.cpp.s
+.PHONY : src/Shapes.cpp.s
+
+src/_main.o: src/_main.cpp.o
+
+.PHONY : src/_main.o
+
+# target to build an object file
+src/_main.cpp.o:
+	$(MAKE) -f CMakeFiles/solver.dir/build.make CMakeFiles/solver.dir/src/_main.cpp.o
+.PHONY : src/_main.cpp.o
+
+src/_main.i: src/_main.cpp.i
+
+.PHONY : src/_main.i
+
+# target to preprocess a source file
+src/_main.cpp.i:
+	$(MAKE) -f CMakeFiles/solver.dir/build.make CMakeFiles/solver.dir/src/_main.cpp.i
+.PHONY : src/_main.cpp.i
+
+src/_main.s: src/_main.cpp.s
+
+.PHONY : src/_main.s
+
+# target to generate assembly for a file
+src/_main.cpp.s:
+	$(MAKE) -f CMakeFiles/solver.dir/build.make CMakeFiles/solver.dir/src/_main.cpp.s
+.PHONY : src/_main.cpp.s
 
 # Help Target
 help:
@@ -196,16 +409,37 @@ help:
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
-	@echo "... rebuild_cache"
 	@echo "... edit_cache"
-	@echo "... Model_ph"
+	@echo "... rebuild_cache"
+	@echo "... ShapeFunctions"
+	@echo "... Cosserat"
+	@echo "... LieAlgebra"
+	@echo "... PortController"
+	@echo "... Config"
+	@echo "... PortHamiltonian"
+	@echo "... AutoDiff"
 	@echo "... solver"
-	@echo "... main.o"
-	@echo "... main.i"
-	@echo "... main.s"
-	@echo "... src/Model_ph.o"
-	@echo "... src/Model_ph.i"
-	@echo "... src/Model_ph.s"
+	@echo "... src/Chameleon.o"
+	@echo "... src/Chameleon.i"
+	@echo "... src/Chameleon.s"
+	@echo "... src/ConfigFile.o"
+	@echo "... src/ConfigFile.i"
+	@echo "... src/ConfigFile.s"
+	@echo "... src/Cosserat.o"
+	@echo "... src/Cosserat.i"
+	@echo "... src/Cosserat.s"
+	@echo "... src/PortController.o"
+	@echo "... src/PortController.i"
+	@echo "... src/PortController.s"
+	@echo "... src/PortHamiltonian.o"
+	@echo "... src/PortHamiltonian.i"
+	@echo "... src/PortHamiltonian.s"
+	@echo "... src/Shapes.o"
+	@echo "... src/Shapes.i"
+	@echo "... src/Shapes.s"
+	@echo "... src/_main.o"
+	@echo "... src/_main.i"
+	@echo "... src/_main.s"
 .PHONY : help
 
 

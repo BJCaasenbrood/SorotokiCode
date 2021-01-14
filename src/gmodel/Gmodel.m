@@ -62,6 +62,7 @@ classdef Gmodel < handle
     
 %--------------------------------------------------------------------------
 methods  
+    
 %---------------------------------------------------------------- Fem Class
 function obj = Gmodel(varargin) 
     
@@ -183,6 +184,10 @@ function Gmodel = render(Gmodel,varargin)
         class = whoClasses('Gmodel');
         for i = 1:length(class)
         	r = update(class{i},'tex');
+        end
+          class = whoClasses('Rig');
+        for i = 1:length(class)
+        	r = class{i}.update();
         end
     end
 

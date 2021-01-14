@@ -1,3 +1,6 @@
+#ifndef READ_FILE_H
+#define READ_FILE_H
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -8,7 +11,7 @@ using namespace Eigen;
 
 #define MAXBUFSIZE  ((int) 1e6)
 
-MatrixXf readMatXf(const char *filename)
+MatrixXd readMatXf(const char *filename)
     {
     int cols = 0, rows = 0;
     double buff[MAXBUFSIZE];
@@ -40,7 +43,7 @@ MatrixXf readMatXf(const char *filename)
     rows--;
 
     // Populate matrix with numbers.
-    MatrixXf result(rows,cols);
+    MatrixXd result(rows,cols);
     for (int i = 0; i < rows; i++)
         for (int j = 0; j < cols; j++)
             result(i,j) = buff[ cols*i+j ];
@@ -49,7 +52,7 @@ MatrixXf readMatXf(const char *filename)
 }
 
 
-VectorXf readVecXf(const char *filename)
+VectorXd readVecXf(const char *filename)
     {
     int cols = 0, rows = 0;
     double buff[MAXBUFSIZE];
@@ -81,9 +84,11 @@ VectorXf readVecXf(const char *filename)
     rows--;
 
     // Populate matrix with numbers.
-    VectorXf result(rows,cols);
+    VectorXd result(rows,cols);
     for (int i = 0; i < rows; i++)
             result(i) = buff[ i ];
 
     return result;
 }
+
+#endif
