@@ -3,6 +3,7 @@ KINEMATIC_CONTROLLER = 0
 ENERGY_CONTROLLER    = 1 
 WRITE_OUTPUT         = 1 
 ACTUSPACE =1
+PROPERTYSET =-1
 DISCONTINIOUS        = 0 
 
 [cosserat] 
@@ -14,7 +15,7 @@ E2 = 0
 E3 = 0
 
 [model] 
-NMODE   = 4
+NMODE   = 3
 NDISC   = 1
 NDOF    = 2
 

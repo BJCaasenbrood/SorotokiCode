@@ -7,7 +7,7 @@ classdef Model
         NDisc;
         Table;
         g;
-        ge;
+        ge, etae;
         gd;
         tau;
         Texture;
@@ -47,6 +47,7 @@ classdef Model
         DistLoad;
         PArea;
         ActuationSpace;
+        AssignProperties;
         
         Movie;
         MovieStart;
@@ -88,6 +89,7 @@ function obj = Model(Table,varargin)
     obj.Spring  = [1e-9,1];
     
     obj.ActuationSpace = -1;
+    obj.AssignProperties = -1;
     
     obj.Point = [1,0,0,0,1,0,0];
     obj.Gain = [1e-2,0.05];
@@ -125,7 +127,12 @@ function Model = generate(Model)
     Model = GenerateCosserat(Model);
     Model = GenerateConfigFile(Model);
     
-    Model.Xspline = [0,Model.Point(5);Model.Tdomain,Model.Point(5)+1e-6];
+    if isempty(Model.Xspline)
+        T = Model.Tdomain;
+        X1 = Model.Point(5);
+        Model.Xspline = [0, X1; 
+                         T, X1 + 1e-6];
+    end
 end
 
 %--------------------------------------------------------------------- make
@@ -189,6 +196,9 @@ Model.H = [y(:,2:end), sum(y(:,2:end),2)];
 
 y = load([dir_path ,'/log/endeffector.txt']);
 Model.ge = y(:,2:end);
+
+y = load([dir_path ,'/log/endeffector_Vel.txt']);
+Model.etae = y(:,2:end);
 
 y = load([dir_path ,'/log/setpoint.txt']);
 Model.gd = y(:,2:end);
@@ -447,6 +457,8 @@ else
 end
 fprintf(FID,'WRITE_OUTPUT         = 1 \n');
 fprintf(FID,['ACTUSPACE =', num2str(Model.ActuationSpace), '\n']);
+fprintf(FID,['PROPERTYSET =', num2str(Model.AssignProperties), '\n']);
+
 %fprintf(FID,['GRAV_VECTOR =', num2str(Model.GravityDirection), '\n']);
 
 if(Model.NDisc > 1)

@@ -10,7 +10,7 @@
 #include "readFile.h"
 #include "DEBUGGER.h"
 
-//#define DISCONTINIOUS
+#define DISCONTINIOUS
 
 #ifdef DISCONTINIOUS
 #include "ShapesX.cpp"
@@ -61,6 +61,7 @@ class Cosserat
 	Vnd gradHq, gradHp, dissR;
 
 	V7d g;
+	V6d eta, deta;
 	Vnd q, dq;
 	Mnd M, C, Mt;
 	Mad Jb, Jbt;

@@ -21,6 +21,7 @@ void Cosserat::setup(const char* str){
 	int E1,E2,E3;
   	int K1,K2,K3; 
   	int ActuationSpace;
+  	int AssignProperties;
 
   	Na = static_cast<int>(cf.Value("model","NDOF"));
   	Nm = static_cast<int>(cf.Value("model","NMODE"));
@@ -64,6 +65,7 @@ void Cosserat::setup(const char* str){
 
 	Table << K1,K2,K3,E1,E2,E3;
 
+	AssignProperties = static_cast<int>(cf.Value("options","PROPERTYSET"));
 	ActuationSpace = static_cast<int>(cf.Value("options","ACTUSPACE"));
 	PreIntegrationSteps = cf.Value("solver","INTSTEP");
 	IntegrationSteps    = cf.Value("solver","SPACESTEP");
@@ -110,9 +112,17 @@ void Cosserat::setup(const char* str){
 	gvec = readVecXf("log/grav_vector.txt");
 
 	// precompute density-properties
-	buildStiffnessTensor(E,Nu,J11,J22,J33,A11,Ktt);
-	buildInertiaTensor(Rho,J11,J22,J33,A11,Mtt);
-	buildDampingTensor(Mu,Ktt,Dtt);
+	if (AssignProperties == -1){
+		buildStiffnessTensor(E,Nu,J11,J22,J33,A11,Ktt);
+		buildInertiaTensor(Rho,J11,J22,J33,A11,Mtt);
+		buildDampingTensor(Mu,Ktt,Dtt);
+	}
+	else{
+		buildInertiaTensor(Rho,J11,J22,J33,A11,Mtt);
+		Ktt.setZero();
+		Ktt.diagonal() = readVecXf("log/Ktt_vector.txt");
+		buildDampingTensor(Mu,Ktt,Dtt);
+	}
 
 	// prebuild global matrices
 	buildGlobalMatrices();
@@ -213,7 +223,6 @@ void Cosserat::buildLagrangianModel(
 
 	double K1Vg, K2Vg;
 
-
 	V13d K1, K2;
 	V13d x, dx;
 
@@ -264,6 +273,7 @@ void Cosserat::buildLagrangianModel(
 
 	// return configuration and velocities
 	g.noalias()   = x.block(0,0,7,1);
+	eta.noalias() = x.block(7,0,6,1);
 
 	// compute adjoint actions
 	AdmapInv(g,AdgInv);
@@ -271,6 +281,9 @@ void Cosserat::buildLagrangianModel(
 	// transform Jacobian to local frame
 	K1J.noalias() = AdgInv*Jb;
 	Jb.noalias() = K1J;
+
+	K1Jt.noalias() = AdgInv*Jbt;
+	Jbt.noalias() = K1Jt;
 }
 
 //---------------------------------------------------
@@ -401,8 +414,10 @@ void Cosserat::lagrangianODE(
 	dM.noalias() = (X0).transpose()*Mtt*(X0);
 
 	// compute local C-coriolis matrix
+	//dC.noalias() = (X0).transpose()*((Mtt*X2 - 
+	// 	X2.transpose()*Mtt)*(X0) + Mtt*(X0));
 	dC.noalias() = (X0).transpose()*((Mtt*X2 - 
-	 	X2.transpose()*Mtt)*(X0) + Mtt*(X0));
+	 	X2.transpose()*Mtt)*(X0) + Mtt*(X1*Jt));
 
 	// compute local G-potential vector
 	dG.noalias() = (X0).transpose()*Mtt*X1*gvec;

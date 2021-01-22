@@ -130,6 +130,11 @@ void PortHamiltonian::HessianInverse(
 
 	int n = Na*Nm;
 	double alpha = (2.0/3.0);
+	double beta = 1.0;
+
+	if (EC1){
+		beta = control.Kd;
+	}
 
 	Mnd S(2*n,2*n);
 	Mnd Mi(n,n);
@@ -139,7 +144,7 @@ void PortHamiltonian::HessianInverse(
 	S.block(0,n,n,n).noalias() = -alpha*h*Mi;
 	S.block(0,0,n,n).noalias() = Mnd::Zero(n,n);
 	S.block(n,0,n,n).noalias() = alpha*h*rod.Kee;
-	S.block(n,n,n,n).noalias() = alpha*h*(1+control.Kd)*rod.Dee*Mi;
+	S.block(n,n,n,n).noalias() = alpha*h*(1+beta)*rod.Dee*Mi;
 	S.block(n,n,n,n).noalias() += -alpha*h*(rod.Mt - rod.C)*Mi;
 	S.noalias() += Mnd::Identity(2*n,2*n);
 

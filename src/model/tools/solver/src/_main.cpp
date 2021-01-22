@@ -11,6 +11,9 @@ ofstream file;
 ofstream fileH;
 ofstream fileG;
 ofstream fileXd;
+ofstream fileEta;
+
+IOFormat matlab(5, 0, ", ", "\n", "[", "]");
 
 void logsetup(){
 	file.open("log/state.txt", ofstream::out | ofstream::trunc);
@@ -21,6 +24,25 @@ void logsetup(){
 	fileG.close();
 	fileXd.open("log/setpoint.txt", ofstream::out | ofstream::trunc);
 	fileXd.close();
+	fileEta.open("log/endeffector_Vel.txt", ofstream::out | ofstream::trunc);
+	fileEta.close();
+}
+
+
+void showInfo(PortHamiltonian &sys){
+
+	cout << "M(q=0): inertia matrix" << endl;
+	cout << sys.rod.M.format(matlab) << endl;
+	cout << endl;
+
+	cout << "K(q=0): stiffness matrix" << endl;
+	cout << sys.rod.Kee.format(matlab) << endl;
+	cout << endl;
+
+	cout << "D(q=0): stiffness matrix" << endl;
+	cout << sys.rod.Dee.format(matlab) << endl;
+	cout << endl;
+
 }
 
 int main(int argc, char** argv)
@@ -35,12 +57,16 @@ int main(int argc, char** argv)
 	fileH.open("log/hamiltonian.txt", ios_base::app | ios::binary);
 	fileG.open("log/endeffector.txt", ios_base::app | ios::binary);
 	fileXd.open("log/setpoint.txt", ios_base::app | ios::binary);
+	fileEta.open("log/endeffector_Vel.txt", ios_base::app | ios::binary);
+	//filedEta.open("log/endeffector_Acc.txt", ios_base::app | ios::binary);
 
 	#ifdef TICTOC
 		tic();
   	#endif
 
-	cout << ph.rod.Sa << endl;
+	#ifdef TICTOC
+		showInfo(ph);
+	#endif 
 
 	// solve time integration
 	while (ph.t < ph.T){
@@ -53,6 +79,7 @@ int main(int argc, char** argv)
 		fwrite(fileH,ph.t,ph.rod.Hamiltonian);
 		fwrite(fileG,ph.t,ph.rod.g);
 		fwrite(fileXd,ph.t,ph.control.gd);
+		fwrite(fileEta,ph.t,ph.rod.eta);
 
 	}
 

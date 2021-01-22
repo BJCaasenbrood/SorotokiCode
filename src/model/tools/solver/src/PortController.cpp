@@ -84,9 +84,8 @@ void PortController::EnergyShaping(
 	V6d k;
 
 	Mnd N(n,n);
-	//Mnd Jd(3,n);
 	Vnd dx(n);
-	M4d G,Gi;
+	M4d G, Gi;
 	M6d Tang;
 	V6d Phi;
 
@@ -115,4 +114,4 @@ void PortController::EnergyShaping(
 
 	// energy-shaping + damping injection -- - Kp*dx 
 	u.noalias() = Sa*(dHdq - Kp*dx - Kd*Dee*dHdp);
-}
+}                         

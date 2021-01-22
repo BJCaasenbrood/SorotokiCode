@@ -42,7 +42,7 @@ addpath('src/__base__');
 addpath('src/__base__/fnc');
 
 skipUpdate = false;
-Path = getPath;
+Path = c;
 DisplayLogo;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
