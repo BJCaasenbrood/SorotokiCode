@@ -7,10 +7,10 @@ msh = Mesh(sdf,'BdBox',[-5,13,0,5],'Quads',[50 25]);
 msh = msh.generate();
 
 %% generate fem model
-fem = Fem(msh,'VolumeInfill',0.3,'Penal',3,'FilterRadius',1,...
+fem = Fem(msh,'VolumeInfill',0.25,'Penal',4,'FilterRadius',1,...
               'Nonlinear',false,'TimeStep',1/3,...
               'OptimizationProblem','Compliant',...
-              'MaxIterationMMA',3,'ChangeMax',0.01,'Movie',true);
+              'MaxIterationMMA',75,'ChangeMax',0.01,'Movie',false);
           
 %% set spatial settings
 fem = fem.set('ReflectionPlane',[0 -1]);
@@ -24,25 +24,16 @@ fem = fem.AddConstraint('Output',id,[0,1]);
 fem = fem.AddConstraint('Spring',id,[0,1]);
 
 id = fem.FindElements('Location',[-3,5],1);
-fem = fem.AddConstraint('PressureCell',id,[-1e-4,0]);
+fem = fem.AddConstraint('PressureCell',id,[1e-4,0]);
 
 %% set density
 fem = fem.initialTopology('Hole',[-3,5],3);
 
 %% material
-fem.Material = Dragonskin10;
+fem.Material = TPU90;
 
 %% solving
 fem.optimize();
-
-%% solve full
-% fem = fem.reset('fem');
-% fem = fem.set('Spring',[],'PressureCell',[],'Nonlinear',true,...
-%     'OptimizationProblem',[]','TimeStep',1/25,'Penal',3);
-% id = fem.FindElements('Location',[-5,5],1);
-% fem = fem.AddConstraint('PressureCell',id,[1e-4,0]);
-% fem.solve();
-
 
 function Dist = PneuGrip(P)
   R1 = dRectangle(P,-5,13,0,5);

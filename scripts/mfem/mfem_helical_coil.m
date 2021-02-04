@@ -8,14 +8,14 @@ W = 25;
 sdf =  cHelix(D,0,0,R,H,W);
 
 %% generate mesh
-mag = Mmesh(sdf,'NElem',2000,'WireThickness',1e-1);
+mag = Mmesh(sdf,'NElem',1000,'WireThickness',1e-1);
 mag = mag.generate();
 
 %% compute inductance
-mag = Blender(mag,'Curve',{'PCC',50,0.0});
+mag = Blender(mag,'Curve',{'PCC+',80,0.0,1.5});
 mag.inductance();
 
 %% render
-mag.show()
+mag.render()
 mag.ground();
 

@@ -58,7 +58,6 @@ int main(int argc, char** argv)
 	fileG.open("log/endeffector.txt", ios_base::app | ios::binary);
 	fileXd.open("log/setpoint.txt", ios_base::app | ios::binary);
 	fileEta.open("log/endeffector_Vel.txt", ios_base::app | ios::binary);
-	//filedEta.open("log/endeffector_Acc.txt", ios_base::app | ios::binary);
 
 	#ifdef TICTOC
 		tic();

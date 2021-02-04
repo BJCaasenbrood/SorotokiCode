@@ -42,7 +42,7 @@ addpath('src/__base__');
 addpath('src/__base__/fnc');
 
 skipUpdate = false;
-Path = c;
+Path = cd;
 DisplayLogo;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -86,7 +86,7 @@ url = ['https://raw.githubusercontent.com/BJCaasenbrood/',...
     'SorotokiCode/master/config/vernum.m'];
 filename = [verFolder,'/vernum.m'];
 websave(filename,url);
-%AddPath(verFolder);
+
 fprintf(['* Succesfully downloaded contents', filename, '\n']);
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -115,7 +115,7 @@ switch(Request)
 end
 
 end
-Request = input(['* Do you want to create a startup file? (y/n)'],'s');
+Request = input('* Do you want to create a startup file? (y/n)','s');
 bool = 1;
 switch(Request)
     case('y'); fprintf('* Proceeding generation startup.m file... \n'); pause(.1);

@@ -2,7 +2,7 @@ clear; close all; clc;
 
 %% set signed distance function
 W = 2.5;
-H = 5;
+H = 6;
 sdf = @(x) Bellow(x,W,H);
 
 %% generate mesh
@@ -14,7 +14,7 @@ msh.show(); pause(2);
 fem = Fem(msh);
 fem = fem.set('TimeStep',1/3,'ResidualNorm',1e-3,'VolumeInfill',0.3,...
               'Penal',4,'VolumetricPressure',true,'FilterRadius',0.65,...
-              'Nonlinear',0,'ReflectionPlane',[1,1],'Repeat',[1 1 2 2],...
+              'Nonlinear',0,'ReflectionPlane',[1,1],'Repeat',[1 2 2],...
               'MaxIterationMMA',75,'OptimizationProblem','Compliant','Movie',0);
 
 %% add constraint
@@ -36,7 +36,7 @@ fem = fem.AddConstraint('PressureCell',id,[1e-2,0]);
 fem = fem.initialTopology('Hole',[0,0],1.0);
 
 %% material
-fem.Material = Dragonskin30A;
+fem.Material = TPU90;
 
 %% solving
 fem.optimize();

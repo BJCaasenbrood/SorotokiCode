@@ -211,8 +211,16 @@ function [g, X] = string(Model,k,Quality)
         Quality = 100;
     end
     
-    N = Model.Nq; 
-    Qtmp = Model.q(k,1:N).';
+    if nargin < 2
+        Qtmp = Model.q0;
+    else
+        if k <= 0
+            Qtmp = Model.q0;
+        else
+            Qtmp = Model.q(k,1:Model.Nq).';
+        end
+    end
+    
     X = linspace(0,Model.Sdomain,Quality);
     ee = Model.Ba*Model.Phi(Model.Length)*Qtmp;
     
