@@ -151,7 +151,6 @@ function obj = Fem(Mesh,varargin)
     
     obj.SigmoidFactor  = 0;
     
-       
     for ii = 1:2:length(varargin)
         obj.(varargin{ii}) = varargin{ii+1};
     end
@@ -196,7 +195,6 @@ S = 'interp';
 V = Fem.Node;
 flag = 0;
 colormap(Fem.Colormap);
-
 switch(Request)
     case('0'),   Z = zeros(Fem.NNode,1);
     case('SDF'), Z = Fem.Mesh.SDF(Fem.Mesh.Node); Z = Z(:,end);
@@ -250,7 +248,6 @@ if Fem.Dim > 2 && (strcmp(Request,'E') || strcmp(Request,'E+'))
 else
     Alp = ones(Fem.NElem,1);
 end
-
 
 h{1} = patch('Faces',BoundMatrix,'Vertices',Fem.Node0,...
     'LineStyle','-','Linewidth',1,'EdgeColor','k');
@@ -345,7 +342,6 @@ if flag == 2
         %text(V(id,1),V(id,2),symbol,'fontname',font,'fontsize',10,'Color','g');
     end
     
-        
     for ii = 1:length(Pres)
         id = Pres(ii);
         text(V(id,1),V(id,2)-.1,symbol,'fontsize',10,'Color','g');
@@ -371,7 +367,7 @@ if flag == 3
     end    
 end
 
-if Fem.Movie %&& strcmp(Request,'ISO')
+if Fem.Movie 
     background(metropolis);
     if Fem.MovieStart == false
        Fem.MovieStart = true;
@@ -531,16 +527,16 @@ while true
            Fem.Log{9,1} = 'Syy';  Fem.Log{9,2} = Fem.syyNodal(idNodes);
            Fem.Log{10,1} = 'Sxy'; Fem.Log{10,2} = Fem.sxyNodal(idNodes);
        else
-           Fem.Log{1,2} = vappend(Fem.Log{1,2},ux(idNodes));
-           Fem.Log{2,2} = vappend(Fem.Log{2,2},uy(idNodes));
-           Fem.Log{3,2} = vappend(Fem.Log{3,2},un(idNodes));
-           Fem.Log{4,2} = vappend(Fem.Log{4,2},fx(idNodes));
-           Fem.Log{5,2} = vappend(Fem.Log{5,2},fy(idNodes));
-           Fem.Log{6,2} = vappend(Fem.Log{6,2},fn(idNodes));
-           Fem.Log{7,2} = vappend(Fem.Log{7,2},Fem.VonMisesNodal(idNodes));
-           Fem.Log{8,2} = vappend(Fem.Log{8,2},Fem.sxxNodal(idNodes));
-           Fem.Log{9,2} = vappend(Fem.Log{9,2},Fem.syyNodal(idNodes));
-           Fem.Log{10,2} = vappend(Fem.Log{10,2},Fem.sxyNodal(idNodes));
+           Fem.Log{1,2} = vappend(Fem.Log{1,2},ux(idNodes),2);
+           Fem.Log{2,2} = vappend(Fem.Log{2,2},uy(idNodes),2);
+           Fem.Log{3,2} = vappend(Fem.Log{3,2},un(idNodes),2);
+           Fem.Log{4,2} = vappend(Fem.Log{4,2},fx(idNodes),2);
+           Fem.Log{5,2} = vappend(Fem.Log{5,2},fy(idNodes),2);
+           Fem.Log{6,2} = vappend(Fem.Log{6,2},fn(idNodes),2);
+           Fem.Log{7,2} = vappend(Fem.Log{7,2},Fem.VonMisesNodal(idNodes),2);
+           Fem.Log{8,2} = vappend(Fem.Log{8,2},Fem.sxxNodal(idNodes),2);
+           Fem.Log{9,2} = vappend(Fem.Log{9,2},Fem.syyNodal(idNodes),2);
+           Fem.Log{10,2} = vappend(Fem.Log{10,2},Fem.sxyNodal(idNodes),2);
        end
     end
     
@@ -718,7 +714,7 @@ Fem.TopologyGridZ = Z;
 end
 
 %--------------------------------------------------------- show iso-surface
-function Fem = showISO(Fem,varargin)
+function [Fem,I] = showISO(Fem,varargin)
 V = Fem.Topology;
 X = Fem.TopologyGridX; 
 Y = Fem.TopologyGridY; 
@@ -778,8 +774,8 @@ cla;
 Uxx = scaleX*Rpt(1)*[min(min(min(X))) max(max(max(X)))];
 Uyy = scaleY*Rpt(2)*[min(min(min(Y))) max(max(max(Y)))];
 I = GaussianFilter((SDF >= varargin{1})*255,3);
-[XX,YY] = meshgrid(linspace(Uxx(1),Uxx(2),size(I,1)),...
-                   linspace(Uyy(1),Uyy(2),size(I,2)));
+% [XX,YY] = meshgrid(linspace(Uxx(1),Uxx(2),size(I,1)),...
+%                    linspace(Uyy(1),Uyy(2),size(I,2)));
 
 I = image(rescale(Uxx),...
     ((max(Uyy)-min(Uyy))/(max(Uxx) - min(Uxx)))*rescale(Uyy),I);
@@ -788,6 +784,62 @@ axis equal; axis off;
 colormap(barney(-1)); 
 caxis([0 1]);
 background('w');
+end
+
+%---------------------------------- export triangular mesh from iso-surface
+function msh = exportMesh(Fem,varargin)
+    ISO = varargin{1};
+    [~,I] = showISO(Fem,ISO);
+    
+    sX = 1; sY = 1;
+    if ~isempty(Fem.Repeat)
+        instr = Fem.Repeat;
+        for ii = 1:length(instr)
+            if instr(ii) == 1
+                sX = sX + 1;
+            end
+            if instr(ii) == 2
+                sY = sY*2;
+            end
+        end
+    end
+    
+    B = [Fem.BdBox(1:2)*sX, Fem.BdBox(3:4)*sY];
+    Xscale = (B(2)-B(1))/size(I.CData,2);
+    Yscale = (B(4)-B(3))/size(I.CData,1);
+    
+    simplify_tol = varargin{2};
+    
+    img = I.CData >= 25;
+    img = fliplr(img.');
+    
+    bnd = bwboundaries(img);
+    
+    c_cell0 = {};
+    c_cell = {};
+    
+    for ii=1:length(bnd)
+        bnd_tmp = bnd{ii};
+        assert(all(bnd_tmp(1,:)==bnd_tmp(end,:)), 'contour is not closed');
+        c_cell0{ii} = bnd_tmp;
+    end
+    
+    for ii=1:length(c_cell0)
+        c_tmp = c_cell0{ii};
+        %[x_tmp, y_tmp] = reducem(c_tmp(:,1), c_tmp(:,2), simplify_tol);
+        c_red = decimatePoly(c_tmp,[simplify_tol, 2],false);
+        if (nnz(c_red(:,1))>0)&&(nnz(c_red(:,2))>0)
+            c_cell{end+1} = [Xscale*c_red(:,1), (Yscale)*c_red(:,2)];
+        end
+    end
+    
+    % create the 2d triangulation
+    H = varargin{3};
+    Tesselation = triangulationCreate(c_cell, H(1), H(2), H(3),'linear');
+    
+    msh = Mesh(Tesselation.Nodes.',Tesselation.Elements.');
+    msh = msh.generate();
+   
 end
 
 %------------------------------------------------ show deformed iso-surface
@@ -947,6 +999,11 @@ function ElementList = FindElements(Fem,varargin)
     ElementList = FindNode(Fem.Mesh.Center,varargin{1:end});
 end
 
+%------------------------------------------------------------ find elements
+function NodeList = FindEdges(Fem,varargin)
+    NodeList = FindEdge(Fem.Mesh,varargin{1:end});
+end
+
 %---------------------------------------------------------- add constraints
 function Fem = AddConstraint(Fem,varargin)
     
@@ -958,6 +1015,9 @@ for ii = 1:3:length(varargin)
           [length(varargin{ii+1}),1])];
       elseif strcmp(varargin{ii},'Contact')
           Fem.(varargin{ii}) = {varargin{ii+1},varargin{ii+2}};
+      elseif strcmp(varargin{ii},'Pressure')
+          Fem.(varargin{ii}) = [{varargin{ii+1}},repmat(varargin{ii+2},...
+          [length(varargin{ii+1}),1])];
       else 
           BC = [varargin{ii+1},repmat(transpose(varargin{ii+2}(:)),...
           [length(varargin{ii+1}),1])];
@@ -970,13 +1030,14 @@ end
 end
 
 end
+
 methods (Access = private)
 %%///////////////////////////////////////////////////////// FINITE ELEMENTS
 %------------------------------------------------ convert mesh to fem class
 function Fem = SetupFiniteElement(Fem)
 
 Fem.SpatialFilter         = GenerateRadialFilter(Fem,Fem.FilterRadius);
-[~,~,Fem.Normal,Fem.Edge] = computeCentroid(Fem);
+%[~,~,Fem.Normal,Fem.Edge] = computeCentroid(Fem);
 
 Fem.ElemNDof = Fem.Dim*cellfun(@length,Fem.Element);
 
@@ -1213,32 +1274,69 @@ if ~isempty(Fem.Contraction)
 end
 
 if ~isempty(Fem.Pressure)
-    IdMat = sign(Fem.Mesh.get('NodeToFace'));
-    N = Fem.Normal;
-    Elem = Fem.Element;
-    PressureForce = zeros(length(Fem.Pressure),2);
-    for ii = 1:length(Fem.Pressure)
-        IdNode = Fem.Pressure(ii,1);
-        Pressmag = max(Fem.Pressure(ii,2),Fem.Pressure(ii,3));
-        el = find(IdMat(IdNode,:) > 1e-12);
-        ntmp = [0,0];
-        etmp = [];
-        kk = 1;
-        for jj = el
-            w = Elem{jj}*0; w(Elem{jj} == IdNode) = 1;
-            ntmp = w(:)'*N{jj};
-            ee = Fem.Edge{jj};
-            etmp(kk) = max(ee(Elem{jj} == IdNode));
-            kk = kk+1;
+    
+    EdgeList = Fem.Pressure{1};
+    Nds = Fem.Node0;
+    
+    Nds(:,1) = Nds(:,1) + Fem.Utmp(1:2:end-1,1);
+    Nds(:,2) = Nds(:,2) + Fem.Utmp(2:2:end,1);
+    
+    for ii = 1:length(EdgeList)
+        NodeID = EdgeList{ii};
+        V = Nds(NodeID,:);
+
+        dsx = diff(V(:,1));
+        dsy = diff(V(:,2));
+        dl = sqrt(dsx.^2+dsy.^2);
+        Nx = -dsy./dl;
+        Ny = dsx./dl;
+        
+        S = [NodeID(1:end-1),NodeID(2:end)].';
+        
+%         hold on;
+%         quiver( V(1:end-1,1)+dsx/2,V(1:end-1,2)+dsy/2,-Nx,-Ny,'b'); 
+
+        Pload = beta*Fem.Pressure{2}(1);
+
+        for jj = 1:length(NodeID)-1
+            F(Fem.Dim*S(1,jj)-1,1) = F(Fem.Dim*S(1,jj)-1,1) ...
+                + 0.5*Pload*Nx(jj)*dl(jj);
+            F(Fem.Dim*S(2,jj)-1,1) = F(Fem.Dim*S(2,jj)-1,1) ...
+                + 0.5*Pload*Nx(jj)*dl(jj);
+            F(Fem.Dim*S(1,jj),1) = F(Fem.Dim*S(1,jj),1) ...
+                + 0.5*Pload*Ny(jj)*dl(jj);
+            F(Fem.Dim*S(2,jj),1) = F(Fem.Dim*S(2,jj),1) ...
+                + 0.5*Pload*Ny(jj)*dl(jj);
         end
         
-        ntmp = 0.5*(ntmp/length(el));
-        PressureForce(ii,:) = ntmp*Pressmag;
     end
     
-    NPLoad = size(Fem.Pressure,1);
-    F(Fem.Dim*Fem.Pressure(1:NPLoad,1)-1,1) = beta*PressureForce(1:NPLoad,1)/NPLoad;
-    F(Fem.Dim*Fem.Pressure(1:NPLoad,1),1)   = beta*PressureForce(1:NPLoad,2)/NPLoad;
+%     IdMat = sign(Fem.Mesh.get('NodeToFace'));
+%     N = Fem.Normal;
+%     Elem = Fem.Element;
+%     PressureForce = zeros(length(Fem.Pressure),2);
+%     for ii = 1:length(Fem.Pressure)
+%         IdNode = Fem.Pressure(ii,1);
+%         Pressmag = max(Fem.Pressure(ii,2),Fem.Pressure(ii,3));
+%         el = find(IdMat(IdNode,:) > 1e-12);
+%         ntmp = [0,0];
+%         etmp = [];
+%         kk = 1;
+%         for jj = el
+%             w = Elem{jj}*0; w(Elem{jj} == IdNode) = 1;
+%             ntmp = w(:)'*N{jj};
+%             ee = Fem.Edge{jj};
+%             etmp(kk) = max(ee(Elem{jj} == IdNode));
+%             kk = kk+1;
+%         end
+%         
+%         ntmp = 0.5*(ntmp/length(el));
+%         PressureForce(ii,:) = ntmp*Pressmag;
+%     end
+%     
+%     NPLoad = size(Fem.Pressure,1);
+%     F(Fem.Dim*Fem.Pressure(1:NPLoad,1)-1,1) = beta*PressureForce(1:NPLoad,1)/NPLoad;
+%     F(Fem.Dim*Fem.Pressure(1:NPLoad,1),1)   = beta*PressureForce(1:NPLoad,2)/NPLoad;
 end
 
 if Fem.VolumetricPressure
@@ -1555,9 +1653,13 @@ CriteriaResidual = (Fem.SolverResidual(end) > Fem.ResidualNorm);
 
 DiffSVM = abs(Fem.SolverVonMises(end-1)/Fem.SolverVonMises(end) - 1);
 
+%DiffDisp = abs(Fem.SolverDisplace(end-1)/Fem.SolverDisplace(end) - 1);
+
 CriteriaStress = (DiffSVM > Fem.StressNorm);
 
-Criteria = CriteriaResidual && CriteriaStress;
+%CriteriaDisplace = (DiffDisp > Fem.DisplaceNorm);
+
+Criteria = CriteriaResidual && CriteriaStress; %&& CriteriaDisplace;
 
 if Fem.SolverResidual(end,1) > Fem.SolverResidual(end-1,1)
    Fem.Divergence = Fem.Divergence + 1;

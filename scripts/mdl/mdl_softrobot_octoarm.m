@@ -1,8 +1,8 @@
 clr;
 %% assign free DOF
 mdl = Model([0,1,1,0,0,0],'NModal',3,'NDisc',1);
-mdl = setupSoftRobot(mdl,50e-5,20,500);
-mdl = mdl.set('TimeStep', 1/5);
+mdl = setupSoftRobot(mdl,10e-5,20,500);
+mdl = mdl.set('TimeStep', 1/25);
 mdl = mdl.set('Tdomain',  15); 
 
 %% generate and solve dynamic model
@@ -50,7 +50,7 @@ end
 %% BACK-END FUNCTIONS
 % setup model
 function mdl = setupSoftRobot(mdl,Kp,Kd,Lam)
-mdl = mdl.set('Controller',0);
+mdl = mdl.set('Controller',1);
 L0 = 0.12;
 
 mdl = mdl.set('Sdomain',   L0);

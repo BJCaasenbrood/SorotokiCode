@@ -7,7 +7,7 @@ nav_order: 4
 # How to cite?
 If you are using Sorotoki in your (academic) work, please consider citing the toolkit:
 ```bibtex
-@misc{Caasenbrood2018,
+@misc{Caasenbrood2020,
   author = {Caasenbrood, Brandon},
   title = {Sorotoki - An open-source soft robotics toolkit for MATLAB},
   year = {2020},

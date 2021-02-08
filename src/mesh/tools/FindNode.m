@@ -68,6 +68,9 @@ function id = Bottom(Node,BdBox,tol)
 if length(BdBox) == 4, id = find(abs(Node(:,2) - BdBox(3))<tol );
 else, id = find(abs(Node(:,3) - BdBox(5))<tol);
 end
+
+[~,I] = sort(Node(id,1));
+id = id(I);
 end
 
 function id = Left(Node,BdBox,tol)

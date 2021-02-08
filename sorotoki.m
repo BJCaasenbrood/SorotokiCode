@@ -147,8 +147,37 @@ if bool == 1
     
     fclose('all');
 end
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%startup;
+S = license('inuse');
+Requisites = {'image_toolbox';'pde_toolbox';'optimization_toolbox'};
+HTMLLink = {'<a href="https://nl.mathworks.com/products/image.html">click here to install</a> \n',...
+            '<a href="https://nl.mathworks.com/products/pde.html">click here to install</a> \n',...
+            '<a href="https://nl.mathworks.com/products/optimization.html">click here to install</a> \n'};
+memb = ismember(Requisites,{S.feature});
+cout('Text','* Checking for prerequisit toolboxes...\n'); pause(1);
+reqCheckList = find(memb == false);
+if ~isempty(reqCheckList)
+cout('Error', '* Missing some required toolboxes! \n');    
+
+    for ii = reqCheckList
+        cout('Error', ['\t ->',Requisites{ii},'  '])
+        cout('Error',HTMLLink{ii});    
+    end
+
+    Request = input(['\n* Do you want to continue without the',...
+        ' recommended prerequisits? (y/n)'],'s');
+    
+    switch(Request)
+        case('y')
+        case('n'), cout('Error','* INSTALLATION TERMINATED! \n'); return;
+    end
+else
+    cout('Text','* All prerequisit toolboxes present! \n\n');   
+    pause(0.75);
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 cout('Text', '\n');
 cout('green','* INSTALLATION DONE! \n');
 cout('Text', '\n');

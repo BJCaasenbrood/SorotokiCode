@@ -2,7 +2,9 @@ clr;
 %% assign free DOF
 mdl = Model([0,1,0,1,0,0],'NModal',3,'NDisc',1);
 mdl = setupSoftRobot(mdl,1,0,1e2);
-mdl = mdl.set('Tdomain',25); 
+mdl = mdl.set('Tdomain',10); 
+mdl = mdl.set('Tdomain',10); 
+mdl = mdl.set('Movie',true); 
 
 %% generate and solve dynamic model
 mdl = mdl.generate();
@@ -29,7 +31,9 @@ legend('$x$','$y$','$z$',...
 %% generate rig
 [rig, sph] = setupRig(mdl);
 
-for ii = 1:fps(t,12):length(mdl.q)
+text(0.05,0,-0.06,'\textbf{$g_d$}','interpreter','latex','fontsize',16);
+
+for ii = 1:fps(t,30):length(mdl.q)
     
     rig = rig.compute(ii);
     rig = rig.update();
@@ -40,7 +44,9 @@ for ii = 1:fps(t,12):length(mdl.q)
     sph.update();
    
     setupFigure(ii);
-    title(['T = ',num2str(t(ii),3)]);
+    %title(['T = ',num2str(t(ii),3)]);
+    if ii == 1, pause; end
+    mdl = mdl.updateFrame();
 end
 
 %% BACK-END FUNCTIONS

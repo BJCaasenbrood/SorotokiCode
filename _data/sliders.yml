@@ -5,13 +5,15 @@
   images:
     - src: /docs/documentation/img/opt_pneunet.gif
       alt: image one
-    - src: /docs/documentation/img/opt_bellow.gif
-      alt: Topology optimization of pressure bellows
+    - src: /docs/documentation/img/fem_pneunet.gif
+      alt: image one
     - src: /docs/documentation/img/fem_tensile.gif
       alt: image one
+    - src: /docs/documentation/img/mdl_twolink_control.gif
+      alt: image two
     - src: /docs/documentation/img/Figure1.gif
       alt: image two
   settings:
     height: "'auto'"
-    effect: "'slide'"
-    transitionDuration: 700
+    effect: "'fade'"
+    transitionDuration: 250

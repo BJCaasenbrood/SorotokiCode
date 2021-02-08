@@ -234,6 +234,21 @@ function [g, X] = string(Model,k,Quality)
          Qtmp*0, Qtmp*0),X,[g0 eta0 deta0]);
 
     g = yf(:,1:7);
+
+end
+
+function Model = updateFrame(Model)
+   
+    if Model.Movie
+        background(gitpage);
+        if Model.MovieStart == false
+            Model.MovieStart = true;
+            MovieMaker(Model,'model','Start');
+        else
+            MovieMaker(Model,'model','');
+        end
+    end
+    
 end
 
 %----------------------------------------------------------------- simulate

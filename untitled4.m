@@ -15,6 +15,7 @@ Sy = linspace(0,70,15)*0;
 Px = repmat(Sx,[length(Ux),1]) + Ux;
 Py = repmat(Sy,[length(Ux),1]) + Uy;
 
+figure(101);
 for ii = 1:3:length(Ux)
     px = mm2m*Px(ii,:);
     py = mm2m*Py(ii,:);
@@ -33,7 +34,7 @@ mdl = mdl.generate();
 X = [];
 x0 = mdl.q0;
 
-figure(108)
+figure(102)
 for ii = 2:4:length(Ux)
     % optimization
     px = mm2m*Px(ii,:);
@@ -46,13 +47,13 @@ for ii = 2:4:length(Ux)
         'quasi-newton','FiniteDifferenceStepSize',1e-4);
     [x, fval, exitflag, output] = fminunc(obj,x0,options);
     
-    %cla;
-    % plotting
     mdl.q0 = x;
     g = mdl.string(0,15);
+    figure(102)
     hold on;
     plot(-py',px','o-','Color',col(1),'linewidth',2);
     plot(-g(:,7),g(:,5),'-o','Color',col(2),'linewidth',1);
+    axis([-0.02 0.07 0 0.08]); axis equal;
     drawnow();
     
     pause(0.5);

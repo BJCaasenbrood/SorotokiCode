@@ -25,6 +25,7 @@ classdef Mesh
         Edge;
         Iteration;
         ElemMat;
+        BndMat;
         eps; 
         eta; 
         Triangulate;
@@ -43,24 +44,6 @@ methods
 %--------------------------------------------------------------- Mesh Class
 function obj = Mesh(Input,varargin) 
     
-    if isa(Input,'char')
-       [~,~,ext] = fileparts(Input);
-       if strcmp(ext,'.stl'), [f,v] = stlreader(Input);
-       elseif strcmp(ext,'.obj'), [v,f] = objreader(Input);
-       else, cout('err','* extension not recognized');
-       end
-       
-       obj.Node    = v;
-       obj.NNode   = length(v);
-       obj.Element = num2cell(f,2);
-       obj.NElem   = length(f);
-       obj.BdBox   = boxhull(v);
-       
-    elseif isa(Input,'function_handle')
-       obj.SDF = Input;
-       obj.NElem = 200;
-    end
-    
     obj.ShowProcess  = false;
     obj.MaxIteration = 100;
     obj.Iteration    = 0;
@@ -76,6 +59,50 @@ function obj = Mesh(Input,varargin)
     obj.Colormap     = turbo;
     obj.LineStyle    = '-';
     obj.Type         = 'C2PX';
+    
+    if isa(Input,'char')
+       [~,~,ext] = fileparts(Input);
+       if strcmp(ext,'.stl'), [f,v] = stlreader(Input);
+       elseif strcmp(ext,'.obj'), [v,f] = objreader(Input);
+       else, cout('err','* extension not recognized');
+       end
+       
+       obj.Node    = v;
+       obj.NNode   = length(v);
+       obj.Element = num2cell(f,2);
+       obj.NElem   = length(f);
+       obj.BdBox   = boxhull(v);
+    
+    elseif isa(Input,'double')
+       if (size(Input,2) ~= 2) || (size(Input,2) ~= 2),
+           error('First input should be a Nx2 or Nx3 matrix');
+       end
+       
+       v = Input;
+       obj.Node    = v;
+       obj.NNode   = length(v);
+       obj.Element = num2cell(varargin{1},2);
+       obj.NElem   = length(varargin{1});
+       obj.BdBox   = boxhull(v);
+       obj.Type    = 'C2T3';
+       obj.Dim     = size(v,2);
+       obj.ElemMat = varargin{1};
+       
+       varargin{1} = 'NNode';
+       varargin{2} = length(v);
+       
+       [Pc,~] = computeCentroid(obj,obj.Element,v); 
+       
+       obj.MaxIteration = 0;
+       obj.Center = Pc;
+       obj.SDF = @(x) -1*ones(length(Pc),1);
+       
+       obj = ElementAdjecency(obj);
+       
+    elseif isa(Input,'function_handle')
+       obj.SDF = Input;
+       obj.NElem = 200;
+    end
     
     for ii = 1:2:length(varargin)
         if strcmp(varargin{ii},'Quads')
@@ -138,8 +165,8 @@ end
 %---------------------------------------------------------------------- set
 function Mesh = generate(Mesh)
     
-Mesh.Iteration   = 1; 
-Mesh.Convergence = 1e7;
+% Mesh.Iteration   = 1; 
+% Mesh.Convergence = 1e7;
 
 if isempty(Mesh.Center)
     Pc = randomPointSet(Mesh); 
@@ -148,7 +175,7 @@ elseif strcmp(Mesh.Type,'C3H8')
     Pc = Mesh.Center; 
     Mesh.NElem = length(Pc);
 else
-    Mesh.MaxIteration = 1;
+    %Mesh.MaxIteration = 1;
     Pc = Mesh.Center; 
     d = Mesh.SDF(Pc);
     Pc = Pc(d(:,end)<0,:);  
@@ -163,7 +190,15 @@ Anew = (Mesh.BdBox(2)-Mesh.BdBox(1))*(Mesh.BdBox(4)-Mesh.BdBox(3))*...
        (Mesh.BdBox(6)-Mesh.BdBox(5));
 end
 
-flag = 0;
+
+if Mesh.MaxIteration < 1
+    flag = 1;
+    f = Mesh.Element;
+    v = Mesh.Node;
+else
+    flag = 0;
+end
+
 % loyd's algorithm 
 while flag == 0
   
@@ -236,6 +271,8 @@ Mesh.Area    = A;
 % Mesh.Edge  = Ev;
 
 Mesh = ElementAdjecency(Mesh);
+Mesh.BndMat = ConstructBounds(Mesh);
+
 end
 
 %---------------------------------------------------------------- show mesh
@@ -254,10 +291,13 @@ switch(Request)
     case('Gradient'), Z = GradientField(Mesh,Mesh.Node);
     case('Node'),     Z = varargin{2};
     case('Element'),  Z = varargin{2};
+    case('Holes'),    Z = zeros(Mesh.NNode,1);
     otherwise;        Z = zeros(Mesh.NNode,1);
 end
 
-if ~strcmp(Request,'Node') && ~strcmp(Request,'Element')
+if ~strcmp(Request,'Node') && ~strcmp(Request,'Element') ...
+        && ~strcmp(Request,'Holes');
+    
 clf; axis equal; axis off; hold on;
     
 % plot tesselation
@@ -270,10 +310,24 @@ patch('Faces',Mesh.Boundary,'Vertices',Mesh.Node,'LineStyle','-',...
     'Linewidth',2,'EdgeColor','k');
 
 hold on;
+
 elseif strcmp(Request,'Node')
     plot(Mesh.Node(Z,1),Mesh.Node(Z,2),'.','Color','r');
 elseif strcmp(Request,'Element')
-    plot(Mesh.Center(Z,1),Mesh.Center(Z,2),'.','Color','r');    
+    plot(Mesh.Center(Z,1),Mesh.Center(Z,2),'.','Color','r');  
+elseif strcmp(Request,'Holes')
+    for ii = 2:length(Mesh.BndMat)
+        B = Mesh.BndMat{ii};
+        Xoffset = 0.012*(Mesh.BdBox(2)-Mesh.BdBox(1));
+        Ctr = mean(Mesh.Node(unique(B(:)),:),1);
+        if ii < 10
+            text(Ctr(1)-Xoffset,Ctr(2),num2str(ii));
+        else
+            text(Ctr(1)-2*Xoffset,Ctr(2),num2str(ii));
+        end
+        Nds = Mesh.Node(B(:),:);
+        plot(Nds(:,1),Nds(:,2),'Color',col(4),'linewidth',1.5); hold on;
+    end
 end
 
 axis(Mesh.BdBox); axis tight;
@@ -354,6 +408,57 @@ function ElementList = FindElements(Mesh,Request)
     n = Mesh.Center;
     ElementList = FindNodes(n,Request);
 end
+
+%---------------------------------------------------------- find boundaries
+function BndList = ConstructBounds(Mesh)
+    
+    Bnd = Mesh.Boundary;
+    ID = 1:length(Bnd);
+    ii = 1;
+    
+    while ~isempty(Bnd)
+        
+        b0 = Bnd(1,:);
+        Bnd(1,:) = [];
+        ID(1) = [];
+        
+        X = max(b0);
+        BndList{ii} = b0(:);
+        idx = find(Bnd(:,1) == X | Bnd(:,2) == X,1);
+
+    while ~isempty(idx)
+               
+        if Bnd(idx,1) == X
+            X = Bnd(idx,2);
+            BndList{ii} = [BndList{ii};Mesh.Boundary(ID(idx),:).'];
+        else
+            X = Bnd(idx,1);
+            BndList{ii} = [BndList{ii};flipud(Mesh.Boundary(ID(idx),:).')];
+        end
+        
+        Bnd(idx,:) = [];
+        ID(idx) = [];
+        
+        idx = find(Bnd(:,1) == X | Bnd(:,2) == X,1);
+    end
+        BndList{ii} = [BndList{ii}(1:2:end-1), BndList{ii}(2:2:end)];
+        ii = ii + 1;
+    end
+    
+    %% make sure loop is clockwise
+    for ii = 1:length(BndList)
+       Elem = unique(BndList{ii}(:),'stable');
+       V = Mesh.Node(Elem,:);
+       [~,isClockWise] = polygonArea(V(:,1),V(:,2));
+       
+       if ~isClockWise, 
+           BndList{ii} = rot90(BndList{ii},2); 
+       end
+           
+    end
+    
+end
+
 %-------------------------------------------------------------- END METHODS
 end
 
@@ -736,6 +841,7 @@ edges = cellfun(@numel,face);
 n = Mesh.NElem;    
 p = max(cellfun(@max,face));    
 MaxNVer = max(cellfun(@numel,face));     
+
 if Mesh.Dim < 3
     tri = GenerateElementalMatrix(Mesh);
     Mesh.ElemMat = tri;

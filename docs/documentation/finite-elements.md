@@ -8,9 +8,9 @@ nav_order: 2
 <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script> 
 
 # Finite element method
-SOROTOKI includes a finite element solver able to deal with linear and nonlinear problems. The finite element toolkit offers a set of constitutive material models - including Linear, Neo-Hookean, Mooney-Rivlin, and Yeoh -- covering for a wide range of soft materials. It also provides some preset soft material models that are known to be used extensively in soft robotics research. Examples included: Ecoflex-0030, Dragonskin-30A, Elastosil, and NinjaFlex TPU.
+SOROTOKI provides its own Finite Element solver that handles linear and nonlinear problems. The finite element toolkit offers a set of constitutive material models -- including Linear, Neo-Hookean, Mooney-Rivlin, and Yeoh -- covering a wide range of soft materials. It also provides some preset materials that are used extensively in soft robotics. Examples included: Ecoflex-0030, Ecoflex-0050, Dragonskin-30A, Elastosil, and NinjaFlex TPU90A.
 
-Generating the mesh can also be done in SOROTOKI, we refer the reader to [`Mesh`](./meshing.html). 
+More information on mesh generation can be found here: [`Mesh`](./meshing.html). 
 
 ## List of material models:
 ```matlab
@@ -22,7 +22,7 @@ fem.Material = YeohMaterial('C1',-,'C2',-,'C3',-)
                             
 % different preset materials
 fem.Material = Ecoflex0030();
-fem.Material = Dragonskin20A();   	 
+fem.Material = Dragonskin30();   	 
 fem.Material = Elastosil();   	 
 fem.Material = TPU90();   	 
 ```

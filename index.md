@@ -24,16 +24,16 @@ image_sliders:
 
 ## List of applications:
 {: .text-purple-000}
-- [x] Modeling of 2D/3D geometries with Signed Distance Functions (SDFs),
-- [x] Performing Finite Element Analysis (FEA) using hyper-elastic materials,
-- [x] Topology optimization-based design of (pressure-driven) soft robots,
-- [x] Dynamic modeling of soft robots through Cosserat-beam theory,
-- [x] Fast and responsive rendering with automatically-updated textures.
+- [x] Modeling with Signed Distance Functions (SDFs),
+- [x] Finite Element Analysis (FEA) using hyper-elastic materials,
+- [x] Topology Optimization of (pressure-driven) soft robots,
+- [x] Dynamical modeling through Cosserat-beam theory,
+- [x] Fast graphics rendering with responsive textures.
 
 #### To do:
 {: .text-purple-000}
-- [ ] Real-time control of physical soft robots via BalloonDog interface,
-- [ ] Including class for magnetic fields/inductive sensing,
+- [ ] Real-time control of soft robots via BalloonDog interface,
+- [ ] Magnetic/induction analysis for soft sensing,
 - [ ] A pdf-version of the documentation.
 
 {% include slider.html selector="example_slider" %}
