@@ -2079,7 +2079,11 @@ fprintf(' Itr  | Inc  | k     | Obj. fun. | g(x)  | Residual  | Delta |\n');
 fprintf('--------------------------------------------------------------\n');
 end
 
-fprintf(' %1.0f\t | %1.0f\t | %1.0f\t | %1.3e | %0.3f | %1.3e | %0.3f |\n',...
+sp1 = repmat(' ',[1,5-length(num2str(Fem.IterationMMA))]);
+sp2 = repmat(' ',[1,5-length(num2str(Fem.Increment))]);
+sp3 = repmat(' ',[1,6-length(num2str(Fem.Iteration))]);
+
+fprintf([' %i',sp1,'| %i',sp2,'| %i',sp3,'| %1.3e | %0.3f | %1.3e | %0.3f |\n'],...
   Fem.IterationMMA,Fem.Increment,Fem.Iteration,abs(Fem.Objective(end)),...
   Fem.Constraint(end)+1,norm(Fem.Residual(FreeDofs)),norm(Fem.Change));
 
@@ -2089,7 +2093,10 @@ fprintf(' Inc | Iter  | Residual  | Max. Svm  | Time | Beta  | dt     |\n');
 fprintf('--------------------------------------------------------------\n');
 end
 
-fprintf(' %1.0f\t | %1.0f\t | %1.3e | %1.3e | %1.2f | %1.3f | %1.3f  |\n',...
+sp1 = repmat(' ',[1,4-length(num2str(Fem.Increment))]);
+sp2 = repmat(' ',[1,6-length(num2str(Fem.Iteration))]);
+
+fprintf([' %i',sp1,'| %i',sp2,'| %1.3e | %1.3e | %1.2f | %1.3f | %1.3f  |\n'],...
     Fem.Increment,Fem.Iteration,norm(Fem.Residual(FreeDofs)),...
     max(Fem.s(:,1)),Fem.Time,Fem.LoadingFactor,Fem.TimeStep);   
 

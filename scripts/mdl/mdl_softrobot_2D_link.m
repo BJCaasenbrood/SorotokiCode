@@ -33,7 +33,7 @@ legend('$x$','$y$','$z$',...
 
 text(0.05,0,-0.06,'\textbf{$g_d$}','interpreter','latex','fontsize',16);
 
-for ii = 1:fps(t,30):length(mdl.q)
+for ii = 1:fps(t,12):length(mdl.q)
     
     rig = rig.compute(ii);
     rig = rig.update();
@@ -44,7 +44,8 @@ for ii = 1:fps(t,30):length(mdl.q)
     sph.update();
    
     setupFigure(ii);
-    %title(['T = ',num2str(t(ii),3)]);
+    title(['T = ',num2str(t(ii),3)]);
+    
     if ii == 1, pause; end
     mdl = mdl.updateFrame();
 end

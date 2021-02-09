@@ -1,4 +1,17 @@
 function x = FindEdge(Mesh,varargin)
+%FINDEDGE Returns a cell-list of nodes that form an edge.
+%
+%   x = FINDEDGE(Mesh, 'Hole', A)   -  Returns holes of index A
+%   x = FINDEDGE(Mesh, 'TopHole')   -  Returns holes at the top
+%   x = FINDEDGE(Mesh, 'AllHole')   -  Returns all holes
+%
+%   x = FINDEDGE(Mesh, 'EdgeSelect', P0, alpha) -  Returns an edge closest
+%       to point P0, and neighbouring edges within an angle limit <= alpha.
+%       alpha by default 90 degrees.
+%
+%   See also FINDNODE
+%   Brandon Caasenbrood
+%   2020, MIT LICENSE.
 
 tol   = BuildTolerance(Mesh.Node); 
 BdBox = BoundingBox(Mesh.Node);
@@ -8,6 +21,7 @@ Request = varargin{1};
 switch(Request)
     case('Hole');       x = FindHoles(Mesh,varargin{end});
     case('TopHole');    x = FindTopHoles(Mesh,tol);
+    case('AllHole');    x = FindAllHoles(Mesh,tol);
     case('EdgeSelect');   x = FindEdgeSelect(Mesh,BdBox,varargin{2:end});
 end
 
@@ -34,6 +48,19 @@ end
 
 C = PolygonCenter(Nds,S);
 id = S(abs(C(:,2)-max(C(:,2))) < tol);
+end
+
+function id = FindAllHoles(Mesh,tol)
+Bnd = Mesh.get('BndMat');
+Nds = Mesh.Node;
+
+for ii = 1:length(Bnd)
+    E = unique(Bnd{ii}(:),'stable');
+    E = [E;E(1)];
+    S{ii,1} = E;
+end   
+
+id = S(2:end);
 end
 
 function id = FindEdgeSelect(Mesh,BdBox,Point,AngleMax)

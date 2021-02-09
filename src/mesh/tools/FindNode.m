@@ -1,4 +1,26 @@
 function x = FindNode(Node,varargin)
+%FINDNODE Returns a column vector of nodes 
+%
+%   x = FINDNODE(Node, 'SW')        -  Returns South-West located node
+%   x = FINDNODE(Node, 'SE')        -  Returns South-East located node
+%   x = FINDNODE(Node, 'NW')        -  Returns North-West located node
+%   x = FINDNODE(Node, 'NE')        -  Returns North-East located node
+%   x = FINDNODE(Node, 'Top')       -  Returns nodes at the top
+%   x = FINDNODE(Node, 'Bottom')    -  Returns nodes at the bottom
+%   x = FINDNODE(Node, 'Left')      -  Returns nodes at the left 
+%   x = FINDNODE(Node, 'Right')     -  Returns nodes at the right
+%   x = FINDNODE(Node, 'TopMid')    -  Returns node at the middle of top
+%   x = FINDNODE(Node, 'BottomMid') -  Returns node at the middle of bottom
+%   x = FINDNODE(Node, 'LeftMid')   -  Returns node at the middle of left 
+%   x = FINDNODE(Node, 'RightMid')  -  Returns node at the middle of right
+%
+%   x = FINDNODE(Node, 'Location', P0, N)  -  Returns N number of nodes 
+%       closest to the point P0 (euclidean distnace)
+%
+%
+%   See also FINDNODE
+%   Brandon Caasenbrood
+%   2020, MIT LICENSE.
 
 tol   = BuildTolerance(Node); 
 BdBox = BoundingBox(Node);

@@ -27,7 +27,7 @@ fem = fem.AddConstraint('Spring',id,[0,1]);
 fem = fem.AddConstraint('Output',id,[0,-1]);
 
 id = fem.FindElements('Location',[W/2,0.625*H],1);
-fem = fem.AddConstraint('PressureCell',id,[1e-4,0]);
+fem = fem.AddConstraint('PressureCell',id,[4*kpa,0]);
 
 %% set density
 fem = fem.initialTopology('Hole',[W/2,0.625*H],0.15);
@@ -51,7 +51,7 @@ id = femr.FindNodes('Left');
 femr = femr.AddConstraint('Support',id,[1,1]);
 
 id = femr.FindEdges('TopHole');
-femr = femr.AddConstraint('Pressure',id,[5*kpa,0]);
+femr = femr.AddConstraint('Pressure',id,[4.5*kpa,0]);
 
 id = femr.FindNodes('Bottom');
 femr = femr.AddConstraint('Output',id,[0,0]);
@@ -72,8 +72,8 @@ figure(103); cla;
 for ii = 1:1:size(Ux,2)
     Nx = N0(id,1) + Ux(:,ii);
     Ny = N0(id,2) + Uy(:,ii);
-    plot(Nx,Ny,'Marker','.','Linewidth',1.5,...
-        'Color',col(1));
+    plot(Nx,Ny,'Linewidth',1.5,...
+        'Color',col(1,ii/size(Ux,2)));
     hold on;
 end
 axis equal;
