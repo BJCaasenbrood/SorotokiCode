@@ -150,10 +150,9 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 S = license('inuse');
-Requisites = {'image_toolbox';'pde_toolbox';'optimization_toolbox'};
+Requisites = {'image_toolbox';'pde_toolbox'};
 HTMLLink = {'<a href="https://nl.mathworks.com/products/image.html">click here to install</a> \n',...
-            '<a href="https://nl.mathworks.com/products/pde.html">click here to install</a> \n',...
-            '<a href="https://nl.mathworks.com/products/optimization.html">click here to install</a> \n'};
+            '<a href="https://nl.mathworks.com/products/pde.html">click here to install</a> \n'};
 memb = ismember(Requisites,{S.feature});
 cout('Text','* Checking for prerequisit toolboxes...\n'); pause(1);
 reqCheckList = find(memb == false);
@@ -210,7 +209,7 @@ cout(['* Adding SOROTOKI libraries to path, ',...
 
 if Request == 1
 %str = strrep(Path,'/','\');
-fprintf(FID,['%%!INSTALDIR:',Path,' \n']);
+fprintf(FID,['%%!INSTALDIR:',strrep(Path,'\','/'),' \n']);
 fprintf(FID,'%% base.lib \n');
 %WriteToFile(Path);
 WriteToFile([Path,'\config\']);

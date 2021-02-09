@@ -5,7 +5,7 @@ if ismac
 elseif isunix
     str = strrep(str,'\','/');
 elseif ispc
-    str = strrep(str,'/','\');
+    str = strrep(str,'\','/');
 else
     %
 end
