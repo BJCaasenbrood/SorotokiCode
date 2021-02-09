@@ -160,9 +160,9 @@ reqCheckList = find(memb == false);
 if ~isempty(reqCheckList)
 cout('Error', '* Missing some required toolboxes! \n');    
 
-    for ii = reqCheckList
-        cout('Error', ['\t ->',Requisites{ii},'  '])
-        cout('Error',HTMLLink{ii});    
+    for ii = 1:length(reqCheckList)
+        cout('Error', ['\t ->',Requisites{reqCheckList(ii)},'  '])
+        cout('Error',HTMLLink{reqCheckList(ii)});    
     end
 
     Request = input(['\n* Do you want to continue without the',...
