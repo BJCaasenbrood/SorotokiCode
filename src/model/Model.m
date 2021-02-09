@@ -161,12 +161,20 @@ else
 end
 
 %//////////////////////////////////
-writematrix(Model.q0,[dir_path,'/log/state.txt'],'Delimiter','tab');
-writematrix(Model.dq0,[dir_path,'/log/momenta.txt'],'Delimiter','tab');
-writematrix([zeros(3,1);Model.Gravity(:)],...
-    [dir_path,'/log/grav_vector.txt'],'Delimiter','tab');
-writematrix(Model.xia0(:),[dir_path,'/log/xi0_vector.txt'],'Delimiter','tab');
-writematrix(Model.Xspline,[dir_path,'/log/splineXd.txt'],'Delimiter','tab');
+% writematrix(Model.q0,[dir_path,'/log/state.txt'],'Delimiter','tab');
+% writematrix(Model.dq0,[dir_path,'/log/momenta.txt'],'Delimiter','tab');
+% writematrix([zeros(3,1);Model.Gravity(:)],...
+%     [dir_path,'/log/grav_vector.txt'],'Delimiter','tab');
+% writematrix(Model.xia0(:),[dir_path,'/log/xi0_vector.txt'],'Delimiter','tab');
+% writematrix(Model.Xspline,[dir_path,'/log/splineXd.txt'],'Delimiter','tab');
+
+writeMatrixFile([dir_path,'/log/state.txt'],Model.q0,'delimiter','\t');
+writeMatrixFile([dir_path,'/log/momenta.txt'],Model.dq0,'delimiter','\t');
+writeMatrixFile([dir_path,'/log/grav_vector.txt'],...
+    [zeros(3,1);Model.Gravity(:)],'delimiter','\t');
+writeMatrixFile([dir_path,'/log/xi0_vector.txt'],Model.xia0(:),'delimiter','\t');
+writeMatrixFile([dir_path,'/log/splineXd.txt'],Model.Xspline,'delimiter','\t');
+
 
 %//////////////////////////////////
 out = fullfile(dir_path,'log/tau_vector.log');
