@@ -172,9 +172,50 @@ cout('Error', '* Missing some required toolboxes! \n');
         case('n'), cout('Error','* INSTALLATION TERMINATED! \n'); return;
     end
 else
-    cout('Text','* All prerequisit toolboxes present! \n\n');   
+    cout('green','* All prerequisit toolboxes present! \n');   
     pause(0.75);
 end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%check if cmake present
+cout('Text','* Checking for c++ compilers...\n'); pause(1);
+
+origLD = getenv('LD_LIBRARY_PATH');
+setenv('LD_LIBRARY_PATH','');
+
+[status1,~] = system("gcc --version");
+[status2,~] = system("g++ --version");
+[status3,~] = system("clang --version");
+
+flag = (status1 ~= 0 && status2 ~= 0 && status3 ~= 0);
+
+if flag
+    cout('Error', '* No C++ compiler found! Please make sure you have a C/C++ compiler!\n')
+    cout('Error', '* Recommended compiler => gcc:')
+    cout('Error', '\t <a href="http://mingw-w64.org/doku.php/start">click here to install</a> \n')
+    
+    cout('Error',['\n* No C++ compiler implies that no changes can be made to',...
+    ' Model.lib (Cosserat Beam model) \n']);
+    cout('Error', '* Press ENTER to continue installation\n');
+    pause();
+else
+    cout('green','* C++ compiler founded - ')
+    if (status1 == 0), cout('green','gcc '); end
+    if (status2 == 0), cout('green','g++ '); end
+    if (status3 == 0), cout('green','clang'); end
+    cout('\n');
+end
+pause(0.75);
+
+cout('Text','* Checking for Cmake...\n'); pause(1);
+
+[status,~] = system("cmake --version");
+if  status~= 0
+    cout('Error', '* Missing Cmake! \n');    
+else
+    cout('green','* Cmake compiler founded\n')
+end
+pause(0.75);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 cout('Text', '\n');

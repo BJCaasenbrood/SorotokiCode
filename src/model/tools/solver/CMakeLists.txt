@@ -63,6 +63,7 @@ add_library(
 	src/Shapes.cpp
 	src/Shapes.h
 )
+
 target_link_libraries(Cosserat PUBLIC ShapeFunctions)
 ################################
 add_library(
