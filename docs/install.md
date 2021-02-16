@@ -35,15 +35,15 @@ To use SOROTOKI optimally, make sure you have the following dependencies install
 ### 3) Running the installation script
 {: .text-purple-000}
 
-Before you get started, you first have to configure the toolkit with MATLAB's function paths. Setting up these paths is relatively straightforward. Simply run `sorotoki.m`{: .text-purple-000}:
+Once you've opened MATLAB, you first have to configure the toolkit with MATLAB's search paths. Setting up these paths is relatively straightforward. Simply run `sorotoki.m`{: .text-purple-000}:
 
 <img src="./documentation/img/installing.gif" width="725"> 
 
-During the installation, the toolkit will ask you if the SOROTOKI directory should be set to the *main* directory of MATLAB. This implies every time you open MATLAB it will automatically go this directory. 
+During install, the installer will ask you if SOROTOKI should can set as the *main* directory of MATLAB. This implies every time you open MATLAB, it will automatically go this directory. 
 
 By using the command: `cdsoro`{: .text-purple-000}, you can quickly go back to the main directory from any other directory (super useful!). It will also generate the file `startup.m`{: .text-purple-000} that loads the toolkit automatically. This start-up file is normally located under `./Documents/MATLAB/startup.m` for Linux/Windows OS.
 
-### That's it!
+### That's all folks!
 {: .text-purple-000}
 The soft robotics toolkit is now ready-to-use. 
 

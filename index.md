@@ -20,17 +20,17 @@ image_sliders:
 # **SOROTOKI** - An open-source soft robotics toolkit for MATLAB
 {: .fs-6 .text-purple-000}
 
-*SOROTOKI* is an open-source MATLAB toolkit for soft robotics that includes an array tools for design, modeling, and control. Due to its scientific diversity, it can be challenging for researchers to quickly learn the different disciplines required for soft robotics. With the aim to lower the multi-disciplinary barrier, Sorotoki aims to incorporate multiple layers of scientific disciplines in one toolkit. Examples include: continuum mechanics, dynamic system- and control theory, topology optimization, computer graphics, and much more to come! 
+*SOROTOKI* is an open-source MATLAB toolkit for soft robotics that includes an array of tools for design, modeling, and control. Due to its scientific diversity, it can be challenging for researchers to quickly familiarize themselves with multiple scientific disciplines. With the aim to lower the threshold, Sorotoki aims to incorporate multiple layers of soft robotics research into one toolkit. Examples include: continuum mechanics, dynamic systems and control theory, topology optimization, computer graphics, and much more to come! The combination provides a highly flexible modeling environment and hopefully aids the development of novel soft robotic research.
 
-## List of applications:
+## Applications highlights:
 {: .text-purple-000}
-- [x] Modeling with Signed Distance Functions (SDFs),
+- [x] Implicit modeling with Signed Distance Functions (SDFs),
 - [x] Finite Element Analysis (FEA) using hyper-elastic materials,
 - [x] Topology Optimization of (pressure-driven) soft robots,
 - [x] Dynamical modeling through Cosserat-beam theory,
 - [x] Fast graphics rendering with responsive textures.
 
-#### To do:
+#### planned:
 {: .text-purple-000}
 - [ ] Real-time control of soft robots via BalloonDog interface,
 - [ ] Magnetic/induction analysis for soft sensing,

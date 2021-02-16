@@ -13,21 +13,6 @@ SOROTOKI provides its own Finite Element solver that handles linear and nonlinea
 More information on mesh generation can be found here: [`Mesh`](./meshing.html). 
 
 ## List of material models:
-```matlab
-% different material models
-fem.Material = LinearMaterial('E',-,'Nu',-);           
-fem.Material = NeoHookeanMaterial('E',-,'Nu',-);     
-fem.Material = MooneyMaterial('C10',-,'C01',-,'K',-); 
-fem.Material = YeohMaterial('C1',-,'C2',-,'C3',-)  
-                            
-% different preset materials
-fem.Material = Ecoflex0030();
-fem.Material = Dragonskin30();   	 
-fem.Material = Elastosil();   	 
-fem.Material = TPU90();   	 
-```
-
-### Material models operators
 
 | Material   | SOROTOKI     | Material model  |
 |:-------------|:------------------|:------|
@@ -35,6 +20,18 @@ fem.Material = TPU90();
 | Neo-Hookean   | `NeoHookeanMaterial('E',-,'Nu',-)`  | $$\Psi = C_1(J_1 - 3)$$ 
 | Mooney-Rivlin   | `MooneyMaterial('C1',-,'C2',-)`  | $$\Psi = C_{1}({J}_1 - 3) + C_{2}({J}_2 - 3)$$ 
 | 3rd-order Yeoh  | `YeohMaterial('C1',-,'C2',-,'C3',-)`  | $$\Psi = \sum_{i=1}^3 C_{i}({J}_1 - 3)^{i}$$ 
+
+## List of material presets
+
+| Material   | Type     | SOROTOKI     | Material supplier  |
+|:-------------|:--------|:------------------|:------|
+| Ecoflex-0030 | Rubber-casting  | `Ecoflex0030()`  | [Smooth-on](https://www.smooth-on.com/products/ecoflex-00-30/)
+| Ecoflex-0050 | Rubber-casting  | `Ecoflex0050()`  | [Smooth-on](https://www.smooth-on.com/products/ecoflex-00-50/)
+| Dragonskin 10A | Rubber-casting   | `Dragonskin10()`  | [Smooth-on](https://www.smooth-on.com/products/dragon-skin-10-medium/)
+| Dragonskin 30A | Rubber-casting  | `Dragonskin30()`  |  [Smooth-on](https://www.smooth-on.com/products/dragon-skin-30/)
+| Elastosil 28A | Rubber-casting | `Elastosil28()`  | [Wacker](https://www.wacker.com/h/en-us/silicone-rubber/room-temperature-curing-silicone-rubber-rtv-2/elastosil-m-4601-ab/p/000018458)
+| NinjaFlex 85A | 3D-printing (FDM) | `NinjaFlex85()`  | [NinjaTek](https://ninjatek.com/ninjaflex/)
+
 
 # Numerical examples
 

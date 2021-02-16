@@ -15,7 +15,7 @@ fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[0,1]);
 fem = fem.AddConstraint('Contact',@(x) SDF(x,R),[0,-0.5*R]);
 
 %% assign material
-fem.Material = Dragonskin10A;
+fem.Material = Dragonskin10;
 
 %% solving
 fem.solve();

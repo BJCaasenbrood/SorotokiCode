@@ -2,7 +2,7 @@ clr;
 %% set signed distance function
 sdf = @(x) dRectangle(x,0,20,0,1);
 
-msh = Mesh(sdf,'BdBox',[0,20,0,1],'NElem',500);
+msh = Mesh(sdf,'BdBox',[0,20,0,1],'Quads',[50, 5]);
 msh = msh.generate();
 
 %% generate fem model
@@ -12,7 +12,7 @@ fem = fem.set('TimeStep',1/200,'PrescribedDisplacement',true);
 %% add constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,1]);
 fem = fem.AddConstraint('Support',fem.FindNodes('Right'),[0,1]);
-fem = fem.AddConstraint('Load',fem.FindNodes('Right'),[-2,0]);
+fem = fem.AddConstraint('Load',fem.FindNodes('Right'),[-2,1e-4]);
 
 %% add logger nodes
 fem = fem.AddConstraint('Output',fem.FindNodes('SE'),[0,0]);

@@ -37,10 +37,10 @@ fem.Material = Ecoflex0030(0.75);
 
 %% solving
 fem.optimize();
-fem.show('ISO',0.25);
+fem.show('ISO',0.3);
 
 %% convert topology result to mesh
-mshr = fem.exportMesh(0.25,0.05,[1.1,1.85,40]); 
+mshr = fem.exportMesh(0.3,0.05,[1.1,1.85,40]); 
 mshr.show(); pause(2);
 
 femr = Fem(mshr,'Nonlinear',true,'TimeStep',1/25,'FilterRadius',H/15,...
@@ -51,7 +51,7 @@ id = femr.FindNodes('Left');
 femr = femr.AddConstraint('Support',id,[1,1]);
 
 id = femr.FindEdges('TopHole');
-femr = femr.AddConstraint('Pressure',id,[4.5*kpa,0]);
+femr = femr.AddConstraint('Pressure',id,[4*kpa,0]);
 
 id = femr.FindNodes('Bottom');
 femr = femr.AddConstraint('Output',id,[0,0]);

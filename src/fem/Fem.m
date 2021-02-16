@@ -792,11 +792,21 @@ function msh = exportMesh(Fem,varargin)
     [~,I] = showISO(Fem,ISO);
     
     sX = 1; sY = 1;
+    if ~isempty(Fem.ReflectionPlane)
+        Rp = Fem.ReflectionPlane;
+        if Rp(1) == 1 || Rp(1) == -1
+            sX = sX*2;
+        end
+        if Rp(2) == 1 || Rp(2) == -1
+            sY = sY*2;
+        end
+    end
+    
     if ~isempty(Fem.Repeat)
         instr = Fem.Repeat;
         for ii = 1:length(instr)
             if instr(ii) == 1
-                sX = sX + 1;
+                sX = sX*2;
             end
             if instr(ii) == 2
                 sY = sY*2;

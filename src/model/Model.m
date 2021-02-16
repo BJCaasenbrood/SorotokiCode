@@ -253,6 +253,7 @@ function [g, X] = string(Model,k,Quality)
 
 end
 
+%--------------------------------------------------- update animation frame
 function Model = updateFrame(Model)
    
     if Model.Movie
@@ -267,7 +268,7 @@ function Model = updateFrame(Model)
     
 end
 
-%----------------------------------------------------------------- simulate
+%-------------------------------------------------- compute inertia of disk 
 function Model = inertia(Model)
     Model.Area    = pi*Model.Radius^2;
     Model.Jxx     = 0.5*Model.Radius^2;
