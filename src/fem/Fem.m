@@ -460,8 +460,14 @@ while true
         
         Delta = Fem.Utmp;
 
-        if rcond(full(A)) >= 1e-10, DeltaU = A\B;
-        else, Singular = true; DeltaU = Fem.Utmp(FreeDofs)*0;
+        if rcond(full(A)) >= 1e-10
+            if Fem.SolverStartMMA
+                DeltaU = A\B; % topology optimization needs exact mid-solution
+            else
+                [DeltaU,~] = gmres(A,B,[],Fem.ResidualNorm,100);
+            end
+        else, Singular = true; 
+            DeltaU = Fem.Utmp(FreeDofs)*0;
         end
             
         if Fem.Nonlinear, Delta(FreeDofs,1)=Delta(FreeDofs,1)-DeltaU(:,1);
@@ -806,10 +812,10 @@ function msh = exportMesh(Fem,varargin)
         instr = Fem.Repeat;
         for ii = 1:length(instr)
             if instr(ii) == 1
-                sX = sX*2;
+                sX = sX + 1;
             end
             if instr(ii) == 2
-                sY = sY*2;
+                sY = sY + 1;
             end
         end
     end

@@ -149,11 +149,12 @@ if bool == 1
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-S = license('inuse');
-Requisites = {'image_toolbox';'pde_toolbox'};
+S = ver;
+ToolboxesInstalled = {S.Name}';
+Requisites = {'Image Processing Toolbox';'Partial Differential Equation Toolbox'};
 HTMLLink = {'<a href="https://nl.mathworks.com/products/image.html">click here to install</a> \n',...
             '<a href="https://nl.mathworks.com/products/pde.html">click here to install</a> \n'};
-memb = ismember(Requisites,{S.feature});
+memb = ismember(Requisites,ToolboxesInstalled);
 cout('Text','* Checking for prerequisit toolboxes...\n'); pause(1);
 reqCheckList = find(memb == false);
 if ~isempty(reqCheckList)

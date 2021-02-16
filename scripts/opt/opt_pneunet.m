@@ -44,7 +44,7 @@ mshr = fem.exportMesh(0.3,0.05,[1.1,1.85,40]);
 mshr.show(); pause(2);
 
 femr = Fem(mshr,'Nonlinear',true,'TimeStep',1/25,'FilterRadius',H/15,...
-    'MovieAxis',[-75 170 -140 40],'Movie',0,'Linestyle','none');
+    'Movie',0,'Linestyle','none');
 
 %% assign boundary conditions to reduced fem
 id = femr.FindNodes('Left'); 
