@@ -3,7 +3,6 @@ function varargout = cdsoro
 %
 %   See also REPO.
 
-%   Copyright 2018-2023 B.J.Caasenbrood 
 %path = erase(cd,'\src\__base__');    
 
 fid = fopen('startup.m','rt');
