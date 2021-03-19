@@ -14,7 +14,7 @@ fem = Fem(msh,'TimeStep',1/5,'PrescribedDisplacement',false,...
 fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[1,1]);
 fem = fem.AddConstraint('Support',fem.FindNodes('Top'),[1,0]);
 %fem = fem.AddConstraint('Load',fem.FindNodes('Top'),[0,-12]);
-id = fem.FindEdges('EdgeSelect',[12,6],89);
+id = fem.FindEdges('EdgeSelect',[15.15,6],80);
 fem = fem.AddConstraint('Pressure',id,[-1e-4,0]);
 
 msh.show();

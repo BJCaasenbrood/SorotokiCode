@@ -22,7 +22,8 @@ switch(Request)
     case('Hole');       x = FindHoles(Mesh,varargin{end});
     case('TopHole');    x = FindTopHoles(Mesh,tol);
     case('AllHole');    x = FindAllHoles(Mesh,tol);
-    case('EdgeSelect');   x = FindEdgeSelect(Mesh,BdBox,varargin{2:end});
+    case('BoxHole');    x = BoxHoles(Mesh,tol,varargin{2:end});
+    case('EdgeSelect'); x = FindEdgeSelect(Mesh,BdBox,varargin{2:end});
 end
 
 end
@@ -50,6 +51,22 @@ C = PolygonCenter(Nds,S);
 id = S(abs(C(:,2)-max(C(:,2))) < tol);
 end
 
+function id = BoxHoles(Mesh,tol,Line)
+Bnd = Mesh.get('BndMat');
+Nds = Mesh.Node;
+
+for ii = 1:length(Bnd)
+    E = unique(Bnd{ii}(:),'stable');
+    E = [E;E(1)];
+    S{ii,1} = E;
+end   
+
+C = PolygonCenter(Nds,S);
+d = dRectangle(C,Line(1)-eps,Line(2)+eps,Line(3)-eps,Line(4)+eps);
+id = S(d(:,end)<tol);
+end
+
+
 function id = FindAllHoles(Mesh,tol)
 Bnd = Mesh.get('BndMat');
 Nds = Mesh.Node;
@@ -76,10 +93,10 @@ end
 
 id = Location(Mesh.Node,BdBox,Point);
 
-if length(S) == 1, 
+if length(S) == 1
    Loop = S{1};
 else
-   for ii = 1:length(S);
+   for ii = 1:length(S)
         if ~ismember(S{ii},id)
         else, break;
         end
@@ -107,7 +124,7 @@ index0 = find(Loop == id);
 n = 1; m = 1;
 
 %forward loop
-for ii = (index0+1):1:length(Loop)
+for ii = (index0+1):1:length(Loop)-1
     if Angles(ii) <= AngleMax
         n = n+1;
     else, 

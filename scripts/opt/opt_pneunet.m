@@ -1,7 +1,7 @@
 clr;
 %% generate mesh from sdf
-W = 20;  % width cell
-H = 45;  % width cell
+W = 30;  % width cell
+H = 75;  % width cell
 D = 2;   % inter distance
 
 sdf = @(x) PneuNet(x,W,H,D,W);
@@ -10,10 +10,10 @@ msh = Mesh(sdf,'BdBox',[0,W,0,H],'Quads',[25 50]);
 msh = msh.generate();
 
 %% show generated mesh
-fem = Fem(msh,'VolumeInfill',0.3,'Penal',4,'FilterRadius',H/15,...
+fem = Fem(msh,'VolumeInfill',0.4,'Penal',4,'FilterRadius',H/15,...
               'Nonlinear',false,'TimeStep',1/3,...
               'OptimizationProblem','Compliant',...
-              'MaxIterationMMA',15,'ChangeMax',0.15,'Movie',0);
+              'MaxIterationMMA',75,'ChangeMax',0.05,'Movie',1);
 
 %% set spatial settings
 fem = fem.set('Periodic',[1/2, 0],'Repeat',ones(7,1));
@@ -27,13 +27,13 @@ fem = fem.AddConstraint('Spring',id,[0,1]);
 fem = fem.AddConstraint('Output',id,[0,-1]);
 
 id = fem.FindElements('Location',[W/2,0.625*H],1);
-fem = fem.AddConstraint('PressureCell',id,[4*kpa,0]);
+fem = fem.AddConstraint('PressureCell',id,[5*kpa,0]);
 
 %% set density
-fem = fem.initialTopology('Hole',[W/2,0.625*H],0.15);
+fem = fem.initialTopology('Hole',[W/2,0.625*H],0.85);
 
 %% material
-fem.Material = Ecoflex0030(0.75);
+fem.Material = Ecoflex0030(0.15);
 
 %% solving
 fem.optimize();
@@ -44,7 +44,7 @@ mshr = fem.exportMesh(0.3,0.05,[1.1,1.85,40]);
 mshr.show(); pause(2);
 
 femr = Fem(mshr,'Nonlinear',true,'TimeStep',1/25,'FilterRadius',H/15,...
-    'Movie',0,'Linestyle','none');
+    'Movie',1,'Linestyle','none','MovieAxis',[-30 180 -140 50]);
 
 %% assign boundary conditions to reduced fem
 id = femr.FindNodes('Left'); 

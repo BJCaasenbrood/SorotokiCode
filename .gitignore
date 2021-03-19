@@ -13,3 +13,4 @@ Gemfile
 Gemfile.lock
 node_modules
 *.mat
+bin

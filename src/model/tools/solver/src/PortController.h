@@ -23,6 +23,7 @@ class PortController
 	typedef Matrix<double, Dynamic, Dynamic> Mnd;
 	typedef Matrix<double, 6, Dynamic> Mad;
 	typedef Vector<double, Dynamic> Vnd;
+	typedef Matrix<double, 6, 1> V6d;
 
 	double t;	// time instance
 	double h;   // time-stepping
@@ -30,17 +31,20 @@ class PortController
 	Vnd q; 		// generalized coordinates
 	Vnd p; 		// generalized momenta
 	Vnd u; 		// generalized control output
+	Vnd uk;		// kalman observer output
 
 	double H;	// Hamiltonian
 	Vnd dHdq;   // Hamiltonian-Grad q
 	Vnd dHdp;   // Hamiltonian-Grad p
 
-	Mnd Dee;	   // dampings matrix
-	Mnd Sa;		   // actuation matrix
-	double Kp, Kd; // controller gains
-	double K1, K2; // virtual stiffness
-	double Lambda; // artif. damping gain
-	V7d gd;		   // desired pos 
+	Mnd Dee;	    // dampings matrix
+	Mnd Sa;		    // actuation matrix
+	double Kp, Kd;  // controller gains
+	double K1, K2;  // virtual stiffness
+	double Lambda;  // artif. damping gain
+	double L;       // observer gain
+	double LambdaK; // artif. observer damping gain
+	V7d gd;		    // desired pos 
 
 	S1d spline_X;
 
@@ -52,6 +56,12 @@ class PortController
 	void EnergyShaping(
 		Mad J,
 		V7d g);
+
+	void KalmanCorrection(
+		Mad J,
+		V7d g,
+		V7d z,
+		V6d ed);
 
 };
 

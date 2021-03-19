@@ -372,13 +372,15 @@ end
 %---------------------------------------------------------------- slice
 function Gmodel = slice(Gmodel,dim,s)
     
-if ~isempty(Gmodel.Slice), delete(Gmodel.Slice); end
+if ~isempty(Gmodel.Slice), 
+    delete(Gmodel.Slice); 
+end
 
 v = Gmodel.Node;
 I = Gmodel.Center(:,3) > s;
 J = -(v(:,3) - s) < 0.01*(Gmodel.BdBox(6) - Gmodel.BdBox(5));
 
-N = 150;
+N = 500;
 
 lambda = 0.1*(Gmodel.BdBox(6) - Gmodel.BdBox(5));
 v = Gmodel.Node(J,:);

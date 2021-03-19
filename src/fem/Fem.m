@@ -84,6 +84,7 @@ classdef Fem < handle
         PressureLoad = 0;
         Type = 'PlaneStrain'
         Linestyle = '-';
+        Linestyle0 = '-';
         Colormap = turbo;
         ColorAxis = [];
         I3 = eye(3); O3 = zeros(3);
@@ -250,7 +251,7 @@ else
 end
 
 h{1} = patch('Faces',BoundMatrix,'Vertices',Fem.Node0,...
-    'LineStyle','-','Linewidth',1,'EdgeColor','k');
+    'LineStyle',Fem.Linestyle0,'Linewidth',1,'EdgeColor','k');
 
 h{2} = patch('Faces',FaceMatrix,'Vertices',V,...
     'FaceVertexCData',Z,'Facecolor',S,'LineStyle',Fem.Linestyle,...
@@ -461,11 +462,11 @@ while true
         Delta = Fem.Utmp;
 
         if rcond(full(A)) >= 1e-10
-            if Fem.SolverStartMMA
+            %if Fem.SolverStartMMA
                 DeltaU = A\B; % topology optimization needs exact mid-solution
-            else
-                [DeltaU,~] = gmres(A,B,[],Fem.ResidualNorm,100);
-            end
+            %else
+            %    [DeltaU,~] = gmres(A,B,[],Fem.ResidualNorm,100);
+            %end
         else, Singular = true; 
             DeltaU = Fem.Utmp(FreeDofs)*0;
         end
@@ -797,27 +798,33 @@ function msh = exportMesh(Fem,varargin)
     ISO = varargin{1};
     [~,I] = showISO(Fem,ISO);
     
-    sX = 1; sY = 1;
+    sX = 0; sY = 0;
+    sX0 = 1; sY0 = 1;
     if ~isempty(Fem.ReflectionPlane)
         Rp = Fem.ReflectionPlane;
         if Rp(1) == 1 || Rp(1) == -1
-            sX = sX*2;
+            sX0 = sX0*2;
         end
         if Rp(2) == 1 || Rp(2) == -1
-            sY = sY*2;
+            sY0 = sY0*2;
         end
     end
+    
+    %sX = sX0;
+    %sY = sY0;
     
     if ~isempty(Fem.Repeat)
         instr = Fem.Repeat;
         for ii = 1:length(instr)
             if instr(ii) == 1
-                sX = sX + 1;
+                sX = sX + sX0;
             end
             if instr(ii) == 2
-                sY = sY + 1;
+                sY = sY + sY0;
             end
         end
+    else
+
     end
     
     B = [Fem.BdBox(1:2)*sX, Fem.BdBox(3:4)*sY];
@@ -1310,7 +1317,7 @@ if ~isempty(Fem.Pressure)
         S = [NodeID(1:end-1),NodeID(2:end)].';
         
 %         hold on;
-%         quiver( V(1:end-1,1)+dsx/2,V(1:end-1,2)+dsy/2,-Nx,-Ny,'b'); 
+         %quiver( V(1:end-1,1)+dsx/2,V(1:end-1,2)+dsy/2,-Nx,-Ny,'b'); 
 
         Pload = beta*Fem.Pressure{2}(1);
 

@@ -49,9 +49,11 @@ J_ZZ     = 0.000625
 [control] 
 KP = 1
 KD = 5
+LK = 0
 KF1 = 1e-09
 KF2 = 1
 LAMBDA    = 0.0018182
+LAMBDAK   = 0
 SPLINEORDER    = 1
 
 [setpoint] 

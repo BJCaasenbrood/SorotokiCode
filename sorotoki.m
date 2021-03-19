@@ -11,6 +11,7 @@ end
 
 end
 
+% -------------------------------------------------------------- ESSENTIALS
 function showDemo
 clr;
 set = {'Meshing a 2D-circle',...
@@ -25,13 +26,14 @@ switch(request)
     case(1); open mesh_circle; mesh_circle;
     case(2); open preview_bunny; preview_bunny;
     case(3); open fem_bellow; fem_bellow;
-    case(4); open fem_twist; fem_twist;
+    case(4); open fem_twisting_beam; fem_twisting_beam;
     case(5); open opt_pneunet; opt_pneunet;
     otherwise; warning('Please select a demo from the list above.');
 end
 
 end
 
+% -------------------------------------------------------------- ESSENTIALS
 function setupToolkit  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 clc; clear; close all; warning off; beep off;
@@ -237,6 +239,7 @@ warning on;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 end
 
+% -------------------------------------------------------------- ESSENTIALS
 function Path = getPath(print)
 if nargin < 1; print = false;end
 Path = cd;
@@ -365,7 +368,7 @@ x = modelPathConfirm;
 end
 end
 
-% ---------------------------------------------------------------- DYNAMICS
+% ----------------------------------------------------------------- CONTROL
 function x = IncludeControl(Path,Request)
 global FID
 

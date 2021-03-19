@@ -6,6 +6,20 @@
 
 #IncludeRegexTransform: 
 
+/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/src/CARE.cpp
+CARE.h
+/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/src/CARE.h
+
+/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/src/CARE.h
+Eigen/Dense
+-
+iostream
+-
+time.h
+-
+vector
+-
+
 /home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/src/Chameleon.cpp
 string
 -
@@ -117,6 +131,8 @@ PortHamiltonian.h
 /home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/src/PortHamiltonian.h
 
 /home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/src/PortHamiltonian.h
+unistd.h
+-
 Eigen/Dense
 -
 PortController.cpp
@@ -125,6 +141,8 @@ Cosserat.cpp
 /home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/src/Cosserat.cpp
 readFile.h
 /home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/src/readFile.h
+CARE.cpp
+/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/src/CARE.cpp
 
 /home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/src/PropertyTensor.h
 

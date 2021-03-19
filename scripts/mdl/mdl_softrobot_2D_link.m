@@ -1,13 +1,13 @@
 clr;
 %% assign free DOF
-mdl = Model([0,1,0,1,0,0],'NModal',3,'NDisc',1);
-mdl = setupSoftRobot(mdl,1,0,1e2);
-mdl = mdl.set('Tdomain',10); 
-mdl = mdl.set('Tdomain',10); 
-mdl = mdl.set('Movie',true); 
+mdl = Model([0,1,0,1,0,0],'NModal',4,'NDisc',1);
+mdl = setupSoftRobot(mdl,0.5,0,1e2);
+mdl = mdl.set('Tdomain',15); 
+mdl = mdl.set('Movie',0); 
 
 %% generate and solve dynamic model
 mdl = mdl.generate();
+mdl.q0_(1) = 15;
 mdl = mdl.csolve(); 
 
 %% show results
@@ -15,7 +15,9 @@ figure(102)
 t  = mdl.get('t');
 
 subplot(3,4,[1 2 5 6]);
-plot(t,mdl.q,'linewidth',1.5); hold on; grid on;
+plot(t,mdl.q_,'k-','linewidth',0.5); hold on; grid on;
+plot(t,mdl.q,'linewidth',1.5);  grid on;
+
 
 subplot(3,4,[3 4 7 8]);
 plot(t,mdl.H,'linewidth',1.5);hold on; grid on;
@@ -29,6 +31,18 @@ legend('$x$','$y$','$z$',...
     'interpreter','latex','FontSize',12);
 
 %% generate rig
+% figure(106);
+% clf;
+% subplot(2,1,1); 
+% plot(t,mdl.etae(:,1:3),'linewidth',1.5); 
+% %plot(t,mdl.detae,'linewidth',1.5); 
+% %axis([0 10 -.02 .02])
+% % 
+% subplot(2,1,2); hold on;
+% plot(t,mdl.etae(:,4:6),'linewidth',1.5); 
+% axis([0 10 -.2 .2]);
+
+if 1
 [rig, sph] = setupRig(mdl);
 
 text(0.05,0,-0.06,'\textbf{$g_d$}','interpreter','latex','fontsize',16);
@@ -49,6 +63,7 @@ for ii = 1:fps(t,8):length(mdl.q)
     if ii == 1, pause(0.5); end
     mdl = mdl.updateFrame();
 end
+end
 
 %% BACK-END FUNCTIONS
 % setup model
@@ -56,17 +71,17 @@ function mdl = setupSoftRobot(mdl,Kp,Kd,Lam)
 mdl = mdl.set('Controller',1);
 
 L0 = 0.063;
-
-mdl = mdl.set('TimeStep',   1/30);
+mdl = mdl.set('TimeStep',   1/50);
 mdl = mdl.set('Sdomain',    L0);
-mdl = mdl.set('SpaceStep',  25);
+mdl = mdl.set('SpaceStep',  10);
 mdl = mdl.set('Density',    50);
 mdl = mdl.set('Radius',     0.03);
-mdl = mdl.set('Gravity',    [-9.81,0,0]);
+mdl = mdl.set('Gravity',    [0,-9.81,0]);
 mdl = mdl.set('E',          250);
 mdl = mdl.set('Mu',         0.05);
-mdl = mdl.set('Gain',       [Kp,Kd]);
-mdl = mdl.set('Lambda',     Kp/Lam);
+mdl = mdl.set('Gain',       [Kp,Kd,Kp]);
+mdl = mdl.set('Lambda',     [Kp/Lam,Kp*1e-2]);
+
 
 mdl = mdl.set('ActuationSpace',1);
 

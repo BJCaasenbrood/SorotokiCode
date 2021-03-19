@@ -27,9 +27,11 @@ void PortController::setup(
   	T = cf.Value("solver","TDOMAIN");
 
   	Lambda = cf.Value("control","LAMBDA");
+  	LambdaK = cf.Value("control","LAMBDAK");
   	Order = cf.Value("control","SPLINEORDER");
   	Kp = cf.Value("control","KP");
   	Kd = cf.Value("control","KD");
+  	L  = cf.Value("control","LK");
   	K1 = cf.Value("control","KF1");
   	K2 = cf.Value("control","KF2");
   	Xd = cf.Value("setpoint","Xd");
@@ -40,9 +42,10 @@ void PortController::setup(
   	Q3d = cf.Value("setpoint","Q3d");
   	Q4d = cf.Value("setpoint","Q4d");
 
-	q.noalias() = VectorXd::Zero(Na*Nm);
-  	p.noalias() = VectorXd::Zero(Na*Nm);
-  	u.noalias() = VectorXd::Zero(Na*Nm);
+	q.noalias()  = VectorXd::Zero(Na*Nm);
+  	p.noalias()  = VectorXd::Zero(Na*Nm);
+  	u.noalias()  = VectorXd::Zero(Na*Nm);
+  	uk.noalias() = VectorXd::Zero(Na*Nm);
   	dHdq.noalias() = VectorXd::Zero(Na*Nm);
   	dHdp.noalias() = VectorXd::Zero(Na*Nm);
 
@@ -93,8 +96,6 @@ void PortController::EnergyShaping(
 	K.setZero();
 	dx.setZero();
 
-	//gd(4) = spline_X((1/T)*t)(0);
-
 	// set virtual stiffness gains
 	k << K1,K1,K1,K2,K2,K2;
 	K.diagonal() = k;
@@ -114,4 +115,52 @@ void PortController::EnergyShaping(
 
 	// energy-shaping + damping injection -- - Kp*dx 
 	u.noalias() = Sa*(dHdq - Kp*dx - Kd*Dee*dHdp);
+}                         
+
+//---------------------------------------------------
+//-------------------------------- class constructor
+//---------------------------------------------------
+void PortController::KalmanCorrection(
+	Mad J,
+	V7d g,
+	V7d z,
+	V6d ed){
+
+	int n = Na*Nm;
+	int m = n;
+
+	M6d K;
+	V6d R;
+	V6d k;
+
+	Mnd N(n,n);
+	Vnd dx(n);
+	M4d G, Gi;
+	M6d Tang;
+	V6d Phi;
+
+	R.setZero();
+	K.setZero();
+	dx.setZero();
+
+	// set virtual stiffness gains
+	k << K1,K1,K1,K2,K2,K2;
+	K.diagonal() = k;
+
+	// relative spatial-twist between g(l) and measurement
+	SE3(g,G);
+	SE3Inv(z,Gi);
+	logmapSE3(Gi*G,Phi);
+	tmapSE3(Phi,Tang);
+
+	// compute residual spring force
+	R.noalias() = K*Tang*Phi;
+
+	//compute dq - desired potential energy 
+	//x.noalias() = J.transpose()*(J*J.transpose() + 
+	//	LambdaK*Mnd::Identity(6,6)).householderQr().solve(R);
+	dx.noalias() = J.transpose()*R;
+
+	// kalman output
+	uk.noalias() = -L*dx - LambdaK*J.transpose()*ed;
 }                         

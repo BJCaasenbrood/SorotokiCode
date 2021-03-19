@@ -21,7 +21,7 @@ for ii = 1:3:length(Ux)
     py = mm2m*Py(ii,:);
 
     hold on;
-    plot(-py',px','o-','Color',col(1),'linewidth',2);
+    plot(-px',px','o-','Color',col(1),'linewidth',2);
 end
 
 axis([-0.02 0.07 0 0.08]);
@@ -87,7 +87,7 @@ figure(103)
 cla;
 subplot(2,1,1);
 for ii = 3:size(Y1,2)
-    shade(s/0.07,Y1(:,ii),'Color',col(1),'linewidth',1,'FillAlpha',0.2);
+    shade(s/0.07,-Y1(:,ii).*(Y2(:,ii) + 8*flipud(Y2(:,ii)) - 0.01*Y1(:,ii)),'Color',col(1),'linewidth',1,'FillAlpha',0.2);
     hold on;
 end
 
@@ -105,22 +105,22 @@ W2 = Y2*Y2.';
 [u2,S2,~] = svd(W2);
 
 figure(105);
+
 for ii = 1:5
     subplot(2,1,1);
     plot(s/max(s),u1(:,ii),'Color',col(ii),'linewidth',2);
     hold on;
     
     subplot(2,1,2);
-    plot(s/max(s),u2(:,ii),'Color',col(ii),'linewidth',2);
+    shade(s/max(s),u2(:,ii),'Color',col(1),'linewidth',2);
     hold on;
 end
-
-
 
 function f = Objective(Model,P,x)
 Model.q0 = x;
 G = Model.string(0,15);
 
+%[~,D] = distance2curve(G,P,'linear');
 f = sqrt(sum((P(:,1)-G(:,7)).^2 + (P(:,2)-G(:,5)).^2));
 end
 
@@ -137,9 +137,9 @@ mdl = mdl.set('Radius',    0.01);
 mdl = mdl.set('Gravity',   [0,0,-9.81]);
 mdl = mdl.set('E',         25);
 mdl = mdl.set('Mu',        0.1);
-mdl = mdl.set('Gain',      [Kp,Kd]);
+mdl = mdl.set('Gain',      [Kp,Kd,2]);
 mdl = mdl.set('Spring',    [1e-10,1]);
-mdl = mdl.set('Lambda',    Kp/Lam);
+mdl = mdl.set('Lambda',    [Kp/Lam,2]);
 
 mdl = mdl.set('ActuationSpace',-1);
 

@@ -107,11 +107,15 @@ function Rig = hide(Rig,varargin)
 end
 
 %----------------------------------------------------------- compute ik rig
-function Rig = compute(Rig,t)
+function Rig = compute(Rig,t,varargin)
     
     Rig = Rig.reset();
-    [Rig.g,X] = Rig.Model.string(t,200);
-    
+    if isempty(varargin)
+        [Rig.g,X] = Rig.Model.string(t,200);
+    else
+        [Rig.g,X] = Rig.Model.string(t,200,varargin{1});
+    end
+%     
     s = Rig.Domain;
     N = length(Rig.List);
     Instr = cell(1,1);
@@ -199,11 +203,6 @@ function Rig = showSweep(Rig)
     
 end
 
-end
-
-methods (Access = private)
-    
-%----------------------------------------------------- generate groundplane
 function Groundplane(Rig,B)
 Nx = 4;
 Ny = 4;
@@ -213,6 +212,7 @@ y = linspace(B(3),B(4),Ny+1);
 
 [X,Y] = meshgrid(x,y);
 
+tmp = B;
 v = [tmp(1),tmp(3), tmp(5);  
      tmp(2),tmp(3), tmp(5);
      tmp(2),tmp(4), tmp(5);
@@ -237,6 +237,13 @@ patch('Faces',f,'Vertices',v,...
     'Linewidth',1.5,'linestyle','-','FaceColor','none',...
     'EdgeColor',[1 1 1]*0.5);
 end
+
+
+end
+
+methods (Access = private)
+    
+%----------------------------------------------------- generate groundplane
 
 end
 end

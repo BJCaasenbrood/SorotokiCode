@@ -11,6 +11,7 @@ typedef Eigen::Matrix<double, 6, 6> M6d;
 typedef Eigen::Matrix<double, 4, 4> M4d;
 typedef Eigen::Matrix<double, 3, 3> M3d;
 typedef Eigen::Vector<double, 13> V13d;
+typedef Eigen::Vector<double, 19> V19d;
 typedef Eigen::Vector<double, 7> V7d;
 typedef Eigen::Vector<double, 6> V6d;
 typedef Eigen::Vector<double, 4> V4d;

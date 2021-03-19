@@ -2,7 +2,7 @@
 KINEMATIC_CONTROLLER = 0 
 ENERGY_CONTROLLER    = 1 
 WRITE_OUTPUT         = 1 
-ACTUSPACE =1
+ACTUSPACE =-1
 PROPERTYSET =-1
 DISCONTINIOUS        = 0 
 
@@ -10,19 +10,19 @@ DISCONTINIOUS        = 0
 K1 = 0
 K2 = 1
 K3 = 0
-E1 = 1
+E1 = 0
 E2 = 0
 E3 = 0
 
 [model] 
-NMODE   = 3
+NMODE   = 8
 NDISC   = 1
-NDOF    = 2
+NDOF    = 1
 
 [solver] 
 TDOMAIN = 10
-SPACESTEP = 25
-TIMESTEP  = 0.033333
+SPACESTEP = 150
+TIMESTEP  = 0.02
 INTSTEP   = 100
 ATOL      = 1e-2
 RTOL      = 1e-2
@@ -33,32 +33,34 @@ SPEEDUP   = 80
 ADAMPING  = 1
 
 [physics] 
-LENGTH   = 0.063
-RHO      = 50
-EMOD     = 250
+LENGTH   = 0.12
+RHO      = 800
+EMOD     = 25
 NU       = 0.4
-MU       = 0.05
+MU       = 0.1
 PRS_AREA = 1e-5
-GRAVITY  = -9.81           0           0
+GRAVITY  = 0           0       -9.81
 RADIUS   = 0.01
-AREA     = 0.0028274
-J_XX     = 0.00045
-J_YY     = 0.000225
-J_ZZ     = 0.000225
+AREA     = 0.00031416
+J_XX     = 5e-05
+J_YY     = 2.5e-05
+J_ZZ     = 2.5e-05
 
 [control] 
-KP = 1
-KD = 0
-KF1 = 1e-09
+KP = 0.0001
+KD = 70
+LK = 0.5
+KF1 = 0.001
 KF2 = 1
-LAMBDA    = 0.01
+LAMBDA    = 2e-07
+LAMBDAK   = 0.003
 SPLINEORDER    = 1
 
 [setpoint] 
-Q1d = 0
+Q1d = 1
 Q2d = 0
 Q3d = 0
 Q4d = 0
-Xd =  0.060411
+Xd =  0.06
 Yd =  0
-Zd =  -0.038467
+Zd =  -0.01

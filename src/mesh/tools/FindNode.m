@@ -172,7 +172,7 @@ end
 
 function id = BoxSelect(Node,Line,tol)
 d = dRectangle(Node,Line(1)-eps,Line(2)+eps,Line(3)-eps,Line(4)+eps);
-id = find(abs(d(:,end))<tol);
+id = find(d(:,end)<tol);
 end
 
 

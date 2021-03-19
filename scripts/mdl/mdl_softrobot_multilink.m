@@ -61,8 +61,8 @@ mdl = mdl.set('Radius',    0.05);
 mdl = mdl.set('Gravity',   [-9.81,0,0]);
 mdl = mdl.set('E',         250);
 mdl = mdl.set('Mu',        0.15);
-mdl = mdl.set('Gain',      [Kp,Kd]);
-mdl = mdl.set('Lambda',    Kp/Lam);
+mdl = mdl.set('Gain',      [Kp,Kd,0]);
+mdl = mdl.set('Lambda',    [Kp/Lam,0]);
 mdl = mdl.set('ActuationSpace',1);
 
 mdl = mdl.set('Point',...

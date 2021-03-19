@@ -271,7 +271,9 @@ Mesh.Area    = A;
 % Mesh.Edge  = Ev;
 
 Mesh = ElementAdjecency(Mesh);
-Mesh.BndMat = ConstructBounds(Mesh);
+if Mesh.Dim < 3
+    Mesh.BndMat = ConstructBounds(Mesh);
+end
 
 end
 

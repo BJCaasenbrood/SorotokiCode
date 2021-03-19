@@ -59,6 +59,7 @@ void Cosserat::setup(const char* str){
   	G.noalias()   = VectorXd::Zero(Na*Nm);
   	q.noalias()   = VectorXd::Constant(Na*Nm,1e-3);
   	dq.noalias()  = VectorXd::Zero(Na*Nm);
+  	ddq.noalias() = VectorXd::Zero(Na*Nm);
 
   	gradHp.noalias() = VectorXd::Zero(Na*Nm);
   	gradHq.noalias() = VectorXd::Zero(Na*Nm);
@@ -223,8 +224,8 @@ void Cosserat::buildLagrangianModel(
 
 	double K1Vg, K2Vg;
 
-	V13d K1, K2;
-	V13d x, dx;
+	V19d K1, K2;
+	V19d x, dx;
 
 	// initial matrices
 	Jb.setZero();
@@ -272,8 +273,9 @@ void Cosserat::buildLagrangianModel(
 	}
 
 	// return configuration and velocities
-	g.noalias()   = x.block(0,0,7,1);
-	eta.noalias() = x.block(7,0,6,1);
+	g.noalias()    = x.block(0,0,7,1);
+	eta.noalias()  = x.block(7,0,6,1);
+	//deta.noalias() = x.block(13,0,6,1);
 
 	// compute adjoint actions
 	AdmapInv(g,AdgInv);
@@ -284,6 +286,8 @@ void Cosserat::buildLagrangianModel(
 
 	K1Jt.noalias() = AdgInv*Jbt;
 	Jbt.noalias() = K1Jt;
+
+	deta.noalias() = Jbt*dq + Jb*ddq;
 }
 
 //---------------------------------------------------
@@ -306,7 +310,7 @@ void Cosserat::buildInertiaMatrix(
 	x(0) = 1.0;
 
 	// set states
-	q.noalias()  = v;
+	q.noalias() = v;
 
 	// compute forward integration step
 	double ds = (1.0*(L))/(1.0*(IntegrationSteps));
@@ -351,10 +355,10 @@ void Cosserat::globalSystemMatODE(
 //---------------------------------------------------
 void Cosserat::lagrangianODE(
 	double s, 
-	V13d x, 
+	V19d x, 
 	Mad J, 
 	Mad Jt,
-	V13d &dx, 
+	V19d &dx, 
 	Mad &dJ, 
 	Mad &dJt, 
 	Mnd &dM, 
@@ -374,28 +378,32 @@ void Cosserat::lagrangianODE(
 	M4d A;
 	M3d R;
 	V4d quat;
-	V6d xi, eta, r;
+	V6d xi, dxi, r;
 
 	//evaluate strain-field
 	Phi.eval(s,PMat);
 
 	// decomposition of configuration space
 	xi.noalias()   = (Ba*PMat)*q + Xi0;
+	dxi.noalias()  = (Ba*PMat)*dq;
 	g.noalias()    = x.block(0,0,7,1);
 	quat.noalias() = x.block(0,0,4,1);
 	eta.noalias()  = x.block(7,0,6,1);
+	deta.noalias() = x.block(13,0,6,1);
 
 	SE3pos(g, r);
 	quat2rot(quat,R);
 	strainMapping(R*xi.block(0,0,3,1),A);
 
 	// precompute temporaries
+	admap(dxi,X1);
 	admap(xi,X2);
 
 	// compute local D-configuration
-	(dx.block(0,0,4,1)).noalias() = (1.0/(2*quat.norm()))*A*quat;
-	(dx.block(4,0,3,1)).noalias() = R*xi.block(3,0,3,1);
-	(dx.block(7,0,6,1)).noalias() = -X2*eta + (Ba*PMat)*dq;
+	(dx.block(0,0,4,1)).noalias()  = (1.0/(2*quat.norm()))*A*quat;
+	(dx.block(4,0,3,1)).noalias()  = R*xi.block(3,0,3,1);
+	(dx.block(7,0,6,1)).noalias()  = -X2*eta + dxi;
+	(dx.block(13,0,6,1)).noalias() = -X1*eta - X2*deta + (Ba*PMat)*ddq;
 
 	// overwrite temporary matrices
 	Admap(g,X1);
@@ -414,8 +422,6 @@ void Cosserat::lagrangianODE(
 	dM.noalias() = (X0).transpose()*Mtt*(X0);
 
 	// compute local C-coriolis matrix
-	//dC.noalias() = (X0).transpose()*((Mtt*X2 - 
-	// 	X2.transpose()*Mtt)*(X0) + Mtt*(X0));
 	dC.noalias() = (X0).transpose()*((Mtt*X2 - 
 	 	X2.transpose()*Mtt)*(X0) + Mtt*(X1*Jt));
 

@@ -10,7 +10,7 @@
 #include "readFile.h"
 #include "DEBUGGER.h"
 
-#define DISCONTINIOUS
+//#define DISCONTINIOUS
 
 #ifdef DISCONTINIOUS
 #include "ShapesX.cpp"
@@ -62,7 +62,7 @@ class Cosserat
 
 	V7d g;
 	V6d eta, deta;
-	Vnd q, dq;
+	Vnd q, dq, ddq;
 	Mnd M, C, Mt;
 	Mad Jb, Jbt;
 	Mad_ Me, Ce;
@@ -98,10 +98,10 @@ class Cosserat
 
 	void lagrangianODE(
 		double s, 
-		V13d x, 
+		V19d x, 
 		Mad J, 
 		Mad Jt,
-		V13d &dx, 
+		V19d &dx, 
 		Mad &dJ, 
 		Mad &dJt, 
 		Mnd &dM, 

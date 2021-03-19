@@ -7,13 +7,13 @@ classdef Model
         NDisc;
         Table;
         g;
-        ge, etae;
+        ge, etae, detae;
         gd;
         tau;
         Texture;
-        q;
+        q,q_;
         dq;
-        q0;
+        q0, q0_;
         dq0;
         u0;      
         t;
@@ -24,6 +24,7 @@ classdef Model
         Controller;
         Spring;
         Area, Jxx, Jyy, Jzz;
+        Kee;
         Xspline;
     end
     
@@ -92,13 +93,14 @@ function obj = Model(Table,varargin)
     obj.AssignProperties = -1;
     
     obj.Point = [1,0,0,0,1,0,0];
-    obj.Gain = [1e-2,0.05];
+    obj.Gain = [1e-2,0.05,0.02];
+    obj.Lambda = [1e-4,1e-4,1e-4];
     
     for ii = 1:2:length(varargin)
         obj.(varargin{ii}) = varargin{ii+1};
     end
     
-    cdsoro;
+    %cdsoro;
 end
 
 %---------------------------------------------------------------------- get     
@@ -126,6 +128,8 @@ function Model = generate(Model)
     Model = inertia(Model);
     Model = GenerateCosserat(Model);
     Model = GenerateConfigFile(Model);
+    
+    Model = linearStiffness(Model);
     
     if isempty(Model.Xspline)
         T = Model.Tdomain;
@@ -184,6 +188,7 @@ end
 %//////////////////////////////////
 writeMatrixFile([dir_path,'/log/state.txt'],Model.q0,'delimiter','\t');
 writeMatrixFile([dir_path,'/log/momenta.txt'],Model.dq0,'delimiter','\t');
+writeMatrixFile([dir_path,'/log/estimate.txt'],Model.q0_,'delimiter','\t');
 writeMatrixFile([dir_path,'/log/grav_vector.txt'],...
     [zeros(3,1);Model.Gravity(:)],'delimiter','\t');
 writeMatrixFile([dir_path,'/log/xi0_vector.txt'],Model.xia0(:),'delimiter','\t');
@@ -207,6 +212,9 @@ y = load([dir_path ,'/log/state.txt']);
 Model.q = y(:,2:end);
 Model.t = y(:,1);
 
+y = load([dir_path ,'/log/estimate.txt']);
+Model.q_ = y(:,2:end);
+
 y = load([dir_path ,'/log/hamiltonian.txt']);
 Model.H = [y(:,2:end), sum(y(:,2:end),2)];
 
@@ -218,10 +226,13 @@ Model.etae = y(:,2:end);
 
 y = load([dir_path ,'/log/setpoint.txt']);
 Model.gd = y(:,2:end);
+
+y = load([dir_path ,'/log/endeffector_Acc.txt']);
+Model.detae = y(:,2:end);
 end
 
-%----------------------------------------------------------------- simulate
-function [g, X] = string(Model,k,Quality)
+%-------------------------------------------------- compute Cosserat string
+function [g, X] = string(Model,k,Quality,varargin)
     
     if nargin < 3
         Quality = 100;
@@ -237,6 +248,12 @@ function [g, X] = string(Model,k,Quality)
         end
     end
     
+    if isempty(varargin)
+        %s = linspace(0,Model.Sdomain,Quality);
+    else
+        Qtmp = varargin{1};
+    end
+%     
     X = linspace(0,Model.Sdomain,Quality);
     ee = Model.Ba*Model.Phi(Model.Length)*Qtmp;
     
@@ -251,6 +268,37 @@ function [g, X] = string(Model,k,Quality)
 
     g = yf(:,1:7);
 
+end
+
+%------------------------------------------- compute Cosserat strain fields
+function [K,s] = strainField(Model,k,Quality,varargin)
+    
+if nargin < 3
+    Quality = 100;
+end
+
+if nargin < 2
+    Qtmp = Model.q0;
+else
+    if k <= 0
+        Qtmp = Model.q0;
+    else
+        Qtmp = Model.q(k,1:Model.Nq).';
+    end
+end
+    
+if isempty(varargin)
+    s = linspace(0,Model.Sdomain,Quality);
+else
+    s = varargin{1};
+end
+
+K = zeros(length(s),Model.NDof);
+
+for jj = 1:length(s)
+    K(jj,:) = transpose((Model.Phi(s(jj))*Qtmp));
+end
+    
 end
 
 %--------------------------------------------------- update animation frame
@@ -274,6 +322,25 @@ function Model = inertia(Model)
     Model.Jxx     = 0.5*Model.Radius^2;
     Model.Jyy     = 0.25*Model.Radius^2;
     Model.Jzz     = 0.25*Model.Radius^2; 
+end
+
+%------------------------------------------------- initial linear stiffness 
+function Model = linearStiffness(Model)
+    E0 = Model.E;
+    G0 = E0/(2*(1+Model.Nu));
+    A = Model.Area;
+    J11 = Model.Jxx;
+    J22 = Model.Jyy;
+    J33 = Model.Jzz;
+    
+    S = diag([G0*J11,E0*J22,E0*J33,E0*A,G0*A,G0*A]);
+    s = linspace(0,Model.Sdomain,150);
+    ds = mean(diff(s));
+    
+    Model.Kee = zeros(Model.NDof*Model.NModal,Model.NDof*Model.NModal);
+    for ii = 1:Model.SpaceStep
+        Model.Kee = Model.Kee + ds*(Model.Ba*Model.Phi(s(ii))).'*S*Model.Ba*Model.Phi(s(ii));
+    end
 end
 
 %------------------------------------------------------------ show 3D model
@@ -462,6 +529,7 @@ Model.NDof = size(Model.Ba,2);
 Model.Phi  = @(x) ShapeFunction(Model,x);
 Model.Nq   = Model.NDof*Model.NModal;
 Model.q0   = zeros(Model.NDof*Model.NModal,1);
+Model.q0_  = zeros(Model.NDof*Model.NModal,1);
 Model.dq0  = zeros(Model.NDof*Model.NModal,1);
 Model.u0  = zeros(Model.NDof*Model.NModal,1);
 end
@@ -550,9 +618,11 @@ fprintf(FID,['J_ZZ     = ', num2str(Model.Jzz), '\n']); %'2.5000e-10'
 fprintf(FID,'\n[control] \n');
 fprintf(FID,['KP = ', num2str(Model.Gain(1)), '\n']);
 fprintf(FID,['KD = ', num2str(Model.Gain(2)), '\n']);
+fprintf(FID,['LK = ', num2str(Model.Gain(3)), '\n']);
 fprintf(FID,['KF1 = ', num2str(Model.Spring(1)), '\n']);
 fprintf(FID,['KF2 = ', num2str(Model.Spring(2)), '\n']);
-fprintf(FID,['LAMBDA    = ', num2str(Model.Lambda), '\n']);
+fprintf(FID,['LAMBDA    = ', num2str(Model.Lambda(1)), '\n']);
+fprintf(FID,['LAMBDAK   = ', num2str(Model.Lambda(2)), '\n']);
 fprintf(FID,['SPLINEORDER    = ',num2str(1),'\n']);
 
 fprintf(FID,'\n[setpoint] \n');

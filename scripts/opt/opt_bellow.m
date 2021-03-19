@@ -2,7 +2,7 @@ clear; close all; clc;
 
 %% set signed distance function
 W = 8;
-H = 4;
+H = 5;
 sdf = @(x) Bellow(x,W,H);
 
 %% generate mesh
@@ -13,34 +13,34 @@ msh.show(); pause(2);
 %% show generated mesh
 fem = Fem(msh,'VolumeInfill',0.3,'Penal',4,'FilterRadius',0.75,...
               'Nonlinear',false,'TimeStep',1/3,'ReflectionPlane',[1,1],...
-              'OptimizationProblem','Compliant','Repeat',[2,2,2],...
-              'MaxIterationMMA',35,'Movie',false);
+              'OptimizationProblem','Compliant','Repeat',[1 2 2],...
+              'MaxIterationMMA',50,'Movie',1);
 
 %% add constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[0,1]);
 fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,0]);
 
 id = fem.FindNodes('Location',[0.1*W,H]);
-fem = fem.AddConstraint('Output',id,[0,1]);
+fem = fem.AddConstraint('Output',id,[0,-1]);
 fem = fem.AddConstraint('Spring',id,[0,1]);
 
 id = fem.FindNodes('Line',[0.02*W,W,H,H]);
 fem = fem.AddConstraint('Spring',id,[0,.1]*1e-1);
 
 id = fem.FindElements('Location',[0,0],1);
-fem = fem.AddConstraint('PressureCell',id,[1e-3,0]);
+fem = fem.AddConstraint('PressureCell',id,[-1e-3,0]);
 
 %% set density
-fem = fem.initialTopology('Hole',[0,0],1.0);
+fem = fem.initialTopology('Hole',[0,0],1.5);
 
 %% material
-fem.Material = Ecoflex0030;
+fem.Material = Ecoflex0050;
 
 %% solving
 fem.optimize();
 
 %% convert topology result to mesh
-mshr = fem.exportMesh(0.25,0.07,[1.0,0.25,5]); 
+mshr = fem.exportMesh(0.25,0.07,[1.2,0.25,5]); 
 mshr.show(); pause(2);
 
 femr = Fem(mshr,'Nonlinear',true,'TimeStep',1/15,'FilterRadius',H/15,...
@@ -50,19 +50,18 @@ femr = Fem(mshr,'Nonlinear',true,'TimeStep',1/15,'FilterRadius',H/15,...
 id = femr.FindNodes('Top'); 
 femr = femr.AddConstraint('Support',id,[1,1]);
 
-id = femr.FindEdges('AllHole');
-femr = femr.AddConstraint('Pressure',id,[1.5*kpa,0]);
-
-id = femr.FindNodes('Bottom');
+id = femr.FindNodes('Bottom'); 
 femr = femr.AddConstraint('Support',id,[1,0]);
+
+id = femr.FindEdges('AllHole');
+femr = femr.AddConstraint('Pressure',id,[-0.15*kpa,0]);
 
 %% assign material to reduced fem
 D = 25; % compress. factor (more stable)
-femr.Material = Ecoflex0030(D);
+femr.Material = Ecoflex0050(D);
 
 %% solve final finite-element problem
 femr.solve();
-
 
 function D = Bellow(x,W,H)
 R1 = dRectangle(x,0,W,0,H);
