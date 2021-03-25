@@ -104,10 +104,11 @@ void PortController::EnergyShaping(
 	SE3(g,G);
 	SE3Inv(gd,Gi);
 	logmapSE3(Gi*G,Phi);
-	tmapSE3(Phi,Tang);
+	//tmapSE3(Phi,Tang);
 
 	// compute residual spring force
-	R.noalias() = K*Tang*Phi*smoothstep(t,0.0,2);
+	//R.noalias() = K*Tang*Phi*smoothstep(t,0.0,2);
+	R.noalias() = K*Phi*smoothstep(t,0.0,2);
 
 	//compute dq - desired potential energy 
 	dx.noalias() = J.transpose()*(J*J.transpose() + 

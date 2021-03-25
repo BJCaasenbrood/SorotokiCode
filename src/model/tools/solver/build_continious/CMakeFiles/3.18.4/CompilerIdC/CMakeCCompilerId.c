@@ -420,6 +420,9 @@ char const *info_cray = "INFO" ":" "compiler_wrapper[CrayPrgEnv]";
 # elif defined(__WINDOWS__)
 #  define PLATFORM_ID "Windows3x"
 
+# elif defined(__VXWORKS__)
+#  define PLATFORM_ID "VxWorks"
+
 # else /* unknown platform */
 #  define PLATFORM_ID
 # endif

@@ -1,6 +1,6 @@
 clr;
 %% assign free DOF
-mdl = Model([0,1,0,0,0,0],'NModal',8,'NDisc',1);
+mdl = Model([0,1,1,0,0,0],'NModal',8,'NDisc',1);
 mdl = setupSoftRobot(mdl,10e-5,70,500);
 mdl = mdl.set('TimeStep', 1/50);
 mdl = mdl.set('Tdomain',  10); 
@@ -48,7 +48,6 @@ for ii = 1:fps(t,7):length(mdl.q)
 
     setupFigure(ii);
     view(0,0);
-    pause;
 end
 
 %% BACK-END FUNCTIONS
