@@ -88,14 +88,14 @@ int main(int argc, char** argv)
 		fwrite(fileG,ph.t,ph.rod.g);
 		fwrite(fileXd,ph.t,ph.control.gd);
 		fwrite(fileEta,ph.t,ph.rod.eta);
-		fwrite(filedEta,ph.t,ph.rod.deta);
+		//fwrite(filedEta,ph.t,ph.rod.deta);
+		fwrite(filedEta,ph.t,ph.control.H);
+		
 
 		ph.ObserverUpdate();
 		fwrite(file_,ph.t,ph.q_);
 
 		ph.TimeUpdate();
-
-
 	}
 
 	//cout << ph.C.block(0,n,n,1)*ph.rod.gradHp << endl;

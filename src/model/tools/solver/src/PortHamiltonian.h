@@ -20,7 +20,7 @@ class PortHamiltonian
 	int Na, Nm, Ny, Nu;
 
 	typedef Matrix<double, Dynamic, Dynamic> Mnd;
-	typedef Vector<double, Dynamic> Vnd;
+	typedef Matrix<double, Dynamic, 1> Vnd;
 
 	bool EC1;   // Energy controller boolean
 

@@ -23,11 +23,11 @@ set = {'Meshing a 2D-circle',...
 request = action(set);
 
 switch(request)
-    case(1); open mesh_circle; mesh_circle;
-    case(2); open preview_bunny; preview_bunny;
-    case(3); open fem_bellow; fem_bellow;
-    case(4); open fem_twisting_beam; fem_twisting_beam;
-    case(5); open opt_pneunet; opt_pneunet;
+    case(1); open mesh_circle;
+    case(2); open preview_bunny;
+    case(3); open fem_bellow;
+    case(4); open fem_twisting_beam;
+    case(5); open opt_pneunet;
     otherwise; warning('Please select a demo from the list above.');
 end
 
@@ -262,25 +262,25 @@ WriteToFile([Path,'\config\']);
 WriteToFile([Path,'\src\__version__']);
 WriteToFile([Path,'\src\__base__']);
 WriteToFile([Path,'\src\__base__\fnc']);
-WriteToFile([Path,'\scripts\']);
 WriteToFile([Path,'\data\']);
 WriteToFile([Path,'\data\color']);
 WriteToFile([Path,'\data\colormap']);
 WriteToFile([Path,'\data\matcap']);
 WriteToFile([Path,'\data\matcap\img']);
 WriteToFile([Path,'\data\stl']);
+WriteToFile(genpath([Path,'/scripts']));
 else
 AddPath(Path);
 AddPath([Path,'\config\']);
 AddPath([Path,'\src\__version__']);
 AddPath([Path,'\src\__base__']);
 AddPath([Path,'\src\__base__\fnc']);
-AddPath([Path,'\scripts\']);
 AddPath([Path,'\data\color']);
 AddPath([Path,'\data\colormap']);
 AddPath([Path,'\data\matcap']);
 AddPath([Path,'\data\matcap\img']);
 AddPath([Path,'\data\stl']);
+AddPath(genpath([Path,'/scripts']));
 pause(.3);
 x = basePathConfirm;
 end

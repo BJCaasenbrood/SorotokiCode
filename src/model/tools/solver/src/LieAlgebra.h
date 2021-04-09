@@ -5,17 +5,18 @@
 #include <cmath>
 #include <math.h>
 #include <Eigen/Dense>
+
 using namespace Eigen;
 
 typedef Eigen::Matrix<double, 6, 6> M6d;
 typedef Eigen::Matrix<double, 4, 4> M4d;
 typedef Eigen::Matrix<double, 3, 3> M3d;
-typedef Eigen::Vector<double, 13> V13d;
-typedef Eigen::Vector<double, 19> V19d;
-typedef Eigen::Vector<double, 7> V7d;
-typedef Eigen::Vector<double, 6> V6d;
-typedef Eigen::Vector<double, 4> V4d;
-typedef Eigen::Vector<double, 3> V3d;
+typedef Eigen::Matrix<double, 13,1> V13d;
+typedef Eigen::Matrix<double, 19,1> V19d;
+typedef Eigen::Matrix<double, 7,1> V7d;
+typedef Eigen::Matrix<double, 6,1> V6d;
+typedef Eigen::Matrix<double, 4,1> V4d;
+typedef Eigen::Matrix<double, 3,1> V3d;
 
 
 //---------------------------------------------------

@@ -3,5 +3,5 @@ clr;
 obj = Gmodel('Bunny.stl');
      
 %% rendering    
-obj.bake().render(); view(10,20);
+obj = obj.bake().render(); view(10,20);
 obj.update();

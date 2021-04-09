@@ -35,10 +35,10 @@ class Cosserat
 	typedef Matrix<double, Dynamic, 6> Mad_;
 	typedef Matrix<double, 6, Dynamic> Mb;
 	typedef DiagonalMatrix<double, 6>  M6dd;
-	typedef Vector<double, Dynamic> Vnd;
-	typedef Vector<double, 3> V3d;
-	typedef Vector<double, 2> V2d;
-	typedef Vector<int, Dynamic> Vxi;
+	typedef Matrix<double, Dynamic, 1> Vnd;
+	typedef Matrix<double, 3, 1> V3d;
+	typedef Matrix<double, 2, 1> V2d;
+	typedef Matrix<int, Dynamic, 1> Vxi;
 
 	typedef VectorXd Vxd;
 	typedef MatrixXd Mxd;

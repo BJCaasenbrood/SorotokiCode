@@ -116,6 +116,8 @@ void PortController::EnergyShaping(
 
 	// energy-shaping + damping injection -- - Kp*dx 
 	u.noalias() = Sa*(dHdq - Kp*dx - Kd*Dee*dHdp);
+
+	H(0) = dx.transpose()*Kp*dx;
 }                         
 
 //---------------------------------------------------

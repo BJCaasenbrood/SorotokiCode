@@ -1,8 +1,9 @@
-clr;
+clr; cdsoro;
 %% assign free DOF
-mdl = Model([0,1,1,1,0,0],'NModal',2,'NDisc',2);
-mdl = setupSoftRobot(mdl,1,5,550);
-mdl = mdl.set('Tdomain',12); 
+mdl = Model([0,1,1,0,0,0],'NModal',6,'NDisc',2);
+mdl = setupSoftRobot(mdl,1e3,10,50);
+mdl = mdl.set('TimeStep', 1/30);
+mdl = mdl.set('Tdomain',25); 
 
 %% generate trajectory
 mdl = mdl.generate(); 
@@ -10,6 +11,7 @@ x = linspace(0,20,1e3).';
 mdl.Xspline = [x,0.02*sin(x)+0.2];
 
 %% generate and solve dynamic model
+mdl.q0(1) = 0;
 mdl = mdl.csolve(); 
 
 %% show results
@@ -53,20 +55,20 @@ mdl = mdl.set('Controller',1);
 
 L0 = 0.36;
 
-mdl = mdl.set('TimeStep',  1/30);
 mdl = mdl.set('Sdomain',   L0);
-mdl = mdl.set('SpaceStep', 12);
+mdl = mdl.set('SpaceStep', 50);
 mdl = mdl.set('Density',   150);
 mdl = mdl.set('Radius',    0.05);
-mdl = mdl.set('Gravity',   [-9.81,0,0]);
+mdl = mdl.set('Gravity',   [0,0,0]);
 mdl = mdl.set('E',         250);
-mdl = mdl.set('Mu',        0.15);
+mdl = mdl.set('Mu',        0.05);
 mdl = mdl.set('Gain',      [Kp,Kd,0]);
+mdl = mdl.set('Spring',    [0,1]);
 mdl = mdl.set('Lambda',    [Kp/Lam,0]);
-mdl = mdl.set('ActuationSpace',1);
+mdl = mdl.set('ActuationSpace',0);
 
 mdl = mdl.set('Point',...
-    [0,0,0,0,0.25,0,0.2]);
+    [0,0,0,0,0.275,0.1,0.05]);
 end
 
 % setup rig
@@ -74,7 +76,7 @@ function [rig, sph] = setupRig(mdl)
 gmdl1 = Gmodel('Pneulink.stl');
 gmdl2 = Gmodel('Pneulink.stl');
 gmdl3 = Gmodel('SoftGripperRedux.stl');
-gmdl3 = Blender(gmdl3,'Scale',0.425);
+gmdl3 = Blender(gmdl3,'Scale',0.475);
 
 assignin('base','gmdl1',gmdl1);
 assignin('base','gmdl2',gmdl2);
@@ -83,10 +85,10 @@ assignin('base','gmdl3',gmdl3);
 rig = Rig(mdl);
 rig = rig.add(gmdl1,gmdl2,gmdl3);
 rig = rig.parent(1,0,0);
-rig = rig.parent(1,1,0.425);
-rig = rig.parent(2,0,0.425);
-rig = rig.parent(2,1,0.85);
-rig = rig.parent(3,0,0.85);
+rig = rig.parent(1,1,0.475);
+rig = rig.parent(2,0,0.475);
+rig = rig.parent(2,1,0.95);
+rig = rig.parent(3,0,0.95);
 
 rig = rig.texture(1:3,base*1.15);
 rig.g0 = [rot2quat(roty(pi)).',0,0,0];

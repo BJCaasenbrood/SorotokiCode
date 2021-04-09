@@ -10,19 +10,19 @@ DISCONTINIOUS        = 1
 K1 = 0
 K2 = 1
 K3 = 1
-E1 = 1
+E1 = 0
 E2 = 0
 E3 = 0
 
 [model] 
-NMODE   = 2
+NMODE   = 8
 NDISC   = 2
-NDOF    = 3
+NDOF    = 2
 
 [solver] 
-TDOMAIN = 12
-SPACESTEP = 12
-TIMESTEP  = 0.033333
+TDOMAIN = 15
+SPACESTEP = 150
+TIMESTEP  = 0.02
 INTSTEP   = 100
 ATOL      = 1e-2
 RTOL      = 1e-2
@@ -33,34 +33,34 @@ SPEEDUP   = 80
 ADAMPING  = 1
 
 [physics] 
-LENGTH   = 0.36
-RHO      = 150
-EMOD     = 250
+LENGTH   = 0.12
+RHO      = 1200
+EMOD     = 25
 NU       = 0.4
-MU       = 0.15
+MU       = 0.1
 PRS_AREA = 1e-5
-GRAVITY  = -9.81           0           0
+GRAVITY  = 0           0       -9.81
 RADIUS   = 0.01
-AREA     = 0.007854
-J_XX     = 0.00125
-J_YY     = 0.000625
-J_ZZ     = 0.000625
+AREA     = 0.00031416
+J_XX     = 5e-05
+J_YY     = 2.5e-05
+J_ZZ     = 2.5e-05
 
 [control] 
-KP = 1
-KD = 5
+KP = 0.1
+KD = 15
 LK = 0
-KF1 = 1e-09
+KF1 = 1e-12
 KF2 = 1
-LAMBDA    = 0.0018182
+LAMBDA    = 0.002
 LAMBDAK   = 0
 SPLINEORDER    = 1
 
 [setpoint] 
-Q1d = 0
+Q1d = 1
 Q2d = 0
 Q3d = 0
 Q4d = 0
-Xd =  0.25
+Xd =  0.05
 Yd =  0
-Zd =  0.2
+Zd =  0.05

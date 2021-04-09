@@ -238,7 +238,6 @@ patch('Faces',f,'Vertices',v,...
     'EdgeColor',[1 1 1]*0.5);
 end
 
-
 end
 
 methods (Access = private)

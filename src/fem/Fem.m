@@ -849,7 +849,6 @@ function msh = exportMesh(Fem,varargin)
     
     for ii=1:length(c_cell0)
         c_tmp = c_cell0{ii};
-        %[x_tmp, y_tmp] = reducem(c_tmp(:,1), c_tmp(:,2), simplify_tol);
         c_red = decimatePoly(c_tmp,[simplify_tol, 2],false);
         if (nnz(c_red(:,1))>0)&&(nnz(c_red(:,2))>0)
             c_cell{end+1} = [Xscale*c_red(:,1), (Yscale)*c_red(:,2)];

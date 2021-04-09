@@ -22,8 +22,9 @@ class PortController
 
 	typedef Matrix<double, Dynamic, Dynamic> Mnd;
 	typedef Matrix<double, 6, Dynamic> Mad;
-	typedef Vector<double, Dynamic> Vnd;
+	typedef Matrix<double, Dynamic, 1> Vnd;
 	typedef Matrix<double, 6, 1> V6d;
+	typedef Matrix<double, 2, 1> V2d;
 
 	double t;	// time instance
 	double h;   // time-stepping
@@ -33,7 +34,7 @@ class PortController
 	Vnd u; 		// generalized control output
 	Vnd uk;		// kalman observer output
 
-	double H;	// Hamiltonian
+	V2d H;	// Hamiltonian
 	Vnd dHdq;   // Hamiltonian-Grad q
 	Vnd dHdp;   // Hamiltonian-Grad p
 

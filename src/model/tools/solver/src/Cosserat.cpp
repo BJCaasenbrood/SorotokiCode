@@ -75,13 +75,16 @@ void Cosserat::setup(const char* str){
 	debug("Table constraint build");
 
 	Vxi sa(Nm/Nd), sc(Nm), stab(Na*Nm);
-	//sa.setZero();
+	sa.setZero();
 	stab.setZero();
 	stab(0) = 1;
 
 	#ifdef DISCONTINIOUS
 		if (ActuationSpace == -1){
-			sa.setConstant(1.0);
+			//sa.setConstant(1.0);
+			sa(0) = 1;
+			sa(1) = 1;
+			sa(2) = 1;
 		}
 		else{
 			sa(0) = 1;

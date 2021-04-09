@@ -2,10 +2,12 @@ classdef Gmodel < handle
 
     properties (Access = public)
         Node;
+        Node0;
         Element;
         NNode;
         NElem;
         Texture;
+        Shading;
         Emission;
         Occlusion;
         Alpha;
@@ -14,7 +16,7 @@ classdef Gmodel < handle
     
     properties (Access = private)
         Name;
-        Node0;
+
         Element0;
         SDF;
         BdBox;
@@ -25,7 +27,6 @@ classdef Gmodel < handle
         FigAxis;
         TextureMap;
         TextureStretch;
-        Shading;
         Colormap;
         LineStyle;
         LineColor;
@@ -98,6 +99,7 @@ function obj = Gmodel(varargin)
     obj = GenerateObject(obj,varargin);   
     obj.NElem = length(obj.Element);
     obj.NNode = length(obj.Node);
+    obj.Node0 = obj.Node;
     
 end
 
