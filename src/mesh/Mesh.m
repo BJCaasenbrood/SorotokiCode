@@ -37,6 +37,9 @@ classdef Mesh
         ShowProcess;
         Colormap;
         LineStyle;
+        Image;
+        SimplifyTol;
+        Hmesh;
     end
     
 %--------------------------------------------------------------------------
@@ -59,19 +62,25 @@ function obj = Mesh(Input,varargin)
     obj.Colormap     = turbo;
     obj.LineStyle    = '-';
     obj.Type         = 'C2PX';
+    obj.Image        = [];
+    obj.SimplifyTol  = 0.05;
+    obj.Hmesh        = 0.05;
     
     if isa(Input,'char')
        [~,~,ext] = fileparts(Input);
        if strcmp(ext,'.stl'), [f,v] = stlreader(Input);
        elseif strcmp(ext,'.obj'), [v,f] = objreader(Input);
+       elseif strcmp(ext,'.png'), obj.Image = rgb2gray(imread(Input));
        else, cout('err','* extension not recognized');
        end
        
-       obj.Node    = v;
-       obj.NNode   = length(v);
-       obj.Element = num2cell(f,2);
-       obj.NElem   = length(f);
-       obj.BdBox   = boxhull(v);
+       if isempty(obj.Image)
+        obj.Node    = v;
+        obj.NNode   = length(v);
+        obj.Element = num2cell(f,2);
+        obj.NElem   = length(f);
+        obj.BdBox   = boxhull(v);
+       end
     
     elseif isa(Input,'double')
        if (size(Input,2) ~= 2) || (size(Input,2) ~= 2),
@@ -126,6 +135,22 @@ function obj = Mesh(Input,varargin)
     if isempty(obj.SDF), obj.Type = 'C3T3'; end
     
     obj.Dim = 0.5*numel(obj.BdBox);
+    
+    if ~isempty(obj.Image)
+        [v,f] = GenerateMeshImage(obj,obj.Image);
+        
+        obj.Node    = v;
+        obj.NNode   = length(v);
+        obj.Element = num2cell(f,2);
+        obj.NElem   = length(f);
+        
+        [Pc,~] = computeCentroid(obj,obj.Element,v); 
+       
+        obj.MaxIteration = 0;
+        obj.Center = Pc;
+        obj.SDF = @(x) -1*ones(length(Pc),1);
+    end
+    
 end
 
 %---------------------------------------------------------------------- get     
@@ -345,22 +370,6 @@ if Mesh.Movie
        MovieMaker(Mesh,'mesh','');
     end
 end
-
-end
-
-%--------------------------------------------------------------- class list
-function list(Mesh)
-% shows list of commands Mesh.list()
-    
-fprintf('* CLASS: Mesh() \n');
-fprintf('\t :PUBLIC: \n');
-fprintf('\t\t get(): \n');
-fprintf('\t\t set(): \n');
-fprintf('\t\t show(): \n');
-fprintf('\t\t showSDF(): \n');
-fprintf('\t\t generate(): \n');
-fprintf('\t\t FindNodes(): \n');
-fprintf('\t\t FindElements(): \n');
 
 end
 
@@ -822,6 +831,44 @@ El = reshape(El,[],1); MaxN = max(cellfun(@(E) size(E,2),El));
 PadWNaN = @(E) [E, NaN(size(E,1), MaxN- size(E,2))]; 
 ElemMat = cellfun(PadWNaN,El,'UniformOutput',false);
 ElemMat = vertcat(ElemMat{:});       
+end
+
+%------------------------------------------------ generate elemental matrix
+function [Node,Element] = GenerateMeshImage(Mesh,Image)
+    
+    B = Mesh.BdBox;
+    Xscale = (B(2)-B(1))/size(Image,2);
+    Yscale = (B(4)-B(3))/size(Image,1);
+    
+    simplify_tol = Mesh.SimplifyTol;
+    
+    img = Image <= 240;
+    img = fliplr(img.');
+    
+    bnd = bwboundaries(img);
+    
+    c_cell0 = {};
+    c_cell = {};
+    
+    for ii=1:length(bnd)
+        bnd_tmp = bnd{ii};
+        assert(all(bnd_tmp(1,:)==bnd_tmp(end,:)), 'contour is not closed');
+        c_cell0{ii} = bnd_tmp;
+    end
+    
+    for ii=1:length(c_cell0)
+        c_tmp = c_cell0{ii};
+        c_red = decimatePoly(c_tmp,[simplify_tol, 2],false);
+        if (nnz(c_red(:,1))>0)&&(nnz(c_red(:,2))>0)
+            c_cell{end+1,1} = [Xscale*c_red(:,1), (Yscale)*c_red(:,2)];
+        end
+    end
+
+    H = Mesh.Hmesh;
+    Tesselation = triangulationCreate(c_cell, H(1), H(2), H(3),'linear');
+    Node = Tesselation.Nodes.';    
+    Element = Tesselation.Elements.';
+    
 end
 
 %----------------------------------------------- generate elemental adjency

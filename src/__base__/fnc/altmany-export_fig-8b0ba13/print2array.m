@@ -58,11 +58,17 @@ function [A, bcol, alpha] = print2array(fig, res, renderer, gs_options)
 % 22/03/20: Alert if ghostscript.m is required but not found on Matlab path
 % 24/05/20: Significant performance speedup; added alpha values (where possible)
 % 07/07/20: Fixed issue #308: bug in R2019a and earlier
+% 07/10/20: Use JavaFrame_I where possible, to avoid evoking a JavaFrame warning
+% 07/03/21: Fixed edge-case in case a non-figure handle was provided as input arg
+% 10/03/21: Forced a repaint at top of function to ensure accurate image snapshot (issue #211)
 %}
 
     % Generate default input arguments, if needed
     if nargin < 1,  fig = gcf;  end
     if nargin < 2,  res = 1;    end
+
+    % Force a repaint to ensure we get an accurate snapshot image (issue #211)
+    drawnow
 
     % Get the figure size in pixels
     old_mode = get(fig, 'Units');
@@ -236,7 +242,11 @@ function [imgData, alpha] = getJavaImage(hFig)
     % Get the figure's underlying Java frame
     oldWarn = warning('off','MATLAB:HandleGraphics:ObsoletedProperty:JavaFrame');
     warning('off','MATLAB:ui:javaframe:PropertyToBeRemoved');
-    jf = get(handle(hFig),'JavaFrame'); %#ok<JAVFM>
+    try
+        jf = get(handle(hFig),'JavaFrame_I');
+    catch
+        jf = get(handle(hFig),'JavaFrame'); %#ok<JAVFM>
+    end
     warning(oldWarn);
 
     % Get the Java frame's root frame handle
@@ -297,6 +307,7 @@ function [imgData, alpha, err, ex] = getPrintImage(fig, res_str, renderer, tmp_n
     ex      = [];
     alpha   = [];
     % Temporarily set the paper size
+    fig = ancestor(fig, 'figure');  % just in case it's not a figure...
     old_pos_mode    = get(fig, 'PaperPositionMode');
     old_orientation = get(fig, 'PaperOrientation');
     set(fig, 'PaperPositionMode','auto', 'PaperOrientation','portrait');
@@ -322,7 +333,9 @@ function [imgData, alpha, err, ex] = getPrintImage(fig, res_str, renderer, tmp_n
     catch ex
         err = true;
     end
-    set(fp, 'LineWidth',0.75);  % restore original figure appearance
+    if ~isempty(fp)  % this check is not really needed, but makes the code cleaner
+        set(fp, 'LineWidth',0.75);  % restore original figure appearance
+    end
     % Reset the paper size
     set(fig, 'PaperPositionMode',old_pos_mode, 'PaperOrientation',old_orientation);
 end

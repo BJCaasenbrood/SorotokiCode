@@ -21,8 +21,8 @@ end
 
 for i=1:length(c_cell)
     c_tmp = c_cell{i};
-    x_vec{i} = c_tmp(:,1).';
-    y_vec{i} = c_tmp(:,2).';
+    x_vec{1,i} = c_tmp(:,1).';
+    y_vec{1,i} = c_tmp(:,2).';
 end
 % get the polygon and make the triangulation
 poly = polyshape(x_vec, y_vec, 'Simplify', false);

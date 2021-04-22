@@ -14,7 +14,7 @@ fem = fem.AddConstraint('Support',fem.FindNodes('Right'),[1,1]);
 fem = fem.AddConstraint('Load',fem.FindNodes('Bottom'),[0,-1e-3]);
 
 %% select material
-fem.Material =  Dragonskin10A;
+fem.Material =  Dragonskin10;
 
 %% solving
 fem.solve();

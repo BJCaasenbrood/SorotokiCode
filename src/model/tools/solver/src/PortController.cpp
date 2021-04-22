@@ -48,6 +48,7 @@ void PortController::setup(
   	uk.noalias() = VectorXd::Zero(Na*Nm);
   	dHdq.noalias() = VectorXd::Zero(Na*Nm);
   	dHdp.noalias() = VectorXd::Zero(Na*Nm);
+  	H.noalias()  = VectorXd::Zero(2);
 
   	Mnd MatPolyX = readMatXf("log/splineXd.txt");
 
@@ -117,7 +118,10 @@ void PortController::EnergyShaping(
 	// energy-shaping + damping injection -- - Kp*dx 
 	u.noalias() = Sa*(dHdq - Kp*dx - Kd*Dee*dHdp);
 
-	H(0) = dx.transpose()*Kp*dx;
+	H(0) = 0;
+	H(0) += dx.transpose()*Kp*q;
+	//H(0) += dHdq.transpose()*q;
+	//H(0) += dHdq.transpose()*q;
 }                         
 
 //---------------------------------------------------

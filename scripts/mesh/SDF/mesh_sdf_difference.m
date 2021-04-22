@@ -13,4 +13,4 @@ sdf2.BdBox = [-1.5,0.5,-1,1];
 
 %% math operations
 S = sdf1-sdf2;
-S.show()
+S.show();

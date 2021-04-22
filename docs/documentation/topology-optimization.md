@@ -1,9 +1,12 @@
 ---
 layout: default
-title: Topology optimization
-parent: Documentation
+title: Topology Optimization
+parent: Theoretical Background 
+grand_parent: Documentation
 nav_order: 3
+permalink: /docs/documentation/background/graphics/
 ---
+
 
 # Topology optimization
 

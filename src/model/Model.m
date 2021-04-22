@@ -11,6 +11,7 @@ classdef Model
         gd;
         tau;
         Texture;
+        p,p_;
         q,q_;
         dq;
         q0, q0_;
@@ -211,6 +212,10 @@ toc;
 y = load([dir_path ,'/log/state.txt']);
 Model.q = y(:,2:end);
 Model.t = y(:,1);
+
+% extracting data from log-files
+y = load([dir_path ,'/log/momenta.txt']);
+Model.p = y(:,2:end);
 
 y = load([dir_path ,'/log/estimate.txt']);
 Model.q_ = y(:,2:end);

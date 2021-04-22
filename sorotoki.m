@@ -268,19 +268,23 @@ WriteToFile([Path,'\data\colormap']);
 WriteToFile([Path,'\data\matcap']);
 WriteToFile([Path,'\data\matcap\img']);
 WriteToFile([Path,'\data\stl']);
-WriteToFile(genpath([Path,'/scripts']));
+WriteToFile([Path,'\data\contours']);
+WriteToFile([Path,'\scripts\']);
 else
 AddPath(Path);
 AddPath([Path,'\config\']);
+AddPath([Path,'\src\']);
 AddPath([Path,'\src\__version__']);
 AddPath([Path,'\src\__base__']);
 AddPath([Path,'\src\__base__\fnc']);
+AddPath([Path,'\data\']);
 AddPath([Path,'\data\color']);
 AddPath([Path,'\data\colormap']);
 AddPath([Path,'\data\matcap']);
 AddPath([Path,'\data\matcap\img']);
 AddPath([Path,'\data\stl']);
-AddPath(genpath([Path,'/scripts']));
+AddPath([Path,'\data\contours']);
+AddPath([Path,'\scripts\']);
 pause(.3);
 x = basePathConfirm;
 end
@@ -292,11 +296,13 @@ global FID
 
 if Request == 1
 fprintf(FID,'%% gmodel.lib \n');
+WriteToFile([Path,'\scripts\gmdl\']);
 WriteToFile([Path,'\src\gmodel']);
 WriteToFile([Path,'\src\gmodel\tools\']);
 WriteToFile([Path,'\src\gmodel\matcap\']);
 WriteToFile([Path,'\src\gmodel\matcap\img']);
 else
+AddPath([Path,'\scripts\gmdl\']);
 AddPath([Path,'\src\gmodel']);
 AddPath([Path,'\src\gmodel\tools\']);
 AddPath([Path,'\src\gmodel\matcap\']);
@@ -314,10 +320,14 @@ global FID
 if Request == 1
 fprintf(FID,'%% mesh.lib \n');
 WriteToFile([Path,'\src\mesh']);
+WriteToFile([Path,'\scripts\mesh\']);
+WriteToFile([Path,'\scripts\mesh\SDF']);
 WriteToFile([Path,'\src\mesh\tools\']);
 WriteToFile([Path,'\src\mesh\shapes\']);
 WriteToFile([Path,'\src\mesh\operators\']);
 else
+AddPath([Path,'\scripts\mesh\']);
+AddPath([Path,'\scripts\mesh\SDF']);
 AddPath([Path,'\src\mesh']);
 AddPath([Path,'\src\mesh\tools\']);
 AddPath([Path,'\src\mesh\shapes\']);
@@ -333,6 +343,10 @@ global FID
 
 if Request == 1
 fprintf(FID,'%% fem.lib \n');
+WriteToFile([Path,'\scripts\fem\']);
+WriteToFile([Path,'\scripts\fem\2D']);
+WriteToFile([Path,'\scripts\fem\3D']);
+WriteToFile([Path,'\scripts\opt']);
 WriteToFile([Path,'\src\fem']);
 WriteToFile([Path,'\src\fem\tools\']);
 WriteToFile([Path,'\src\fem\tools\tpswarp']);
@@ -340,6 +354,10 @@ WriteToFile([Path,'\src\fem\tools\mma']);
 WriteToFile([Path,'\src\fem\materials\']);
 WriteToFile([Path,'\src\fem\materials\samples']);
 else
+AddPath([Path,'\scripts\fem\']);
+AddPath([Path,'\scripts\fem\2D']);
+AddPath([Path,'\scripts\fem\3D']);
+AddPath([Path,'\scripts\opt']);
 AddPath([Path,'\src\fem']);
 AddPath([Path,'\src\fem\tools\']);
 AddPath([Path,'\src\fem\tools\tpswarp']);
@@ -357,10 +375,12 @@ global FID
 
 if Request == 1
 fprintf(FID,'%% mdl.lib \n');
+WriteToFile([Path,'\scripts\mdl']);
 WriteToFile([Path,'\src\model']);
 WriteToFile([Path,'\src\model\tools']);
 WriteToFile([Path,'\src\model\tools\solver']);
 else
+AddPath([Path,'\scripts\mdl']);
 AddPath([Path,'\src\model']);
 AddPath([Path,'\src\model\tools']);
 pause(.3);
@@ -374,9 +394,11 @@ global FID
 
 if Request == 1
 fprintf(FID,'%% bdog.lib \n');
+WriteToFile([Path,'\scripts\bdog']);
 WriteToFile([Path,'\src\bdog']);
 WriteToFile([Path,'\src\bdog\tools']);
 else
+AddPath([Path,'\scripts\bdog']);
 AddPath([Path,'\src\bdog']);
 AddPath([Path,'\src\bdog\tools']);
 pause(.3);

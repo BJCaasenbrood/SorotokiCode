@@ -8,5 +8,5 @@ fprintf('~finding host computer... \n');
 SSH_ = ssh2_config(ip,usr,pwd);
 SSH_ = ssh2(SSH_);
 
-cout('green',['* Connected to host computer: @',ip,'\n']); s
+cout('green',['* Connected to host computer: @',ip,'\n']);
 end

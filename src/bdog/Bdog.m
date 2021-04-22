@@ -91,6 +91,7 @@ function Bdog = connect(Bdog)
     % else
     %     CallExecuted([FILENAME,' not found! File is required!'])
     end
+    
 end
 
 %---------------------------------------------------------------------- get   

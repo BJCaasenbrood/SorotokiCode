@@ -1,8 +1,10 @@
 ---
 layout: default
-title: Computer graphics
-parent: Documentation
+title: Computer Graphics
+parent: Theoretical Background 
+grand_parent: Documentation
 nav_order: 4
+permalink: /docs/documentation/background/graphics/
 ---
 
 # Computer graphics 

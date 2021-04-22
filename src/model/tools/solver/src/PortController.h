@@ -34,7 +34,7 @@ class PortController
 	Vnd u; 		// generalized control output
 	Vnd uk;		// kalman observer output
 
-	V2d H;	// Hamiltonian
+	V2d H;	    // Hamiltonian
 	Vnd dHdq;   // Hamiltonian-Grad q
 	Vnd dHdp;   // Hamiltonian-Grad p
 

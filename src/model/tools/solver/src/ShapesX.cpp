@@ -31,7 +31,7 @@ Shapes::Shapes(){
 //---------------------------------------------------
 void Shapes::set(int nmode, int ndof, int nx, const char* str) 
 {
-	NMode = max(0,min(nmode,10));
+	NMode = max(0,min(nmode,16));
 	NDof = max(0,min(ndof,6));
 	Nx = nx;
 

@@ -1,34 +1,47 @@
-clr;
+%cdsoro; clr;
 %% assign free DOF
-mdl = Model([0,1,0,1,0,0],'NModal',4,'NDisc',1);
+mdl = Model([0,1,0,1,0,0],'NModal',6,'NDisc',1);
 mdl = setupSoftRobot(mdl,0.5,0,1e2);
-mdl = mdl.set('Tdomain',15); 
-mdl = mdl.set('Movie',0); 
+mdl = mdl.set('Controller',1);
+mdl = mdl.set('Tdomain',5); 
 
 %% generate and solve dynamic model
 mdl = mdl.generate();
-mdl.q0_(1) = 15;
+mdl.q0(1) = 0;
 mdl = mdl.csolve(); 
 
 %% show results
 figure(102)
 t  = mdl.get('t');
 
-subplot(3,4,[1 2 5 6]);
-plot(t,mdl.q_,'k-','linewidth',0.5); hold on; grid on;
-plot(t,mdl.q,'linewidth',1.5);  grid on;
+% subplot(3,4,[1 2 5 6]);
+% plot(t,mdl.q_,'k-','linewidth',0.5); hold on; grid on;
+% plot(t,mdl.q,'linewidth',1.5);  grid on;
+% 
+% 
+% subplot(3,4,[3 4 7 8]);
+% plot(t,mdl.H,'linewidth',1.5);hold on; grid on;
+% legend('$\mathcal{T}$','$\mathcal{V}_e$','$\mathcal{V}_g$','$\mathcal{H}$',...
+%     'interpreter','latex','FontSize',12);
+% 
+% subplot(3,4,9:12);
+% plot(t,mdl.ge(:,5:end),'linewidth',1.5); hold on; grid on;
+% plot(t,mdl.gd(:,5:end),'k--','linewidth',1); 
+% legend('$x$','$y$','$z$',...
+%     'interpreter','latex','FontSize',12);
 
+subplot(2,1,2);
+hold on;
+plot(t,mdl.H(:,4) - mdl.detae(:,2),'linewidth',1.5); hold on; grid on;
+box on;
 
-subplot(3,4,[3 4 7 8]);
-plot(t,mdl.H,'linewidth',1.5);hold on; grid on;
-legend('$\mathcal{T}$','$\mathcal{V}_e$','$\mathcal{V}_g$','$\mathcal{H}$',...
-    'interpreter','latex','FontSize',12);
+% legend('$H_s(q,p)$',...
+%    'interpreter','latex','FontSize',12);
 
-subplot(3,4,9:12);
-plot(t,mdl.ge(:,5:end),'linewidth',1.5); hold on; grid on;
-plot(t,mdl.gd(:,5:end),'k--','linewidth',1); 
-legend('$x$','$y$','$z$',...
-    'interpreter','latex','FontSize',12);
+%plot(t(2:end),diff(mdl.H(:,4) + mdl.detae(:,1)),'linewidth',1.5);hold on; grid on;
+
+grid on;
+error('force terminate');
 
 %% generate rig
 % figure(106);
@@ -68,16 +81,15 @@ end
 %% BACK-END FUNCTIONS
 % setup model
 function mdl = setupSoftRobot(mdl,Kp,Kd,Lam)
-mdl = mdl.set('Controller',1);
 
 L0 = 0.063;
-mdl = mdl.set('TimeStep',   1/50);
+mdl = mdl.set('TimeStep',   1/150);
 mdl = mdl.set('Sdomain',    L0);
-mdl = mdl.set('SpaceStep',  10);
-mdl = mdl.set('Density',    50);
+mdl = mdl.set('SpaceStep',  100);
+mdl = mdl.set('Density',    500);
 mdl = mdl.set('Radius',     0.03);
-mdl = mdl.set('Gravity',    [0,-9.81,0]);
-mdl = mdl.set('E',          250);
+mdl = mdl.set('Gravity',    [0,0,-9.81]);
+mdl = mdl.set('E',          75);
 mdl = mdl.set('Mu',         0.05);
 mdl = mdl.set('Gain',       [Kp,Kd,Kp]);
 mdl = mdl.set('Lambda',     [Kp/Lam,Kp*1e-2]);

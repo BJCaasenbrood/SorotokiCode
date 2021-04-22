@@ -1,9 +1,10 @@
-clr; cdsoro;
+%clr; cdsoro;
 %% assign free DOF
-mdl = Model([0,1,1,0,0,0],'NModal',6,'NDisc',2);
-mdl = setupSoftRobot(mdl,1e3,10,50);
-mdl = mdl.set('TimeStep', 1/30);
-mdl = mdl.set('Tdomain',25); 
+mdl = Model([0,1,1,0,0,0],'NModal',16,'NDisc',2);
+mdl = setupSoftRobot(mdl,1e4,5,50);
+mdl = mdl.set('Controller',0);
+mdl = mdl.set('TimeStep',1/130);
+mdl = mdl.set('Tdomain',2); 
 
 %% generate trajectory
 mdl = mdl.generate(); 
@@ -11,31 +12,34 @@ x = linspace(0,20,1e3).';
 mdl.Xspline = [x,0.02*sin(x)+0.2];
 
 %% generate and solve dynamic model
-mdl.q0(1) = 0;
+mdl.q0(1) = 10;
+% mdl.q0(mdl.NModal/2 + 1) = -10;
+% mdl.dq0(mdl.NModal/2 + 4 + 1) = -0.01;
 mdl = mdl.csolve(); 
 
 %% show results
 figure(102)
 t  = mdl.get('t');
 
-subplot(3,4,[1 2 5 6]);
-plot(t,mdl.q,'linewidth',1.5); hold on; grid on;
+%subplot(3,4,[1 2 5 6]);
+%plot(t,mdl.q,'linewidth',1.5); hold on; grid on;
 
-subplot(3,4,[3 4 7 8]);
-plot(t,mdl.H,'linewidth',1.5);hold on; grid on;
-legend('$\mathcal{T}$','$\mathcal{V}_e$','$\mathcal{V}_g$','$\mathcal{H}$',...
-    'interpreter','latex','FontSize',12);
+%subplot(3,4,[3 4 7 8]);
+%plot(t,mdl.H,'linewidth',1.5);hold on; grid on;
+plot(t,mdl.H(:,4) - mdl.detae(:,2),'linewidth',1.5); hold on; grid on;
+% legend('$\mathcal{H} + \mathcal{H}_c$',...
+%     'interpreter','latex','FontSize',12);
 
-subplot(3,4,9:12);
-plot(t,mdl.ge(:,5:end),'linewidth',1.5); hold on; grid on;
-plot(t,mdl.gd(:,5:end),'k--','linewidth',1); 
-legend('$x$','$y$','$z$',...
-    'interpreter','latex','FontSize',12);
-
+% subplot(3,4,9:12);
+% plot(t,mdl.ge(:,5:end),'linewidth',1.5); hold on; grid on;
+% plot(t,mdl.gd(:,5:end),'k--','linewidth',1); 
+% legend('$x$','$y$','$z$',...
+%     'interpreter','latex','FontSize',12);
+%error('bla');
 %% generate rig
 [rig, sph] = setupRig(mdl);
 
-for ii = 1:fps(t,12):length(mdl.q)
+for ii = 1:fps(t,60):length(mdl.q)
     rig = rig.compute(ii);
     rig = rig.update();
       

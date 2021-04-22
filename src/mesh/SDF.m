@@ -65,6 +65,7 @@ function show(SDF,Quality)
     axis equal; hold on;
     contour3(X,Y,reshape(D(:,end),[Quality Quality]),[0 0],'linewidth',...
         1.5,'Color','w');
+    
     colormap(SDF.cmap);
 end
 end

@@ -91,7 +91,6 @@ int main(int argc, char** argv)
 		//fwrite(filedEta,ph.t,ph.rod.deta);
 		fwrite(filedEta,ph.t,ph.control.H);
 		
-
 		ph.ObserverUpdate();
 		fwrite(file_,ph.t,ph.q_);
 

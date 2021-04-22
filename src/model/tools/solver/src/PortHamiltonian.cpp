@@ -142,8 +142,8 @@ void PortHamiltonian::ImplicitTrapzoidStep(
 	control.EnergyShaping(rod.Jb,rod.g);
 
 	// computer residual
-	Rs.block(0,0,n,1).noalias() = +h*rod.gradHp;
-	Rs.block(n,0,n,1).noalias() = -h*rod.gradHq;
+	Rs.block(0,0,n,1).noalias() =  +h*rod.gradHp;
+	Rs.block(n,0,n,1).noalias() =  -h*rod.gradHq;
 	Rs.block(n,0,n,1).noalias() += -h*rod.Dee*rod.gradHp;
 
 	if (EC1){
@@ -160,24 +160,15 @@ void PortHamiltonian::ImplicitTrapzoidStep(
 	// compute joint accelerations
 	rod.ddq.noalias() = rod.M.partialPivLu().solve(-(1.0f/h)*dr.block(Na*Nm,0,Na*Nm,1) + rod.Mt*rod.dq);
 
-	//Mxd P(2*Na*Nm,2*Na*Nm);
-	//Mxd Q(2*Na*Nm,2*Na*Nm);
-	//Mxd R(1,1);
+	if (EC1){
+		//control.H(1) = rod.dq.dot(rod.Sa.transpose()*control.u -rod.Dee*rod.gradHp);
+		control.H(0) = rod.dq.dot(rod.Dee*rod.dq);
+		control.H(1) += h*rod.dq.dot(rod.Sa.transpose()*control.u);
+	}
+	else {
+		//control.H(1) = rod.dq.dot(-rod.Dee*rod.gradHp);
+	}
 
-	//R << 1.0;
-	//Q.noalias() = Mnd::Identity(2*Na*Nm,2*Na*Nm);
-
-	//solveRiccatiArimotoPotter(A,C,Q,R,P);
-
-	//cout << A << endl;
-	//cout << C << endl;
-	//cout << P << endl;
-
-	//cout << "check: " << A.transpose()*P + P*A  - P*C*C.transpose()*P + Q << endl;
-
-	//sleep(1200);
-
-	//SchurComplement(A.transpose(),C.transpose());
 }
 
 //---------------------------------------------------

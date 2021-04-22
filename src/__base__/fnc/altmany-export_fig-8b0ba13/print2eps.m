@@ -19,20 +19,23 @@ function print2eps(name, fig, export_options, varargin)
 %              ".eps" extension is added if not there already. If a path is
 %              not specified, the figure is saved in the current directory.
 %   fig_handle - The handle of the figure to be saved. Default: gcf().
-%   export_options - array or struct of optional scalar values:
-%       bb_padding - Scalar value of amount of padding to add to border around
-%                    the cropped image, in points (if >1) or percent (if <1).
-%                    Can be negative as well as positive; Default: 0
-%       crop       - Cropping flag. Deafult: 0
-%       fontswap   - Whether to swap non-default fonts in figure. Default: true
+%   export_options - array or struct of optional values:
+%       bb_padding    - Scalar value of amount of padding to add to border around
+%                       the cropped image, in points (if >1) or percent (if <1).
+%                       Can be negative as well as positive; Default: 0
+%       crop          - Cropping flag. Deafult: 0
+%       fontswap      - Whether to swap non-default fonts in figure. Default: true
 %       preserve_size - Whether to preserve the figure's PaperSize. Default: false
-%       font_space - Character used to separate font-name terms in the EPS output
-%                    e.g. "Courier New" => "Courier-New". Default: ''
-%                    (available only via the struct alternative)
-%       renderer   - Renderer used to generate bounding-box. Default: 'opengl'
-%                    (available only via the struct alternative)
-%       crop_amounts - 4-element vector of crop amounts: [top,right,bottom,left]
-%                    (available only via the struct alternative)
+%       font_space    - Character used to separate font-name terms in the EPS output
+%                       e.g. "Courier New" => "Courier-New". Default: ''
+%                       (available only via the struct alternative)
+%       renderer      - Renderer used to generate bounding-box. Default: 'opengl'
+%                       (available only via the struct alternative)
+%       crop_amounts  - 4-element vector of crop amounts: [top,right,bottom,left]
+%                       (available only via the struct alternative)
+%       regexprep     - 2-element cell-array of regular-expression replacement in the
+%                       generated EPS. 1st element is the replaced string(s), 2nd is
+%                       the replacement(s) (available only via the struct alternative)
 %   print_options - Additional parameter strings to be passed to the print command
 
 %{
@@ -105,6 +108,8 @@ function print2eps(name, fig, export_options, varargin)
 % 06/08/19: Issue #281: only fix patch/textbox color if it's not opaque
 % 15/01/20: Added warning ID for easier suppression by users
 % 20/01/20: Added comment about unsupported patch transparency in some Ghostscript versions (issue #285)
+% 10/12/20: Enabled user-specified regexp replacements in the generated EPS file (issue #324)
+% 11/03/21: Added documentation about export_options.regexprep; added sanity check (issue #324)
 %}
 
     options = {'-loose'};
@@ -461,10 +466,7 @@ function print2eps(name, fig, export_options, varargin)
         for a = update
             set(font_handles(a), 'FontName', fonts{a}, 'FontSize', fonts_size(a));
         end
-    end
 
-    % Replace the font names
-    if ~isempty(font_swap)
         for a = 1:size(font_swap, 2)
             fontName = font_swap{3,a};
             %fontName = fontName(~isspace(font_swap{3,a}));
@@ -569,6 +571,17 @@ function print2eps(name, fig, export_options, varargin)
     fstrm = regexprep(fstrm, '\n([-\d.]+ [-\d.]+) ([-\d.]+ [-\d.]+) ([-\d.]+ [-\d.]+) 3 MP\nPP\n\2 \3 \1 3 MP\nPP\n','\n$1 $2 $3 0 0 4 MP\nPP\n');
     fstrm = regexprep(fstrm, '\n([-\d.]+ [-\d.]+) ([-\d.]+ [-\d.]+) ([-\d.]+ [-\d.]+) 3 MP\nPP\n\3 \1 \2 3 MP\nPP\n','\n$1 $2 $3 0 0 4 MP\nPP\n');
     fstrm = regexprep(fstrm, '\n([-\d.]+ [-\d.]+) ([-\d.]+ [-\d.]+) ([-\d.]+ [-\d.]+) 3 MP\nPP\n\3 \2 \1 3 MP\nPP\n','\n$1 $2 $3 0 0 4 MP\nPP\n');
+
+    % If user requested a regexprep replacement of string(s), do this now (issue #324)
+    if isstruct(export_options) && isfield(export_options,'regexprep') %&& ~isempty(export_options.regexprep)
+        try
+            oldStrOrRegexp = export_options.regexprep{1};
+            newStrOrRegexp = export_options.regexprep{2};
+            fstrm = regexprep(fstrm, oldStrOrRegexp, newStrOrRegexp);
+        catch err
+            warning('YMA:export_fig:regexprep', 'Error parsing regexprep: %s', err.message);
+        end
+    end
 
     % Write out the fixed eps file
     read_write_entire_textfile(name, fstrm);

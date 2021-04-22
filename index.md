@@ -7,7 +7,6 @@ image_sliders:
   - example_slider
 ---
 
-
 <!--
   https://fontawesome.com/how-to-use/on-the-web/styling/sizing-icons
 -->

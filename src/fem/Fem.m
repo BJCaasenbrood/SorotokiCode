@@ -73,6 +73,7 @@ classdef Fem < handle
         SolverStart = false;
         SolverStartMMA = false;
         SolverPlot = true;
+        SolverPlotType = 'Svm';
         Assemble = false;
         Convergence = false; 
         Nonlinear = true;
@@ -86,6 +87,7 @@ classdef Fem < handle
         Linestyle = '-';
         Linestyle0 = '-';
         Colormap = turbo;
+        ColormapOpt = barney(-1);
         ColorAxis = [];
         I3 = eye(3); O3 = zeros(3);
         i; j; m; fi; t; e; c; s; p; v; l; k; fb; ed; fb0; ft;
@@ -382,10 +384,17 @@ end
 end
 
 %-------------------------------------------------------------------- reset
-function Fem = reset(Fem,Request)
+function Fem = reset(Fem,varargin)
+    
+    if isempty(varargin), Request = 'fem';
+    else, Request = varargin{1};
+    end
+    
    switch(Request) 
-       case('fem'), Fem.Iteration = 1; Fem.Increment = 1; 
+       case('fem')
+           Fem.Iteration = 1; Fem.Increment = 1; 
            Fem.Node = Fem.Node0; Fem.Utmp = [];
+           Fem.Support = []; Fem.Load = [];
            Fem.Spring = [];
        case('opt'), Fem.Iteration = 1; Fem.Increment = 1; 
            Fem.IterationMMA = 1; Fem.Node = Fem.Node0; 
@@ -396,7 +405,7 @@ function Fem = reset(Fem,Request)
 end
 
 %-------------------------------------------------------------------- solve
-function Fem = solve(Fem)
+function [Fem, TempNode] = solve(Fem,varargin)
     
 Fem.Log           = [];    
 Fem.TimeDelta     = Fem.TimeEnd;
@@ -411,6 +420,15 @@ Fem.TimeStep      = Fem.TimeStep0 + 1e-6;
 Fem.Density       = clamp(Fem.Density,Fem.Ersatz,1);
 Fem.Utmp          = zeros(Fem.Dim*Fem.NNode,1);
 Fem.Node          = Fem.Node0;
+
+TempNode = cell(1);
+TempNode{1} = Fem.Node;
+
+if nargin > 1
+   for ii = 1:2:length(varargin)
+        Fem.(varargin{ii}) = varargin{ii+1};
+    end
+end
 
 if ~isempty(Fem.Contact) && isempty(Fem.Load)
     %Fem.Load = [1,0,1e-6];
@@ -461,15 +479,15 @@ while true
         
         Delta = Fem.Utmp;
 
-        if rcond(full(A)) >= 1e-10
+        %if rcond(full(A)) >= 1e-10
             %if Fem.SolverStartMMA
                 DeltaU = A\B; % topology optimization needs exact mid-solution
             %else
             %    [DeltaU,~] = gmres(A,B,[],Fem.ResidualNorm,100);
             %end
-        else, Singular = true; 
-            DeltaU = Fem.Utmp(FreeDofs)*0;
-        end
+        %else, Singular = true; 
+        %    DeltaU = Fem.Utmp(FreeDofs)*0;
+        %end
             
         if Fem.Nonlinear, Delta(FreeDofs,1)=Delta(FreeDofs,1)-DeltaU(:,1);
         else, Delta(FreeDofs,1) = DeltaU(:,1); B = Fem.ResidualNorm; end
@@ -517,6 +535,10 @@ while true
         Fem.fyNodal = force(2*(1:Fem.NNode));
     end
     
+    if ~Fem.SolverStartMMA
+       TempNode{length(TempNode)+1} = Fem.Node;
+    end
+    
     if ~isempty(Fem.Output) && ~Fem.SolverStartMMA
        [ux,uy,un] = DisplacementField(Fem,Fem.Utmp);
        [fx,fy,fn] = DisplacementField(Fem,Fem.fInternal);
@@ -548,7 +570,7 @@ while true
     end
     
     if Fem.SolverPlot || ~Fem.SolverStartMMA
-        Fem.show('Svm'); 
+        Fem.show(Fem.SolverPlotType); 
         drawnow;
     end
     
@@ -624,12 +646,14 @@ Fem.SolverStartMMA = false;
 end
 
 %----------------------------------------------------- form smooth topology
-function Fem = former(Fem, Thickness)
+function Fem = former(Fem, Thickness, Res)
     
 if Fem.SolverStartMMA && ~Fem.MovieStart
     Res = 100;
+    Thickness = 0.2*(Fem.BdBox(2)-Fem.BdBox(1));
 else
     Res = 300;
+    Thickness = 0.2*(Fem.BdBox(2)-Fem.BdBox(1));
 end
     
 Layers = 40;
@@ -788,7 +812,7 @@ I = image(rescale(Uxx),...
     ((max(Uyy)-min(Uyy))/(max(Uxx) - min(Uxx)))*rescale(Uyy),I);
 
 axis equal; axis off; 
-colormap(barney(-1)); 
+colormap(Fem.ColormapOpt); 
 caxis([0 1]);
 background('w');
 end
@@ -810,8 +834,8 @@ function msh = exportMesh(Fem,varargin)
         end
     end
     
-    %sX = sX0;
-    %sY = sY0;
+    sX = sX0;
+    sY = sY0;
     
     if ~isempty(Fem.Repeat)
         instr = Fem.Repeat;
@@ -824,7 +848,8 @@ function msh = exportMesh(Fem,varargin)
             end
         end
     else
-
+%         sX = sX0;
+%         sY = sY0;
     end
     
     B = [Fem.BdBox(1:2)*sX, Fem.BdBox(3:4)*sY];
@@ -834,6 +859,7 @@ function msh = exportMesh(Fem,varargin)
     simplify_tol = varargin{2};
     
     img = I.CData >= 25;
+    %img = img==false;
     img = fliplr(img.');
     
     bnd = bwboundaries(img);
@@ -851,7 +877,7 @@ function msh = exportMesh(Fem,varargin)
         c_tmp = c_cell0{ii};
         c_red = decimatePoly(c_tmp,[simplify_tol, 2],false);
         if (nnz(c_red(:,1))>0)&&(nnz(c_red(:,2))>0)
-            c_cell{end+1} = [Xscale*c_red(:,1), (Yscale)*c_red(:,2)];
+            c_cell{end+1,1} = [Xscale*c_red(:,1), (Yscale)*c_red(:,2)];
         end
     end
     
@@ -1058,7 +1084,7 @@ methods (Access = private)
 %------------------------------------------------ convert mesh to fem class
 function Fem = SetupFiniteElement(Fem)
 
-Fem.SpatialFilter         = GenerateRadialFilter(Fem,Fem.FilterRadius);
+Fem.SpatialFilter = GenerateRadialFilter(Fem,Fem.FilterRadius);
 %[~,~,Fem.Normal,Fem.Edge] = computeCentroid(Fem);
 
 Fem.ElemNDof = Fem.Dim*cellfun(@length,Fem.Element);
@@ -1266,7 +1292,8 @@ if Fem.PrescribedDisplacement
             if numel(Fem.Load(1,2:end)) >= 6
                 alpha = Fem.TimeStep*Fem.OptFactor;
             else
-                alpha = 1; 
+                %alpha = 1; 
+                alpha = Fem.TimeStep*Fem.OptFactor;
             end
         else
             alpha = 1; 
@@ -1282,9 +1309,9 @@ if Fem.PrescribedDisplacement
         Ktmp(pDof,:) = I(pDof,:);
         Ktmp(:,pDof) = I(:,pDof);
         F = -beta*K*F;
-        if isempty(Fem.Contact), %F(pDof) = beta*Fem.Load(1:NLoad,id+1);
-        else, F(pDof) = beta*fDof;
-        end
+%         if isempty(Fem.Contact), %F(pDof) = beta*Fem.Load(1:NLoad,id+1);
+%         else, F(pDof) = beta*fDof;
+%         end
             
         K = Ktmp;
     end
@@ -1955,8 +1982,12 @@ PS2 = Fem.Mesh.get('Center');
 
 d = DistancePointSet(Fem,PS1,PS2,R);
 
-P = sparse(d(:,1),d(:,2),1-d(:,3)/R);
-P = spdiags(1./sum(P,2),0,Fem.NElem,Fem.NElem)*P;
+if ~isempty(d)
+    P = sparse(d(:,1),d(:,2),1-d(:,3)/R);
+    P = spdiags(1./sum(P,2),0,Fem.NElem,Fem.NElem)*P;
+else
+    P = 1;
+end
 end
 
 %---------------------------------------------------------- material filter 
@@ -2235,4 +2266,36 @@ MaxNVer = max(cellfun(@numel,El));
 PadWNaN = @(E) [E NaN(1,MaxNVer-numel(E))]; 
 ElemMat = cellfun(PadWNaN,El,'UniformOutput',false);
 ElemMat = vertcat(ElemMat{:});       
+end
+
+%-------------------------------------------------- Kelvin-voight notation
+function Sv = VoightNotation(S)
+Sv = [S(1,1); S(2,2); S(3,3); S(1,2); S(2,3); S(1,3)]; 
+end
+
+%----------------------------------------------------- update nodes of MESH
+function [Node,Node0] = UpdateNode(Fem,U)
+Node0 = Fem.get('Node0'); 
+Ntmp = Node0;
+
+u = FieldOperator(Fem,U);
+
+Ntmp(:,1) = Node0(:,1) + u(:,1);
+Ntmp(:,2) = Node0(:,2) + u(:,2);
+if Fem.Dim == 3, Ntmp(:,3) = Node0(:,3) + u(:,3); end
+
+Node = Ntmp;
+end
+
+%---------------------------------------------------------- field operation
+function u = FieldOperator(Fem,U)
+mm = Fem.Dim;
+u = zeros(Fem.NNode,mm);
+
+    for node = 1:Fem.NNode
+       u(node,1) = U(mm*node + (1-mm),1);
+       u(node,2) = U(mm*node + (2-mm),1);
+       if Fem.Dim == 3, u(node,3) = U(mm*node,1); end
+    end
+
 end

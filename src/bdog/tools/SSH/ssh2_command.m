@@ -41,6 +41,7 @@ end
 if nargout > 1
     command_result = ssh2_struct.command_result;
 end
+
 if nargout == 0
     clear ssh2_struct;
 end

@@ -1,8 +1,10 @@
 ---
 layout: default
-title: Finite element method
-parent: Documentation
+title: Finite Element Method
+parent: Theoretical Background 
+grand_parent: Documentation
 nav_order: 2
+permalink: /docs/documentation/background/finite-elements/
 ---
 
 <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script> 

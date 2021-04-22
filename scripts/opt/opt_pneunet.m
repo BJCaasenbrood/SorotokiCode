@@ -13,10 +13,10 @@ msh = msh.generate();
 fem = Fem(msh,'VolumeInfill',0.4,'Penal',4,'FilterRadius',H/15,...
               'Nonlinear',false,'TimeStep',1/3,...
               'OptimizationProblem','Compliant',...
-              'MaxIterationMMA',75,'ChangeMax',0.05,'Movie',1);
+              'MaxIterationMMA',25,'ChangeMax',0.05,'Movie',1);
 
 %% set spatial settings
-fem = fem.set('Periodic',[1/2, 0],'Repeat',ones(7,1));
+fem = fem.set('Periodic',[1/2, 0],'Repeat',[]);%ones(7,1));
 
 %% add boundary condition
 id = fem.FindNodes('Left'); 
@@ -40,11 +40,17 @@ fem.optimize();
 fem.show('ISO',0.3);
 
 %% convert topology result to mesh
-mshr = fem.exportMesh(0.3,0.05,[1.1,1.85,40]); 
+ISO  = 0.3;
+Simp = 0.05;
+GrowH = 1.1;
+MinH = 2.5;
+MaxH = 40;
+
+mshr = fem.exportMesh(ISO,Simp,[GrowH,MinH,MaxH]); 
 mshr.show(); pause(2);
 
-femr = Fem(mshr,'Nonlinear',true,'TimeStep',1/25,'FilterRadius',H/15,...
-    'Movie',1,'Linestyle','none','MovieAxis',[-30 180 -140 50]);
+femr = Fem(mshr,'Nonlinear',true,'TimeStep',1/15,'FilterRadius',H/15,...
+    'Linestyle','none');
 
 %% assign boundary conditions to reduced fem
 id = femr.FindNodes('Left'); 

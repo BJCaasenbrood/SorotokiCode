@@ -1,10 +1,11 @@
 ---
 layout: default
-title: Installation 
+title: Installation
+parent: Documentation
 nav_order: 2
 ---
 
-# Installation of SOROTOKI
+# Installation
 {: .no_toc }
 
 The toolkit is easy to install. The fastest and easiest way to acquire the toolkit is through [**git**](https://git-scm.com/downloads). You can directly clone the repository using the command:
@@ -37,7 +38,7 @@ To use SOROTOKI optimally, make sure you have the following dependencies install
 
 Once you've opened MATLAB, you first have to configure the toolkit with MATLAB's search paths. Setting up these paths is relatively straightforward. Simply run `sorotoki.m`{: .text-purple-000}:
 
-<img src="./documentation/img/installing.gif" width="725"> 
+<img src="./img/installing.gif" width="725"> 
 
 During install, the installer will ask you if SOROTOKI should can set as the *main* directory of MATLAB. This implies every time you open MATLAB, it will automatically go this directory. 
 

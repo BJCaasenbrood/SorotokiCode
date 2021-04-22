@@ -1,6 +1,6 @@
 [options] 
 KINEMATIC_CONTROLLER = 0 
-ENERGY_CONTROLLER    = 1 
+ENERGY_CONTROLLER    = 0 
 WRITE_OUTPUT         = 1 
 ACTUSPACE =-1
 PROPERTYSET =-1
@@ -20,9 +20,9 @@ NDISC   = 1
 NDOF    = 2
 
 [solver] 
-TDOMAIN = 25
-SPACESTEP = 150
-TIMESTEP  = 0.016667
+TDOMAIN = 15
+SPACESTEP = 50
+TIMESTEP  = 0.02
 INTSTEP   = 100
 ATOL      = 1e-2
 RTOL      = 1e-2
@@ -37,7 +37,7 @@ LENGTH   = 0.12
 RHO      = 1200
 EMOD     = 25
 NU       = 0.4
-MU       = 0.4
+MU       = 0.15
 PRS_AREA = 1e-5
 GRAVITY  = 0           0       -9.81
 RADIUS   = 0.01
@@ -47,12 +47,12 @@ J_YY     = 1.6e-05
 J_ZZ     = 1.6e-05
 
 [control] 
-KP = 0.1
+KP = 1
 KD = 0
 LK = 0
 KF1 = 0.01
 KF2 = 1
-LAMBDA    = 0.01
+LAMBDA    = 0.4
 LAMBDAK   = 0
 SPLINEORDER    = 1
 

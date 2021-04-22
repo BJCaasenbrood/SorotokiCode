@@ -1,8 +1,10 @@
 ---
 layout: default
-title: Dynamical modeling
-parent: Documentation
+title: Dynamic Modeling
+parent: Theoretical Background 
+grand_parent: Documentation
 nav_order: 4
+permalink: /docs/documentation/background/modeling/
 ---
 
 
