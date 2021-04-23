@@ -1,7 +1,7 @@
 ---
 layout: default
-title: Theoretical Background
-nav_order: 4
+title: Theoretical background
+nav_order: 5
 has_children: true
 parent: Documentation
 ---

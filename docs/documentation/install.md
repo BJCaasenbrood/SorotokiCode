@@ -23,6 +23,7 @@ Alternatively, you can download the latest stable version of the toolkit below, 
 {: .text-purple-000}
 - MATLAB compatibility: R2018a/R2018b/R2020a.
 - OS compatibility: Windows/Linux.
+- Installation size: ~315 MB
 
 Please inform the developers if any compatibility issues may occur.
 

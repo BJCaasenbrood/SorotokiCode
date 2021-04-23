@@ -6,7 +6,7 @@ D = 2;   % inter distance
 
 sdf = @(x) PneuNet(x,W,H,D,W);
 
-msh = Mesh(sdf,'BdBox',[0,W,0,H],'Quads',[25 50]);
+msh = Mesh(sdf,'BdBox',[0,W,0,H],'NElem',1000);
 msh = msh.generate();
 
 %% show generated mesh
@@ -16,7 +16,7 @@ fem = Fem(msh,'VolumeInfill',0.4,'Penal',4,'FilterRadius',H/15,...
               'MaxIterationMMA',25,'ChangeMax',0.05,'Movie',1);
 
 %% set spatial settings
-fem = fem.set('Periodic',[1/2, 0],'Repeat',[]);%ones(7,1));
+fem = fem.set('Periodic',[1/2, 0],'Repeat', ones(7,1));
 
 %% add boundary condition
 id = fem.FindNodes('Left'); 
@@ -57,7 +57,7 @@ id = femr.FindNodes('Left');
 femr = femr.AddConstraint('Support',id,[1,1]);
 
 id = femr.FindEdges('TopHole');
-femr = femr.AddConstraint('Pressure',id,[4*kpa,0]);
+femr = femr.AddConstraint('Pressure',id,[8*kpa,0]);
 
 id = femr.FindNodes('Bottom');
 femr = femr.AddConstraint('Output',id,[0,0]);
