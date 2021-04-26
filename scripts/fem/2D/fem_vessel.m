@@ -9,8 +9,7 @@ msh = Mesh(sdf,'BdBox',[0,R,0,R],'NElem',750);
 msh = msh.generate();
 
 %% generate fem model from mesh
-fem = Fem(msh,'TimeStep',1/15,'PrescribedDisplacement',false,...
-    'Type','PlaneStress','Linestyle','none');
+fem = Fem(msh,'TimeStep',1/15,'Linestyle','none');
 
 %% add constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[0,1]);

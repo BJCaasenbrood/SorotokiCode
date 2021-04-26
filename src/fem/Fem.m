@@ -246,7 +246,6 @@ BoundMatrix = Fem.Mesh.get('Boundary');
 if Fem.Dim > 2 && (strcmp(Request,'E') || strcmp(Request,'E+'))
     Z(Z<Fem.VoidTolerance,:) = nan;
     S = 'flat';
-    %Alp = Fem.Mesh.get('ElementToFace')*Z;
     Z = Fem.Mesh.get('ElementToFace')*Z;
 else
     Alp = ones(Fem.NElem,1);
@@ -479,15 +478,15 @@ while true
         
         Delta = Fem.Utmp;
 
-        %if rcond(full(A)) >= 1e-10
+        if rcond(full(A)) >= 1e-10
             %if Fem.SolverStartMMA
                 DeltaU = A\B; % topology optimization needs exact mid-solution
             %else
             %    [DeltaU,~] = gmres(A,B,[],Fem.ResidualNorm,100);
             %end
-        %else, Singular = true; 
-        %    DeltaU = Fem.Utmp(FreeDofs)*0;
-        %end
+        else, Singular = true; 
+            DeltaU = Fem.Utmp(FreeDofs)*0;
+        end
             
         if Fem.Nonlinear, Delta(FreeDofs,1)=Delta(FreeDofs,1)-DeltaU(:,1);
         else, Delta(FreeDofs,1) = DeltaU(:,1); B = Fem.ResidualNorm; end
@@ -545,27 +544,29 @@ while true
        idNodes = Fem.Output(:,1);
        if isempty(Fem.Log)
            Fem.Log = cell(10,2);
-           Fem.Log{1,1} = 'ux';   Fem.Log{1,2} = ux(idNodes); 
-           Fem.Log{2,1} = 'uy';   Fem.Log{2,2} = uy(idNodes);
-           Fem.Log{3,1} = 'un';   Fem.Log{3,2} = un(idNodes);
-           Fem.Log{4,1} = 'fx';   Fem.Log{4,2} = fx(idNodes); 
-           Fem.Log{5,1} = 'fy';   Fem.Log{5,2} = fy(idNodes);
-           Fem.Log{6,1} = 'fy';   Fem.Log{6,2} = fn(idNodes);
-           Fem.Log{7,1} = 'Svm';  Fem.Log{7,2} = Fem.VonMisesNodal(idNodes);
-           Fem.Log{8,1} = 'Sxx';  Fem.Log{8,2} = Fem.sxxNodal(idNodes);
-           Fem.Log{9,1} = 'Syy';  Fem.Log{9,2} = Fem.syyNodal(idNodes);
-           Fem.Log{10,1} = 'Sxy'; Fem.Log{10,2} = Fem.sxyNodal(idNodes);
+           Fem.Log{1,1} = 't';    Fem.Log{1,2} = Fem.Time; 
+           Fem.Log{2,1} = 'ux';   Fem.Log{2,2} = ux(idNodes); 
+           Fem.Log{3,1} = 'uy';   Fem.Log{3,2} = uy(idNodes);
+           Fem.Log{4,1} = 'un';   Fem.Log{4,2} = un(idNodes);
+           Fem.Log{5,1} = 'fx';   Fem.Log{5,2} = fx(idNodes); 
+           Fem.Log{6,1} = 'fy';   Fem.Log{6,2} = fy(idNodes);
+           Fem.Log{7,1} = 'fy';   Fem.Log{7,2} = fn(idNodes);
+           Fem.Log{8,1} = 'Svm';  Fem.Log{8,2} = Fem.VonMisesNodal(idNodes);
+           Fem.Log{9,1} = 'Sxx';  Fem.Log{9,2} = Fem.sxxNodal(idNodes);
+           Fem.Log{10,1} = 'Syy';  Fem.Log{10,2} = Fem.syyNodal(idNodes);
+           Fem.Log{11,1} = 'Sxy'; Fem.Log{11,2} = Fem.sxyNodal(idNodes);
        else
-           Fem.Log{1,2} = vappend(Fem.Log{1,2},ux(idNodes),2);
-           Fem.Log{2,2} = vappend(Fem.Log{2,2},uy(idNodes),2);
-           Fem.Log{3,2} = vappend(Fem.Log{3,2},un(idNodes),2);
-           Fem.Log{4,2} = vappend(Fem.Log{4,2},fx(idNodes),2);
-           Fem.Log{5,2} = vappend(Fem.Log{5,2},fy(idNodes),2);
-           Fem.Log{6,2} = vappend(Fem.Log{6,2},fn(idNodes),2);
-           Fem.Log{7,2} = vappend(Fem.Log{7,2},Fem.VonMisesNodal(idNodes),2);
-           Fem.Log{8,2} = vappend(Fem.Log{8,2},Fem.sxxNodal(idNodes),2);
-           Fem.Log{9,2} = vappend(Fem.Log{9,2},Fem.syyNodal(idNodes),2);
-           Fem.Log{10,2} = vappend(Fem.Log{10,2},Fem.sxyNodal(idNodes),2);
+           Fem.Log{1,2} = vappend(Fem.Log{1,2},Fem.Time,2);
+           Fem.Log{2,2} = vappend(Fem.Log{2,2},ux(idNodes),2);
+           Fem.Log{3,2} = vappend(Fem.Log{3,2},uy(idNodes),2);
+           Fem.Log{4,2} = vappend(Fem.Log{4,2},un(idNodes),2);
+           Fem.Log{5,2} = vappend(Fem.Log{5,2},fx(idNodes),2);
+           Fem.Log{6,2} = vappend(Fem.Log{6,2},fy(idNodes),2);
+           Fem.Log{7,2} = vappend(Fem.Log{7,2},fn(idNodes),2);
+           Fem.Log{8,2} = vappend(Fem.Log{8,2},Fem.VonMisesNodal(idNodes),2);
+           Fem.Log{9,2} = vappend(Fem.Log{9,2},Fem.sxxNodal(idNodes),2);
+           Fem.Log{10,2} = vappend(Fem.Log{10,2},Fem.syyNodal(idNodes),2);
+           Fem.Log{11,2} = vappend(Fem.Log{11,2},Fem.sxyNodal(idNodes),2);
        end
     end
     

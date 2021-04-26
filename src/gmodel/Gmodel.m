@@ -183,6 +183,7 @@ function Gmodel = render(Gmodel,varargin)
     %drawnow;
     
     function myprecallback(src,evnt)
+        warning off;
         class = whoClasses('Gmodel');
         for i = 1:length(class)
         	r = update(class{i},'tex');
@@ -191,6 +192,7 @@ function Gmodel = render(Gmodel,varargin)
         for i = 1:length(class)
         	r = class{i}.update();
         end
+        warning on;
     end
 
 end

@@ -314,6 +314,7 @@ end
 function Mesh = show(Mesh,varargin)
 if nargin<2, Request = -1; 
 else, Request = varargin{1}; end
+
 figure(101);
 
 % generate elemental matrices for plotting

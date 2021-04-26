@@ -1,37 +1,44 @@
 clr;
+%% parameters
+P = 30*kpa;
+
 %% set signed distance function
 sdf = @(x) Bellow(x,5,4,6,5,7,5,2);
 
 %% generate mesh
 msh = Mesh(sdf,'BdBox',[0,25,0,25],'NElem',500);
 msh = msh.generate();
+msh.show();
 
 %% generate fem model from mesh
-fem = Fem(msh,'TimeStep',1/5,'PrescribedDisplacement',false,...
+fem = Fem(msh,'TimeStep',1/35,'PrescribedDisplacement',false,...
     'SigmoidFactor',0.5,'Linestyle','none');
 
 %% add constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[1,1]);
 fem = fem.AddConstraint('Support',fem.FindNodes('Top'),[1,0]);
-%fem = fem.AddConstraint('Load',fem.FindNodes('Top'),[0,-12]);
-id = fem.FindEdges('EdgeSelect',[15.15,6],80);
-fem = fem.AddConstraint('Pressure',id,[-1e-4,0]);
 
-msh.show();
-msh.show('Node',id{:});
-pause;
+id = fem.FindEdges('EdgeSelect',[12,6],60);
+fem = fem.AddConstraint('Pressure',id,[P,0]);
 
 %% add logger nodes
-fem = fem.AddConstraint('Output',fem.FindNodes('Location',[6,22]),[0,0]);
+trackerNodeid = fem.FindNodes('Location',[6,22]);
+fem = fem.AddConstraint('Output',trackerNodeid,[0,0]);
 
 %% assign material
-fem.Material = Dragonskin10;
+fem.Material = TPU90;
 
 %% solving
 fem.solve();
 
-%% plot nonlinear stiffness
-fem.show('Svm');
+%% plotting displacement
+figure(102);
+time = fem.Log{1,2};
+uy   = fem.Log{3,2};
+
+plot(P*time/kpa,uy,'-o','Color',col(1),'linewidth',2);
+xaxis('Quasi-static pressure','kpa');
+yaxis('Vertical displacement','mm');
 
 function Dist = Bellow(P,r0,r1,r2,r3,r4,x,t)
   C1 = dCircle(P,r2+r0,0,r1);

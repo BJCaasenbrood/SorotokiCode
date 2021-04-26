@@ -10,6 +10,5 @@ plot3([1,500,500,1,1],[1,1,40,40,1],...
 colormap(gca,x); view(0,90);
 axis tight; axis off;
 background(gitpage);
-
 end
 

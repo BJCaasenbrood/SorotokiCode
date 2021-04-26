@@ -4,11 +4,11 @@ R = 6;
 sdf = @(x) dRectangle(x,-10,10,0,30);
 
 %% generate mesh
-msh = Mesh(sdf,'BdBox',[-10,10,0,30],'Quads',25^2);
+msh = Mesh(sdf,'BdBox',[-10,10,0,30],'Quads',[10,50]);
 msh = msh.generate();
 
 %% generate fem model from mesh
-fem = Fem(msh,'TimeStep',1/5,'Linestyle','none');
+fem = Fem(msh,'TimeStep',1/15,'Linestyle','none');
 
 %% add constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[0,1]);

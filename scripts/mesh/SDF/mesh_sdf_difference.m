@@ -13,10 +13,11 @@ sdf2.BdBox = [-1.5,0.5,-1,1];
 
 %% math operations
 f = sdf1-sdf2;
+f.cmap = heatmap*0;
 f.show(); view(0,90);
 pause(1);
 
-%% generate mesh from SDF
-msh = Mesh(f,'NElem',1e2);
-msh = msh.generate();
-msh.show();
+% %% generate mesh from SDF
+% msh = Mesh(f,'NElem',1e2);
+% msh = msh.generate();
+% msh.show();
