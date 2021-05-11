@@ -1,6 +1,6 @@
 clr;
 %% parameters
-P = 30*kpa;
+P = 0.5*kpa;
 
 %% set signed distance function
 sdf = @(x) Bellow(x,5,4,6,5,7,5,2);
@@ -26,7 +26,7 @@ trackerNodeid = fem.FindNodes('Location',[6,22]);
 fem = fem.AddConstraint('Output',trackerNodeid,[0,0]);
 
 %% assign material
-fem.Material = TPU90;
+fem.Material = Ecoflex0030;
 
 %% solving
 fem.solve();

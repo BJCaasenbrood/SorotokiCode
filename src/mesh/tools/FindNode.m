@@ -36,6 +36,8 @@ switch(Request)
     case('Bottom');     x = Bottom(Node,BdBox,tol);
     case('Left');       x = Left(Node,BdBox,tol);
     case('Right');      x = Right(Node,BdBox,tol);
+    case('Front');      x = Front(Node,BdBox,tol);
+    case('Back');       x = Back(Node,BdBox,tol);
     case('Middle');     x = Middle(Node,BdBox,varargin{end});
     case('TopMid');     x = TopMid(Node,BdBox);
     case('BottomMid');  x = BottomMid(Node,BdBox);
@@ -90,21 +92,24 @@ function id = Bottom(Node,BdBox,tol)
 if length(BdBox) == 4, id = find(abs(Node(:,2) - BdBox(3))<tol );
 else, id = find(abs(Node(:,3) - BdBox(5))<tol);
 end
-
-[~,I] = sort(Node(id,1));
-id = id(I);
+% [~,I] = sort(Node(id,1));
+% id = id(I);
 end
 
 function id = Left(Node,BdBox,tol)
-if length(BdBox) == 4, id = find(abs(Node(:,1) - BdBox(1))<tol);
-else, id = find(abs(Node(:,1) - BdBox(1))<tol);
-end
+id = find(abs(Node(:,1) - BdBox(1))<tol);
 end
 
 function id = Right(Node,BdBox,tol)
-if length(BdBox) == 4, id = find(abs(Node(:,1) - BdBox(2))<tol);
-else, id = find(abs(Node(:,1) - BdBox(2))<tol);
+id = find(abs(Node(:,1) - BdBox(2))<tol);
 end
+
+function id = Front(Node,BdBox,tol)
+id = find(abs(Node(:,2) - BdBox(3))<tol);
+end
+
+function id = Back(Node,BdBox,tol)
+id = find(abs(Node(:,2) - BdBox(4))<tol);
 end
 
 function id = TopHalf(Node,BdBox,tol)

@@ -40,6 +40,7 @@ classdef Mesh
         Image;
         SimplifyTol;
         Hmesh;
+        STLFile;
     end
     
 %--------------------------------------------------------------------------
@@ -65,25 +66,37 @@ function obj = Mesh(Input,varargin)
     obj.Image        = [];
     obj.SimplifyTol  = 0.05;
     obj.Hmesh        = 0.05;
+    obj.STLFile      = [];
     
     if isa(Input,'char')
        [~,~,ext] = fileparts(Input);
-       if strcmp(ext,'.stl'), [f,v] = stlreader(Input);
-       elseif strcmp(ext,'.obj'), [v,f] = objreader(Input);
-       elseif strcmp(ext,'.png'), obj.Image = rgb2gray(imread(Input));
+       if strcmp(ext,'.stl')
+           if strcmp(varargin{1},'Hmesh'), obj.Hmesh = varargin{2};
+           else, error('Requested inputs is Hmesh with [Hgrad,Hmin,Hmax]');
+           end
+           warning off % please Matlab fix your stuff...
+           [v,f] = GenerateMeshSTL(obj,Input);
+           warning on  
+           Input = v;
+           varargin{1} = f;
+       elseif strcmp(ext,'.obj')
+           [v,f] = objreader(Input);
+       elseif strcmp(ext,'.png') 
+           obj.Image = rgb2gray(imread(Input));
        else, cout('err','* extension not recognized');
        end
        
-       if isempty(obj.Image)
+       if isempty(obj.Image) && isempty(obj.STLFile)  
         obj.Node    = v;
         obj.NNode   = length(v);
         obj.Element = num2cell(f,2);
         obj.NElem   = length(f);
         obj.BdBox   = boxhull(v);
        end
-    
-    elseif isa(Input,'double')
-       if (size(Input,2) ~= 2) || (size(Input,2) ~= 2),
+    end
+       
+    if isa(Input,'double')
+       if (size(Input,2) ~= 2) && (size(Input,2) ~= 3),
            error('First input should be a Nx2 or Nx3 matrix');
        end
        
@@ -92,10 +105,15 @@ function obj = Mesh(Input,varargin)
        obj.NNode   = length(v);
        obj.Element = num2cell(varargin{1},2);
        obj.NElem   = length(varargin{1});
-       obj.BdBox   = boxhull(v);
-       obj.Type    = 'C2T3';
+       obj.BdBox   = boxhull(v);   
        obj.Dim     = size(v,2);
        obj.ElemMat = varargin{1};
+       
+       if obj.Dim == 3
+          obj.Type = 'C3T4';  
+       else
+          obj.Type = 'C2T3'; 
+       end
        
        varargin{1} = 'NNode';
        varargin{2} = length(v);
@@ -133,7 +151,7 @@ function obj = Mesh(Input,varargin)
         elseif strcmp(varargin{ii},'Tetrahedron')
             N = num2cell(varargin{ii+1});
             obj.Center = Hexahedron(obj.BdBox,N{:});
-            obj.Type   = 'C3T6';
+            obj.Type   = 'C3T4';
         else
             obj.(varargin{ii}) = varargin{ii+1};
         end
@@ -151,12 +169,19 @@ function obj = Mesh(Input,varargin)
         obj.NNode   = length(v);
         obj.Element = num2cell(f,2);
         obj.NElem   = length(f);
+        obj.BdBox   = boxhull(v);   
+        obj.Dim     = size(v,2);
         
         [Pc,~] = computeCentroid(obj,obj.Element,v); 
        
         obj.MaxIteration = 0;
         obj.Center = Pc;
         obj.SDF = @(x) -1*ones(length(Pc),1);
+        
+    elseif ~isempty(obj.STLFile)
+        
+       
+        
     end
     
 end
@@ -197,9 +222,6 @@ end
 
 %---------------------------------------------------------------------- set
 function Mesh = generate(Mesh)
-    
-% Mesh.Iteration   = 1; 
-% Mesh.Convergence = 1e7;
 
 if isempty(Mesh.Center)
     Pc = randomPointSet(Mesh); 
@@ -222,7 +244,6 @@ else
 Anew = (Mesh.BdBox(2)-Mesh.BdBox(1))*(Mesh.BdBox(4)-Mesh.BdBox(3))*...
        (Mesh.BdBox(6)-Mesh.BdBox(5));
 end
-
 
 if Mesh.MaxIteration < 1
     flag = 1;
@@ -348,7 +369,12 @@ patch('Faces',Mesh.Boundary,'Vertices',Mesh.Node,'LineStyle','-',...
 hold on;
 
 elseif strcmp(Request,'Node')
-    plot(Mesh.Node(Z,1),Mesh.Node(Z,2),'.','Color','r');
+    if size(Mesh.Node,2) == 2
+        plot(Mesh.Node(Z,1),Mesh.Node(Z,2),'.','Color',col(2));
+    else
+        plot3(Mesh.Node(Z,1),Mesh.Node(Z,2),Mesh.Node(Z,3),'.',...
+            'Color',col(2),'Markersize',20);
+    end
 elseif strcmp(Request,'Element')
     plot(Mesh.Center(Z,1),Mesh.Center(Z,2),'.','Color','r');  
 elseif strcmp(Request,'Holes')
@@ -875,6 +901,18 @@ function [Node,Element] = GenerateMeshImage(Mesh,Image)
     Tesselation = triangulationCreate(c_cell, H(1), H(2), H(3),'linear');
     Node = Tesselation.Nodes.';    
     Element = Tesselation.Elements.';
+    
+end
+
+%----------------------------------------------- generate elemental adjency
+function [Node,Element] = GenerateMeshSTL(Mesh,filename)
+    
+    model = createpde(3);
+    importGeometry(model,filename);
+    msh = generateMesh(model,'GeometricOrder','linear',...
+        'Hgrad', Mesh.Hmesh(1), 'Hmin', Mesh.Hmesh(2), 'Hmax', Mesh.Hmesh(3));
+    Node = msh.Nodes';
+    Element = msh.Elements';
     
 end
 

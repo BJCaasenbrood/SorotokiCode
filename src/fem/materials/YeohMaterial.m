@@ -5,9 +5,9 @@ classdef YeohMaterial
         C1 = 10;
         C2 = 0;
         C3 = 0;
-        D1 = 50;
-        D2 = 50;
-        D3 = 50;
+        D1 = 1;
+        D2 = 1;
+        D3 = 1;
     end
     
     properties (Access = private)

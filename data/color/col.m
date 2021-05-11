@@ -1,5 +1,5 @@
 function color  = col(n,per)
-Colors = pallateV1;
+Colors = pallateV0;
 if nargin < 1
     color = vertcat(Colors{:});
 else

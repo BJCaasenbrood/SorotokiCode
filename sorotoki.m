@@ -51,12 +51,6 @@ DisplayLogo;
 fprintf(['* Thank you for installing SOROTOKI, we will',...
     ' start the installation shortly \n']); pause(1.0);
 
-% if exist('BuildVersion.m','file')
-%      % File exists.
-% else
-%      % File does not exist.
-% end
-
 fprintf('* Starting installation - SOROTOKI');
 verFolder = 'config';
 if ~exist(verFolder, 'dir')
@@ -98,6 +92,7 @@ libs(3) = IncludeMesh(Path,0);
 libs(4) = IncludeFiniteElement(Path,0);
 libs(5) = IncludeDynamicModel(Path,0);
 libs(6) = IncludeControl(Path,0);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if min(libs) == 1
 fprintf('\n* Libary check completed - all libaries are up-to-date - \n');
@@ -141,7 +136,7 @@ if bool == 1
     if libs(6), IncludeControl(Path,1); end
     
     Request = input(['\n* Do you want to setup the SorotokiCode folder',...
-        ' as the main directory (y/n)'],'s');
+        ' as your main directory (y/n)'],'s');
 
     switch(Request)
         case('y'), fprintf(FID,'cdsoro; \n');

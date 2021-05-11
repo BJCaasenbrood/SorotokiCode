@@ -82,7 +82,6 @@ for ii = 1:fps(t,7):length(mdl.q)
 
     setupFigure(ii);
     view(0,0);
-
 end
 
 %% BACK-END FUNCTIONS

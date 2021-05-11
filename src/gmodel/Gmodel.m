@@ -92,7 +92,7 @@ function obj = Gmodel(varargin)
     obj.SSSTextureMap = 1;
     obj.Shading = 'Vertex';
     
-    for ii = 3:2:length(varargin)
+    for ii = 2:2:length(varargin)
         obj.(varargin{ii}) = varargin{ii+1};
     end
 

@@ -10,9 +10,6 @@ permalink: /docs/documentation/examples/pneunet/
 #  Topology optimization of a PneuNet actuator
 {: .no_toc }
 
-<div align="center"> <img src="./img/sampleFigure.png" height="1520"> </div>
-<div align="center"> Source image is taken from the work of (see [1]) </div>
-
 <details open markdown="block">
   <summary>
     Table of contents
@@ -30,6 +27,16 @@ permalink: /docs/documentation/examples/pneunet/
  - Code length: `~25 lines`{: .text-purple-000} (without comments)
 
 ---
+
+### Introduction
+In this illustrative example, we will exploit topology optimization to find a sub-optimal soft structure that undergoes a bending motion when pressurized. This morphology is often associated with a popular class of soft robots named ‘PneuNet’ actuators [1]. PneuNet actuators consist of a set of rectangular pneumatic chambers inside an elastomer medium. When pressurized, these chambers inflate, and due to a stiffness differential the elastomer structure bends (see figure below). To model and optimize such a hyper-elastic structure, we use mainly use the functionality within the `Fem.m`{: .text-purple-000} class of SOROTOKI. The classes `Sdf.m`{: .text-purple-000} and `Mesh.m`{: .text-purple-000} are used to shape the rectangular domain of a single pressure chamber.
+
+<div align="center"> <img src="./img/sampleFigure.png" height="1520"> </div>
+<div align="center"> Source image is taken from the work of (see [1]) </div>
+
+<div align="center"> <img src="./img/opt_pneunet.gif" width="550"> </div> 
+<div align="center"> Topology optimization process of a PneuNet using SOROTOKI (see [2]) 
+ </div>
 
 ### Generating the mesh
 
@@ -56,7 +63,7 @@ function Dist = PneuNet(P,W,H,E,T)
 end
 ```
 
-Then, we wish to generate a discretized mesh based on the signed distance function `sdf`{: .text-purple-000}. To do so, we simply input the signed distance function into `msh = Mesh(sdf)`{: .text-purple-000}; together with the **bounding box** (`BdBox = [0,W,0,H]`{: .text-purple-000}) and the required **number of finite-elements** (`NElem = 1250`{: .text-purple-000}). Notice that we can use the previously defined width and height to outline this bounding box. Finally, we call the public function `msh.generate()`{: .text-purple-000} to build the mesh and we show it by calling `msh.show()`{: .text-purple-000}.
+Then, we wish to generate a discretized mesh based on the signed distance function `sdf`{: .text-purple-000}. To do so, we simply input the signed distance function into `msh = Mesh(sdf)`{: .text-purple-000}; together with the **bounding box** (`BdBox = [0,W,0,H]`{: .text-purple-000}) and the required **number of finite-elements** (`NElem = 1250`{: .text-purple-000}). Notice that we can use the previously defined width and height to outline this bounding box. Finally, we call the public function `msh.generate()`{: .text-purple-000} to build the mesh.
 
 ```matlab
 %% generate mesh
@@ -64,7 +71,11 @@ msh = Mesh(sdf,'BdBox',[0,W,0,H],'NElem',1250);
 msh = msh.generate();
 msh.show();
 ```
-In SOROTOKI, figures produced by the classes through a `.show()` request automatically have the name `figure(101)` if no other figures are present. 
+In SOROTOKI, figures can be produced through a `show()`{: .text-purple-000} request of the class. The figure will automatically be called `figure(101)` if no figures are opened. The polygonal mesh of the PneuNet domain is shown below.
+
+<div align="center"> <img src="./img/mesh.png" width="350"> </div> 
+<div align="center"> Polygonal mesh of single PneuNet chamber.
+ </div>
 
 ---
 ### Building the finite element model
@@ -88,29 +99,42 @@ Alternatively, we can rewrite the code above more compactly.
 fem = Fem(msh,'OptimizationProblem','Compliant','VolumeInfill',0.4,'FilterRadius',H/15,...
   'Penal',4,'Nonlinear',false,'MaxIterationMMA',50,'ChangeMax',0.05);
 ```
-Lets further detail these settings: `OptimizationProblem'`{: .text-purple-000} set the optimization objective function to compliant structure (default is `'Compliance'`{: .text-purple-000}); `VolumeInfill`{: .text-purple-000} the desired material-infill (default is set to `0.3`{: .text-purple-000}); `FilterRadius`{: .text-purple-000} the radius of the spatial filter needed for regularization; `Penal`{: .text-purple-000} penalty power-factor for low density regions; `Nonlinear`{: .text-purple-000} turns on/off the geometrical and material nonlinearities (default is set to `true`{: .text-purple-000}, so nonlinearities are active by default); `MaxIterationMMA`{: .text-purple-000} maximum number of solver steps in the *Method-of-Moving Asymptotes* optimization routine; and `ChangeMax`{: .text-purple-000} the maximum allowable change in material densities during optimization. **Important!** It shall be clear that setting `Nonlinear = true`{: .text-purple-000} will significantly increase the numerical solver time, please check if your system can handle the computational loads during optimization. If not, please use lower-order meshes.
+Lets discuss these settings in more detail: The setting `OptimizationProblem`{: .text-purple-000} sets the optimization objective to a compliant problem (default is `'Compliance'`{: .text-purple-000}); `VolumeInfill`{: .text-purple-000} sets the desired volume infill (default is set to `0.3`{: .text-purple-000}); `FilterRadius`{: .text-purple-000} the radius of the spatial filter needed for spatial regularization; `Penal`{: .text-purple-000} penalty power-factor for low-density regions; `Nonlinear`{: .text-purple-000} turns on/off the geometrical and material nonlinearities (default is set to `true`{: .text-purple-000}, i.e.,  active by default); `MaxIterationMMA`{: .text-purple-000} maximum number of optimization steps; and `ChangeMax`{: .text-purple-000} the maximum allowable change in material densities during optimization. 
+
+**Important!** It shall be clear that `Nonlinear = true`{: .text-purple-000} will significantly increase the numerical solver time, please check if your system can handle the computational loads during optimization. If not, please use lower-order meshes or have nonlinear deformation turned off.
 
 ---
 
 ### Introduce periodicity and repetition
+In this section, we repeat the material domain 8 times along the horizontal plane to construct a full PneuNet. Furthermore, we add a (periodic) symmetry, which will ensure that a pressure chamber has an appropriate topology that seals. To do so, we can run the code below.
 
 ```matlab
 %% set spatial settings
 fem = fem.set('Periodic',[0.5, 0],'Repeat',ones(8,1));
 ```
 
-### (Hyper-elastic) Material assignment
+### Boundary conditions (static)
+
+```matlab
+%% add boundary condition
+id = fem.FindNodes('Left'); 
+fem = fem.AddConstraint('Support',id,[1,1]);
+
+id = fem.FindNodes('Right'); 
+fem = fem.AddConstraint('Spring',id,[0,1]);
+fem = fem.AddConstraint('Output',id,[0,-1]);
+```
+### Loading conditions (dynamic)
+
+
+### Material assignment
 
 ```matlab
 %% assign material
 fem.Material =  Dragonskin10();
 ```
 
-### (Static) boundary conditions
-
-### (Dynamic) loading condition
-
-### Crunching the numbers!
+### Starting the optimization!
 
 <div align="center"> <img src="./img/opt_pneunet.gif" width="550"> </div>
 

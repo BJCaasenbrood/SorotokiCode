@@ -5,12 +5,16 @@ classdef Sdf
     properties
         sdf;
         BdBox;
-        cmap = viridis;
+        cmap;
     end
     
     methods
-        function obj = Sdf(fnc)
+        function obj = Sdf(fnc,varargin)
             obj.sdf = @(x) [fnc(x),fnc(x)];
+            obj.cmap = turbo;
+            for ii = 1:2:length(varargin)
+                obj.(varargin{ii}) = varargin{ii+1};
+            end
         end
 
         function r = plus(obj1,obj2)
@@ -49,24 +53,44 @@ end
 
 function show(Sdf,Quality)
     if nargin < 2,
-        Quality = 250;
+        if numel(Sdf.BdBox) < 6
+            Quality = 250;
+        else
+            Quality = 25;
+        end
     end
     
     x = linspace(Sdf.BdBox(1),Sdf.BdBox(2),Quality);
     y = linspace(Sdf.BdBox(3),Sdf.BdBox(4),Quality);
-    [X,Y] = meshgrid(x,y);
     
-    D = Sdf.eval([X(:),Y(:)]);
-    D = D(:,end);
-    D(D>0) = NaN;
-    figure(101);
-    surf(X,Y,reshape(D,[Quality Quality]),'linestyle','none');
-    axis equal;
-    axis equal; hold on;
-    contour3(X,Y,reshape(D,[Quality Quality]),[0 0],'linewidth',...
-        1.5,'Color','w');
-    
-    colormap(Sdf.cmap);
+    if numel(Sdf.BdBox) < 6
+        [X,Y] = meshgrid(x,y);
+
+        D = Sdf.eval([X(:),Y(:)]);
+        D = D(:,end);
+        %D(D>0) = NaN;
+        figure(101);
+        surf(X,Y,reshape(D,[Quality Quality]),'linestyle','none');
+        axis equal; hold on;
+        contour3(X,Y,reshape(D,[Quality Quality]),[0 0],'linewidth',...
+            1.5,'Color','w');
+        
+        colormap(Sdf.cmap);
+        view(0,90);
+    else
+        z = linspace(Sdf.BdBox(5),Sdf.BdBox(6),Quality);
+        [X,Y,Z] = meshgrid(x,y,z);
+
+        D = Sdf.eval([X(:),Y(:),Z(:)]);
+        D = D(:,end);
+        D(D>0) = NaN;
+        figure(101);
+        C = reshape(D,[Quality Quality,Quality]);
+        scatter3(X(:),Y(:),Z(:),15,C(:),'Marker','.');
+        axis equal; hold on;
+
+        colormap(Sdf.cmap);
+    end
 end
 end
     

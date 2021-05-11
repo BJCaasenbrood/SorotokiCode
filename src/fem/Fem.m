@@ -1115,6 +1115,7 @@ if (Fem.Iteration == 1 && Fem.Increment == 1)
         case('C2T3'), tmp = TabulateShapeFunctions(tmp);
         case('C2Q4'), tmp = TabulateShapeFunctions(tmp);
         case('C3H8'), tmp = TabulateShapeFunctionsC3H8(tmp);
+        case('C3T4'), tmp = TabulateShapeFunctionsC3T4(tmp);
         otherwise, tmp = TabulateShapeFunctions(tmp);
     end
     Fem.ShapeFnc = tmp.ShapeFnc;
@@ -1836,8 +1837,8 @@ dfdE = [temp(1);temp(2:end)-temp(1:end-1)];
 elseif strcmp(Fem.OptimizationProblem,'Compliant') && Fem.Nonlinear
 E = MaterialField(Fem);
 f = -Fem.OutputVector.'*u(:,1); 
-%K = sparse(Fem.i,Fem.j,E(Fem.e).*Fem.t);
-K = sparse(Fem.i,Fem.j,E(Fem.e).*Fem.k);
+K = sparse(Fem.i,Fem.j,E(Fem.e).*Fem.t);
+%K = sparse(Fem.i,Fem.j,E(Fem.e).*Fem.k);
 lam = 0*u(:,1);
 lam(fDof) = K(fDof,fDof)\Fem.OutputVector(fDof);
 temp = cumsum(u(Fem.i).*Fem.k.*lam(Fem.j));

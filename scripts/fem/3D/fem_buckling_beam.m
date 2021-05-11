@@ -14,7 +14,7 @@ fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[1,1,1]);
 fem = fem.AddConstraint('Load',fem.FindNodes('Top'),[0,5,-15]);
 
 %% select material
-fem.Material =  TPU90();
+fem.Material = TPU90();
 
 %% solving
 fem.solve();

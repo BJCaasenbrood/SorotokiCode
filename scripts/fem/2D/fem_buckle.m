@@ -18,7 +18,7 @@ fem = fem.AddConstraint('Load',fem.FindNodes('Right'),[-5,0]);
 fem = fem.AddConstraint('Output',fem.FindNodes('SE'),[0,0]);
 
 %% assign material
-fem.Material = Dragonskin30(0.1);
+fem.Material = Dragonskin30();
 
 %% solving
 fem.solve();

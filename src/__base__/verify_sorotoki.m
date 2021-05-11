@@ -2,50 +2,113 @@ function out = verify_sorotoki
 %VERIFY_SOROTOKI Summary of this function goes here
 %   Detailed explanation goes here
 clr;
+
+global dt;
+dt = 0.01;
 fprintf('* Starting verification check - SOROTOKI \n'); pause(0.2)
 fprintf('* The verification check might take a couple of minutes. \n');
 fprintf('  The analysis will perform a full check shortly... \n');
-pause(2);
+pause(1);
 
 List = cell(0);
 
 % check plotting within SOROTOKI
-List = verifySorotoki(List,@(x) checkPlot,'Plotting tools');
-pause(1); close all;
+List = verifySorotoki(List,@(x) checkPlot,'Plotting tools'); 
+close(101);
 
-List = verifySorotoki(List,@(x) check2,'Check 2');
+List = verifySorotoki(List,@(x) checkSDF,'Class Sdf.m');
+close(101);
 
 out = List;
 end
 
 function checkPlot
+global dt
 figure(101);
+set(gcf,'Name','Checking Plotting tools');
 subplot(2,2,1);
+cout('\t col()\t');
+bic;
 colorshow();
+boc;
 
 subplot(2,2,2);
 [X,Y,Z] = peaks(40);
 surf(X,Y,Z,'linestyle','none')
-colormap(turbo); drawnow; pause(0.1);
-colormap(barney); drawnow; pause(0.1);
-colormap(blackwhite); drawnow; pause(0.1);
-colormap(bluesea); drawnow; pause(0.1);
-colormap(bounce); drawnow; pause(0.1);
-colormap(inferno); drawnow; pause(0.1);
-colormap(metro); drawnow; pause(0.1);
-colormap(noir); drawnow; pause(0.1);
-colormap(turbo); drawnow; pause(0.1);
-colormap(viridis); drawnow; pause(0.1); 
+cout('\t colormap')
+bic;
+colormap(turbo); drawnow; pause(dt);
+colormap(barney); drawnow; pause(dt);
+colormap(blackwhite); drawnow; pause(dt);
+colormap(bluesea); drawnow; pause(dt);
+colormap(bounce); drawnow; pause(dt);
+colormap(inferno); drawnow; pause(dt);
+colormap(metro); drawnow; pause(dt);
+colormap(noir); drawnow; pause(dt);
+colormap(turbo); drawnow; pause(dt);
+colormap(viridis); drawnow; pause(dt); 
+boc;
 
 subplot(2,2,3);
-showColormap(turbo); drawnow; pause(0.1);
-showColormap(turbo(-1)); drawnow; pause(0.1);
-showColormap(turbo(0)); drawnow; pause(0.1);
-showColormap(turbo(-100)); drawnow; pause(0.1);
-showColormap(turbo(100)); drawnow; pause(0.1);
+cout('\t cmapping()')
+bic;
+showColormap(turbo); drawnow; pause(dt);
+showColormap(turbo(-1)); drawnow; pause(dt);
+showColormap(turbo(0)); drawnow; pause(dt);
+showColormap(turbo(-100)); drawnow; pause(dt);
+showColormap(turbo(100)); drawnow; pause(dt);
+boc;
 
 subplot(2,2,4);
+cout('\t verify images')
+bic;
 imshow('FEMbot.png');
+boc;
+end
+
+function checkSDF
+global dt
+f1 = @(x) sqrt((x(:,1)).^2+(x(:,2)).^2)-0.75;
+f2 = @(x) sqrt((x(:,1)).^2+(x(:,2)).^2 + +(x(:,3)).^2)-0.75;
+f3 = @(x) sqrt((x(:,1)+0.5).^2+(x(:,2)).^2 + +(x(:,3)).^2)-0.75;
+
+cout('\t Sdf(...) (2D)')
+bic; sdf1 = Sdf(f1,'BdBox',[-1,1,-1,1]); boc;
+
+cout('\t Sdf(...) (3D)')
+bic; 
+sdf2 = Sdf(f2,'BdBox',[-1,1,-1,1,-1,1]); 
+sdf3 = Sdf(f3,'BdBox',[-1.5,1.5,-1,1,-1,1]);
+boc;
+
+figure(101);
+set(gcf,'Name','Checking Signed Distance Functions Sdf.m');
+subplot(2,2,1);
+cout('\t sdf.show() 2D')
+bic; sdf1.show(); boc;  drawnow; pause(2*dt);
+subplot(2,2,2);
+cout('\t sdf.show() 3D')
+bic; sdf2.show(); boc; drawnow; pause(2*dt);
+
+subplot(2,2,3);
+cout('\t sdf1 + sdf2 ');
+bic; 
+s = sdf2 + sdf3; 
+s.show(); boc; 
+drawnow; pause(5*dt);
+
+cout('\t sdf1 - sdf2 ');
+bic; 
+s = sdf2 - sdf3; cla;
+s.show(); boc; 
+drawnow; pause(5*dt);
+
+subplot(2,2,4);
+cout('\t sdf1/sdf2 ');
+bic; 
+s = sdf2/sdf3; cla;
+s.show(); boc; 
+drawnow; pause(5*dt);
 end
 
 function list = verifySorotoki(list,exec,label)
@@ -65,16 +128,22 @@ if index == 0
     cout('text','Assesing: ');
     str = char(input);
     cout('key',str);
-    cout('key','... ');
+    cout('key','... \n');
     List{end+1,1} = str;
 elseif index == 1
-    List{end,2} = empty;
+    List{end,2} = [];
     cout(' ');
-    cout('green','completed!\n');
+    cout('green','\t Complete!\n');
 else
     List{end,2} = input;
     cout(' ');
-    cout('red','unsuccesfull!\n');
+    cout('red','\t Unsuccesfull!\n');
+    cout('red', input.message);
+    cout('\n');
+    
 end
 
 end
+
+function bic, cout('\t\t [ ]');end
+function boc, cout('\b\b\b[x] \n'); end

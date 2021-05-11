@@ -19,9 +19,20 @@ image_sliders:
 # **SOROTOKI** - An open-source soft robotics toolkit for MATLAB
 {: .fs-6 .text-purple-000}
 
-*SOROTOKI* is an open-source MATLAB toolkit for soft robotics that includes an array of tools for design, modeling, and control. Due to its scientific diversity, it can be challenging for researchers to quickly familiarize themselves with multiple scientific disciplines. With the aim to lower the threshold, Sorotoki aims to incorporate multiple layers of soft robotics research into one toolkit. Examples include: continuum mechanics, dynamic systems and control theory, topology optimization, computer graphics, and much more to come! The combination provides a highly flexible modeling environment and hopefully aids the development of novel soft robotic research.
+*SOROTOKI* is an open-source MATLAB toolkit for soft robotics that includes an array of tools for design, modeling, and control. Due to its scientific diversity, it can be challenging for new researchers to quickly familiarize themselves with multiple scientific areas. With the aim to lower this threshold, Sorotoki aims to incorporate multiple layers of soft robotics research into one compact toolkit. Examples include: continuum mechanics, dynamic systems and control theory, topology optimization, computer graphics, and much more to come! The combination provides a highly flexible programming environment and will hopefully aid the development of novel soft robotic research.
 
-## Applications highlights:
+#### Download the latest stable version (v1.03):
+{: .text-purple-000}
+
+```bash
+git clone --depth 1  https://github.com/BJCaasenbrood/SorotokiCode.git
+```
+
+{: .text-purple-000}
+[Stable V1.03 (.zip)](https://github.com/BJCaasenbrood/SorotokiCode/zipball/master){: .btn .btn-purple .fs-5 .mb-4 .mb-md-0 .mr-2} [Stable V1.03 (.tar)](https://github.com/BJCaasenbrood/SorotokiCode/tarball/master){: .btn .btn-purple .fs-5 .mb-4 .mb-md-0 .mr-2} [View on Github](https://github.com/BJCaasenbrood/SorotokiCode){: .btn .fs-5 .mb-4 .mb-md-0}  
+
+
+## Applications highlights
 {: .text-purple-000}
 - [x] Implicit modeling with Signed Distance Functions (SDFs),
 - [x] Finite Element Analysis (FEA) using hyper-elastic materials,
@@ -29,27 +40,19 @@ image_sliders:
 - [x] Dynamical modeling through Cosserat-beam theory,
 - [x] Fast graphics rendering with responsive textures.
 
-#### planned:
+#### in development:
 {: .text-purple-000}
+- [ ] FEM-based inverse kinematic control,
 - [ ] Real-time control of soft robots via BalloonDog interface,
-- [ ] Magnetic/induction analysis for soft sensing,
-- [ ] A pdf-version of the documentation.
+- [ ] Magnetic/induction/capative finite-elements for soft sensing,
 
 {% include slider.html selector="example_slider" %}
 
-### Download the latest stable version
+## Citation
 {: .text-purple-000}
-[Stable V3.03 (.zip)](https://github.com/BJCaasenbrood/SorotokiCode/zipball/master){: .btn .btn-purple .fs-5 .mb-4 .mb-md-0 .mr-2} [Stable V3.03 (.tar)](https://github.com/BJCaasenbrood/SorotokiCode/tarball/master){: .btn .btn-purple .fs-5 .mb-4 .mb-md-0 .mr-2} [View on Github](https://github.com/BJCaasenbrood/SorotokiCode){: .btn .fs-5 .mb-4 .mb-md-0}  
 
-or via git clone
-{: .fs-5 .text-purple-000}
-```fortran
- git clone https://github.com/BJCaasenbrood/SorotokiCode.git
-```
+If you are planning on using Sorotoki in your (academic) work, please consider citing the toolkit  
 
-### Citation
-{: .text-purple-000}
-If you are using Sorotoki in your (academic) work, please consider citing the toolkit:
 ```bibtex
 @misc{Caasenbrood2018,
   author = {Caasenbrood, Brandon},

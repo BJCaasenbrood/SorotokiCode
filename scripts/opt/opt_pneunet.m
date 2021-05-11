@@ -6,14 +6,14 @@ D = 2;   % inter distance
 
 sdf = @(x) PneuNet(x,W,H,D,W);
 
-msh = Mesh(sdf,'BdBox',[0,W,0,H],'NElem',1000);
+msh = Mesh(sdf,'BdBox',[0,W,0,H],'NElem',1500);
 msh = msh.generate();
 
 %% show generated mesh
 fem = Fem(msh,'VolumeInfill',0.4,'Penal',4,'FilterRadius',H/15,...
               'Nonlinear',false,'TimeStep',1/3,...
               'OptimizationProblem','Compliant',...
-              'MaxIterationMMA',25,'ChangeMax',0.05,'Movie',1);
+              'MaxIterationMMA',25,'ChangeMax',0.05,'Movie',0);
 
 %% set spatial settings
 fem = fem.set('Periodic',[1/2, 0],'Repeat', ones(7,1));
@@ -33,7 +33,7 @@ fem = fem.AddConstraint('PressureCell',id,[5*kpa,0]);
 fem = fem.initialTopology('Hole',[W/2,0.625*H],0.85);
 
 %% material
-fem.Material = Ecoflex0030(0.15);
+fem.Material = Ecoflex0050(0.15);
 
 %% solving
 fem.optimize();
@@ -42,7 +42,7 @@ fem.show('ISO',0.3);
 %% convert topology result to mesh
 ISO  = 0.3;
 Simp = 0.05;
-GrowH = 1.1;
+GrowH = 1.5;
 MinH = 2.5;
 MaxH = 40;
 
@@ -64,25 +64,24 @@ femr = femr.AddConstraint('Output',id,[0,0]);
 
 %% assign material to reduced fem
 D = 25; % compress. factor (more stable)
-femr.Material = Ecoflex0030(D);
+femr.Material = Ecoflex0050(D);
 
 %% solve final finite-element problem
 femr.solve();
 
 %% post-process curvature data
-Ux = femr.Log{1,2};
-Uy = femr.Log{2,2};
+Ux = femr.Log{2,2};
+Uy = femr.Log{3,2};
 N0 = femr.get('Node0');
 
 figure(103); cla;
 for ii = 1:1:size(Ux,2)
     Nx = N0(id,1) + Ux(:,ii);
     Ny = N0(id,2) + Uy(:,ii);
-    plot(Nx,Ny,'Linewidth',1.5,...
-        'Color',col(1,ii/size(Ux,2)));
+    plot(Nx,Ny,'Linewidth',2,...
+        'Color',col(4,ii/(1.05*size(Ux,2))));
     hold on;
 end
-axis equal;
 
 function Dist = PneuNet(P,W,H,E,T)
 R1 = dRectangle(P,0,W,0,H);

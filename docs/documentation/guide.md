@@ -1,6 +1,6 @@
 ---
 layout: default
-title: User guide
+title: User functions
 nav_order: 3
 parent: Documentation
 ---
@@ -17,7 +17,73 @@ parent: Documentation
 {:toc}
 </details>
 
+
 ---
+
+# SOROTOKI architecture
+
+
+```mermaid!
+classDiagram
+class Sdf {
+	<<signed distance function>>
+	eval()
+  	show()
+}
+
+class Mesh {
+	<<mesh generation>>
+	Blender
+  	generate()
+}
+
+class Gmodel {
+	<<graphical models>>
+	Material
+  	render()
+  	bake()
+  	update()
+}
+
+class Fem {
+	<<finite element & topology optimization>>
+	Material
+  	solve()
+  	optimize()
+}
+
+class Model {
+	<<Cosserat-beam models>>
+	Rig
+	Shapes
+  	build()
+  	simulate()
+}
+
+
+class Bdog {
+	<<Real-time interface via Balloondog>>
+	SetPoint
+  	connect()
+ 	execute()
+  	shell()
+  	close()
+}
+
+Sdf --> Mesh : Meshing domain
+Sdf ..> Gmodel : Implicit modeling
+Mesh ..> Gmodel
+Gmodel ..> Model : Rendering
+
+Mesh --> Fem : Import
+Fem --> Mesh  : Export topology
+Fem ..> Model : FEM-driven data
+Model ..> Bdog : Model-based control
+Fem ..> Bdog : FEM-based IK-control
+
+```
+
+
 
 # Useful commands within SOROTOKI
 <div class="code-example" markdown="1">
