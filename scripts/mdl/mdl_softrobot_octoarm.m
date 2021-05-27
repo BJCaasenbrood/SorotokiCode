@@ -1,15 +1,15 @@
-%clr; cdsoro; beep off;
+clr; cdsoro; beep off;
 %clc; clear;
 %% assign free DOF
 mdl = Model([0,1,1,0,0,0],'NModal',8,'NDisc',1);
-mdl = setupSoftRobot(mdl,1,0,0.4);
-mdl = mdl.set('Controller',0);
-mdl = mdl.set('TimeStep', 1/50);
-mdl = mdl.set('Tdomain', 15); 
+mdl = setupSoftRobot(mdl,0.1,0,0.01);
+mdl = mdl.set('Controller',1);
+mdl = mdl.set('TimeStep', 1/30);
+mdl = mdl.set('Tdomain', 25); 
 
 %% generate and solve dynamic model
 mdl = mdl.generate();
-mdl.q0(1) = 2;
+%mdl.q0(1) = 2;
 %mdl.q0(2) = -15;
 %  mdl.q0(3) = -16;
 mdl = mdl.csolve(); 
@@ -90,12 +90,12 @@ function mdl = setupSoftRobot(mdl,Kp,Kd,Lam)
 L0 = 0.12;
 
 mdl = mdl.set('Sdomain',   L0);
-mdl = mdl.set('SpaceStep', 50);
+mdl = mdl.set('SpaceStep', 30);
 mdl = mdl.set('Density',   1200);
-mdl = mdl.set('Radius',    8e-3);
+mdl = mdl.set('Radius',    1e-2);
 mdl = mdl.set('Gravity',   [0,0,-9.81]);
 mdl = mdl.set('E',         25);
-mdl = mdl.set('Mu',        0.15);
+mdl = mdl.set('Mu',        0.1);
 mdl = mdl.set('Gain',      [Kp,Kd,0]);
 mdl = mdl.set('Spring',    [0.01,1]);
 mdl = mdl.set('Lambda',    [Lam,0]);%[Kp/Lam,Kp*30*0]);

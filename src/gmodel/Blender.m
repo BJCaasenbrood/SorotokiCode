@@ -5,11 +5,13 @@ switch(Request)
     case('Translate');    x = TranslateMesh(x,Arg);
     case('Rotate');       x = RotateMesh(x,Arg);
     case('Center');       x = CenterMesh(x);
+    case('Fix');          x = FixMesh(x);
     case('Transform');    x = Transformation(x,Arg);
     case('Scale');        x = ScaleMesh(x,Arg);
     case('Curve');        x = CurveMesh(x,Arg);
     case('Sweep');        x = SweepMesh(x,Arg);
     case('SE3');          x = SE3Mesh(x,Arg);
+    case('SE3x');         x = SE3MeshXTangent(x,Arg);
     case('Twist');        x = TwistMesh(x,Arg);
 end
 
@@ -67,13 +69,10 @@ Node0 = mesh.Node;
 
 if strcmp(Ax,'x')
     R = [1,0,0; 0, cos(dr),-sin(dr); 0, sin(dr), cos(dr)];
-    Node = transpose(R*(Node0'));
 elseif strcmp(Ax,'y')
     R = [cos(dr), 0,-sin(dr);0,1,0;sin(dr), 0, cos(dr)];
-    Node = transpose(sparse(R)*(Node0'));
 elseif strcmp(Ax,'z')
     R = [cos(dr),-sin(dr), 0; sin(dr), cos(dr), 0; 0,0,1];
-    Node = transpose(sparse(R)*(Node0'));
 elseif strcmp(Ax,'3D')
     drx  = Arg{2}*(pi/180);
     dry  = Arg{3}*(pi/180);
@@ -81,22 +80,25 @@ elseif strcmp(Ax,'3D')
     c_3 = cos(drx); s_3 = sin(drx);
     c_2 = cos(dry); s_2 = sin(dry);
     c_1 = cos(drz); s_1 = sin(drz);
-    rotm = zeros(3,3);
-    rotm(1,1) =  c_1*c_2;
-    rotm(1,2) =  c_1*s_2*s_3 - s_1*c_3;
-    rotm(1,3) =  c_1*s_2*c_3 + s_1*s_3;
+    R = zeros(3,3);
+    R(1,1) =  c_1*c_2;
+    R(1,2) =  c_1*s_2*s_3 - s_1*c_3;
+    R(1,3) =  c_1*s_2*c_3 + s_1*s_3;
     
-    rotm(2,1) =  s_1*c_2;
-    rotm(2,2) =  s_1*s_2*s_3 + c_1*c_3;
-    rotm(2,3) =  s_1*s_2*c_3 - c_1*s_3;
+    R(2,1) =  s_1*c_2;
+    R(2,2) =  s_1*s_2*s_3 + c_1*c_3;
+    R(2,3) =  s_1*s_2*c_3 - c_1*s_3;
     
-    rotm(3,1) = -s_2;
-    rotm(3,2) =  c_2*s_3;
-    rotm(3,3) =  c_2*c_3;
-    
-    Node = transpose(rotm*(Node0'));
+    R(3,1) = -s_2;
+    R(3,2) =  c_2*s_3;
+    R(3,3) =  c_2*c_3;
 end
 
+if size(Node0,2) == 2,
+    R = R(2:3,2:3);
+end
+
+Node = transpose(R*(Node0')); 
 mesh.Node = Node;
 
 end
@@ -127,8 +129,28 @@ mesh.Node = Node0 - [X0,Y0,Z0];
 end
 
 %-------------------------------------------------------------- ROTATE MESH
-function mesh = SE3Mesh(mesh,Arg)
+function mesh = FixMesh(mesh)
+Node0 = mesh.Node; 
+mesh.set('Node0',Node0);
+end
 
+%-------------------------------------------------------------- ROTATE MESH
+function mesh = SE3Mesh(mesh,Arg)
+Node0 = [mesh.Node, ones(mesh.NNode,1)]; 
+
+R = quat2rot(Arg(1:4));
+r = Arg(5:7);
+H = zeros(4);
+H(1:3,1:3) = R;
+H(1:3,4) = [r(1),r(2),r(3)].';
+H(4,4) = 1;
+
+Node = H*Node0.';
+mesh.Node = Node(1:3,:).';
+end
+
+%-------------------------------------------------------------- ROTATE MESH
+function mesh = SE3MeshXTangent(mesh,Arg)
 Node0 = [mesh.Node, ones(mesh.NNode,1)]; 
 
 R = Quat2Rot(Arg(1:4));
@@ -140,7 +162,6 @@ H(4,4) = 1;
 
 Node = H*Node0.';
 mesh.Node = Node(1:3,:).';
-
 end
 
 %--------------------------------------------------------------- SCALE MESH
@@ -365,7 +386,6 @@ R = [ cos(gamma), sin(gamma), 0;
      -sin(gamma), cos(gamma), 0;
                0,          0, 1];
 end
-
 
 %---------------------------------------------------------------------- set
 function R = Quat2Rot(q)

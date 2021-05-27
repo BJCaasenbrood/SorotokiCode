@@ -90,7 +90,7 @@ function obj = Mesh(Input,varargin)
         obj.Node    = v;
         obj.NNode   = length(v);
         obj.Element = num2cell(f,2);
-        obj.NElem   = length(f);
+        obj.NElem   = size(f,1);
         obj.BdBox   = boxhull(v);
        end
     end
@@ -104,13 +104,17 @@ function obj = Mesh(Input,varargin)
        obj.Node    = v;
        obj.NNode   = length(v);
        obj.Element = num2cell(varargin{1},2);
-       obj.NElem   = length(varargin{1});
+       obj.NElem   = size(varargin{1},1);
        obj.BdBox   = boxhull(v);   
        obj.Dim     = size(v,2);
        obj.ElemMat = varargin{1};
        
-       if obj.Dim == 3
+       if obj.Dim == 3 && size(varargin{1},2) == 4
           obj.Type = 'C3T4';  
+       elseif obj.Dim == 3 && size(varargin{1},2) == 8
+          obj.Type = 'C3H8';  
+       elseif obj.Dim == 2 && size(varargin{1},2) == 4,
+          obj.Type = 'C2Q4'; 
        else
           obj.Type = 'C2T3'; 
        end
@@ -229,6 +233,14 @@ elseif strcmp(Mesh.Type,'C3H8')
     Mesh.MaxIteration = 1;
     Pc = Mesh.Center; 
     Mesh.NElem = length(Pc);
+elseif strcmp(Mesh.Type,'C2Q4')    
+    if ~isempty(Mesh.Center)
+        Mesh.MaxIteration = 1;
+        Pc = Mesh.Center; 
+        Mesh.NElem = length(Pc);
+    else
+        return;
+    end
 else
     %Mesh.MaxIteration = 1;
     Pc = Mesh.Center; 
@@ -489,7 +501,7 @@ function BndList = ConstructBounds(Mesh)
         ii = ii + 1;
     end
     
-    %% make sure loop is clockwise
+    % making sure loops are clockwise
     for ii = 1:length(BndList)
        Elem = unique(BndList{ii}(:),'stable');
        V = Mesh.Node(Elem,:);

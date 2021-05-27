@@ -62,7 +62,7 @@ methods
 %-------------------------------------------------------------- Model Class
 function obj = Model(Table,varargin) 
     
-    obj.Table  = Table;
+    obj.Table      = Table;
     obj.Controller = 1;
     obj.Movie      = false;
     obj.MovieStart = false;
@@ -101,7 +101,7 @@ function obj = Model(Table,varargin)
         obj.(varargin{ii}) = varargin{ii+1};
     end
     
-    %cdsoro;
+    cdsoro;
 end
 
 %---------------------------------------------------------------------- get     
@@ -240,7 +240,7 @@ end
 function [g, X] = string(Model,k,Quality,varargin)
     
     if nargin < 3
-        Quality = 100;
+        Quality = 300;
     end
     
     if nargin < 2
@@ -536,7 +536,7 @@ Model.Nq   = Model.NDof*Model.NModal;
 Model.q0   = zeros(Model.NDof*Model.NModal,1);
 Model.q0_  = zeros(Model.NDof*Model.NModal,1);
 Model.dq0  = zeros(Model.NDof*Model.NModal,1);
-Model.u0  = zeros(Model.NDof*Model.NModal,1);
+Model.u0   = zeros(Model.NDof*Model.NModal,1);
 end
 
 %---------------------------------------------------------------------- set

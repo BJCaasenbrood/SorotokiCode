@@ -1,7 +1,5 @@
 function P = DijkstraFilter(Fem)
-
 tri = ConcaveDelaunay(Fem,0.95);
-
 A = zeros(Fem.NElem);
 I = tri(:); 
 J = tri(:,[2 3 1]); J = J(:);
@@ -11,7 +9,6 @@ A(IJ) = 1;
 [Dist,~] = Dijkstra(A,Fem.Center);
 
 P = spdiags(1./max(Dist,[],1).',0,Fem.NElem,Fem.NElem)*Dist;
-
 end
 
 function tri = ConcaveDelaunay(fem,per)

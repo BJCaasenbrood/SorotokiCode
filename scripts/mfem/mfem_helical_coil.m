@@ -12,7 +12,7 @@ mag = Mmesh(sdf,'NElem',1000,'WireThickness',1e-1);
 mag = mag.generate();
 
 %% compute inductance
-mag = Blender(mag,'Curve',{'PCC+',80,0.0,1.5});
+mag = Blender(mag,'Curve',{'PCC+',1e-3,0.0,1.5});
 mag.inductance();
 
 %% render

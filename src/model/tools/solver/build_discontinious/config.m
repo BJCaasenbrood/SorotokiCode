@@ -1,6 +1,6 @@
 [options] 
 KINEMATIC_CONTROLLER = 0 
-ENERGY_CONTROLLER    = 0 
+ENERGY_CONTROLLER    = 1 
 WRITE_OUTPUT         = 1 
 ACTUSPACE =0
 PROPERTYSET =-1
@@ -15,14 +15,14 @@ E2 = 0
 E3 = 0
 
 [model] 
-NMODE   = 16
+NMODE   = 6
 NDISC   = 2
 NDOF    = 2
 
 [solver] 
-TDOMAIN = 2
+TDOMAIN = 20
 SPACESTEP = 50
-TIMESTEP  = 0.0076923
+TIMESTEP  = 0.0066667
 INTSTEP   = 100
 ATOL      = 1e-2
 RTOL      = 1e-2
@@ -47,12 +47,12 @@ J_YY     = 0.000625
 J_ZZ     = 0.000625
 
 [control] 
-KP = 10000
-KD = 5
+KP = 1000
+KD = 3
 LK = 0
 KF1 = 0
 KF2 = 1
-LAMBDA    = 200
+LAMBDA    = 50
 LAMBDAK   = 0
 SPLINEORDER    = 1
 

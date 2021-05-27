@@ -33,7 +33,7 @@ fem = fem.AddConstraint('PressureCell',id,[5*kpa,0]);
 fem = fem.initialTopology('Hole',[W/2,0.625*H],0.85);
 
 %% material
-fem.Material = Ecoflex0050();
+fem.Material = Ecoflex0030();
 
 %% solving
 fem.optimize();
@@ -62,8 +62,8 @@ id = femr.FindNodes('Bottom');
 femr = femr.AddConstraint('Output',id,[0,0]);
 
 %% assign material to reduced fem
-D = 10; % compress. factor (more stable)
-femr.Material = Ecoflex0050(50);
+D = 25; % compress. factor (more stable)
+femr.Material = Dragonskin10(D);
 
 %% solve final finite-element problem
 femr.solve();

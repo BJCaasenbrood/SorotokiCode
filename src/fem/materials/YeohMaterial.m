@@ -49,11 +49,10 @@ function YeohMaterial = set(YeohMaterial,varargin)
 end
     
 %------------------------------ 2ND PIOLLA STRESSAND STIFFNESS FOR YEOH
-function [S, D] = PiollaStress(YeohMaterial,C,R)
+function [S, D, P] = PiollaStress(YeohMaterial,C,R)
 %Se = 2nd PK stress [S11, S22, S33, S12, S23, S13];
-
+P = 0;
 S = zeros(3,3);
-%D = zeros(3,3);
 J = sqrt(det(C));
 
 YeohC = [YeohMaterial.C1,YeohMaterial.C2,YeohMaterial.C3];
@@ -67,6 +66,11 @@ C33=C(3,3);
 I1 = C11+C22+C33;
 I1iso = J^(-2/3)*I1;
 %I1iso = I1;
+
+for ii = 1:3
+    P = P + YeohC(ii)*(I1iso - 3)^(ii) + (1/YeohD(ii))*(J-1)^(2*ii);
+end
+
 
 for ii = 1:3
     S = S + 2*(ii*YeohC(ii)*(I1iso - 3)^(ii-1))*J^(-2/3)*(I - (I1/3)*Cinv)...
@@ -103,7 +107,6 @@ end
 function E = Emod(YeohMaterial)
    E = 6*YeohMaterial.C1;
 end
-
 end
 
 methods (Access = private)
@@ -164,5 +167,23 @@ end
 
 end
 
+function [id, set, W] = Tensor4IdSymmetric
+
+id = [1,1; 2,2; 3,3; 1,2; 2,3; 1,3];
+
+set = {[1,1], [1,2], [1,3], [1,4], [1,5], [1,6],...
+       [2,1], [2,2], [2,3], [2,4], [2,5], [2,6],...
+       [3,1], [3,2], [3,3], [3,4], [3,5], [3,6],...
+       [4,1], [4,2], [4,3], [4,4], [4,5], [4,6],...
+       [5,1], [5,2], [5,3], [5,4], [5,5], [5,6],...
+       [6,1], [6,2], [6,3], [6,4], [6,5], [6,6]};
+   
+set = set(:);
+
+%W = kron([1,sqrt(2);sqrt(2),2],ones(3));%%
+W = kron([1,2;2,4],ones(3));
+% W = [1,1,1,2,2,2;1,1,1,2,2,2;1,1,1,2,2,2;...
+%      2,2,2,4,4,4;2,2,2,4,4,4;2,2,2,4,4,4];
+end
 
 

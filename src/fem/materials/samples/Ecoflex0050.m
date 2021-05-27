@@ -4,6 +4,6 @@ if nargin < 1, D = 1; end
     %'D1',D,'D2',10,'D3',10);
     
 Material = YeohMaterial('C1',0.0145,'C2',0.0001,'C3',0,...
-    'D1',D,'D2',10,'D3',10);
+    'D1',D,'D2',20,'D3',30);
 end
 

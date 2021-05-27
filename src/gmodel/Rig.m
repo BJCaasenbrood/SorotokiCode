@@ -15,6 +15,7 @@ classdef Rig < handle
         ListDraw;
         AutoScale;
         RigHandle;
+        XTangent;
     end
     
 %--------------------------------------------------------------------------
@@ -22,10 +23,17 @@ methods
 %---------------------------------------------------------------- Fem Class
 function obj = Rig(mdl,varargin) 
     
-    obj.Model = mdl;
-    obj.Domain = mdl.get('Sdomain');
-    obj.AutoScale = true;
+    obj.Model  = mdl;
+    if isa(mdl,'Model')
+        obj.Domain = mdl.get('Sdomain');
+        obj.XTangent = true;
+    else,
+        obj.Domain = 1;
+        obj.XTangent = false;
+    end
+    
     obj.Frame = 1;
+    obj.AutoScale = true;
     obj.g0 = [1,0,0,0,0,0,0];
     
     for ii = 1:2:length(varargin)
@@ -111,12 +119,13 @@ function Rig = compute(Rig,t,varargin)
     
     Rig = Rig.reset();
     if isempty(varargin)
-        [Rig.g,X] = Rig.Model.string(t,200);
+        [Rig.g] = Rig.Model.string(t);
     else
-        [Rig.g,X] = Rig.Model.string(t,200,varargin{1});
+        [Rig.g] = Rig.Model.string(t,200,varargin{1});
     end
 %     
     s = Rig.Domain;
+    X = linspace(0,s,size(Rig.g,1));
     N = length(Rig.List);
     Instr = cell(1,1);
     
@@ -140,10 +149,10 @@ function Rig = compute(Rig,t,varargin)
             if (v(b)-v(a)) < 1.0 && Rig.AutoScale
                 gmdl = Rig.List{ii};
                 gmdl = Blender(gmdl,'Scale',(v(b)-v(a)));
-                %Rig.List{ii} = gmdl.set('Node0',gmdl.Node);
             end
             
-            Rig.List{ii} = Blender(Rig.List{ii},'Translate',{'z',v(a)*Rig.Domain});
+            Rig.List{ii} = Blender(Rig.List{ii},...
+                'Translate',{'z',v(a)*Rig.Domain});
         end
     end
     
@@ -153,7 +162,13 @@ function Rig = compute(Rig,t,varargin)
            LinkID = knnsearch(X(id).',Rig.List{ii}.Node(:,3));
            Rig.List{ii} = Blender(Rig.List{ii},'Sweep', {LinkID,Rig.g(id,:)});
         elseif strcmp(Instr{ii,1},'SE3')
-           Rig.List{ii} = Blender(Rig.List{ii},'SE3', Rig.g(Instr{ii,2},:));
+            if Rig.XTangent
+                Rig.List{ii} = Blender(Rig.List{ii},'SE3x', ...
+                    Rig.g(Instr{ii,2},:));
+            else
+                Rig.List{ii} = Blender(Rig.List{ii},'SE3', ...
+                    Rig.g(Instr{ii,2},:));
+            end
         end
     end
     
