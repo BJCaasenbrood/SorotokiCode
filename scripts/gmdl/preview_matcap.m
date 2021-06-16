@@ -10,10 +10,9 @@ mat = {aniso, bluered, bump, chroma, chromium, ...
        redshine, redwax, retro, rim, soft, ...
        skin, studioclay};
    
-f = figure(103);
+f = figure(101);
 obj.set('TextureStretch',0.65);
 obj.bake().render();
-
 
 b = uicontrol('Parent',f,'Style','slider','Position',[81,24,419,23],...
               'value',X,'min',1, 'max',length(mat));

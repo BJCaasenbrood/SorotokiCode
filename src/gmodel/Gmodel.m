@@ -68,7 +68,7 @@ methods
 function obj = Gmodel(varargin) 
     
     obj.Texture = base;
-    obj.TextureStretch = .9;
+    obj.TextureStretch = .99;
     obj.Quality = 80;
     obj.FlipNormals = false;
     obj.AOBias = 0.01;
@@ -93,6 +93,9 @@ function obj = Gmodel(varargin)
     obj.Shading = 'Vertex';
     
     for ii = 2:2:length(varargin)
+        if isfloat(varargin{2})
+            break;
+        end
         obj.(varargin{ii}) = varargin{ii+1};
     end
 
@@ -244,8 +247,14 @@ function Gmodel = updateNode(Gmodel,varargin)
     if ~isempty(varargin), V = varargin{1};
     else, V = Gmodel.Node; end
     
-    [Gmodel.VNormal,Gmodel.Normal] = TriangleNormal(V,...
-        Gmodel.Element);
+    TR = triangulation(Gmodel.Element, ...
+        V(:,1), V(:,2), V(:,3));
+    
+    Gmodel.VNormal = vertexNormal(TR);
+    Gmodel.Normal = faceNormal(TR);
+    
+    %[Gmodel.VNormal,Gmodel.Normal] = TriangleNormal(V,...
+    %    Gmodel.Element);
 
     set(Gmodel.FigHandle,'Vertices',Gmodel.Node);
     
@@ -306,9 +315,13 @@ end
 %--------------------------------------------------------------------- show
 function showMap(Gmodel,Request)
     
+    if ~isfloat(Request)
     switch(Request)
     case('AO');  P = TextureSmoothing(Gmodel.Element,1./Gmodel.AOTextureMap-1,10);
     case('SSS'); P = TextureSmoothing(Gmodel.Element,Gmodel.SSSTextureMap,10);
+    end
+    else
+        P = TextureSmoothing(Gmodel.Element,Request,4);
     end
     
     set(Gmodel.FigHandle,'FaceVertexCData',P,'facecolor','interp');
@@ -515,7 +528,12 @@ function Gmodel = BakeCubemap(Gmodel,Cubemap)
         Phi = eye(4); 
     end
     
-    Phi = transpose(Phi(1:3,1:3));
+    Phi = (Phi(1:3,1:3));
+    P1 = Phi(:,1)/norm(Phi(:,1));
+    P2 = Phi(:,2)/norm(Phi(:,2));
+    P3 = Phi(:,3)/norm(Phi(:,3));
+    
+    Phi = transpose([P1,P2,P3]);
     
     if ~isempty(Gmodel.View)
        Phi = Phi*Gmodel.View;

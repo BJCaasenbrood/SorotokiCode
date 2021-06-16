@@ -2,16 +2,13 @@ clr; cdsoro; beep off;
 %clc; clear;
 %% assign free DOF
 mdl = Model([0,1,1,0,0,0],'NModal',8,'NDisc',1);
-mdl = setupSoftRobot(mdl,0.1,0,0.01);
+mdl = setupSoftRobot(mdl,0.1,0.1,0.1);
 mdl = mdl.set('Controller',1);
 mdl = mdl.set('TimeStep', 1/30);
-mdl = mdl.set('Tdomain', 25); 
+mdl = mdl.set('Tdomain', 35); 
 
 %% generate and solve dynamic model
 mdl = mdl.generate();
-%mdl.q0(1) = 2;
-%mdl.q0(2) = -15;
-%  mdl.q0(3) = -16;
 mdl = mdl.csolve(); 
 
 %% show results                                               
@@ -64,25 +61,31 @@ box on;
 
 
 grid on;
-%error('force terminate');
 disp(' - Press enter to play simulation - ');
 %% generate rig
 [rig, sph] = setupRig(mdl);
 
-%text(0.055,0.00,-0.005,'\textbf{$g_d$}','interpreter','latex','fontsize',16);
+text(0.055,0.00,-0.005,'\textbf{$g_d$}','interpreter','latex','fontsize',16);
 
-for ii = 1:fps(t,7):length(mdl.q)
-    rig = rig.compute(ii);
+for ii = 1:fps(t,5):length(mdl.q)
+    rig = rig.computeFK(mdl.q(ii,:));
     rig = rig.update();
    
     sph.reset();
-    sph = Blender(sph,'SE3',mdl.gd(ii,:));
+    sph = Blender(sph,'SE3x',mdl.gd(ii,:));
     sph = Blender(sph,'SE3',rig.g0);
     sph.update();
 
     setupFigure(ii);
     view(0,0);
+    
+    if ii == 1, gif('srm3_octarm.gif','frame',gcf,'nodither');
+        pause; framepause(5);
+    else, gif;
+    end
 end
+
+framepause(15);
 
 %% BACK-END FUNCTIONS
 % setup model
@@ -95,16 +98,16 @@ mdl = mdl.set('Density',   1200);
 mdl = mdl.set('Radius',    1e-2);
 mdl = mdl.set('Gravity',   [0,0,-9.81]);
 mdl = mdl.set('E',         25);
-mdl = mdl.set('Mu',        0.1);
+mdl = mdl.set('Mu',        0.2);
 mdl = mdl.set('Gain',      [Kp,Kd,0]);
-mdl = mdl.set('Spring',    [0.01,1]);
+mdl = mdl.set('Spring',    [0.01e-7,1]);
 mdl = mdl.set('Lambda',    [Lam,0]);%[Kp/Lam,Kp*30*0]);
 
 mdl = mdl.set('ActuationSpace',-1);
 mdl = mdl.set('Movie',1);
 
 mdl = mdl.set('Point',...
-    [1,0,0,0,0.05,0.00,0.01]);
+    [1,0,0,0,0.07,0.00,0.01]);
 end
 
 % setup rig
@@ -114,13 +117,13 @@ gmdl = Gmodel('Arm.stl');
 gmdl = gmdl.set('Emission', [0.9 0.8 0.8],...
     'SSSPower',0.1,'SSSRadius',0.15,'SSS',true);
 
-rig = Rig(mdl);
+rig = Rig(@(x) mdl.string(x),'Domain',mdl.Sdomain);
 rig = rig.add(gmdl);
 rig = rig.parent(1,0,0);
 rig = rig.parent(1,1,.999);
 
 rig = rig.texture(1,mateplastic);
-rig.g0 = [rot2quat(roty(-pi/2)).',0,0,0];
+rig.g0 = [rot2quat(roty(pi/2)),0,0,0];
 
 sph = Gmodel('Sphere.stl');
 sph = Blender(sph,'Scale',3e-3);
@@ -143,5 +146,14 @@ if (ii == 1)
 else
     drawnow;
 end
+background(metropolis);
 end
 
+function framepause(k)
+
+i = 1;
+while i < k
+   gif
+   i = i+1;
+end
+end

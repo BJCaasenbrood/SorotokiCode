@@ -27,6 +27,9 @@ classdef Model
         Area, Jxx, Jyy, Jzz;
         Kee;
         Xspline;
+        Tdomain;
+        Sdomain
+        Length;
     end
     
     properties (Access = private)
@@ -41,9 +44,6 @@ classdef Model
         Gravity;
         Radius;
         Density;
-        Tdomain;
-        Sdomain
-        Length;
         Length0;
         SimTime;
         DistLoad;
@@ -237,28 +237,29 @@ Model.detae = y(:,2:end);
 end
 
 %-------------------------------------------------- compute Cosserat string
-function [g, X] = string(Model,k,Quality,varargin)
+function [g, X] = string(Model,z,varargin)
     
-    if nargin < 3
-        Quality = 300;
-    end
-    
-    if nargin < 2
-        Qtmp = Model.q0;
-    else
-        if k <= 0
-            Qtmp = Model.q0;
-        else
-            Qtmp = Model.q(k,1:Model.Nq).';
-        end
-    end
-    
-    if isempty(varargin)
-        %s = linspace(0,Model.Sdomain,Quality);
-    else
-        Qtmp = varargin{1};
-    end
+%     if nargin < 3
+      Quality = 200;
+%     end
 %     
+%     if nargin < 2
+%         Qtmp = Model.q0;
+%     else
+%         if k <= 0
+%             Qtmp = Model.q0;
+%         else
+%             Qtmp = Model.q(k,1:Model.Nq).';
+%         end
+%     end
+%     
+%     if isempty(varargin)
+%         %s = linspace(0,Model.Sdomain,Quality);
+%     else
+%         Qtmp = varargin{1};
+%     end
+%     
+    Qtmp = z(:);
     X = linspace(0,Model.Sdomain,Quality);
     ee = Model.Ba*Model.Phi(Model.Length)*Qtmp;
     

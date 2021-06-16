@@ -20,7 +20,7 @@ NDISC   = 1
 NDOF    = 2
 
 [solver] 
-TDOMAIN = 25
+TDOMAIN = 35
 SPACESTEP = 30
 TIMESTEP  = 0.033333
 INTSTEP   = 100
@@ -37,7 +37,7 @@ LENGTH   = 0.12
 RHO      = 1200
 EMOD     = 25
 NU       = 0.4
-MU       = 0.1
+MU       = 0.2
 PRS_AREA = 1e-5
 GRAVITY  = 0           0       -9.81
 RADIUS   = 0.01
@@ -48,11 +48,11 @@ J_ZZ     = 2.5e-05
 
 [control] 
 KP = 0.1
-KD = 0
+KD = 0.1
 LK = 0
-KF1 = 0.01
+KF1 = 1e-09
 KF2 = 1
-LAMBDA    = 0.01
+LAMBDA    = 0.1
 LAMBDAK   = 0
 SPLINEORDER    = 1
 
@@ -61,6 +61,6 @@ Q1d = 1
 Q2d = 0
 Q3d = 0
 Q4d = 0
-Xd =  0.05
+Xd =  0.07
 Yd =  0
 Zd =  0.01

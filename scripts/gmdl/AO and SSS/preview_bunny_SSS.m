@@ -3,8 +3,8 @@ clr;
 obj = Gmodel('Bunny.stl');
 
 %% set texture
-obj.set('Texture',grey,'Emission',[0.70 0.70 0.70],...
-        'SSS',true,'SSSPower',1.40,'SSSRadius',0.2);
+obj.set('Texture',grey,'Emission',[0.75 0.75 0.75],...
+        'SSS',true,'SSSPower',1.70,'SSSRadius',0.15);
         
 obj.bake().render();
 

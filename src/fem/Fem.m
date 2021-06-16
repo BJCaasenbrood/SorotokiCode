@@ -360,12 +360,12 @@ end
 if flag == 3
     switch(Request)
     case('ISO')
-        clf; former(Fem,10);
+        clf; former(Fem);
         if nargin < 3, ISOVALUE = 0.2; else, ISOVALUE = varargin{2};
         end
         showISO(Fem,ISOVALUE,0.5);
     case('ISO+')
-        clf; former(Fem,10);
+        clf; former(Fem);
         if nargin < 3, ISOVALUE = 0.2; else, ISOVALUE = varargin{2};
         end
         showISOPlus(Fem,ISOVALUE,0.5);

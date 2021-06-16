@@ -3,7 +3,7 @@ clr;
 obj = Gmodel('Bunny.stl');
 
 %% set texture and render
-obj.set('Texture',grey,'AO',true,'AOPower',5.0,'AORadius',0.2);
+obj.set('Texture',mateplastic,'AO',true,'AOPower',5.0,'AORadius',0.2);
 obj.bake().render();
 
 view(0,15); obj.update();

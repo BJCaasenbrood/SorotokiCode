@@ -1,9 +1,9 @@
-%cdsoro; clr;
+cdsoro; clr;
 %% assign free DOF
 mdl = Model([0,1,0,1,0,0],'NModal',6,'NDisc',1);
-mdl = setupSoftRobot(mdl,0.5,0,1e2);
+mdl = setupSoftRobot(mdl,0.05,0,1e2);
 mdl = mdl.set('Controller',1);
-mdl = mdl.set('Tdomain',5); 
+mdl = mdl.set('Tdomain',10); 
 
 %% generate and solve dynamic model
 mdl = mdl.generate();
@@ -41,7 +41,7 @@ box on;
 %plot(t(2:end),diff(mdl.H(:,4) + mdl.detae(:,1)),'linewidth',1.5);hold on; grid on;
 
 grid on;
-error('force terminate');
+%error('force terminate');
 
 %% generate rig
 % figure(106);
@@ -62,11 +62,11 @@ text(0.05,0,-0.06,'\textbf{$g_d$}','interpreter','latex','fontsize',16);
 
 for ii = 1:fps(t,8):length(mdl.q)
     
-    rig = rig.compute(ii);
+    rig = rig.computeFK(mdl.q(ii,:).');
     rig = rig.update();
       
     sph.reset();
-    sph = Blender(sph,'SE3',mdl.Point);
+    sph = Blender(sph,'SE3x',mdl.Point);
     sph = Blender(sph,'SE3',rig.g0);
     sph.update();
    
@@ -94,10 +94,9 @@ mdl = mdl.set('Mu',         0.05);
 mdl = mdl.set('Gain',       [Kp,Kd,Kp]);
 mdl = mdl.set('Lambda',     [Kp/Lam,Kp*1e-2]);
 
-
 mdl = mdl.set('ActuationSpace',1);
 
-[px,py] = SpherePosition(-15,L0*1.2);
+[px,py] = SpherePosition(-15,L0*1.2)
 
 mdl = mdl.set('Point',...
     [0,0,0,0,py,0,px]);
@@ -109,13 +108,13 @@ gmdl1 = Gmodel('SoftActuatorPlanarRedux.stl');
 gmdl1.set('TextureStretch',.85);
 assignin('base','gmdl1',gmdl1);
 
-rig = Rig(mdl);
+rig = Rig(@(x) mdl.string(x),'Domain', 0.063);
 rig = rig.add(gmdl1);
 rig = rig.parent(1,0,0);
 rig = rig.parent(1,1,0.99);
 
 rig = rig.texture(1,base);
-rig.g0 = [rot2quat(roty(pi)).',0,0,0];
+rig.g0 = [rot2quat(roty(pi)),0,0,0];
 
 sph = Gmodel('Sphere.stl');
 sph = Blender(sph,'Scale',5e-3);
@@ -128,7 +127,7 @@ rig = rig.render();
 axis([-0.05 0.05 -0.03 0.03 -0.1 0]);
 view(30,10); 
 
-assignin('base','sph',sph);
+%assignin('base','sph',sph);
 end
 
 % compute possible desired trajectory

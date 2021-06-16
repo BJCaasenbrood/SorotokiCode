@@ -1,8 +1,5 @@
-function y = wrap(x,y,map)
+function y = wrap(x,map)
 
-x = mod(x,map(2)-map(1));
-xlow = min(x); 
-xupp = max(x);
-
+y = mod(x,map(2)-map(1));
 end
 
