@@ -3,7 +3,7 @@ clr;
 sdf = @(x) PneuGrip(x);
 
 %% generate mesh
-msh = Mesh(sdf,'BdBox',[-5,13,0,5],'Quads',[50 25]);
+msh = Mesh(sdf,'BdBox',[-5,13,0,5],'NElem',2e3);%'Quads',[50 25]);
 msh = msh.generate();
 
 %% generate fem model
@@ -23,14 +23,14 @@ id = fem.FindNodes('Location',[13,4.5],1);
 fem = fem.AddConstraint('Output',id,[0,1]);
 fem = fem.AddConstraint('Spring',id,[0,1]);
 
-id = fem.FindElements('Location',[-3,5],1);
+id = fem.FindElements('Location',[-5,5],1);
 fem = fem.AddConstraint('PressureCell',id,[1*kpa,0]);
 
 %% set density
-fem = fem.initialTopology('Hole',[-3,5],3);
+fem = fem.initialTopology('Hole',[-5,5],3);
 
 %% material
-fem.Material = TPU90;
+fem.Material = Ecoflex0030;
 
 %% solving
 fem.optimize();

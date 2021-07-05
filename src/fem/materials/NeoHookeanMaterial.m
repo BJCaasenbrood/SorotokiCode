@@ -6,6 +6,8 @@ classdef NeoHookeanMaterial
         Nu = 1;
         C10;
         D1 = 10;
+        Zeta;
+        Rho;
     end
     
     properties (Access = private)

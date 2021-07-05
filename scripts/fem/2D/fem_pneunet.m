@@ -1,7 +1,7 @@
 clr;
 %% settings
-Mat = Dragonskin10();
-P0  =  7.5*kpa;
+Mat = Ecoflex0030(10);
+P0  = 5*kpa;
 
 %% generate mesh
 Simp  = 0.02;
@@ -13,16 +13,20 @@ msh = Mesh('Pneunet.png','BdBox',[0,120,0,20],'SimplifyTol',Simp,...
     'Hmesh',[GrowH,MinH,MaxH]);
 
 msh = msh.generate();
+
+%% re-orient the mesh
 msh = Blender(msh,'Rotate',{'x',90});
 msh = msh.show();
 pause(2);
 
 %% generate fem model
 fem = Fem(msh);
-fem = fem.set('TimeStep',1/35,'Linestyle','none','StressNorm',1e-3);
+fem = fem.set('TimeStep',1/50,'Linestyle','none','StressNorm',1e-3,...
+    'MovieAxis',[-25 120 -60 130],'Movie',0);
 
 %% add boundary constraint
-fem = fem.AddConstraint('Support',fem.FindNodes('Box',[0,0,0,5]),[1,1]);
+fem = fem.AddConstraint('Support',fem.FindNodes('Box',[0,0,0,10]),[1,1]);
+fem = fem.AddConstraint('Gravity',[],[0,-9810]);
 
 id = fem.FindEdges('AllHole');
 fem = fem.AddConstraint('Pressure',id,[P0,0]);

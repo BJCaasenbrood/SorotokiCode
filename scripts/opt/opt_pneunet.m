@@ -6,7 +6,7 @@ D = 2;   % inter distance
 
 sdf = @(x) PneuNet(x,W,H,D,W);
 
-msh = Mesh(sdf,'BdBox',[0,W,0,H],'NElem',1500);
+msh = Mesh(sdf,'BdBox',[0,W,0,H],'NElem',800);
 msh = msh.generate();
 
 %% show generated mesh

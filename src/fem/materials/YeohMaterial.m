@@ -2,12 +2,14 @@ classdef YeohMaterial
 
     properties (Access = public)
         Type = 'Yeoh';
-        C1 = 10;
-        C2 = 0;
-        C3 = 0;
-        D1 = 1;
-        D2 = 1;
-        D3 = 1;
+        C1   = 10;
+        C2   = 0;
+        C3   = 0;
+        D1   = 1;
+        D2   = 1;
+        D3   = 1;
+        Rho  = 1e-9;
+        Zeta = 0.1;
     end
     
     properties (Access = private)

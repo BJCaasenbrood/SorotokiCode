@@ -35,8 +35,8 @@ t2 = fem.Log{1,2}*Stretch(1);
 s2 = -fem.Log{8,2};
 
 %% stitch data
-lam = [fliplr(t2),0,t1];
-svm = [fliplr(s2),0,s1];
+lam = [flipud(t2(:));0;t1(:)];
+svm = [flipud(s2(:));0;s1(:)];
 
 %% plot
 figure(102); overwrite_colors;

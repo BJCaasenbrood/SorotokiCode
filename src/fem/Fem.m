@@ -37,8 +37,7 @@ classdef Fem < handle
         SPxyNodal;
         Potential;
         ElemMat;
-        Rho = 1e12;
-        Zeta = 0.1;
+        Gravity;
         fInternal = rand(1)*1e-8;
         fExternal = rand(1)*1e-8;
         Stiffness; TangentStiffness;
@@ -66,6 +65,7 @@ classdef Fem < handle
         Increment = 1;
         Divergence = 0;
         ShapeFnc;
+        
         U = 0;
         Utmp = 0;
         Utmp_ = 0;
@@ -153,6 +153,7 @@ function obj = Fem(Mesh,varargin)
     obj.Density  = ones(obj.NElem,1);
     obj.Residual = zeros(obj.Dim*obj.NNode,1);
     obj.Utmp     = zeros(obj.Dim*obj.NNode,1);
+    obj.Gravity  = zeros(obj.Dim,1);
     
     obj.SigmoidFactor  = 0;
     obj.ShowProcess    = true;
@@ -692,6 +693,8 @@ for ii = 1:3:length(varargin)
       elseif strcmp(varargin{ii},'Pressure')
           Fem.(varargin{ii}) = [{varargin{ii+1}},repmat(varargin{ii+2},...
           [length(varargin{ii+1}),1])];
+      elseif strcmp(varargin{ii},'Gravity')
+          Fem.(varargin{ii}) = [varargin{ii+2}(:)];
       else 
           BC = [varargin{ii+1},repmat(transpose(varargin{ii+2}(:)),...
           [length(varargin{ii+1}),1])];
@@ -1100,10 +1103,8 @@ methods (Access = private)
 %------------------------------------------------ convert mesh to fem class
 function Fem = SetupFiniteElement(Fem)
 
-Fem.SpatialFilter = GenerateRadialFilter(Fem,Fem.FilterRadius);
-%[~,~,Fem.Normal,Fem.Edge] = computeCentroid(Fem);
-
 Fem.ElemNDof = Fem.Dim*cellfun(@length,Fem.Element);
+Fem.SpatialFilter = GenerateRadialFilter(Fem,Fem.FilterRadius);
 
 if (~Fem.AssembledSystem && ~Fem.Nonlinear) || Fem.Nonlinear
 Fem.i = zeros(sum(Fem.ElemNDof.^2),1);
@@ -1165,7 +1166,7 @@ for el = 1:Fem.NElem
             3*Fem.Element{el}],NDof,1);
     end
     
-    [Fe,Qe,Me,Ce,Ke,Kte,Svme,SS,EE,Te,Ve] = ...
+    [Fe,Fb,Qe,Me,Ce,Ke,Kte,Svme,SS,EE,Te,Ve] = ...
     Locals(Fem,Fem.Element{el},eDof,dV,V(el));
     
     ind1 = index+1:index+NDof^2;
@@ -1181,6 +1182,7 @@ for el = 1:Fem.NElem
     Fem.k(ind1)  = Ke(:);
     Fem.t(ind1)  = Kte(:);
     Fem.fi(ind2) = Fe(:);
+    Fem.fb(ind2) = Fb(:);
     Fem.ft(ind2) = Te(:);    
     
     Fem.s(ind3,1) = E(el)*Svme(:);
@@ -1231,6 +1233,7 @@ end
 K   = sparse(Fem.i,Fem.j,E(Fem.e).*Fem.k);
 Ktr = sparse(Fem.i,Fem.j,E(Fem.e).*Fem.t);
 Fe  = sparse(Fem.i,1,E(Fem.e).*Fem.fi);
+Fb  = sparse(Fem.i,1,E(Fem.e).*Fem.fb);
 F   = sparse(Fem.Dim*Fem.NNode,1);
 
 if Fem.Nonlinear
@@ -1410,7 +1413,7 @@ else
 end
 
 Fem.fInternal        = Fe; 
-Fem.fExternal        = F - spMat*Fem.Utmp + Ft;
+Fem.fExternal        = F - spMat*Fem.Utmp + Ft + beta*Fb;
 Fem.Stiffness        = K + spMat;
 Fem.TangentStiffness = Ktr + spMat;
 Fem.Residual         = Fem.fInternal - Fem.fExternal;
@@ -1435,7 +1438,7 @@ FreeDofs = setdiff(AllDofs,FixedDofs);
 end
 
 %--------------------------------------------------- local element matrices
-function [Fe,Qe,Me,Ce,Ke,Kte,Svme,SS,EE,Te,Ve] = Locals(Fem,eNode,eDof,dV,Rb)
+function [Fe,Fb,Qe,Me,Ce,Ke,Kte,Svme,SS,EE,Te,Ve] = Locals(Fem,eNode,eDof,dV,Rb)
 % get order
 nn = length(eNode);
 mm = Fem.Dim;
@@ -1444,6 +1447,7 @@ mm = Fem.Dim;
 W   = Fem.ShapeFnc{nn}.W;
 %Q   = Fem.ShapeFnc{nn}.Q;    
 Fe  = zeros(mm*nn,1);
+Fb  = zeros(mm*nn,1);
 Te  = zeros(mm*nn,1);
 Me  = zeros(mm*nn,mm*nn);
 Ce  = zeros(mm*nn,mm*nn);
@@ -1457,8 +1461,12 @@ Ve  = 0;
 Nshp = length(Fem.ShapeFnc{nn}.N(:,:,1));
 NNe  = zeros(length(W),Nshp);
 
-if mm == 2, Et = [dV;dV;0];
-else, Et = [dV;dV;dV;0;0;0];
+if mm == 2
+    Et = [dV;dV;0];
+    Fg = [0;Fem.Gravity];
+else
+    Et = [dV;dV;dV;0;0;0];
+    Fg = [0;Fem.Gravity;0];
 end
 
 % quadrature loop
@@ -1507,6 +1515,9 @@ for q = 1:length(W)
     % internal force vector
     Fe = Fe + tau*W(q)*Bnl.'*Se*dJ;
     
+    % (graviational) body force vector
+    Fb = Fb + tau*W(q)*Fem.Material.Rho*(NN.')*Fem.Gravity(:)*dJ;
+    
     % lineararized stiffness matrix
     Ke = Ke + tau*W(q)*(Bnl.'*De*Bnl)*dJ;
     
@@ -1514,10 +1525,10 @@ for q = 1:length(W)
     Kte = Kte + tau*W(q)*(Bnl.'*De*Bnl + Bg.'*Ge*Bg)*dJ;
     
     % mass matrix
-    Me = Me + tau*W(q)*Fem.Rho*(NN.')*NN*dJ;
+    Me = Me + tau*W(q)*Fem.Material.Rho*(NN.')*NN*dJ;
     
     % dampings matrix
-    Ce = Ce + tau*W(q)*Fem.Zeta*(NN.')*NN*dJ;
+    Ce = Ce + tau*W(q)*Fem.Material.Zeta*(NN.')*NN*dJ;
     
     % thermal expansion force
     Te = Te + tau*W(q)*Bnl.'*De*Et*dJ;
@@ -2194,17 +2205,22 @@ if Fem.Movie
                 'ConvertFrom','datenum')),'.gif']);
             
             filename = erase(filename,[":"," "]);
-            background('w');
+            background(metropolis);
             if ~isempty(Fem.MovieAxis), axis(Fem.MovieAxis); end
             if ~isempty(Fem.MovieCAxis), caxis(Fem.MovieCAxis); end
             drawnow;
             gif(char(filename),'frame',gcf,'nodither');
+            for ii = 1:10, gif; end
+            
         otherwise
-            background('w');
+            background(metropolis);
             if ~isempty(Fem.MovieAxis), axis(Fem.MovieAxis); end
             if ~isempty(Fem.MovieCAxis), caxis(Fem.MovieCAxis); end
             drawnow;
             gif;
+            if abs(Fem.Time-Fem.TimeEnd) <= 1e-3,
+               for ii = 1:14, gif; end
+            end
     end
 end
 

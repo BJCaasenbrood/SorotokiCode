@@ -5,5 +5,8 @@ if nargin < 1, D = 1; end
     
 Material = YeohMaterial('C1',0.0145,'C2',0.0001,'C3',0,...
     'D1',D,'D2',20,'D3',30);
+
+Material.Rho  = 1.07e-9;
+Material.Zeta = 0.1;
 end
 

@@ -5,6 +5,8 @@ classdef MooneyMaterial
         C10 = 10;
         C01 = 0;
         K = 500;
+        Rho  = 1e-9;
+        Zeta = 0.1;
     end
 
     
