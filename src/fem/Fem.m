@@ -916,6 +916,13 @@ function Fem = initialTopology(Fem,varargin)
         d = DistancePointSet(Fem,varargin{2},Pc,varargin{3});
         Z = ones(Fem.NElem,1); Z(d(:,1)) = 0;
         Fem.Density = Z;
+    elseif strcmp(varargin{1},'Sdf')
+        Pc = Fem.Mesh.get('Center');
+        sdf = varargin{2};
+        D = sdf(Pc);
+        Z = ones(Fem.NElem,1); 
+        Z(D(:,end) <= 0) = 0;
+        Fem.Density = Z;
     else
         Fem.Density = InitialDesign(Fem,{[1,1],1});
     end
