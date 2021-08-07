@@ -1,7 +1,13 @@
 function color  = col(n,per)
+
 Colors = pallateV0;
+
 if nargin < 1
-    color = vertcat(Colors{:});
+    C = vertcat(Colors{:});
+    color = [];
+    for ii = 1:length(C)
+        color = [color;hex2rgb(Colors{ii},1)];
+    end
 else
     color = hex2rgb(Colors{n},1);
 end
