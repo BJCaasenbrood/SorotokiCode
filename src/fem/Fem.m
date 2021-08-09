@@ -165,7 +165,6 @@ function obj = Fem(Mesh,varargin)
     obj.TimeStep0 = obj.TimeStep;
     obj = SetupFiniteElement(obj);
 end
-
 %---------------------------------------------------------------------- get     
 function varargout = get(Fem,varargin)
     if nargin > 1
@@ -176,8 +175,7 @@ function varargout = get(Fem,varargin)
     else
         varargout = Fem.(varargin);
     end
-end
-        
+end    
 %---------------------------------------------------------------------- set
 function Fem = set(Fem,varargin)
     for ii = 1:2:length(varargin)
@@ -191,7 +189,6 @@ function Fem = set(Fem,varargin)
     end
     
 end
-
 %--------------------------------------------------------------------- show
 function h = show(Fem,varargin)
     
@@ -385,7 +382,6 @@ if Fem.Movie
 end
 
 end
-
 %-------------------------------------------------------------------- reset
 function Fem = reset(Fem,varargin)
     
@@ -414,7 +410,6 @@ function Fem = reset(Fem,varargin)
    end
     
 end
-
 %-------------------------------------------------------------------- solve
 function [Fem, TempNode] = solve(Fem,varargin)
     
@@ -555,32 +550,32 @@ while true
        [fx,fy,fn] = DisplacementField(Fem,Fem.fInternal);
        idNodes = Fem.Output(:,1);
        if isempty(Fem.Log)
-           Fem.Log = cell(10,2);
-           Fem.Log{1,1} = 't';    Fem.Log{1,2} = Fem.Time; 
-           Fem.Log{2,1} = 'ux';   Fem.Log{2,2} = ux(idNodes); 
-           Fem.Log{3,1} = 'uy';   Fem.Log{3,2} = uy(idNodes);
-           Fem.Log{4,1} = 'un';   Fem.Log{4,2} = un(idNodes);
-           Fem.Log{5,1} = 'fx';   Fem.Log{5,2} = fx(idNodes); 
-           Fem.Log{6,1} = 'fy';   Fem.Log{6,2} = fy(idNodes);
-           Fem.Log{7,1} = 'fy';   Fem.Log{7,2} = fn(idNodes);
-           Fem.Log{8,1} = 'Svm';  Fem.Log{8,2} = Fem.VonMisesNodal(idNodes);
-           Fem.Log{9,1} = 'Sxx';  Fem.Log{9,2} = Fem.sxxNodal(idNodes);
-           Fem.Log{10,1} = 'Syy';  Fem.Log{10,2} = Fem.syyNodal(idNodes);
-           Fem.Log{11,1} = 'Sxy'; Fem.Log{11,2} = Fem.sxyNodal(idNodes);
-           Fem.Log{12,1} = 'Ve'; Fem.Log{12,2} = Fem.Potential;
+           Fem.Log = struct;
+           Fem.Log.t = [0*Fem.Time,Fem.Time]; 
+           Fem.Log.Ux = [0*ux(idNodes),ux(idNodes)]; 
+           Fem.Log.Uy = [0*uy(idNodes),uy(idNodes)]; 
+           Fem.Log.Un = [0*un(idNodes),un(idNodes)]; 
+           Fem.Log.Fx = [0*fx(idNodes),fx(idNodes)]; 
+           Fem.Log.Fy = [0*fy(idNodes),fy(idNodes)]; 
+           Fem.Log.Fn = [0*fn(idNodes),fn(idNodes)]; 
+           Fem.Log.Svm = [0*Fem.VonMisesNodal(idNodes),Fem.VonMisesNodal(idNodes)];
+           Fem.Log.Sxx = [0*Fem.sxxNodal(idNodes),Fem.sxxNodal(idNodes)];
+           Fem.Log.Syy = [0*Fem.syyNodal(idNodes),Fem.syyNodal(idNodes)];
+           Fem.Log.Sxy = [0*Fem.sxyNodal(idNodes),Fem.sxyNodal(idNodes)];
+           Fem.Log.Psi = [0*Fem.Potential,Fem.Potential];
        else
-           Fem.Log{1,2} = vappend(Fem.Log{1,2},Fem.Time,1);
-           Fem.Log{2,2} = vappend(Fem.Log{2,2},ux(idNodes),2);
-           Fem.Log{3,2} = vappend(Fem.Log{3,2},uy(idNodes),2);
-           Fem.Log{4,2} = vappend(Fem.Log{4,2},un(idNodes),2);
-           Fem.Log{5,2} = vappend(Fem.Log{5,2},fx(idNodes),2);
-           Fem.Log{6,2} = vappend(Fem.Log{6,2},fy(idNodes),2);
-           Fem.Log{7,2} = vappend(Fem.Log{7,2},fn(idNodes),2);
-           Fem.Log{8,2} = vappend(Fem.Log{8,2},Fem.VonMisesNodal(idNodes),2);
-           Fem.Log{9,2} = vappend(Fem.Log{9,2},Fem.sxxNodal(idNodes),2);
-           Fem.Log{10,2} = vappend(Fem.Log{10,2},Fem.syyNodal(idNodes),2);
-           Fem.Log{11,2} = vappend(Fem.Log{11,2},Fem.sxyNodal(idNodes),2);
-           Fem.Log{12,2} = vappend(Fem.Log{12,2},Fem.Potential,1);
+           Fem.Log.t   = vappend(Fem.Log.t,Fem.Time,2);
+           Fem.Log.Ux  = vappend(Fem.Log.Ux,ux(idNodes),2);
+           Fem.Log.Uy  = vappend(Fem.Log.Uy,uy(idNodes),2);
+           Fem.Log.Un  = vappend(Fem.Log.Un,un(idNodes),2);
+           Fem.Log.Fx  = vappend(Fem.Log.Fx,fx(idNodes),2);
+           Fem.Log.Fy  = vappend(Fem.Log.Fy,fy(idNodes),2);
+           Fem.Log.Fn  = vappend(Fem.Log.Fn,fn(idNodes),2);
+           Fem.Log.Svm  = vappend(Fem.Log.Svm,Fem.VonMisesNodal(idNodes),2);
+           Fem.Log.Sxx  = vappend(Fem.Log.Sxx,Fem.sxxNodal(idNodes),2);
+           Fem.Log.Syy  = vappend(Fem.Log.Syy,Fem.syyNodal(idNodes),2);
+           Fem.Log.Sxy  = vappend(Fem.Log.Sxy,Fem.sxyNodal(idNodes),2);
+           Fem.Log.Psi  = vappend(Fem.Log.Psi,Fem.Potential,2);
        end
     end
     
@@ -593,7 +588,6 @@ while true
 end
 
 end
-
 %------------------------------------------------------ optimization solver
 function Fem = optimize(Fem)
  
@@ -659,26 +653,18 @@ end
 Fem.SolverStartMMA = false;
 
 end
-
 %--------------------------------------------------------------- find nodes
 function NodeList = FindNodes(Fem,varargin)
-    if  nargin > 2
-        NodeList = FindNode(Fem.Node,varargin{1:end});
-    else
-        NodeList = FindNode(Fem.Node,varargin{1:end});
-    end
+NodeList = FindNode(Fem.Node,varargin{1:end});
 end
-
 %------------------------------------------------------------ find elements
 function ElementList = FindElements(Fem,varargin)
-    ElementList = FindNode(Fem.Mesh.Center,varargin{1:end});
+ElementList = FindNode(Fem.Mesh.Center,varargin{1:end});
 end
-
 %------------------------------------------------------------ find elements
 function NodeList = FindEdges(Fem,varargin)
-    NodeList = FindEdge(Fem.Mesh,varargin{1:end});
+NodeList = FindEdge(Fem.Mesh,varargin{1:end});
 end
-
 %---------------------------------------------------------- add constraints
 function Fem = AddConstraint(Fem,varargin)
     
@@ -705,7 +691,6 @@ for ii = 1:3:length(varargin)
   end
 end
 end
-
 %---------------------------------- export triangular mesh from iso-surface
 function msh = exportMesh(Fem,varargin)
     
@@ -779,7 +764,6 @@ function msh = exportMesh(Fem,varargin)
     msh = msh.generate();
    
 end
-
 %------------------------------------------------ show deformed iso-surface
 function Fem = showISOPlus(Fem,varargin)
 V = Fem.Topology;
@@ -872,7 +856,6 @@ caxis([0 1]);
 background('w');
 
 end
-
 %-------------------------------------------------- show STL reconstruction
 function obj = showSTL(Fem,value)
     
@@ -905,7 +888,6 @@ axis off;
 %     end
 
 end
-
 %----------------------------------------------------------- initial design
 function Fem = initialTopology(Fem,varargin)
 
@@ -930,7 +912,6 @@ function Fem = initialTopology(Fem,varargin)
     Fem.Density = Fem.SpatialFilter*(1.25*Fem.Density*...
         clamp(Fem.VolumeInfill,0.2,1));
 end
-
 %----------------------------------------------------- form smooth topology
 function Fem = former(Fem)
     
@@ -1029,7 +1010,6 @@ Fem.TopologyGridY = Y;
 Fem.TopologyGridZ = Z; 
 
 end
-
 %--------------------------------------------------------- show iso-surface
 function [Fem,I,UxUy] = showISO(Fem,varargin)
 V = Fem.Topology;
@@ -1124,7 +1104,6 @@ Fem.l  = zeros(Fem.NNode,1);
 end
 
 end
-
 %------------------------------------ assemble global finite-element system 
 function Fem = AssembleGlobalSystem(Fem,ForceBuild)
     
@@ -1212,7 +1191,6 @@ end
 Fem.AssembledSystem = true;
 
 end
-
 %------------------------ assemble prescribed boundary forces/displacements
 function Fem = AssembleBoundaryConditions(Fem)
     
@@ -1427,7 +1405,6 @@ Fem.Residual         = Fem.fInternal - Fem.fExternal;
 Fem.OutputVector     = L;
 
 end
-
 %---------------------------------------------- get free degrees-of-freedom
 function FreeDofs = GetFreeDofs(Fem)
 NSupp = size(Fem.Support,1);
@@ -1443,7 +1420,6 @@ FixedDofs = unique(FixedDofs(FixedDofs>0));
 AllDofs = 1:Fem.Dim*Fem.NNode;   
 FreeDofs = setdiff(AllDofs,FixedDofs);
 end
-
 %--------------------------------------------------- local element matrices
 function [Fe,Fb,Qe,Me,Ce,Ke,Kte,Svme,SS,EE,Te,Ve] = Locals(Fem,eNode,eDof,dV,Rb)
 % get order
@@ -1560,7 +1536,6 @@ EE = NNe.'*EGP;
 Svme = Svm(:); 
 
 end
-
 %----------------------------------------------- compute displacement field
 function [ux,uy,un] = DisplacementField(Fem,U)
 ux = zeros(Fem.NNode,1);
@@ -1574,7 +1549,6 @@ for node = 1:Fem.NNode
 end
 
 end
-
 %------------------------------------------------------ compute force field
 function [fx,fy,fn] = InternalForceField(Fem,F)
 
@@ -1589,7 +1563,6 @@ for node = 1:Fem.NNode
 end
 
 end
-
 %----------------------------------------------------- deformation gradient
 function F = DeformationGradient(Fem,U,dNdx)
 nn = length(U)/Fem.Dim;
@@ -1604,7 +1577,6 @@ UU(:,3) = U(3:Fem.Dim:Fem.Dim*nn);
 F = (dNdx'*UU)' + eye(3);
 end
 end
-
 %---------------------------------------------------------- polar decompose
 function [R,S,V] = PolarDecomposition(~,F)
 [M, N] = size(F);
@@ -1619,7 +1591,6 @@ R = F*Uinv;
 S = R'*F;
 V = F*R';
 end
-
 %---------------------------------------------------------- strain operator
 function [Bn,Bg,NN,tau] = NonlinearStrainOperator(Fem,N,dNdx,F)
 nn = length(N);
@@ -1685,7 +1656,6 @@ end
 
 tau = 1;
 end 
-
 %------------------------------------------------------ isotropic reduction
 function [S, D, G] = IsotropicReduction(Fem,D0,S0)
 mm = Fem.Dim;
@@ -1705,7 +1675,6 @@ end
 
 G = kron(eye(mm),SIG);
 end
-
 %------------------------------------------------------ isotropic reduction
 function [flag,Fem] = CheckConvergence(Fem,SingularKt)
 
@@ -1754,7 +1723,6 @@ if Fem.ShowProcess
 end
 
 end
-
 %--------------------------------------------------- numerical solver timer
 function [Fem, Terminate] = SolverTimer(Fem)
     
@@ -1800,7 +1768,6 @@ if (Fem.SolverStartMMA && Terminate)||(Fem.SolverStartMMA && ~Fem.Nonlinear)
 end
 
 end
-
 %----------------------------------------------------------- mesh smoothing
 function f = Smoothing(Fem,f,naver)
 face = Fem.Element; 
@@ -1866,7 +1833,6 @@ end
 dfdV = zeros(size(Fem.NElem));
 
 end
-
 %------------------------------------------------------ constraint function
 function [g,dgdE,dgdV] = ConstraintFunction(Fem)
 V = Fem.SpatialFilter*Fem.Density;
@@ -1875,7 +1841,6 @@ g = sum(A.*V)/(sum(A)*Fem.VolumeInfill)-1;
 dgdE = zeros(size(A));
 dgdV = A/(sum(A)*Fem.VolumeInfill);
 end
-
 %---------------------------------------------- method of moving asymptotes
 function [Fem,zNew] = UpdateSchemeMMA(Fem,f,dfdz,g,dgdz)  
     
@@ -1916,7 +1881,6 @@ if iter >= 1, Fem.xold1 = xval; end
 if iter >= 2, Fem.xold2 = Fem.xold1; end
 
 end
-
 %------------------------------------------------------ isotropic reduction
 function [bool,Fem] = CheckConvergenceOpt(Fem)
 
@@ -1931,7 +1895,6 @@ else
 end
 
 end
-
 %--------------------------------------------------- material interpolation 
 function [E,dEdy,V,dVdy] = MaterialField(Fem,ForceFilterOff)
 if nargin < 2, ForceFilterOff = false; end
@@ -1957,7 +1920,6 @@ switch(Fem.MaterialInterpolation)
     dVdy = dhdy;
 end
 end
-
 %---------------------------------------------------------- material filter 
 function P = GenerateRadialFilter(Fem,R)
 if R<0, P = speye(Fem.NElem); return; end
@@ -1974,7 +1936,6 @@ else
     P = 1;
 end
 end
-
 %---------------------------------------------------------- material filter 
 function Z = InitialDesign(Fem,Arg)
 
@@ -1999,7 +1960,6 @@ Z = ones(Fem.NElem,1);
 Z(d(:,1)) = 0;
 
 end
-
 %---------------------------------------------------------- material filter 
 function d = DistancePointSet(Fem,PS1,PS2,R)
 B = Fem.BdBox;
@@ -2046,7 +2006,6 @@ end
 % matrix of indices and distance value
 d = cell2mat(d); 
 end
-
 %--------------------------------------------------------------------------
 function Rp = Reflection(Fem,P)
 Domain = @(x) dRectangle(x,Fem.BdBox(1),Fem.BdBox(2),...
@@ -2075,7 +2034,6 @@ J    = abs(d_R_P(:,end))>=eta*abs(d(I)) & d_R_P(:,end)>0;
 Rp   = Rp(J,:); 
 Rp   = unique(Rp,'rows');
 end
-
 %-------------------------------------------------------------- GEN MESH
 function SDF = GenerateCell(Fem,SDF0)
 vq = SDF0;
@@ -2141,7 +2099,6 @@ fprintf([' %i',sp1,'| %i',sp2,'| %1.3e | %1.3e | %1.2f | %1.3f | %1.3f  |\n'],..
 end 
 
 end
-
 %------------------------------------------------------ optimization solver
 function showInformation(Fem,Request)
 if nargin < 2, Request = ''; end
@@ -2182,7 +2139,6 @@ Fem.InformationBoolean = true;
 end
 
 end
-
 %------------------------------------------------- show material properties
 function showMaterialInfo(Fem)
 fprintf('--------------------------------------------------------------\n');
@@ -2200,7 +2156,6 @@ E = Fem.Material.E*1e3; Nu = Fem.Material.Nu;
 fprintf('\tE = %1.1e kPa, Nu = %1.2f [-] \n', E,Nu);
 end
 end
-
 %-------------------------------------------------------------- movie maker
 function MovieMaker(Fem,Name,Request)
 if nargin < 2, Request = ''; end
@@ -2232,7 +2187,6 @@ if Fem.Movie
 end
 
 end
-
 %----------------------------------------------- triangulate polygonal mesh
 function [v, f] = QuickTriangulation(Fem,Center,v0,f0)
 f = [];
@@ -2248,7 +2202,6 @@ end
 f = num2cell(f,2);
 v = [v0;Center];
 end
-
 %------------------------------------------------ generate elemental matrix
 function ElemMat = GenerateElementalMatrix(Element,NElem)
 El = Element(1:NElem)';                 
@@ -2257,12 +2210,10 @@ PadWNaN = @(E) [E NaN(1,MaxNVer-numel(E))];
 ElemMat = cellfun(PadWNaN,El,'UniformOutput',false);
 ElemMat = vertcat(ElemMat{:});       
 end
-
 %--------------------------------------------------- Kelvin-voight notation
 function Sv = VoightNotation(S)
 Sv = [S(1,1); S(2,2); S(3,3); S(1,2); S(2,3); S(1,3)]; 
 end
-
 %---------------------------------------------- compute von-Mises stresses
 function [Svm, Svmm] = VonMises(S11,S22,S33,S12,S23,S13)
 s11 = S11; s22 = S22; s33 = S33; s12 = S12; s23 = S23; s13 = S13;
@@ -2270,7 +2221,6 @@ Svm = sqrt(0.5*((s11-s22).^2 + (s22-s33).^2 + (s33-s11).^2 ...
     + 6*(s12.^2 + s23.^2 + s13.^2)));
 Svmm = mean(Svm); 
 end
-
 %----------------------------------------------------- update nodes of MESH
 function [Node,Node0] = UpdateNode(Fem,U)
     Node0 = Fem.get('Node0'); 

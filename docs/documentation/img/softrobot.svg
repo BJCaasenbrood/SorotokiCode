@@ -1,13 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="203.23608mm"
    height="67.405075mm"
    viewBox="0 0 203.23608 67.405075"
@@ -16,8 +8,16 @@
    inkscape:export-filename="/home/brandon/Documents/MATLAB/SorotokiCode/docs/documentation/img/softrobot_.png"
    inkscape:export-xdpi="120"
    inkscape:export-ydpi="120"
-   inkscape:version="1.0.2 (e86c870879, 2021-01-15)"
-   sodipodi:docname="softrobot.svg">
+   inkscape:version="1.1 (c68e22c387, 2021-05-23)"
+   sodipodi:docname="softrobot.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
   <defs
      id="defs2">
     <clipPath
@@ -56,7 +56,11 @@
     <filter
        inkscape:label="Light Eraser"
        style="color-interpolation-filters:sRGB;"
-       id="filter1087">
+       id="filter1087"
+       x="0"
+       y="0"
+       width="1"
+       height="1">
       <feColorMatrix
          values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 -185.47 -624.401 -62.9289 760.4 0 "
          result="colormatrix"
@@ -92,8 +96,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.8"
-     inkscape:cx="405.37494"
-     inkscape:cy="151.19353"
+     inkscape:cx="405"
+     inkscape:cy="151.25"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -104,11 +108,12 @@
      inkscape:measure-start="0,0"
      inkscape:measure-end="0,0"
      inkscape:window-width="1920"
-     inkscape:window-height="1016"
+     inkscape:window-height="1043"
      inkscape:window-x="0"
-     inkscape:window-y="27"
+     inkscape:window-y="75"
      inkscape:window-maximized="1"
-     inkscape:document-rotation="0" />
+     inkscape:document-rotation="0"
+     inkscape:pagecheckerboard="0" />
   <metadata
      id="metadata5">
     <rdf:RDF>
@@ -117,7 +122,6 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -130,6 +134,13 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(12.419219,-50.50723)">
+    <rect
+       style="fill:#ffffff;stroke:none;stroke-width:1;fill-opacity:1"
+       id="rect939"
+       width="202.36417"
+       height="66.31926"
+       x="-11.98327"
+       y="51.050106" />
     <g
        id="g1437"
        style="opacity:0.435584"

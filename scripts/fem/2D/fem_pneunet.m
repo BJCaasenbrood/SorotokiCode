@@ -1,7 +1,6 @@
 clr;
 %% settings
-Mat = Ecoflex0030(10);
-P0  = 5*kpa;
+P0  = 6*kpa;
 
 %% generate mesh
 Simp  = 0.02;
@@ -14,39 +13,38 @@ msh = Mesh('Pneunet.png','BdBox',[0,120,0,20],'SimplifyTol',Simp,...
 
 msh = msh.generate();
 
+figure(101);
+subplot(2,1,1); imshow('Pneunet.png');
+subplot(2,1,2); msh.show();
+
 %% re-orient the mesh
-msh = Blender(msh,'Rotate',{'x',90});
-msh = msh.show();
-pause(2);
+%msh = Blender(msh,'Rotate',{'x',90}); msh = msh.show(); pause(2);
 
 %% generate fem model
 fem = Fem(msh);
-fem = fem.set('TimeStep',1/50,'Linestyle','none','StressNorm',1e-3,...
+fem = fem.set('TimeStep',1/50,'Linestyle','none',...
     'MovieAxis',[-25 120 -60 130],'Movie',0);
 
 %% add boundary constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Box',[0,0,0,10]),[1,1]);
-fem = fem.AddConstraint('Gravity',[],[0,-9810]);
-
-id = fem.FindEdges('AllHole');
-fem = fem.AddConstraint('Pressure',id,[P0,0]);
+fem = fem.AddConstraint('Pressure',fem.FindEdges('AllHole'),[P0,0]);
 
 %% add output nodes
 id = fem.FindNodes('Right');
 fem = fem.AddConstraint('Output',id,[0,0]);
 
 %% assign material
-fem.Material = Mat;
+fem.Material = Ecoflex0030(2);
 
 %% solve
 fem.solve();
 
 %% post-processing
-t = fem.Log{1,2};
-Ux = fem.Log{2,2};
-Uy = fem.Log{3,2};
-Ve = fem.Log{12,2};
-N0 = fem.get('Node0');
+t   = fem.Log.t;
+Ux  = fem.Ux;
+Uy  = fem.Uy;
+Psi = fem.Psi;
+N0  = fem.get('Node0');
 
 figure(103); cla; subplot(1,2,1);
 for ii = 1:1:size(Ux,2)

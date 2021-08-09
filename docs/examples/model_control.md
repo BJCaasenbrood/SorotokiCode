@@ -1,11 +1,11 @@
 ---
 layout: default
-title: Examples
-nav_order: 4
+title: Modeling and Control
+nav_order: 2
 has_children: true
-parent: Documentation
+parent: Examples 
 ---
-
 
 # Examples
 {: .no_toc }
+

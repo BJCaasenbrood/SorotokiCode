@@ -1,8 +1,8 @@
 clr;
 %% generate mesh from sdf
-sdf = @(x) dRectangle(x,0,40,0,1);
+sdf = sRectangle(0,40,0,1);
 
-msh = Mesh(sdf,'BdBox',[0,40,0,1],'Quads',[40 4]);
+msh = Mesh(sdf,'Quads',[40 4]);
 msh = msh.generate();
 
 %% generate fem model from mesh

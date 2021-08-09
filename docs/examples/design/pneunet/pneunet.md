@@ -1,13 +1,13 @@
 ---
 layout: default
-title: Optimization of PneuNet
-parent: Examples 
-grand_parent: Documentation
-nav_order: 4
-permalink: /docs/documentation/examples/pneunet/
+title: Example 3 - Topology Optimization of PneuNet
+parent: Design and Analysis
+grand_parent: Examples
+nav_order: 3
+permalink: /docs/examples/design/pneunet/
 ---
 
-#  Topology optimization of a PneuNet actuator
+#  Topology optimization of PneuNet actuator
 {: .no_toc }
 
 <details open markdown="block">
@@ -74,8 +74,7 @@ msh.show();
 In SOROTOKI, figures can be produced through a `show()`{: .text-purple-000} request of the class. The figure will automatically be called `figure(101)` if no figures are opened. The polygonal mesh of the PneuNet domain is shown below.
 
 <div align="center"> <img src="./img/mesh.png" width="350"> </div> 
-<div align="center"> Polygonal mesh of single PneuNet chamber.
- </div>
+<div align="center"> Polygonal mesh of single PneuNet chamber.</div>
 
 ---
 ### Building the finite element model

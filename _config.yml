@@ -70,7 +70,6 @@ last_edit_time_format: "%b %e %Y at %I:%M %p" # uses ruby's time format: https:/
 color_scheme: nil
 
 plugins:
-  - mermaid2
   - jekyll-seo-tag
   - jekyll-spaceship
 

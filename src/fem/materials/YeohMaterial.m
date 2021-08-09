@@ -109,6 +109,15 @@ end
 function E = Emod(YeohMaterial)
    E = 6*YeohMaterial.C1;
 end
+
+%------------------------------ 2ND PIOLLA STRESSAND STIFFNESS FOR YEOH
+function y = dWdI(YeohMaterial,I1)
+C1 = YeohMaterial.C1; 
+C2 = YeohMaterial.C2; 
+C3 = YeohMaterial.C3;
+y = C1 + 2*C2*(I1 -3) + 3*C3*(I1 -3).^2;
+end
+
 end
 
 methods (Access = private)

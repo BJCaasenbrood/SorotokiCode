@@ -83,8 +83,6 @@ Fem ..> Bdog : FEM-based IK-control
 
 ```
 
-
-
 # Useful commands within SOROTOKI
 <div class="code-example" markdown="1">
 ## `sorotoki(varargin)`{: .fs-6 .text-purple-000 .text-alpha}	

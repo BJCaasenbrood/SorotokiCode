@@ -1,10 +1,10 @@
 ---
 layout: default
-title: Render 3D models (.stl)
-parent: Examples 
-grand_parent: Documentation
-nav_order: 4
-permalink: /docs/documentation/examples/renderstl/
+title: Example 1 - Rendering the Stanford Bunny (.stl)
+parent:  Computer Graphics
+grand_parent: Examples
+nav_order: 1
+permalink: /docs/examples/3_graphics/renderstl/
 ---
 
 #  Rendering the Stanford Bunny

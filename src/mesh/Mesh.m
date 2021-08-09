@@ -183,9 +183,7 @@ function obj = Mesh(Input,varargin)
         obj.SDF = @(x) -1*ones(length(Pc),1);
         
     elseif ~isempty(obj.STLFile)
-        
-       
-        
+        % not implemented yet
     end
     
 end
@@ -367,7 +365,7 @@ end
 if ~strcmp(Request,'Node') && ~strcmp(Request,'Element') ...
         && ~strcmp(Request,'Holes');
     
-clf; axis equal; axis off; hold on;
+cla; axis equal; axis off; hold on;
     
 % plot tesselation
 patch('Faces',Mesh.ElemMat,'Vertices',Mesh.Node,'FaceVertexCData',Z,...
