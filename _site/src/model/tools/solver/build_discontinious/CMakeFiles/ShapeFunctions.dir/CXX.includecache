@@ -1,0 +1,36 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/src/DEBUGGER.h
+iostream
+-
+
+/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/src/LieAlgebra.h
+cmath
+-
+math.h
+-
+Eigen/Dense
+-
+
+/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/src/Shapes.cpp
+Shapes.h
+/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/src/Shapes.h
+cmath
+-
+
+/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/src/Shapes.h
+iostream
+-
+Eigen/Dense
+-
+LieAlgebra.h
+/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/src/LieAlgebra.h
+DEBUGGER.h
+/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/src/DEBUGGER.h
+

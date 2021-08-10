@@ -1,0 +1,102 @@
+I"�/<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+
+<!-- <div align="center"> <img src="./src/mesh.png" width="650"> </div> -->
+
+<h1 id="mesh-generation">Mesh generation</h1>
+<p>SOROTOKI offers mesh generation for triangular, quadrilateral, and polygonal elements. The restricted material domains are defined by so-called ‘<em>signed distance functions</em>’ (SDF). The toolkit provides a set of these geometric shape SDFs (e.g., circles, rectangles, lines) and boolean operators (e.g., union, difference, and intersect). Together they allow for a wide range of spatial discretization in $$\mathbb{R}^2$$ and $$\mathbb{R}^3$$.</p>
+
+<h1 id="mathematical-background">Mathematical background</h1>
+<h2 id="signed-distance-functions">Signed distance functions</h2>
+<p>A signed distance functions (SDF) passes a spatial coordinate and returns the shortest distance to the boundaries of a metric domain. Mathematically speaking, the signed distance function $$d_\Omega: \mathbb{R}^n \mapsto \mathbb{R}$$ associated with the subset $$\Omega$$ of Euclidean space $$\mathbb{R}^n$$ is defined as</p>
+
+<p>$$ d_\Omega(x) := s_\Omega(x) \min_{y \in \partial \Omega} \lVert x - y \rVert,$$</p>
+
+<p>where $$s_\Omega$$ represents a discontinuous sign function</p>
+
+\[s_\Omega(x) = 
+\begin{cases}
+-1, &amp; x \in\Omega, \\
++1, &amp; x \in \mathbb{R}^n\setminus \Omega,
+\end{cases}\]
+
+<p>and $$\partial \Omega$$ is the boundary of the material domain $$\Omega$$. The sign of the distance function determines if the coordinate is located inside or outside the bounded domain. Therefore, evaluation of the SDF function is not only numerically efficient, it also allows for an implicit representation of the spatial domain, which can be easily paired with various mathematical operations, like addition, subtraction, and differentiation. The toolkit comes with some preset SDF functions which can be used with off-the-shelf available mathematical operators.</p>
+
+<h3 id="preset-sdf-functions">Preset SDF-functions</h3>
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">%</span> <span class="n">two</span><span class="o">-</span><span class="n">dimensional</span>
+<span class="n">d</span> <span class="o">=</span> <span class="nf">dCircle</span><span class="p">(</span><span class="n">P</span><span class="p">,</span><span class="n">xc</span><span class="p">,</span><span class="n">xy</span><span class="p">,</span><span class="n">r</span><span class="p">);</span>
+<span class="n">d</span> <span class="o">=</span> <span class="nf">dLine</span><span class="p">(</span><span class="n">P</span><span class="p">,</span><span class="n">x1</span><span class="p">,</span><span class="n">x2</span><span class="p">,</span><span class="n">y1</span><span class="p">,</span><span class="n">y2</span><span class="p">);</span>
+<span class="n">d</span> <span class="o">=</span> <span class="nf">dRectangle</span><span class="p">(</span><span class="n">P</span><span class="p">,</span><span class="n">x1</span><span class="p">,</span><span class="n">x2</span><span class="p">,</span><span class="n">y1</span><span class="p">,</span><span class="n">y2</span><span class="p">);</span>
+
+<span class="o">%</span> <span class="n">three</span><span class="o">-</span><span class="n">dimensional</span>
+<span class="n">d</span> <span class="o">=</span> <span class="nf">dCube</span><span class="p">(</span><span class="n">P</span><span class="p">,</span><span class="n">x1</span><span class="p">,</span><span class="n">x2</span><span class="p">,</span><span class="n">y1</span><span class="p">,</span><span class="n">y2</span><span class="p">,</span><span class="n">z1</span><span class="p">,</span><span class="n">z2</span><span class="p">);</span>
+<span class="n">d</span> <span class="o">=</span> <span class="nf">dSphere</span><span class="p">(</span><span class="n">P</span><span class="p">,</span><span class="n">xc</span><span class="p">,</span><span class="n">yc</span><span class="p">,</span><span class="n">zc</span><span class="p">,</span><span class="n">r</span><span class="p">);</span>
+<span class="n">d</span> <span class="o">=</span> <span class="nf">dCuboid</span><span class="p">(</span><span class="n">P</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">);</span>
+</code></pre></div></div>
+
+<h3 id="mathematical-operators">Mathematical operators</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Operation</th>
+      <th style="text-align: left">SOROTOKI</th>
+      <th style="text-align: left">Math</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">Build</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">OMEGA = dCircle(P,a,b,R)</code></td>
+      <td style="text-align: left">$$\Omega = \left{r\in \mathbb{R}^2 \; : \; (r_x-a)^2 + (r_y - b)^2 \le R^2 \right} $$</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Union</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">D = OMEGA1 + OMEGA2</code></td>
+      <td style="text-align: left">$$\mathcal{D} = \Omega_1 \cup \Omega_2$$</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Difference</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">D = OMEGA1 - OMEGA2</code></td>
+      <td style="text-align: left">$$\mathcal{D} = \Omega_1  \backslash \Omega_2$$</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Intersection</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">D = OMEGA1\OMEGA2</code></td>
+      <td style="text-align: left">$$\mathcal{D} = \Omega_1 \cap \Omega_2$$</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Evaluation</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">y = D.eval(x)</code></td>
+      <td style="text-align: left">$$y = d_\Omega(x)$$ with $$x\in \Omega$$</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="example">Example</h3>
+
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">%%</span> <span class="n">set</span> <span class="n">signed</span> <span class="n">distance</span> <span class="n">function</span>
+<span class="n">msh</span> <span class="o">=</span> <span class="nf">Mesh</span><span class="p">(</span><span class="o">@</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="nf">SDF</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span><span class="nv">'BdBox</span><span class="err">'</span><span class="p">,[</span><span class="o">-</span><span class="mi">1</span> <span class="mi">3</span> <span class="o">-</span><span class="mi">1</span> <span class="mi">3</span><span class="p">]);</span>
+<span class="nf">subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span> <span class="n">msh</span><span class="nf">.showSDF</span><span class="p">();</span>
+
+<span class="n">msh</span> <span class="o">=</span> <span class="nf">Mesh</span><span class="p">(</span><span class="o">@</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="nf">SDF</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span><span class="nv">'BdBox</span><span class="err">'</span><span class="p">,[</span><span class="o">-</span><span class="mi">2</span> <span class="mi">2</span> <span class="o">-</span><span class="mi">1</span> <span class="mi">3</span><span class="p">]);</span>
+<span class="nf">subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span> <span class="n">msh</span><span class="nf">.showSDF</span><span class="p">();</span>
+
+<span class="n">msh</span> <span class="o">=</span> <span class="nf">Mesh</span><span class="p">(</span><span class="o">@</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="nf">SDF</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span><span class="nv">'BdBox</span><span class="err">'</span><span class="p">,[</span><span class="o">-</span><span class="mf">1.5</span> <span class="mf">2.5</span> <span class="o">-</span><span class="mi">1</span> <span class="mi">3</span><span class="p">]);</span>
+<span class="nf">subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">);</span> <span class="n">msh</span><span class="nf">.showSDF</span><span class="p">();</span>
+
+<span class="n">msh</span> <span class="o">=</span> <span class="nf">Mesh</span><span class="p">(</span><span class="o">@</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="nf">SDF</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span><span class="nv">'BdBox</span><span class="err">'</span><span class="p">,[</span><span class="o">-</span><span class="mi">1</span> <span class="mi">3</span> <span class="o">-</span><span class="mi">1</span> <span class="mi">3</span><span class="p">]);</span>
+<span class="nf">subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">);</span> <span class="n">msh</span><span class="nf">.showSDF</span><span class="p">();</span>
+
+<span class="n">function</span> <span class="n">Dist</span> <span class="o">=</span> <span class="nf">SDF</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">request</span><span class="p">)</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="nf">dRectangle</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="nf">dCircle</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
+
+    <span class="nf">switch</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="nf">case</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">Dist</span> <span class="o">=</span> <span class="n">R</span><span class="p">;</span>
+        <span class="nf">case</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">Dist</span> <span class="o">=</span> <span class="n">C</span><span class="p">;</span>
+        <span class="nf">case</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">Dist</span> <span class="o">=</span> <span class="nf">dUnion</span><span class="p">(</span><span class="n">R</span><span class="p">,</span><span class="n">C</span><span class="p">);</span>
+        <span class="nf">case</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">Dist</span> <span class="o">=</span> <span class="nf">dDiff</span><span class="p">(</span><span class="n">R</span><span class="p">,</span><span class="n">C</span><span class="p">);</span>
+    <span class="n">end</span>
+<span class="n">end</span>
+</code></pre></div></div>
+:ET

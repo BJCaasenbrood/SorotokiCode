@@ -1,0 +1,2 @@
+/usr/bin/ar qc libPortController.a  CMakeFiles/PortController.dir/src/PortController.cpp.o
+/usr/bin/ranlib libPortController.a

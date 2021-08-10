@@ -1,0 +1,25 @@
+I"�<h1 id="how-to-cite">How to cite?</h1>
+<p>If you are using Sorotoki in your (academic) work, please consider citing the toolkit:</p>
+<div class="language-bibtex highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">@misc</span><span class="p">{</span><span class="nl">Caasenbrood2020</span><span class="p">,</span>
+  <span class="na">author</span> <span class="p">=</span> <span class="s">{Caasenbrood, Brandon}</span><span class="p">,</span>
+  <span class="na">title</span> <span class="p">=</span> <span class="s">{Sorotoki - An open-source soft robotics toolkit for MATLAB}</span><span class="p">,</span>
+  <span class="na">year</span> <span class="p">=</span> <span class="s">{2020}</span><span class="p">,</span>
+  <span class="na">publisher</span> <span class="p">=</span> <span class="s">{GitHub}</span><span class="p">,</span>
+  <span class="na">journal</span> <span class="p">=</span> <span class="s">{GitHub repository}</span><span class="p">,</span>
+  <span class="na">howpublished</span> <span class="p">=</span> <span class="s">{\url{https://github.com/BJCaasenbrood/SorotokiCode}}</span><span class="p">,</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="references">References</h2>
+<p class="fs-3"><a href="https://ieeexplore.ieee.org/abstract/document/9116010/metrics#metrics"><strong>[1]</strong></a> B. Caasenbrood, A. Pogromsky and H. Nijmeijer, <strong>A Computational Design Framework for Pressure-driven Soft Robots through Nonlinear Topology Optimization</strong>, 2020 3rd IEEE Inter. Conf. on Soft Robotics (RoboSoft), pp. 633-638, 2020. <a href="https://doi.org/10.1109/RoboSoft48309.2020.9116010"> 10.1109/RoboSoft48309.2020.9116010</a></p>
+
+<p class="fs-3">[2] B. Caasenbrood, A. Pogromsky, and H. Nijmeijer, <strong>Dynamic modeling of hyper-elastic soft robots using spatial curves</strong>, IFAC World Congress, 2020.</p>
+
+<p class="fs-3"><a href="https://link.springer.com/article/10.1007/s00158-011-0706-z"><strong>[3]</strong></a> C. Talischi, G. H. Paulino, A. Pereira, and I. F. M. Menezes, <strong>PolyMesher: A general-purpose mesh generator for polygonal elements written in Matlab</strong>, Struct. Multidiscip. Optim., vol. 45, no. 3, pp. 309–328, 2012.</p>
+
+<p class="fs-3"><a href="https://www.springer.com/gp/book/9781441917454"><strong>[4]</strong></a> N. Kim, <strong>Introduction Analysis Finite Element to Nonlinear</strong>. Springer, 2018.</p>
+
+<p class="fs-3"><a href="https://www.springer.com/gp/book/9783540429920"><strong>[5]</strong></a> M. Bendsøe and O. Sigmund, <strong>Topology Optimization. Theory, Methods and Applications</strong>. Springer, 2003.</p>
+
+<p class="fs-3"><a href="https://doi.org/10.1089/soro.2019.0115"><strong>[6]</strong></a> L. Marechal, P. Balland, L. Lindenroth, F. Petrou, C. Kontovounisios and F. Bello <strong>Toward a Common Framework and Database of Materials for Soft Robotics</strong>, Soft Robotics, 2020. <a href="https://doi.org/10.1089/soro.2019.0115">10.1089/soro.2019.0115</a></p>
+:ET

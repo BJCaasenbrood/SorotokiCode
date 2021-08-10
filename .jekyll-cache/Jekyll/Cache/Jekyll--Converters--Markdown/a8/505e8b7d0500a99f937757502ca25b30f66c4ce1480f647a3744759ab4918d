@@ -1,0 +1,104 @@
+I"FH<h1 id="topology-optimization">Topology optimization</h1>
+
+<h1 id="numerical-examples">Numerical examples</h1>
+<h3 id="example-pneu-net-soft-robot">Example: Pneu-net soft robot</h3>
+
+<div align="center"> <img src="./img/opt_pneunet.gif" width="550" /> </div>
+
+<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">%% generate mesh from sdf</span>
+<span class="n">sdf</span> <span class="o">=</span> <span class="o">@</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="n">PneuNet</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mi">40</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">20</span><span class="p">);</span>
+
+<span class="n">msh</span> <span class="o">=</span> <span class="n">Mesh</span><span class="p">(</span><span class="n">sdf</span><span class="p">,</span><span class="s1">'BdBox'</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">40</span><span class="p">],</span><span class="s1">'Quads'</span><span class="p">,[</span><span class="mi">25</span> <span class="mi">50</span><span class="p">]);</span>
+<span class="n">msh</span> <span class="o">=</span> <span class="n">msh</span><span class="o">.</span><span class="n">generate</span><span class="p">();</span>
+
+<span class="c1">%% generate fem from mesh</span>
+<span class="n">fem</span> <span class="o">=</span> <span class="n">Fem</span><span class="p">(</span><span class="n">msh</span><span class="p">,</span><span class="s1">'VolumeInfill'</span><span class="p">,</span><span class="mf">0.3</span><span class="p">,</span><span class="s1">'Penal'</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="s1">'FilterRadius'</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="k">...</span>
+              <span class="s1">'Nonlinear'</span><span class="p">,</span><span class="nb">false</span><span class="p">,</span><span class="s1">'TimeStep'</span><span class="p">,</span><span class="mi">1</span><span class="p">/</span><span class="mi">3</span><span class="p">,</span><span class="k">...</span>
+              <span class="s1">'OptimizationProblem'</span><span class="p">,</span><span class="s1">'Compliant'</span><span class="p">,</span><span class="k">...</span>
+              <span class="s1">'MaxIterationMMA'</span><span class="p">,</span><span class="mi">70</span><span class="p">);</span>
+
+<span class="c1">%% set spatial settings</span>
+<span class="n">fem</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="nb">set</span><span class="p">(</span><span class="s1">'Periodic'</span><span class="p">,[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span><span class="s1">'Repeat'</span><span class="p">,</span><span class="nb">ones</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">1</span><span class="p">));</span>
+
+<span class="c1">%% add boundary condition</span>
+<span class="n">id</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="n">FindNodes</span><span class="p">(</span><span class="s1">'Left'</span><span class="p">);</span> 
+<span class="n">fem</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="n">AddConstraint</span><span class="p">(</span><span class="s1">'Support'</span><span class="p">,</span><span class="n">id</span><span class="p">,[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]);</span>
+
+<span class="n">id</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="n">FindNodes</span><span class="p">(</span><span class="s1">'Right'</span><span class="p">);</span> 
+<span class="n">fem</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="n">AddConstraint</span><span class="p">(</span><span class="s1">'Spring'</span><span class="p">,</span><span class="n">id</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]);</span>
+<span class="n">fem</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="n">AddConstraint</span><span class="p">(</span><span class="s1">'Output'</span><span class="p">,</span><span class="n">id</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]);</span>
+
+<span class="n">id</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="n">FindElements</span><span class="p">(</span><span class="s1">'Location'</span><span class="p">,[</span><span class="mi">10</span><span class="p">,</span><span class="mi">25</span><span class="p">],</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">fem</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="n">AddConstraint</span><span class="p">(</span><span class="s1">'PressureCell'</span><span class="p">,</span><span class="n">id</span><span class="p">,[</span><span class="mf">1e-3</span><span class="p">,</span><span class="mi">0</span><span class="p">]);</span>
+
+<span class="c1">%% set density</span>
+<span class="n">fem</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="n">initialTopology</span><span class="p">(</span><span class="s1">'Hole'</span><span class="p">,[</span><span class="mi">10</span><span class="p">,</span><span class="mi">25</span><span class="p">],</span><span class="mf">0.5</span><span class="p">);</span>
+
+<span class="c1">%% material</span>
+<span class="n">fem</span><span class="o">.</span><span class="n">Material</span> <span class="o">=</span> <span class="n">Dragonskin10</span><span class="p">;</span>
+
+<span class="c1">%% solving</span>
+<span class="n">fem</span><span class="o">.</span><span class="n">optimize</span><span class="p">();</span>
+<span class="n">fem</span><span class="o">.</span><span class="nb">show</span><span class="p">(</span><span class="s1">'ISO'</span><span class="p">);</span>
+
+<span class="k">function</span> <span class="n">Dist</span> <span class="o">=</span> <span class="n">PneuNet</span><span class="p">(</span><span class="n">P</span><span class="p">,</span><span class="n">W</span><span class="p">,</span><span class="n">H</span><span class="p">,</span><span class="n">E</span><span class="p">,</span><span class="n">T</span><span class="p">)</span>
+<span class="n">R1</span> <span class="o">=</span> <span class="n">dRectangle</span><span class="p">(</span><span class="n">P</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">W</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">H</span><span class="p">);</span>
+<span class="n">R2</span> <span class="o">=</span> <span class="n">dRectangle</span><span class="p">(</span><span class="n">P</span><span class="p">,</span><span class="o">-</span><span class="n">W</span><span class="p">/</span><span class="mi">2</span><span class="p">,</span><span class="n">E</span><span class="p">,</span><span class="n">T</span><span class="p">,</span><span class="n">H</span><span class="o">+</span><span class="n">H</span><span class="p">/</span><span class="mi">2</span><span class="p">);</span>
+<span class="n">R3</span> <span class="o">=</span> <span class="n">dRectangle</span><span class="p">(</span><span class="n">P</span><span class="p">,</span><span class="n">W</span><span class="o">-</span><span class="n">E</span><span class="p">,</span><span class="n">W</span><span class="o">+</span><span class="n">W</span><span class="p">/</span><span class="mi">2</span><span class="p">,</span><span class="n">T</span><span class="p">,</span><span class="n">H</span><span class="o">+</span><span class="n">H</span><span class="p">/</span><span class="mi">2</span><span class="p">);</span>
+<span class="n">C1</span> <span class="o">=</span> <span class="n">dCircle</span><span class="p">(</span><span class="n">P</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">T</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">C2</span> <span class="o">=</span> <span class="n">dCircle</span><span class="p">(</span><span class="n">P</span><span class="p">,</span><span class="n">W</span><span class="p">,</span><span class="n">T</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">Dist</span> <span class="o">=</span> <span class="n">dDiff</span><span class="p">(</span><span class="n">dDiff</span><span class="p">(</span><span class="n">dDiff</span><span class="p">(</span><span class="n">dDiff</span><span class="p">(</span><span class="n">R1</span><span class="p">,</span><span class="n">R2</span><span class="p">),</span><span class="n">R3</span><span class="p">),</span><span class="n">C1</span><span class="p">),</span><span class="n">C2</span><span class="p">);</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<h3 id="example-pneumatic-bellow">Example: Pneumatic bellow</h3>
+
+<div align="center"> <img src="./img/opt_bellow.gif" width="350" /> </div>
+
+<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">%% set signed distance function</span>
+<span class="n">W</span> <span class="o">=</span> <span class="mi">8</span><span class="p">;</span>
+<span class="n">H</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+<span class="n">sdf</span> <span class="o">=</span> <span class="o">@</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="n">Bellow</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">W</span><span class="p">,</span><span class="n">H</span><span class="p">);</span>
+
+<span class="c1">%% generate mesh</span>
+<span class="n">msh</span> <span class="o">=</span> <span class="n">Mesh</span><span class="p">(</span><span class="n">sdf</span><span class="p">,</span><span class="s1">'BdBox'</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="n">W</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">H</span><span class="p">],</span><span class="s1">'NElem'</span><span class="p">,</span><span class="mi">750</span><span class="p">);</span>
+<span class="n">msh</span> <span class="o">=</span> <span class="n">msh</span><span class="o">.</span><span class="n">generate</span><span class="p">();</span>
+
+<span class="c1">%% generate fem from mesh</span>
+<span class="n">fem</span> <span class="o">=</span> <span class="n">Fem</span><span class="p">(</span><span class="n">msh</span><span class="p">,</span><span class="s1">'VolumeInfill'</span><span class="p">,</span><span class="mf">0.3</span><span class="p">,</span><span class="s1">'Penal'</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="s1">'FilterRadius'</span><span class="p">,</span><span class="mf">0.75</span><span class="p">,</span><span class="k">...</span>
+              <span class="s1">'Nonlinear'</span><span class="p">,</span><span class="nb">false</span><span class="p">,</span><span class="s1">'TimeStep'</span><span class="p">,</span><span class="mi">1</span><span class="p">/</span><span class="mi">3</span><span class="p">,</span><span class="s1">'ReflectionPlane'</span><span class="p">,[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span><span class="k">...</span>
+              <span class="s1">'OptimizationProblem'</span><span class="p">,</span><span class="s1">'Compliant'</span><span class="p">,</span><span class="s1">'Repeat'</span><span class="p">,[</span><span class="mi">1</span> <span class="mi">2</span><span class="p">],</span><span class="k">...</span>
+              <span class="s1">'MaxIterationMMA'</span><span class="p">,</span><span class="mi">65</span><span class="p">);</span>
+
+<span class="c1">%% add boundary condition</span>
+<span class="n">fem</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="n">AddConstraint</span><span class="p">(</span><span class="s1">'Support'</span><span class="p">,</span><span class="n">fem</span><span class="o">.</span><span class="n">FindNodes</span><span class="p">(</span><span class="s1">'Bottom'</span><span class="p">),[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]);</span>
+<span class="n">fem</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="n">AddConstraint</span><span class="p">(</span><span class="s1">'Support'</span><span class="p">,</span><span class="n">fem</span><span class="o">.</span><span class="n">FindNodes</span><span class="p">(</span><span class="s1">'Left'</span><span class="p">),[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]);</span>
+
+<span class="n">id</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="n">FindNodes</span><span class="p">(</span><span class="s1">'Location'</span><span class="p">,[</span><span class="mf">0.01</span><span class="o">*</span><span class="n">W</span><span class="p">,</span><span class="n">H</span><span class="p">]);</span>
+<span class="n">fem</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="n">AddConstraint</span><span class="p">(</span><span class="s1">'Output'</span><span class="p">,</span><span class="n">id</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]);</span>
+<span class="n">fem</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="n">AddConstraint</span><span class="p">(</span><span class="s1">'Spring'</span><span class="p">,</span><span class="n">id</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="o">.</span><span class="mi">1</span><span class="p">]);</span>
+
+<span class="n">id</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="n">FindNodes</span><span class="p">(</span><span class="s1">'Line'</span><span class="p">,[</span><span class="mf">0.02</span><span class="o">*</span><span class="n">W</span><span class="p">,</span><span class="n">W</span><span class="p">,</span><span class="n">H</span><span class="p">,</span><span class="n">H</span><span class="p">]);</span>
+<span class="n">fem</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="n">AddConstraint</span><span class="p">(</span><span class="s1">'Spring'</span><span class="p">,</span><span class="n">id</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="o">.</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mf">1e-1</span><span class="p">);</span>
+
+<span class="n">id</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="n">FindElements</span><span class="p">(</span><span class="s1">'Location'</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">fem</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="n">AddConstraint</span><span class="p">(</span><span class="s1">'PressureCell'</span><span class="p">,</span><span class="n">id</span><span class="p">,[</span><span class="mf">1e-3</span><span class="p">,</span><span class="mi">0</span><span class="p">]);</span>
+
+<span class="c1">%% set density</span>
+<span class="n">fem</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="n">initialTopology</span><span class="p">(</span><span class="s1">'Hole'</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="mf">1.0</span><span class="p">);</span>
+
+<span class="c1">%% material</span>
+<span class="n">fem</span><span class="o">.</span><span class="n">Material</span> <span class="o">=</span> <span class="n">Ecoflex0030</span><span class="p">;</span>
+
+<span class="c1">%% solving</span>
+<span class="n">fem</span><span class="o">.</span><span class="n">optimize</span><span class="p">();</span>
+
+<span class="k">function</span> <span class="n">D</span> <span class="o">=</span> <span class="n">Bellow</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">W</span><span class="p">,</span><span class="n">H</span><span class="p">)</span>
+<span class="n">R1</span> <span class="o">=</span> <span class="n">dRectangle</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">W</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">H</span><span class="p">);</span>
+<span class="n">C2</span> <span class="o">=</span> <span class="n">dCircle</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">W</span><span class="p">,</span><span class="n">H</span><span class="p">,</span><span class="mf">1.</span><span class="p">);</span>
+
+<span class="n">D</span> <span class="o">=</span> <span class="n">dDiff</span><span class="p">(</span><span class="n">R1</span><span class="p">,</span><span class="n">C2</span><span class="p">);</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+:ET

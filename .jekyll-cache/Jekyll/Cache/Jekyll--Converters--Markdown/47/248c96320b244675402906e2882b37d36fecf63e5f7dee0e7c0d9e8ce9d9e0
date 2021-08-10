@@ -1,0 +1,48 @@
+I"v<h1 class="no_toc" id="installation">Installation</h1>
+
+<p>The toolkit is easy to install. The fastest and easiest way to acquire the toolkit is through <a href="https://git-scm.com/downloads">git</a>. You can directly clone the repository using the command:</p>
+
+<div class="language-fortran highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">git</span><span class="w"> </span><span class="n">clone</span><span class="w"> </span><span class="o">--</span><span class="n">depth</span><span class="w"> </span><span class="mi">1</span><span class="w">  </span><span class="n">https</span><span class="p">://</span><span class="n">github</span><span class="err">.</span><span class="n">com</span><span class="p">/</span><span class="n">BJCaasenbrood</span><span class="p">/</span><span class="n">SorotokiCode</span><span class="err">.</span><span class="n">git</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Alternatively, you can download the latest version of the toolkit below, and unpack the compressed folder at any desired working directory.</p>
+
+<p><a href="https://github.com/BJCaasenbrood/SorotokiCode/zipball/master" class="btn btn fs-3 mb-4 mb-md-0 mr-2">Stable V3.03 (.zip)</a>  <a href="https://github.com/BJCaasenbrood/SorotokiCode/tarball/master" class="btn btn fs-3 mb-4 mb-md-0 mr-2">Stable V3.03 (.tar)</a> <a href="https://github.com/BJCaasenbrood/SorotokiCode" class="btn fs-3 mb-4 mb-md-0">Download from Github</a></p>
+
+<h2 id="1-open-matlab">1) Open MATLAB</h2>
+<ul>
+  <li>MATLAB compatibility: verified from R2018a – to R2021a.</li>
+  <li>OS compatibility: Windows/Linux (OSX untested).</li>
+  <li>Installation size: ~75 MB</li>
+</ul>
+
+<p>Please inform the developers if any compatibility issues may occur.</p>
+
+<h2 id="2-install-the-prerequisites">2) Install the prerequisites</h2>
+<p>To use SOROTOKI optimally, make sure you have the following dependencies installed:</p>
+
+<ul>
+  <li><a href="https://nl.mathworks.com/products/optimization.html">Optimization Toolbox</a>, <a href="https://nl.mathworks.com/products/pde.html">Partial Differential Equation Toolbox</a>, and <a href="https://nl.mathworks.com/products/image.html">Image Processing Toolbox</a></li>
+  <li><a href="http://mingw-w64.org/doku.php/start">C++ compiler</a>, <a href="https://eigen.tuxfamily.org/index.php?title=Main_Page">Eigen Libary</a>, and <a href="https://cmake.org/">CMAKE</a> are highly recommended.</li>
+</ul>
+
+<h2 id="3-run-the-installation-script">3) Run the installation script</h2>
+
+<p>Once you’ve opened MATLAB, you first have to configure the toolkit with MATLAB’s search paths. Setting up these paths is relatively straightforward. Simply run <code class="language-plaintext text-purple-000 highlighter-rouge">sorotoki()</code>:</p>
+
+<p><img src="./img/installing.gif" width="725" /></p>
+
+<p>During install, the installer will ask you if SOROTOKI should can set as the <em>main</em> directory of MATLAB. This implies every time you open MATLAB, it will automatically go this directory.</p>
+
+<p>By using the command: <code class="language-plaintext text-purple-000 highlighter-rouge">cdsoro</code>, you can quickly go back to the main directory from any other directory (super useful!). It will also generate the file <code class="language-plaintext text-purple-000 highlighter-rouge">startup.m</code> that loads the toolkit automatically. This start-up file is typically located under <code class="language-plaintext highlighter-rouge">./Documents/MATLAB/startup.m</code> for Linux/Windows OS.</p>
+
+<h2 id="thats-all-folks">That’s all folks!</h2>
+<p>The soft robotics toolkit is now ready-to-use. The toolkit can be verified using the command <code class="language-plaintext text-purple-000 highlighter-rouge">sorotoki('check')</code>.</p>
+
+<h1 id="checking-for-future-updates">Checking for future updates</h1>
+<p>It is also worth mentioning that the command above is also used to update the toolkit. It is recommended to run <code class="language-plaintext text-purple-000 highlighter-rouge">sorotoki()</code> to check for updates occasionally. Or type:</p>
+
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">%</span> <span class="n">show</span> <span class="n">demos</span>
+<span class="nf">sorotoki</span><span class="p">(</span><span class="nv">'update</span><span class="err">'</span><span class="p">);</span>
+</code></pre></div></div>
+:ET

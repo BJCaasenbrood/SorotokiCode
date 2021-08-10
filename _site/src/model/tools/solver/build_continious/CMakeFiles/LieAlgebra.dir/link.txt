@@ -1,0 +1,2 @@
+/usr/bin/ar qc libLieAlgebra.a  
+/usr/bin/ranlib libLieAlgebra.a

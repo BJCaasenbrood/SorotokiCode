@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+<link rel="shortcut icon" href="/SorotokiCode/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="/SorotokiCode/assets/css/just-the-docs-default.css"> <script type="text/javascript" src="/SorotokiCode/assets/js/vendor/lunr.min.js"></script> <script type="text/javascript" src="/SorotokiCode/assets/js/just-the-docs.js"></script><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Example 3 - Topology Optimization of PneuNet | SOROTOKI</title>
+<meta name="generator" content="Jekyll v3.9.0">
+<meta property="og:title" content="Example 3 - Topology Optimization of PneuNet">
+<meta property="og:locale" content="en_US">
+<meta name="description" content="A Soft Robotics Toolkit for MATLAB">
+<meta property="og:description" content="A Soft Robotics Toolkit for MATLAB">
+<link rel="canonical" href="http://localhost:4000/SorotokiCode/docs/examples/design/pneunet/">
+<meta property="og:url" content="http://localhost:4000/SorotokiCode/docs/examples/design/pneunet/">
+<meta property="og:site_name" content="SOROTOKI">
+<meta name="twitter:card" content="summary">
+<meta property="twitter:title" content="Example 3 - Topology Optimization of PneuNet"> <script type="application/ld+json"> {"url":"http://localhost:4000/SorotokiCode/docs/examples/design/pneunet/","description":"A Soft Robotics Toolkit for MATLAB","@type":"WebPage","headline":"Example 3 - Topology Optimization of PneuNet","@context":"https://schema.org"}</script> <script src="https://kit.fontawesome.com/b6cba8db77.js" crossorigin="anonymous"></script>
+</head>
+<body> <svg xmlns="http://www.w3.org/2000/svg" style="display: none;"> <symbol id="svg-link" viewbox="0 0 24 24"><title>Link</title>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-link"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path> </svg> </symbol> <symbol id="svg-search" viewbox="0 0 24 24"><title>Search</title>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"> <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line> </svg> </symbol> <symbol id="svg-menu" viewbox="0 0 24 24"><title>Menu</title>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line> </svg> </symbol> <symbol id="svg-arrow-right" viewbox="0 0 24 24"><title>Expand</title>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline> </svg> </symbol> <symbol id="svg-doc" viewbox="0 0 24 24"><title>Document</title>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline> </svg> </symbol> </svg><div class="side-bar">
+<div class="site-header"> <a href="http://localhost:4000/SorotokiCode/" class="site-title lh-tight"> SOROTOKI </a> <a href="#" id="menu-button" class="site-button"> <svg viewbox="0 0 24 24" class="icon"><use xlink:href="#svg-menu"></use></svg> </a>
+</div>
+<nav role="navigation" aria-label="Main" id="site-nav" class="site-nav"><ul class="nav-list">
+<li class="nav-list-item"><a href="http://localhost:4000/SorotokiCode/" class="nav-list-link">Home</a></li>
+<li class="nav-list-item">
+<a href="#" class="nav-list-expander"><svg viewbox="0 0 24 24"><use xlink:href="#svg-arrow-right"></use></svg></a><a href="http://localhost:4000/SorotokiCode/docs/documentation" class="nav-list-link">Documentation</a><ul class="nav-list ">
+<li class="nav-list-item "><a href="http://localhost:4000/SorotokiCode/docs/documentation/introduction.html" class="nav-list-link">About SOROTOKI</a></li>
+<li class="nav-list-item "><a href="http://localhost:4000/SorotokiCode/docs/documentation/install.html" class="nav-list-link">Installation guide</a></li>
+<li class="nav-list-item "><a href="http://localhost:4000/SorotokiCode/docs/documentation/guide.html" class="nav-list-link">User functions</a></li>
+</ul>
+</li>
+<li class="nav-list-item active">
+<a href="#" class="nav-list-expander"><svg viewbox="0 0 24 24"><use xlink:href="#svg-arrow-right"></use></svg></a><a href="http://localhost:4000/SorotokiCode/docs/examples" class="nav-list-link">Examples</a><ul class="nav-list ">
+<li class="nav-list-item active">
+<a href="#" class="nav-list-expander"><svg viewbox="0 0 24 24"><use xlink:href="#svg-arrow-right"></use></svg></a><a href="http://localhost:4000/SorotokiCode/docs/examples/design.html" class="nav-list-link">Design and Analysis</a><ul class="nav-list">
+<li class="nav-list-item "> <a href="http://localhost:4000/SorotokiCode/docs/examples/design/pull/" class="nav-list-link">Example 1 - Uni-axial test</a>
+</li>
+<li class="nav-list-item "> <a href="http://localhost:4000/SorotokiCode/docs/examples/design/pneufem/" class="nav-list-link">Example 2 - Finite Element Analysis of PneuNet</a>
+</li>
+<li class="nav-list-item active"> <a href="http://localhost:4000/SorotokiCode/docs/examples/design/pneunet/" class="nav-list-link active">Example 3 - Topology Optimization of PneuNet</a>
+</li>
+</ul>
+</li>
+<li class="nav-list-item ">
+<a href="#" class="nav-list-expander"><svg viewbox="0 0 24 24"><use xlink:href="#svg-arrow-right"></use></svg></a><a href="http://localhost:4000/SorotokiCode/docs/examples/model_control.html" class="nav-list-link">Modeling and Control</a><ul class="nav-list">
+<li class="nav-list-item "> <a href="http://localhost:4000/SorotokiCode/docs/examples/model_control/multilink" class="nav-list-link">Example 1 - Simulating a Multi-link Soft Manipulator</a>
+</li>
+<li class="nav-list-item "> <a href="http://localhost:4000/SorotokiCode/docs/documentation/examples/design/control/" class="nav-list-link">Example 2 - Energy-based Control of Soft Tentacle</a>
+</li>
+<li class="nav-list-item "> <a href="http://localhost:4000/SorotokiCode/docs/examples/model_control/dynfem" class="nav-list-link">Example 3 - Reduced-order Models using FEM-driven Galerkin Projections.</a>
+</li>
+</ul>
+</li>
+<li class="nav-list-item ">
+<a href="#" class="nav-list-expander"><svg viewbox="0 0 24 24"><use xlink:href="#svg-arrow-right"></use></svg></a><a href="http://localhost:4000/SorotokiCode/docs/examples/graphics.html" class="nav-list-link">Computer Graphics</a><ul class="nav-list"><li class="nav-list-item "> <a href="http://localhost:4000/SorotokiCode/docs/examples/3_graphics/renderstl/" class="nav-list-link">Example 1 - Rendering the Stanford Bunny (.stl)</a>
+</li></ul>
+</li>
+</ul>
+</li>
+<li class="nav-list-item"><a href="http://localhost:4000/SorotokiCode/docs/cite.html" class="nav-list-link">How to cite?</a></li>
+<li class="nav-list-item"><a href="http://localhost:4000/SorotokiCode/docs/contact.html" class="nav-list-link">Contributors</a></li>
+<li class="nav-list-item"><a href="http://localhost:4000/SorotokiCode/docs/license.html" class="nav-list-link">License</a></li>
+<li class="nav-list-item"><a href="http://localhost:4000/SorotokiCode/paper.html" class="nav-list-link">SOROTOKI: A Soft Robotics Toolkit for Matlab </a></li>
+</ul></nav><footer class="site-footer"> This site uses <a href="https://github.com/pmarsceill/just-the-docs">Just the Docs</a>, a documentation theme for Jekyll.</footer>
+</div>
+<div class="main" id="top">
+<div id="main-header" class="main-header">
+<div class="search">
+<div class="search-input-wrap"> <input type="text" id="search-input" class="search-input" tabindex="0" placeholder="Search SOROTOKI" aria-label="Search SOROTOKI" autocomplete="off"> <label for="search-input" class="search-label"><svg viewbox="0 0 24 24" class="search-icon"><use xlink:href="#svg-search"></use></svg></label>
+</div>
+<div id="search-results" class="search-results"></div>
+</div>
+<nav aria-label="Auxiliary" class="aux-nav"><ul class="aux-nav-list"><li class="aux-nav-list-item"> <a href="https://github.com/BJCaasenbrood/SorotokiCode" class="site-button"> SOROTOKI on GitHub </a>
+</li></ul></nav>
+</div>
+<div id="main-content-wrap" class="main-content-wrap">
+<nav aria-label="Breadcrumb" class="breadcrumb-nav"><ol class="breadcrumb-nav-list">
+<li class="breadcrumb-nav-list-item"><a href="http://localhost:4000/SorotokiCode/docs/examples">Examples</a></li>
+<li class="breadcrumb-nav-list-item"><a href="http://localhost:4000/SorotokiCode/docs/examples/design.html">Design and Analysis</a></li>
+<li class="breadcrumb-nav-list-item"><span>Example 3 - Topology Optimization of PneuNet</span></li>
+</ol></nav><div id="main-content" class="main-content" role="main">
+<h1 class="no_toc" id="topology-optimization-of-pneunet-actuator"> <a href="#topology-optimization-of-pneunet-actuator" class="anchor-heading" aria-labelledby="topology-optimization-of-pneunet-actuator"><svg viewbox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Topology optimization of PneuNet actuator</h1>
+<details open=""> <summary class="text-delta"> Table of contents </summary><ol id="markdown-toc">
+<li><a href="#introduction" id="markdown-toc-introduction">Introduction</a></li>
+<li><a href="#generating-the-mesh" id="markdown-toc-generating-the-mesh">Generating the mesh</a></li>
+<li><a href="#building-the-finite-element-model" id="markdown-toc-building-the-finite-element-model">Building the finite element model</a></li>
+<li><a href="#introduce-periodicity-and-repetition" id="markdown-toc-introduce-periodicity-and-repetition">Introduce periodicity and repetition</a></li>
+<li><a href="#boundary-conditions-static" id="markdown-toc-boundary-conditions-static">Boundary conditions (static)</a></li>
+<li><a href="#loading-conditions-dynamic" id="markdown-toc-loading-conditions-dynamic">Loading conditions (dynamic)</a></li>
+<li><a href="#material-assignment" id="markdown-toc-material-assignment">Material assignment</a></li>
+<li><a href="#starting-the-optimization" id="markdown-toc-starting-the-optimization">Starting the optimization!</a></li>
+<li><a href="#complete-code-27-lines-without-comments" id="markdown-toc-complete-code-27-lines-without-comments">Complete code (27 lines without comments)</a></li>
+</ol></details><hr>
+<h4 class="no_toc" id="difficulty-intermediate"> <a href="#difficulty-intermediate" class="anchor-heading" aria-labelledby="difficulty-intermediate"><svg viewbox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Difficulty: <code class="language-plaintext fs-3 text-green-200 highlighter-rouge">intermediate</code>
+</h4>
+<ul>
+<li>Required classes: <code class="language-plaintext text-purple-000 highlighter-rouge">Sdf.m</code>, <code class="language-plaintext text-purple-000 highlighter-rouge">Mesh.m</code>, <code class="language-plaintext text-purple-000 highlighter-rouge">Fem.m</code>
+</li>
+<li>Code length: <code class="language-plaintext text-purple-000 highlighter-rouge">~25 lines</code> (without comments)</li>
+</ul>
+<hr>
+<h3 id="introduction"> <a href="#introduction" class="anchor-heading" aria-labelledby="introduction"><svg viewbox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Introduction</h3>
+<p>In this illustrative example, we will exploit topology optimization to find a sub-optimal soft structure that undergoes a bending motion when pressurized. This morphology is often associated with a popular class of soft robots named ‘PneuNet’ actuators [1]. PneuNet actuators consist of a set of rectangular pneumatic chambers inside an elastomer medium. When pressurized, these chambers inflate, and due to a stiffness differential the elastomer structure bends (see figure below). To model and optimize such a hyper-elastic structure, we use mainly use the functionality within the <code class="language-plaintext text-purple-000 highlighter-rouge">Fem.m</code> class of SOROTOKI. The classes <code class="language-plaintext text-purple-000 highlighter-rouge">Sdf.m</code> and <code class="language-plaintext text-purple-000 highlighter-rouge">Mesh.m</code> are used to shape the rectangular domain of a single pressure chamber.</p>
+<div align="center"> <img src="./img/sampleFigure.png" height="1520">
+</div>
+<div align="center"> Source image is taken from the work of (see [1])</div>
+<div align="center"> <img src="./img/opt_pneunet.gif" width="550">
+</div>
+<div align="center"> Topology optimization process of a PneuNet using SOROTOKI (see [2])</div>
+<h3 id="generating-the-mesh"> <a href="#generating-the-mesh" class="anchor-heading" aria-labelledby="generating-the-mesh"><svg viewbox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Generating the mesh</h3>
+<p>Lets start with designing the material domain of the PneuNet actuator. To do so, we start with the classes <code class="language-plaintext text-purple-000 highlighter-rouge">Sdf.m</code> and <code class="language-plaintext text-purple-000 highlighter-rouge">Mesh.m</code>. Since PneuNet actuators have a periodical structure, it is sufficient to model a single pressure chamber of the PneuNet for this particular example.</p>
+<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">%% Domain parameters</span>
+<span class="n">W</span> <span class="o">=</span> <span class="mi">30</span><span class="p">;</span>  <span class="c1">% width cell</span>
+<span class="n">H</span> <span class="o">=</span> <span class="mi">75</span><span class="p">;</span>  <span class="c1">% width cell</span>
+<span class="n">D</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>   <span class="c1">% inter distance</span>
+
+<span class="c1">%% Signed Distance Function (SDF)</span>
+<span class="n">sdf</span> <span class="o">=</span> <span class="o">@</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="n">PneuNet</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">W</span><span class="p">,</span><span class="n">H</span><span class="p">,</span><span class="n">D</span><span class="p">,</span><span class="n">W</span><span class="p">);</span>
+
+<span class="c1">%% SDF construction</span>
+<span class="k">function</span> <span class="n">Dist</span> <span class="o">=</span> <span class="n">PneuNet</span><span class="p">(</span><span class="n">P</span><span class="p">,</span><span class="n">W</span><span class="p">,</span><span class="n">H</span><span class="p">,</span><span class="n">E</span><span class="p">,</span><span class="n">T</span><span class="p">)</span>
+  <span class="n">R1</span> <span class="o">=</span> <span class="n">dRectangle</span><span class="p">(</span><span class="n">P</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">W</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">H</span><span class="p">);</span>
+  <span class="n">R2</span> <span class="o">=</span> <span class="n">dRectangle</span><span class="p">(</span><span class="n">P</span><span class="p">,</span><span class="o">-</span><span class="n">W</span><span class="p">/</span><span class="mi">2</span><span class="p">,</span><span class="n">E</span><span class="p">,</span><span class="n">T</span><span class="p">,</span><span class="n">H</span><span class="o">+</span><span class="n">H</span><span class="p">/</span><span class="mi">2</span><span class="p">);</span>
+  <span class="n">R3</span> <span class="o">=</span> <span class="n">dRectangle</span><span class="p">(</span><span class="n">P</span><span class="p">,</span><span class="n">W</span><span class="o">-</span><span class="n">E</span><span class="p">,</span><span class="n">W</span><span class="o">+</span><span class="n">W</span><span class="p">/</span><span class="mi">2</span><span class="p">,</span><span class="n">T</span><span class="p">,</span><span class="n">H</span><span class="o">+</span><span class="n">H</span><span class="p">/</span><span class="mi">2</span><span class="p">);</span>
+  <span class="n">C1</span> <span class="o">=</span> <span class="n">dCircle</span><span class="p">(</span><span class="n">P</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">T</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
+  <span class="n">C2</span> <span class="o">=</span> <span class="n">dCircle</span><span class="p">(</span><span class="n">P</span><span class="p">,</span><span class="n">W</span><span class="p">,</span><span class="n">T</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
+  <span class="n">Dist</span> <span class="o">=</span> <span class="n">dDiff</span><span class="p">(</span><span class="n">dDiff</span><span class="p">(</span><span class="n">dDiff</span><span class="p">(</span><span class="n">dDiff</span><span class="p">(</span><span class="n">R1</span><span class="p">,</span><span class="n">R2</span><span class="p">),</span><span class="n">R3</span><span class="p">),</span><span class="n">C1</span><span class="p">),</span><span class="n">C2</span><span class="p">);</span>
+<span class="k">end</span>
+</code></pre></div></div>
+<p>Then, we wish to generate a discretized mesh based on the signed distance function <code class="language-plaintext text-purple-000 highlighter-rouge">sdf</code>. To do so, we simply input the signed distance function into <code class="language-plaintext text-purple-000 highlighter-rouge">msh = Mesh(sdf)</code>; together with the <strong>bounding box</strong> (<code class="language-plaintext text-purple-000 highlighter-rouge">BdBox = [0,W,0,H]</code>) and the required <strong>number of finite-elements</strong> (<code class="language-plaintext text-purple-000 highlighter-rouge">NElem = 1250</code>). Notice that we can use the previously defined width and height to outline this bounding box. Finally, we call the public function <code class="language-plaintext text-purple-000 highlighter-rouge">msh.generate()</code> to build the mesh.</p>
+<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">%% generate mesh</span>
+<span class="n">msh</span> <span class="o">=</span> <span class="n">Mesh</span><span class="p">(</span><span class="n">sdf</span><span class="p">,</span><span class="s1">'BdBox'</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="n">W</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">H</span><span class="p">],</span><span class="s1">'NElem'</span><span class="p">,</span><span class="mi">1250</span><span class="p">);</span>
+<span class="n">msh</span> <span class="o">=</span> <span class="n">msh</span><span class="o">.</span><span class="n">generate</span><span class="p">();</span>
+<span class="n">msh</span><span class="o">.</span><span class="nb">show</span><span class="p">();</span>
+</code></pre></div></div>
+<p>In SOROTOKI, figures can be produced through a <code class="language-plaintext text-purple-000 highlighter-rouge">show()</code> request of the class. The figure will automatically be called <code class="language-plaintext highlighter-rouge">figure(101)</code> if no figures are opened. The polygonal mesh of the PneuNet domain is shown below.</p>
+<div align="center"> <img src="./img/mesh.png" width="350">
+</div>
+<div align="center"> Polygonal mesh of single PneuNet chamber.</div>
+<hr>
+<h3 id="building-the-finite-element-model"> <a href="#building-the-finite-element-model" class="anchor-heading" aria-labelledby="building-the-finite-element-model"><svg viewbox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Building the finite element model</h3>
+<p>We can now convert this polygonal mesh to a two-dimensional finite element model in a few steps. First, we input the <code class="language-plaintext text-purple-000 highlighter-rouge">msh</code> object generated by the class <code class="language-plaintext text-purple-000 highlighter-rouge">Mesh.m</code> into <code class="language-plaintext text-purple-000 highlighter-rouge">Fem.m</code>. Secondly, we specify some important setting for the finite element solver and the optimization algorithm. We’ll worry about loads and material settings later on.</p>
+<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">%% generate fem model</span>
+<span class="n">fem</span> <span class="o">=</span> <span class="n">Fem</span><span class="p">(</span><span class="n">msh</span><span class="p">);</span>
+<span class="n">fem</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="nb">set</span><span class="p">(</span><span class="s1">'OptimizationProblem'</span><span class="p">,</span><span class="s1">'Compliant'</span><span class="p">);</span> 
+<span class="n">fem</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="nb">set</span><span class="p">(</span><span class="s1">'VolumeInfill'</span><span class="p">,</span><span class="mf">0.4</span><span class="p">);</span>
+<span class="n">fem</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="nb">set</span><span class="p">(</span><span class="s1">'FilterRadius'</span><span class="p">,</span><span class="n">H</span><span class="p">/</span><span class="mi">15</span><span class="p">);</span>
+<span class="n">fem</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="nb">set</span><span class="p">(</span><span class="s1">'Penal'</span><span class="p">,</span><span class="mi">4</span><span class="p">);</span>
+<span class="n">fem</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="nb">set</span><span class="p">(</span><span class="s1">'Nonlinear'</span><span class="p">,</span><span class="nb">false</span><span class="p">);</span>
+<span class="n">fem</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="nb">set</span><span class="p">(</span><span class="s1">'MaxIterationMMA'</span><span class="p">,</span><span class="mi">50</span><span class="p">);</span>
+<span class="n">fem</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="nb">set</span><span class="p">(</span><span class="s1">'ChangeMax'</span><span class="p">,</span><span class="mf">0.05</span><span class="p">)</span>
+</code></pre></div></div>
+<p>Alternatively, we can rewrite the code above more compactly.</p>
+<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">%% generate fem model</span>
+<span class="n">fem</span> <span class="o">=</span> <span class="n">Fem</span><span class="p">(</span><span class="n">msh</span><span class="p">,</span><span class="s1">'OptimizationProblem'</span><span class="p">,</span><span class="s1">'Compliant'</span><span class="p">,</span><span class="s1">'VolumeInfill'</span><span class="p">,</span><span class="mf">0.4</span><span class="p">,</span><span class="s1">'FilterRadius'</span><span class="p">,</span><span class="n">H</span><span class="p">/</span><span class="mi">15</span><span class="p">,</span><span class="k">...</span>
+  <span class="s1">'Penal'</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="s1">'Nonlinear'</span><span class="p">,</span><span class="nb">false</span><span class="p">,</span><span class="s1">'MaxIterationMMA'</span><span class="p">,</span><span class="mi">50</span><span class="p">,</span><span class="s1">'ChangeMax'</span><span class="p">,</span><span class="mf">0.05</span><span class="p">);</span>
+</code></pre></div></div>
+<p>Lets discuss these settings in more detail: The setting <code class="language-plaintext text-purple-000 highlighter-rouge">OptimizationProblem</code> sets the optimization objective to a compliant problem (default is <code class="language-plaintext text-purple-000 highlighter-rouge">'Compliance'</code>); <code class="language-plaintext text-purple-000 highlighter-rouge">VolumeInfill</code> sets the desired volume infill (default is set to <code class="language-plaintext text-purple-000 highlighter-rouge">0.3</code>); <code class="language-plaintext text-purple-000 highlighter-rouge">FilterRadius</code> the radius of the spatial filter needed for spatial regularization; <code class="language-plaintext text-purple-000 highlighter-rouge">Penal</code> penalty power-factor for low-density regions; <code class="language-plaintext text-purple-000 highlighter-rouge">Nonlinear</code> turns on/off the geometrical and material nonlinearities (default is set to <code class="language-plaintext text-purple-000 highlighter-rouge">true</code>, i.e., active by default); <code class="language-plaintext text-purple-000 highlighter-rouge">MaxIterationMMA</code> maximum number of optimization steps; and <code class="language-plaintext text-purple-000 highlighter-rouge">ChangeMax</code> the maximum allowable change in material densities during optimization.</p>
+<p><strong>Important!</strong> It shall be clear that <code class="language-plaintext text-purple-000 highlighter-rouge">Nonlinear = true</code> will significantly increase the numerical solver time, please check if your system can handle the computational loads during optimization. If not, please use lower-order meshes or have nonlinear deformation turned off.</p>
+<hr>
+<h3 id="introduce-periodicity-and-repetition"> <a href="#introduce-periodicity-and-repetition" class="anchor-heading" aria-labelledby="introduce-periodicity-and-repetition"><svg viewbox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Introduce periodicity and repetition</h3>
+<p>In this section, we repeat the material domain 8 times along the horizontal plane to construct a full PneuNet. Furthermore, we add a (periodic) symmetry, which will ensure that a pressure chamber has an appropriate topology that seals. To do so, we can run the code below.</p>
+<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">%% set spatial settings</span>
+<span class="n">fem</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="nb">set</span><span class="p">(</span><span class="s1">'Periodic'</span><span class="p">,[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span><span class="s1">'Repeat'</span><span class="p">,</span><span class="nb">ones</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">1</span><span class="p">));</span>
+</code></pre></div></div>
+<h3 id="boundary-conditions-static"> <a href="#boundary-conditions-static" class="anchor-heading" aria-labelledby="boundary-conditions-static"><svg viewbox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Boundary conditions (static)</h3>
+<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">%% add boundary condition</span>
+<span class="n">id</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="n">FindNodes</span><span class="p">(</span><span class="s1">'Left'</span><span class="p">);</span> 
+<span class="n">fem</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="n">AddConstraint</span><span class="p">(</span><span class="s1">'Support'</span><span class="p">,</span><span class="n">id</span><span class="p">,[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]);</span>
+
+<span class="n">id</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="n">FindNodes</span><span class="p">(</span><span class="s1">'Right'</span><span class="p">);</span> 
+<span class="n">fem</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="n">AddConstraint</span><span class="p">(</span><span class="s1">'Spring'</span><span class="p">,</span><span class="n">id</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]);</span>
+<span class="n">fem</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="n">AddConstraint</span><span class="p">(</span><span class="s1">'Output'</span><span class="p">,</span><span class="n">id</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]);</span>
+</code></pre></div></div>
+<h3 id="loading-conditions-dynamic"> <a href="#loading-conditions-dynamic" class="anchor-heading" aria-labelledby="loading-conditions-dynamic"><svg viewbox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Loading conditions (dynamic)</h3>
+<h3 id="material-assignment"> <a href="#material-assignment" class="anchor-heading" aria-labelledby="material-assignment"><svg viewbox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Material assignment</h3>
+<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">%% assign material</span>
+<span class="n">fem</span><span class="o">.</span><span class="n">Material</span> <span class="o">=</span>  <span class="n">Dragonskin10</span><span class="p">();</span>
+</code></pre></div></div>
+<h3 id="starting-the-optimization"> <a href="#starting-the-optimization" class="anchor-heading" aria-labelledby="starting-the-optimization"><svg viewbox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Starting the optimization!</h3>
+<div align="center"> <img src="./img/opt_pneunet.gif" width="550">
+</div>
+<h2 id="complete-code-27-lines-without-comments"> <a href="#complete-code-27-lines-without-comments" class="anchor-heading" aria-labelledby="complete-code-27-lines-without-comments"><svg viewbox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Complete code (27 lines without comments)</h2>
+<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">%% generate mesh from sdf</span>
+<span class="n">sdf</span> <span class="o">=</span> <span class="o">@</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="n">PneuNet</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mi">40</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">20</span><span class="p">);</span>
+
+<span class="n">msh</span> <span class="o">=</span> <span class="n">Mesh</span><span class="p">(</span><span class="n">sdf</span><span class="p">,</span><span class="s1">'BdBox'</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">40</span><span class="p">],</span><span class="s1">'Quads'</span><span class="p">,[</span><span class="mi">25</span> <span class="mi">50</span><span class="p">]);</span>
+<span class="n">msh</span> <span class="o">=</span> <span class="n">msh</span><span class="o">.</span><span class="n">generate</span><span class="p">();</span>
+
+<span class="c1">%% generate fem from mesh</span>
+<span class="n">fem</span> <span class="o">=</span> <span class="n">Fem</span><span class="p">(</span><span class="n">msh</span><span class="p">,</span><span class="s1">'VolumeInfill'</span><span class="p">,</span><span class="mf">0.3</span><span class="p">,</span><span class="s1">'Penal'</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="s1">'FilterRadius'</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="k">...</span>
+              <span class="s1">'Nonlinear'</span><span class="p">,</span><span class="nb">false</span><span class="p">,</span><span class="s1">'TimeStep'</span><span class="p">,</span><span class="mi">1</span><span class="p">/</span><span class="mi">3</span><span class="p">,</span><span class="k">...</span>
+              <span class="s1">'OptimizationProblem'</span><span class="p">,</span><span class="s1">'Compliant'</span><span class="p">,</span><span class="k">...</span>
+              <span class="s1">'MaxIterationMMA'</span><span class="p">,</span><span class="mi">70</span><span class="p">);</span>
+
+<span class="c1">%% set spatial settings</span>
+<span class="n">fem</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="nb">set</span><span class="p">(</span><span class="s1">'Periodic'</span><span class="p">,[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span><span class="s1">'Repeat'</span><span class="p">,</span><span class="nb">ones</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">1</span><span class="p">));</span>
+
+<span class="c1">%% add boundary condition</span>
+<span class="n">id</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="n">FindNodes</span><span class="p">(</span><span class="s1">'Left'</span><span class="p">);</span> 
+<span class="n">fem</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="n">AddConstraint</span><span class="p">(</span><span class="s1">'Support'</span><span class="p">,</span><span class="n">id</span><span class="p">,[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]);</span>
+
+<span class="n">id</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="n">FindNodes</span><span class="p">(</span><span class="s1">'Right'</span><span class="p">);</span> 
+<span class="n">fem</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="n">AddConstraint</span><span class="p">(</span><span class="s1">'Spring'</span><span class="p">,</span><span class="n">id</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]);</span>
+<span class="n">fem</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="n">AddConstraint</span><span class="p">(</span><span class="s1">'Output'</span><span class="p">,</span><span class="n">id</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]);</span>
+
+<span class="n">id</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="n">FindElements</span><span class="p">(</span><span class="s1">'Location'</span><span class="p">,[</span><span class="mi">10</span><span class="p">,</span><span class="mi">25</span><span class="p">],</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">fem</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="n">AddConstraint</span><span class="p">(</span><span class="s1">'PressureCell'</span><span class="p">,</span><span class="n">id</span><span class="p">,[</span><span class="mf">1e-3</span><span class="p">,</span><span class="mi">0</span><span class="p">]);</span>
+
+<span class="c1">%% set density</span>
+<span class="n">fem</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="n">initialTopology</span><span class="p">(</span><span class="s1">'Hole'</span><span class="p">,[</span><span class="mi">10</span><span class="p">,</span><span class="mi">25</span><span class="p">],</span><span class="mf">0.5</span><span class="p">);</span>
+
+<span class="c1">%% material</span>
+<span class="n">fem</span><span class="o">.</span><span class="n">Material</span> <span class="o">=</span> <span class="n">Dragonskin10</span><span class="p">;</span>
+
+<span class="c1">%% solving</span>
+<span class="n">fem</span><span class="o">.</span><span class="n">optimize</span><span class="p">();</span>
+<span class="n">fem</span><span class="o">.</span><span class="nb">show</span><span class="p">(</span><span class="s1">'ISO'</span><span class="p">);</span>
+
+<span class="k">function</span> <span class="n">Dist</span> <span class="o">=</span> <span class="n">PneuNet</span><span class="p">(</span><span class="n">P</span><span class="p">,</span><span class="n">W</span><span class="p">,</span><span class="n">H</span><span class="p">,</span><span class="n">E</span><span class="p">,</span><span class="n">T</span><span class="p">)</span>
+<span class="n">R1</span> <span class="o">=</span> <span class="n">dRectangle</span><span class="p">(</span><span class="n">P</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">W</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">H</span><span class="p">);</span>
+<span class="n">R2</span> <span class="o">=</span> <span class="n">dRectangle</span><span class="p">(</span><span class="n">P</span><span class="p">,</span><span class="o">-</span><span class="n">W</span><span class="p">/</span><span class="mi">2</span><span class="p">,</span><span class="n">E</span><span class="p">,</span><span class="n">T</span><span class="p">,</span><span class="n">H</span><span class="o">+</span><span class="n">H</span><span class="p">/</span><span class="mi">2</span><span class="p">);</span>
+<span class="n">R3</span> <span class="o">=</span> <span class="n">dRectangle</span><span class="p">(</span><span class="n">P</span><span class="p">,</span><span class="n">W</span><span class="o">-</span><span class="n">E</span><span class="p">,</span><span class="n">W</span><span class="o">+</span><span class="n">W</span><span class="p">/</span><span class="mi">2</span><span class="p">,</span><span class="n">T</span><span class="p">,</span><span class="n">H</span><span class="o">+</span><span class="n">H</span><span class="p">/</span><span class="mi">2</span><span class="p">);</span>
+<span class="n">C1</span> <span class="o">=</span> <span class="n">dCircle</span><span class="p">(</span><span class="n">P</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">T</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">C2</span> <span class="o">=</span> <span class="n">dCircle</span><span class="p">(</span><span class="n">P</span><span class="p">,</span><span class="n">W</span><span class="p">,</span><span class="n">T</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">Dist</span> <span class="o">=</span> <span class="n">dDiff</span><span class="p">(</span><span class="n">dDiff</span><span class="p">(</span><span class="n">dDiff</span><span class="p">(</span><span class="n">dDiff</span><span class="p">(</span><span class="n">R1</span><span class="p">,</span><span class="n">R2</span><span class="p">),</span><span class="n">R3</span><span class="p">),</span><span class="n">C1</span><span class="p">),</span><span class="n">C2</span><span class="p">);</span>
+<span class="k">end</span>
+</code></pre></div></div>
+<p class="fs-3"><a href="https://ieeexplore.ieee.org/abstract/document/9116010/metrics#metrics"><strong>[1]</strong></a> B. Caasenbrood, A. Pogromsky and H. Nijmeijer, <strong>A Computational Design Framework for Pressure-driven Soft Robots through Nonlinear Topology Optimization</strong>, 2020 3rd IEEE Inter. Conf. on Soft Robotics (RoboSoft), pp. 633-638, 2020. <a href="https://doi.org/10.1109/RoboSoft48309.2020.9116010"> 10.1109/RoboSoft48309.2020.9116010</a></p>
+<hr>
+<footer><p><a href="#top" id="back-to-top">Back to top</a></p>
+<p class="text-small text-grey-dk-100 mb-0">Copyright © 2018-2021 Brandon Caasenbrood. Distributed by a <a href="https://github.com/BJCaasenbrood/SorotokiCode/tree/master/LICENSE.md">MIT license.</a></p>
+<div class="d-flex mt-2"></div></footer>
+</div>
+</div>
+<div class="search-overlay"></div>
+</div>
+</body>
+</html>

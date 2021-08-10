@@ -1,0 +1,1 @@
+/usr/bin/c++  -O3 -fopenmp -DNDEBUG  -rdynamic CMakeFiles/solver.dir/src/_main.cpp.o  -o solver  libAutoDiff.a libPortHamiltonian.a libPortController.a libCosserat.a libLieAlgebra.a libShapeFunctions.a libConfig.a 

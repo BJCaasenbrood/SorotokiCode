@@ -1,0 +1,31 @@
+
+Release Notes:
+==============
+
+m1_r7, 2018-08-20:
+- Per Mathworks requirements all .zip files have been removed. The default of using the custom ganymed-ssh2 library for SFTP-GET is now on.
+
+m1_r6, 2014-08-10:
+- Bug fix for for SFTP put
+
+m1_r5, 2013-08-20:
+- Includes Ganymed-250 library since it is no longer avaialbe for download from http://www.cleondris.ch/
+
+m1_r4, 2013-08-09:
+- Added filename separator for SFTP-GET which would error when downloading a unix filename (when the folder is included as part of the source path).
+- Made SFTP/SCP filename lists works as 1XN or NX1 arrays by replacing size(ARRAY,2) with numel(ARRAY). (Thanks Xiangrui Li from Ohio State University)
+
+m1 (matlab v1), 2013-01-01:
+- Added support for proper data exchange in Matlab via included 
+custom ganymed-library (SFTP_v3Client.java). Not used by default, 
+must be enabled by changing USE_CUSTOM_GANYMED_LIB = 1 in the first 
+few lines of ssh2_setup.m.
+
+r2-r3, 2012-04 to 2012-06:
+- Bugfix for newer version of matlab when checking for ganymed-ssh2 
+library (for jcp_index = 1:length(jcp)).
+
+r1, 2012-03-01:
+
+- Initial release.
+
