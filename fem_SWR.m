@@ -14,7 +14,7 @@ msh.show();
 
 %% generate fem model
 fem = Fem(msh);
-fem = fem.set('TimeStep',1/45,'Linestyle','none',...
+fem = fem.set('TimeStep',1/25,'Linestyle','none',...
     'MovieAxis',[-1 45 -1  213.9000],'Movie',0);
 
 %% assign material
@@ -26,9 +26,9 @@ fem = fem.AddConstraint('Support',id{:},[1,1]);
 
 id = fem.FindEdges('Hole',12);
 fem = fem.AddConstraint('Support',id{:},[1,0]);
-fem = fem.AddConstraint('Load',id{:},-[0,2]);
+%fem = fem.AddConstraint('Load',id{:},-[0,0.2]);
 
-P0 = -70e-2;
+P0 = -25e-3;
 % 
 id = fem.FindEdges('Hole',2:11);
 fem = fem.AddConstraint('Pressure',id,[P0,0]);
