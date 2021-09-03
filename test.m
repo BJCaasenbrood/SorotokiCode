@@ -1,14 +1,15 @@
+clr;
 H  = 20;       % height of specimen
 W  = 20;       % (half) width of specimen
 dL = H*4;      % elongation of specimen
 sdf = sRectangle(0,W,0,H);
-msh = Mesh(sdf,'Quads',[10,10]);
+msh = Mesh(sdf,'Quads',[5,5]);
 msh = msh.generate();
 
 figure(101);
 subplot(1,2,1); sdf.show();
 subplot(1,2,2); msh.show();
-fem = Fem(msh,'TimeStep',1/10,'PrescribedDisplacement',true,...
+fem = Fem(msh,'TimeStep',1/15,'PrescribedDisplacement',true,...
 'Linestyle','none','SolverPlotType','Uy');
 fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,0]);
 fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[0,1]);

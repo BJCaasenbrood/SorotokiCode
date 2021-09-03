@@ -85,7 +85,7 @@ compress_html:
   startings: []
   blanklines: false
   profile: false
-  
+
 mathjax-processor:
     src:
       - https://polyfill.io/v3/polyfill.min.js?features=es6
@@ -120,3 +120,15 @@ mermaid-processor:
     config:
       theme: default
     src: https://mermaid.ink/svg/
+
+atom:
+  buildCommand:
+    - jekyll
+    - build
+    - --option
+    - --this
+  buildEnv:
+    JEKYLL_ENV: development
+  postDirs:
+    - _newsletters
+  defaultPostDir: _drafts

@@ -1,5 +1,40 @@
+% class Fem(msh,varargin)
+%--------------------------------------------------------------------------
+% FEM is an class used for (nonlinear) finite element methods and topology
+% optimization.  
+% -------------------------------------------------------------------------  
+% main usage:
+%   fem = Fem(msh);                      % converts MESH class to FEM class
+% ------------------------------------------------------------------------- 
+% options:
+%   fem = Fem(msh,'Timestep',1e-3);                   % set time increments
+%
+% -------------------------------------------------------------------------  
+% add boundary constraints:
+%   fem = fem.AddConstraint('Support',id,[1,0]);     % fixes x-displacement
+%   fem = fem.AddConstraint('Support',id,[0,1]);     % fixes y-displacement 
+%   fem = fem.AddConstraint('Support',id,[1,1]);     % no displacement x-y
+%
+%   fem = fem.AddConstraint('Load',id,[A,0]);      % apply load A in x-axis
+%   fem = fem.AddConstraint('Load',id,[0,A]);      % apply load A in y-axis
+%   (Note: id are Nodal indices)
+%
+%   fem = fem.AddConstraint('Displace',id,[A,0]);    % displace A in x-axis
+%   fem = fem.AddConstraint('Displace',id,[0,A]);    % displace A in y-axis
+%   (Note: id are Nodal indices)
+%
+%   fem = fem.AddConstraint('Pressure',id,A);            % apply pressure A 
+%   (Note: id are Edge/Surface indices)
+% -------------------------------------------------------------------------  
+% assign material:
+%   fem.Material = YeohMaterial('C1',1,'C2',0.1);
+%   fem.Material = Ecoflex0030;
+%   fem.Material = Dragonskin10;
+% 
+%  Also see: SOROTOKI
+% -------------------------------------------------------------------------    
 classdef Fem < handle
-
+    
     properties (Access = public)
         BdBox;
         Mesh;
@@ -411,7 +446,7 @@ function Fem = reset(Fem,varargin)
     
 end
 %-------------------------------------------------------------------- solve
-function [Fem, TempNode] = solve(Fem,varargin)
+function [Fem, TempNode] = solve(Fem)
     
 Fem.Log           = [];    
 Fem.TimeDelta     = Fem.TimeEnd;
@@ -430,17 +465,11 @@ Fem.Node          = Fem.Node0;
 TempNode = cell(1);
 TempNode{1} = Fem.Node;
 
-if nargin > 1
-   for ii = 1:2:length(varargin)
-        Fem.(varargin{ii}) = varargin{ii+1};
-    end
-end
-
 if Fem.ShowProcess
     showInformation(Fem,'NonlinearFem');
 end
 
-if Fem.SolverPlot || ~Fem.SolverStartMMA
+if Fem.SolverPlot || (Fem.SolverStartMMA && Fem.SolverPlot)
     figure(101); 
     Fem.show('0');
     background(metropolis);
@@ -579,7 +608,7 @@ while true
        end
     end
     
-    if Fem.SolverPlot || ~Fem.SolverStartMMA
+    if Fem.SolverPlot || (Fem.SolverStartMMA && Fem.SolverPlot)
         Fem.show(Fem.SolverPlotType); 
         drawnow;
     end

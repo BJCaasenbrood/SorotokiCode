@@ -235,7 +235,7 @@ elseif strcmp(Mesh.Type,'C2Q4')
     if ~isempty(Mesh.Center)
         Mesh.MaxIteration = 1;
         Pc = Mesh.Center; 
-        Mesh.NElem = length(Pc);
+        Mesh.NElem = size(Pc,1);
     else
         return;
     end
@@ -304,7 +304,6 @@ end
 
 f = f(1:Mesh.NElem);
 
-% %
 [v,f] = RemoveDuplicates(Mesh,v,f);
 [v,f] = ExtractNode(Mesh,v,f);
 if Mesh.Dim < 3
@@ -322,7 +321,6 @@ if Mesh.Triangulate
     Mesh.NNode = length(v);
 end
 
-%[Pc,A,Nv,Ev] = computeCentroid(Mesh,f,v); 
 [Pc,A] = computeCentroid(Mesh,f,v); 
 
 Mesh.Center  = Pc;
@@ -331,8 +329,6 @@ Mesh.Element = f;
 Mesh.NNode   = length(v);
 Mesh.NElem   = length(f);
 Mesh.Area    = A;
-% Mesh.Normal  = Nv;
-% Mesh.Edge  = Ev;
 
 Mesh = ElementAdjecency(Mesh);
 if Mesh.Dim < 3
@@ -424,10 +420,6 @@ Bd = 1.05*Mesh.BdBox;
 Q  = 250;
 xmin = Bd(1); xmax = Bd(2); 
 ymin = Bd(3); ymax = Bd(4); 
-%dl = 0.21*(0.5*((xmax - xmin) + (ymax - ymin))); 
-
-% if xmin == 0, xmin = -Bd(2)/3; end
-% if ymin == 0, ymin = -Bd(4)/3; end
 x = linspace(xmin,xmax,Q);
 y = linspace(ymin,ymax,Q);
 [X,Y] = meshgrid(x,y);
@@ -435,14 +427,11 @@ y = linspace(ymin,ymax,Q);
 P = [X(:),Y(:)];
 D = Mesh.SDF(P);
 Dist = reshape(D(:,end),[Q, Q]);
-%Ds = reshape(mod(D(:,end),dl),[Q, Q]);
 cla;
-%image(x,y,Dist+2); hold on;
 DistBnd = -wthresh(-Dist,'h',1e-6);
 surf(x,y,Dist,'linestyle','none'); hold on;
-contour3(X,Y,DistBnd,5,'w-','linewidth',1)%,%'Color',V(4,1:3)); 
+contour3(X,Y,DistBnd,5,'w-','linewidth',1);
 contour(X,Y,Dist,[0 1e-6],'w-','linewidth',2); 
-%colormap((bluesea(20)));
 colormap(viridis);
 caxis([-1,2 + 1e-6]);
 axis equal;
@@ -564,8 +553,10 @@ Rp(:,3) = P3(I)-2*n3(I).*d(I);
 end
 
 d_R_P = Mesh.SDF(Rp);
-J    = abs(d_R_P(:,end))>=Mesh.eta*abs(d(I)) & d_R_P(:,end)>0;
-Rp   = Rp(J,:); 
+if Mesh.NElem > 1 % temporary fix
+    J  = abs(d_R_P(:,end))>=Mesh.eta*abs(d(I)) & d_R_P(:,end)>0;
+    Rp = Rp(J,:); 
+end
 Rp   = unique(Rp,'rows');
 end
 

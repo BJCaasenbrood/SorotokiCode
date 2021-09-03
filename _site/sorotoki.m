@@ -1,8 +1,21 @@
-function sorotoki(arg)
+% function SOROTOKI(arg)
+%--------------------------------------------------------------------------
+% Calls the SoRoToKi installation manager, can also be used for demonstra-
+% tion, uninstalling, and general update notifications.  
+%
+% arg - `(empty)`, 'check', 'update', 'demo', 'update'.
+%
+% Usage:
+%   sorotoki();	          % calls the installer
+%   sorotoki('check');	  % performs complete check of toolkit
+%   sorotoki('update');	  % updates toolkit to newest version
+%   sorotoki('unload');	  % removes toolkit from search path
+%   sorotoki('demo');	  % provides a list of demos
 % -------------------------------------------------------------------------
+function sorotoki(arg)
+
 if nargin < 1, clc; clear; arg = 'install'; end
 % ------------------------------------------------------------------------
-
 switch(arg)
     case('install');  setupToolkit;
     case('demo');     showDemo;
@@ -11,7 +24,7 @@ end
 
 end
 
-% -------------------------------------------------------------- ESSENTIALS
+% -------------------------------------------------------------- show demos
 function showDemo
 clr;
 set = {'Meshing a 2D-circle',...
@@ -32,8 +45,7 @@ switch(request)
 end
 
 end
-
-% -------------------------------------------------------------- ESSENTIALS
+% ----------------------------------------------------------- setup toolkit
 function setupToolkit  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 clc; clear; close all; warning off; beep off;
@@ -233,15 +245,13 @@ cout('String', 'sorotoki(''demo'') \n');
 warning on;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 end
-
-% -------------------------------------------------------------- ESSENTIALS
+% ---------------------------------------------------------------- get path
 function Path = getPath(print)
 if nargin < 1; print = false;end
 Path = cd;
 if print, disp(['* cd: ',Path]); end
 end
-
-% -------------------------------------------------------------- ESSENTIALS
+% ------------------------------------------------------------------ BASICS
 function x = IncludeBase(Path,Request)
 global FID
 cout(['* Adding SOROTOKI libraries to path, ',...
@@ -284,7 +294,6 @@ pause(.3);
 x = basePathConfirm;
 end
 end
-
 % ---------------------------------------------------------------- GRAPHICS
 function x = IncludeGraphicsModel(Path,Request)
 global FID
@@ -307,7 +316,6 @@ pause(.3);
 x = graphicsmodelPathConfirm;
 end
 end
-
 % -------------------------------------------------------------------- MESH
 function x = IncludeMesh(Path,Request)
 global FID
@@ -331,7 +339,6 @@ pause(.3);
 x = meshPathConfirm;
 end
 end
-
 % --------------------------------------------------------------------- FEM
 function x = IncludeFiniteElement(Path,Request)
 global FID
@@ -363,7 +370,6 @@ pause(.3);
 x = femPathConfirm;
 end
 end
-
 % ---------------------------------------------------------------- DYNAMICS
 function x = IncludeDynamicModel(Path,Request)
 global FID
@@ -382,7 +388,6 @@ pause(.3);
 x = modelPathConfirm;
 end
 end
-
 % ----------------------------------------------------------------- CONTROL
 function x = IncludeControl(Path,Request)
 global FID

@@ -1,4 +1,15 @@
 classdef Bdog < handle
+% class Bdog(ip,usr,pwd,varargin)
+%--------------------------------------------------------------------------
+% BDOG is the main installer of the SOFT ROBOTICS TOOLKIT for MATLAB,
+% which can also be used for demonstration, and updates.  
+%
+% Usage:
+%   sorotoki;            % installs toolkit
+%   sorotoki('check');   % checks if toolkit is install correctly
+%   sorotoki('update');  % updates toolkit/checks version w.r.t. to Git
+%   sorotoki('demo');    % shows demos
+% -------------------------------------------------------------------------    
 
     properties (Access = public)
         ip;

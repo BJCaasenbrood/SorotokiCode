@@ -1,2 +1,8 @@
-
 *.zip
+*.asv
+_site
+_includes
+_layouts
+_sass
+assets
+_data
