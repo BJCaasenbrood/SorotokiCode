@@ -74,7 +74,7 @@ function obj = Mesh(Input,varargin)
            if strcmp(varargin{1},'Hmesh'), obj.Hmesh = varargin{2};
            else, error('Requested inputs is Hmesh with [Hgrad,Hmin,Hmax]');
            end
-           warning off % please Matlab fix your stuff...
+           warning off % Matlab, please fix your stuff...
            [v,f] = GenerateMeshSTL(obj,Input);
            warning on  
            Input = v;

@@ -1,0 +1,60 @@
+```mermaid!
+classDiagram
+class Sdf {
+	<<signed distance function>>
+	eval()
+  	show()
+}
+
+class Mesh {
+	<<mesh generation>>
+	Blender
+  	generate()
+}
+
+class Gmodel {
+	<<graphical models>>
+	Material
+  	render()
+  	bake()
+  	update()
+}
+
+class Fem {
+	<<finite elements>>
+	Material
+  	solve()
+  	optimize()
+}
+
+class Model {
+	<<dynamic beam models>>
+	Rig
+	Shapes
+  	build()
+  	simulate()
+}
+
+
+class Bdog {
+	<<Real-time interface via Balloondog>>
+	SetPoint
+  	connect()
+ 	execute()
+  	shell()
+  	close()
+}
+
+Sdf --> Mesh : Meshing domain
+Sdf ..> Gmodel : Implicit modeling
+Mesh ..> Gmodel
+Gmodel ..> Model : Rendering
+
+Mesh --> Fem : Import
+Fem --> Mesh  : Export topology
+Fem ..> Model : FEM-driven data
+Model ..> Bdog : Model-based control
+Fem ..> Bdog : FEM-based IK-control
+
+```
+

@@ -16,8 +16,7 @@
 <meta property="og:url" content="http://localhost:4000/SorotokiCode/">
 <meta property="og:site_name" content="SOROTOKI">
 <meta name="twitter:card" content="summary">
-<meta property="twitter:title" content="Home"> <script type="application/ld+json"> {"url":"http://localhost:4000/SorotokiCode/","description":"A Soft Robotics Toolkit for MATLAB","@type":"WebSite","headline":"Home","name":"SOROTOKI","@context":"https://schema.org"}</script><link rel="stylesheet" href="/SorotokiCode/assets/css/slider/ideal-image-slider.css">
-<link rel="stylesheet" href="/SorotokiCode/assets/css/slider/themes/default.css"> <script src="https://kit.fontawesome.com/b6cba8db77.js" crossorigin="anonymous"></script>
+<meta property="twitter:title" content="Home"> <script type="application/ld+json"> {"url":"http://localhost:4000/SorotokiCode/","description":"A Soft Robotics Toolkit for MATLAB","@type":"WebSite","headline":"Home","name":"SOROTOKI","@context":"https://schema.org"}</script> <script src="https://kit.fontawesome.com/b6cba8db77.js" crossorigin="anonymous"></script>
 </head>
 <body> <svg xmlns="http://www.w3.org/2000/svg" style="display: none;"> <symbol id="svg-link" viewbox="0 0 24 24"><title>Link</title>
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-link"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path> </svg> </symbol> <symbol id="svg-search" viewbox="0 0 24 24"><title>Search</title>
@@ -40,7 +39,7 @@
 <a href="#" class="nav-list-expander"><svg viewbox="0 0 24 24"><use xlink:href="#svg-arrow-right"></use></svg></a><a href="http://localhost:4000/SorotokiCode/docs/examples" class="nav-list-link">Examples</a><ul class="nav-list ">
 <li class="nav-list-item ">
 <a href="#" class="nav-list-expander"><svg viewbox="0 0 24 24"><use xlink:href="#svg-arrow-right"></use></svg></a><a href="http://localhost:4000/SorotokiCode/docs/examples/design.html" class="nav-list-link">Design and Analysis</a><ul class="nav-list">
-<li class="nav-list-item "> <a href="http://localhost:4000/SorotokiCode/docs/examples/design/pull/" class="nav-list-link">Example 1 - Uni-axial test</a>
+<li class="nav-list-item "> <a href="http://localhost:4000/SorotokiCode/docs/examples/design/pull/" class="nav-list-link">Ex1 - Material fit</a>
 </li>
 <li class="nav-list-item "> <a href="http://localhost:4000/SorotokiCode/docs/examples/design/pneufem/" class="nav-list-link">Example 2 - Finite Element Analysis of PneuNet</a>
 </li>
@@ -64,10 +63,8 @@
 </li>
 </ul>
 </li>
+<li class="nav-list-item"><a href="http://localhost:4000/SorotokiCode/docs/contact.html" class="nav-list-link">Contact</a></li>
 <li class="nav-list-item"><a href="http://localhost:4000/SorotokiCode/docs/cite.html" class="nav-list-link">How to cite?</a></li>
-<li class="nav-list-item"><a href="http://localhost:4000/SorotokiCode/docs/contact.html" class="nav-list-link">Contributors</a></li>
-<li class="nav-list-item"><a href="http://localhost:4000/SorotokiCode/docs/license.html" class="nav-list-link">License</a></li>
-<li class="nav-list-item"><a href="http://localhost:4000/SorotokiCode/paper.html" class="nav-list-link">SOROTOKI: A Soft Robotics Toolkit for Matlab </a></li>
 </ul></nav><footer class="site-footer"> This site uses <a href="https://github.com/pmarsceill/just-the-docs">Just the Docs</a>, a documentation theme for Jekyll.</footer>
 </div>
 <div class="main" id="top">
@@ -80,9 +77,7 @@
 <nav aria-label="Auxiliary" class="aux-nav"><ul class="aux-nav-list"><li class="aux-nav-list-item"> <a href="https://github.com/BJCaasenbrood/SorotokiCode" class="site-button"> SOROTOKI on GitHub </a>
 </li></ul></nav>
 </div>
-<div id="main-content-wrap" class="main-content-wrap"><div id="main-content" class="main-content" role="main">
-<link rel="stylesheet" href="/SorotokiCode/assets/css/slider/ideal-image-slider.css">
-<link rel="stylesheet" href="/SorotokiCode/assets/css/slider/themes/default.css"> <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script><div align="center"> <img src="./docs/documentation/img/softrobot_.png" width="650">
+<div id="main-content-wrap" class="main-content-wrap"><div id="main-content" class="main-content" role="main"> <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script><div align="center"> <img src="./docs/documentation/img/softrobot_.png" width="650">
 </div>
 <p><br></p>
 <h1 class="fs-6 text-purple-000" id="sorotoki---an-open-source-soft-robotics-toolkit-for-matlab"> <a href="#sorotoki---an-open-source-soft-robotics-toolkit-for-matlab" class="anchor-heading" aria-labelledby="sorotoki---an-open-source-soft-robotics-toolkit-for-matlab"><svg viewbox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> <strong>SOROTOKI</strong> - An open-source soft robotics toolkit for MATLAB</h1>
@@ -96,26 +91,58 @@
 <li class="task-list-item">
 <input type="checkbox" class="task-list-item-checkbox" disabled checked>Implicit modeling with Signed Distance Functions (SDFs),</li>
 <li class="task-list-item">
-<input type="checkbox" class="task-list-item-checkbox" disabled checked>Finite Element Analysis (FEA) using hyper-elastic materials,</li>
+<input type="checkbox" class="task-list-item-checkbox" disabled checked>Finite element method (FEM) using hyper-elastic materials,</li>
 <li class="task-list-item">
-<input type="checkbox" class="task-list-item-checkbox" disabled checked>Topology Optimization of (pressure-driven) soft robots,</li>
+<input type="checkbox" class="task-list-item-checkbox" disabled checked>Topology optimization of (pressure-driven) soft robots,</li>
 <li class="task-list-item">
-<input type="checkbox" class="task-list-item-checkbox" disabled checked>Dynamical modeling through Cosserat-beam theory,</li>
+<input type="checkbox" class="task-list-item-checkbox" disabled checked>Dynamical modeling through geometric theory,</li>
+<li class="task-list-item">
+<input type="checkbox" class="task-list-item-checkbox" disabled checked>(NEW!) Real-time control of soft robots via Raspi-interface,</li>
 <li class="task-list-item">
 <input type="checkbox" class="task-list-item-checkbox" disabled checked>Fast graphics rendering with responsive textures.</li>
 </ul>
-<h4 class="text-purple-000" id="in-development"> <a href="#in-development" class="anchor-heading" aria-labelledby="in-development"><svg viewbox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> in development:</h4>
-<ul class="task-list">
-<li class="task-list-item">
-<input type="checkbox" class="task-list-item-checkbox" disabled>FEM-based inverse kinematic control,</li>
-<li class="task-list-item">
-<input type="checkbox" class="task-list-item-checkbox" disabled>Real-time control of soft robots via BalloonDog interface,</li>
-<li class="task-list-item">
-<input type="checkbox" class="task-list-item-checkbox" disabled>Magnetic/induction/capative finite-elements for soft sensing,</li>
-</ul>
-<div id="example_slider"> <img data-src="" data-src-2x="" src="/SorotokiCode/docs/documentation/img/opt_pneunet.gif" title="" alt="image one"> <img data-src="" data-src-2x="" src="/SorotokiCode/docs/documentation/img/fem_pneunet.gif" title="" alt="image one"> <img data-src="" data-src-2x="" src="/SorotokiCode/docs/documentation/img/fem_tensile.gif" title="" alt="image one"> <img data-src="" data-src-2x="" src="/SorotokiCode/docs/documentation/img/mdl_twolink_control.gif" title="" alt="image two"> <img data-src="" data-src-2x="" src="/SorotokiCode/docs/documentation/img/Figure1.gif" title="" alt="image two">
+<p class="text-purple-000 fs-2"><strong>REMARK</strong>: All images are produced using only MATLAB and SOROTOKI, no additional software was used!</p>
+<h3 id="signed-distance-functions-and-meshing--sdfm-meshm"> <a href="#signed-distance-functions-and-meshing--sdfm-meshm" class="anchor-heading" aria-labelledby="signed-distance-functions-and-meshing--sdfm-meshm"><svg viewbox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Signed Distance Functions and Meshing – <code class="language-plaintext text-purple-000 highlighter-rouge">Sdf.m</code>, <code class="language-plaintext text-purple-000 highlighter-rouge">Mesh.m</code>
+</h3>
+<h4 class="text-purple-000" id="sdf-implicit-modeling-of-2d-primes-union-and-subtraction"> <a href="#sdf-implicit-modeling-of-2d-primes-union-and-subtraction" class="anchor-heading" aria-labelledby="sdf-implicit-modeling-of-2d-primes-union-and-subtraction"><svg viewbox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> SDF: Implicit modeling of 2D-primes: union and subtraction</h4>
+<details> <summary>Show image</summary><div align="left"> <img src="./docs/documentation/img/sdf_primes.png" width="500">
 </div>
-<h2 class="text-purple-000" id="citation"> <a href="#citation" class="anchor-heading" aria-labelledby="citation"><svg viewbox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Citation</h2>
+<a href="https://github.com/BJCaasenbrood/SorotokiCode/blob/master/scripts/mesh/mesh_sdf.m">Code available here</a> </details><h4 class="text-purple-000" id="sdf-implicit-modeling-of-3d-primes-subtraction-and-intersection"> <a href="#sdf-implicit-modeling-of-3d-primes-subtraction-and-intersection" class="anchor-heading" aria-labelledby="sdf-implicit-modeling-of-3d-primes-subtraction-and-intersection"><svg viewbox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> SDF: Implicit modeling of 3D-primes: subtraction and intersection</h4>
+<details> <summary>Show image</summary><div align="left"> <img src="./docs/documentation/img/sdf_3Dprimes.png" width="250">
+</div>
+<a href="https://github.com/BJCaasenbrood/SorotokiCode/blob/master/scripts/gmdl/SDF/preview_sdf.m">Code available here</a> </details><h4 class="text-purple-000" id="mesh-signed-distance-function-sdf-to-mesh"> <a href="#mesh-signed-distance-function-sdf-to-mesh" class="anchor-heading" aria-labelledby="mesh-signed-distance-function-sdf-to-mesh"><svg viewbox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> MESH: Signed distance function (SDF) to mesh</h4>
+<details> <summary>Show image</summary><div align="left"> <img src="./docs/documentation/img/msh_lens.png" width="500">
+</div></details><h4 class="text-purple-000" id="mesh-polygonal-meshing-of-circular-sdf"> <a href="#mesh-polygonal-meshing-of-circular-sdf" class="anchor-heading" aria-labelledby="mesh-polygonal-meshing-of-circular-sdf"><svg viewbox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> MESH: Polygonal meshing of circular SDF</h4>
+<details> <summary>Show image</summary><div align="left"> <img src="./docs/documentation/img/msh_circle_gen.gif" width="500">
+</div></details><h3 id="finite-element-method---femm"> <a href="#finite-element-method---femm" class="anchor-heading" aria-labelledby="finite-element-method---femm"><svg viewbox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Finite Element Method – <code class="language-plaintext text-purple-000 highlighter-rouge">Fem.m</code>
+</h3>
+<h4 class="text-purple-000" id="fem-uni-axial-tensile-test"> <a href="#fem-uni-axial-tensile-test" class="anchor-heading" aria-labelledby="fem-uni-axial-tensile-test"><svg viewbox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> FEM: Uni-axial tensile test</h4>
+<details> <summary>Show image</summary><div align="left"> <img src="./docs/documentation/img/fem_tensile.gif" width="500">
+</div></details><h4 class="text-purple-000" id="fem-topology-optimization-of-pneunet-actuator"> <a href="#fem-topology-optimization-of-pneunet-actuator" class="anchor-heading" aria-labelledby="fem-topology-optimization-of-pneunet-actuator"><svg viewbox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> FEM: Topology optimization of PneuNet actuator</h4>
+<details> <summary>Show image</summary><div align="left"> <img src="./docs/documentation/img/opt_pneunet.gif" width="500">
+</div></details><h4 class="text-purple-000" id="fem-deforming-pneunet-actuator--ecoflex-0030"> <a href="#fem-deforming-pneunet-actuator--ecoflex-0030" class="anchor-heading" aria-labelledby="fem-deforming-pneunet-actuator--ecoflex-0030"><svg viewbox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> FEM: Deforming PneuNet actuator – Ecoflex 0030</h4>
+<details> <summary>Show image</summary><div align="left"> <img src="./docs/documentation/img/fem_pneunet.gif" width="500">
+</div></details><h4 class="text-purple-000" id="fem-3d-buckling-of-hyper-elastic-beam"> <a href="#fem-3d-buckling-of-hyper-elastic-beam" class="anchor-heading" aria-labelledby="fem-3d-buckling-of-hyper-elastic-beam"><svg viewbox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> FEM: 3D buckling of hyper-elastic beam</h4>
+<details> <summary>Show image</summary><div align="left"> <img src="./docs/documentation/img/fem_3D_buckle.gif" width="200">
+</div></details><h3 id="dynamic-model---modelm"> <a href="#dynamic-model---modelm" class="anchor-heading" aria-labelledby="dynamic-model---modelm"><svg viewbox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Dynamic Model – <code class="language-plaintext text-purple-000 highlighter-rouge">Model.m</code>
+</h3>
+<h4 class="text-purple-000" id="model-simulation-of-two-link-soft-robot"> <a href="#model-simulation-of-two-link-soft-robot" class="anchor-heading" aria-labelledby="model-simulation-of-two-link-soft-robot"><svg viewbox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> MODEL: Simulation of two-link soft robot</h4>
+<details> <summary>Show image</summary><div align="left"> <img src="./docs/documentation/img/mdl_softarm.gif" width="500">
+</div></details><h4 class="text-purple-000" id="model-energy-based-control-of-planar-soft-robot"> <a href="#model-energy-based-control-of-planar-soft-robot" class="anchor-heading" aria-labelledby="model-energy-based-control-of-planar-soft-robot"><svg viewbox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> MODEL: Energy-based control of planar soft robot</h4>
+<details> <summary>Show image</summary><div align="left"> <img src="./docs/documentation/img/mdl_twolink_control.gif" width="500">
+</div></details><h4 class="text-purple-000" id="model-basis-reconstruction-from-fem-data--reduced-order-modeling"> <a href="#model-basis-reconstruction-from-fem-data--reduced-order-modeling" class="anchor-heading" aria-labelledby="model-basis-reconstruction-from-fem-data--reduced-order-modeling"><svg viewbox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> MODEL: Basis reconstruction from FEM-data – Reduced-order modeling</h4>
+<details> <summary>Show image</summary><div align="left"> <img src="./docs/documentation/img/mdl_femconstruct.png" width="900">
+</div></details><h3 id="graphics-model--gmodelm"> <a href="#graphics-model--gmodelm" class="anchor-heading" aria-labelledby="graphics-model--gmodelm"><svg viewbox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Graphics Model – <code class="language-plaintext text-purple-000 highlighter-rouge">Gmodel.m</code>
+</h3>
+<h4 class="text-purple-000" id="gmodel-responsive-rendering-of-the-stanford-bunny"> <a href="#gmodel-responsive-rendering-of-the-stanford-bunny" class="anchor-heading" aria-labelledby="gmodel-responsive-rendering-of-the-stanford-bunny"><svg viewbox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> GMODEL: Responsive rendering of the Stanford bunny</h4>
+<details> <summary>Show image</summary><div align="left"> <img src="./docs/examples/graphics/renderstl/img/rotateBunny.gif" width="500">
+</div></details><h4 class="text-purple-000" id="gmodel-responsive-lighting"> <a href="#gmodel-responsive-lighting" class="anchor-heading" aria-labelledby="gmodel-responsive-lighting"><svg viewbox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> GMODEL: Responsive lighting</h4>
+<details> <summary>Show image</summary><div align="left"> <img src="./docs/documentation/img/david.gif" width="300">
+</div></details><h4 class="text-purple-000" id="gmodel-rendering-ambient-occlusion-ao"> <a href="#gmodel-rendering-ambient-occlusion-ao" class="anchor-heading" aria-labelledby="gmodel-rendering-ambient-occlusion-ao"><svg viewbox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> GMODEL: Rendering ambient occlusion (AO)</h4>
+<details> <summary>Show image</summary><div align="left"> <img src="./docs/documentation/img/bunny_AO.png" width="550">
+</div></details><h4 class="text-purple-000" id="gmodel-rendering-sub-surface-scattering-sss"> <a href="#gmodel-rendering-sub-surface-scattering-sss" class="anchor-heading" aria-labelledby="gmodel-rendering-sub-surface-scattering-sss"><svg viewbox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> GMODEL: Rendering sub-surface scattering (SSS)</h4>
+<details> <summary>Show image</summary><div align="left"> <img src="./docs/documentation/img/bunny_SSS.png" width="550">
+</div></details><h2 class="text-purple-000" id="citation"> <a href="#citation" class="anchor-heading" aria-labelledby="citation"><svg viewbox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Citation</h2>
 <p>If you are planning on using Sorotoki in your (academic) work, please consider citing the toolkit</p>
 <div class="language-bibtex highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">@misc</span><span class="p">{</span><span class="nl">Caasenbrood2018</span><span class="p">,</span>
   <span class="na">author</span> <span class="p">=</span> <span class="s">{Caasenbrood, Brandon}</span><span class="p">,</span>
@@ -133,6 +160,5 @@
 </div></div>
 <div class="search-overlay"></div>
 </div>
-<script src="/SorotokiCode/assets/js/slider/ideal-image-slider.min.js"></script> <script src="/SorotokiCode/assets/js/slider/iis-bullet-nav.js"></script> <script src="/SorotokiCode/assets/js/slider/iis-captions.js"></script> <script> var example_slider = new IdealImageSlider.Slider({ selector: '#example_slider', height: 'auto', transitionDuration: 250, effect: 'fade', }); example_slider.start(); </script>
 </body>
 </html>

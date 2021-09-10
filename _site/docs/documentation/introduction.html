@@ -39,7 +39,7 @@
 <a href="#" class="nav-list-expander"><svg viewbox="0 0 24 24"><use xlink:href="#svg-arrow-right"></use></svg></a><a href="http://localhost:4000/SorotokiCode/docs/examples" class="nav-list-link">Examples</a><ul class="nav-list ">
 <li class="nav-list-item ">
 <a href="#" class="nav-list-expander"><svg viewbox="0 0 24 24"><use xlink:href="#svg-arrow-right"></use></svg></a><a href="http://localhost:4000/SorotokiCode/docs/examples/design.html" class="nav-list-link">Design and Analysis</a><ul class="nav-list">
-<li class="nav-list-item "> <a href="http://localhost:4000/SorotokiCode/docs/examples/design/pull/" class="nav-list-link">Example 1 - Uni-axial test</a>
+<li class="nav-list-item "> <a href="http://localhost:4000/SorotokiCode/docs/examples/design/pull/" class="nav-list-link">Ex1 - Material fit</a>
 </li>
 <li class="nav-list-item "> <a href="http://localhost:4000/SorotokiCode/docs/examples/design/pneufem/" class="nav-list-link">Example 2 - Finite Element Analysis of PneuNet</a>
 </li>
@@ -63,10 +63,8 @@
 </li>
 </ul>
 </li>
+<li class="nav-list-item"><a href="http://localhost:4000/SorotokiCode/docs/contact.html" class="nav-list-link">Contact</a></li>
 <li class="nav-list-item"><a href="http://localhost:4000/SorotokiCode/docs/cite.html" class="nav-list-link">How to cite?</a></li>
-<li class="nav-list-item"><a href="http://localhost:4000/SorotokiCode/docs/contact.html" class="nav-list-link">Contributors</a></li>
-<li class="nav-list-item"><a href="http://localhost:4000/SorotokiCode/docs/license.html" class="nav-list-link">License</a></li>
-<li class="nav-list-item"><a href="http://localhost:4000/SorotokiCode/paper.html" class="nav-list-link">SOROTOKI: A Soft Robotics Toolkit for Matlab </a></li>
 </ul></nav><footer class="site-footer"> This site uses <a href="https://github.com/pmarsceill/just-the-docs">Just the Docs</a>, a documentation theme for Jekyll.</footer>
 </div>
 <div class="main" id="top">
@@ -85,10 +83,16 @@
 <li class="breadcrumb-nav-list-item"><span>About SOROTOKI</span></li>
 </ol></nav><div id="main-content" class="main-content" role="main">
 <h1 id="about"> <a href="#about" class="anchor-heading" aria-labelledby="about"><svg viewbox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> About</h1>
-<p>SOROTOKI is an open-source MATLAB toolkit for soft robotics that includes an array of tools for design, modeling, and control. Due to its scientific diversity, it can be challenging for researchers to quickly familiarize themselves with multiple scientific disciplines. With the aim to lower the threshold, Sorotoki aims to incorporate multiple layers of soft robotics research into one toolkit. Examples include: continuum mechanics, dynamic systems and control theory, topology optimization, computer graphics, and much more to come! The combination provides a highly flexible modeling environment and hopefully aids the development of novel soft robotic research.</p>
+<p>SOROTOKI is an open-source MATLAB toolkit for soft robotics that includes an array of tools for design, modeling, and control. Due to its scientific diversity, it can be challenging for researchers to quickly familiarize themselves with multiple scientific disciplines. With the aim to lower the threshold, SOROTOKI aims to incorporate multiple layers of soft robotics research into one toolkit. Examples include: continuum mechanics, dynamic systems and control theory, topology optimization, computer graphics, and much more to come! The combination provides a highly flexible modeling environment and hopefully aids the development of novel soft robotic research.</p>
 <h1 id="object-oriented-architecture"> <a href="#object-oriented-architecture" class="anchor-heading" aria-labelledby="object-oriented-architecture"><svg viewbox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Object-oriented architecture</h1>
 <p>SOROTOKI is an object-oriented toolkit that aims for a minimalistic code style. To do so, the toolkit is equipped with several Classes with user-input functionalities, which allow for cross-interaction between other Classes. The main classes are <strong>Sdf</strong>, <strong>Mesh</strong>, <strong>Fem</strong>, <strong>Model</strong>, <strong>Gmodel</strong>, and <strong>Bdog</strong>. A flow-diagram of the toolkit on how these Classes work and interact is given schematically below:</p>
-<p><img class="mermaid" src="https://mermaid.ink/svg/eyJjb2RlIjoiY2xhc3NEaWFncmFtXG5jbGFzcyBTZGYge1xuPDxzaWduZWQgZGlzdGFuY2UgZnVuY3Rpb24-PlxuZXZhbCgpXG5zaG93KClcbn1cbiUlLVxuY2xhc3MgTWVzaCB7XG48PG1lc2ggZ2VuZXJhdGlvbj4-XG5CbGVuZGVyXG5nZW5lcmF0ZSgpXG59XG4lJS1cbmNsYXNzIEdtb2RlbCB7XG48PGdyYXBoaWNhbCBtb2RlbHM-PlxuTWF0ZXJpYWxcbnJlbmRlcigpXG5iYWtlKClcbnVwZGF0ZSgpXG59XG4lJS1cbmNsYXNzIEZlbSB7XG48PGZpbml0ZSBlbGVtZW50cz4-XG5NYXRlcmlhbFxuc29sdmUoKVxub3B0aW1pemUoKVxufVxuJSUtXG5jbGFzcyBNb2RlbCB7XG48PGR5bmFtaWMgYmVhbSBtb2RlbHM-PlxuUmlnXG5TaGFwZXNcbmJ1aWxkKClcbnNpbXVsYXRlKClcbn1cbiUlLVxuY2xhc3MgQmRvZyB7XG48PFJlYWwtdGltZSBpbnRlcmZhY2UgdmlhIEJhbGxvb25kb2c-PlxuU2V0UG9pbnRcbmNvbm5lY3QoKVxuZXhlY3V0ZSgpXG5zaGVsbCgpXG5jbG9zZSgpXG59XG4lJS1cblNkZiAtLT4gTWVzaCA6IE1lc2hpbmcgZG9tYWluXG5TZGYgLi4-IEdtb2RlbCA6IEltcGxpY2l0IG1vZGVsaW5nXG5NZXNoIC4uPiBHbW9kZWxcbkdtb2RlbCAuLj4gTW9kZWwgOiBSZW5kZXJpbmdcbiUlLVxuTWVzaCAtLT4gRmVtIDogSW1wb3J0XG5GZW0gLS0-IE1lc2ggIDogRXhwb3J0IHRvcG9sb2d5XG5GZW0gLi4-IE1vZGVsIDogRkVNLWRyaXZlbiBkYXRhXG5Nb2RlbCAuLj4gQmRvZyA6IE1vZGVsLWJhc2VkIGNvbnRyb2xcbkZlbSAuLj4gQmRvZyA6IEZFTS1iYXNlZCBJSy1jb250cm9sXG4lJS0iLCJtZXJtYWlkIjpudWxsfQ"></p>
+<div align="center"> <img src="./img/diagram.svg" height="1520">
+</div>
+<h3 id="the-main-object-oriented-classes"> <a href="#the-main-object-oriented-classes" class="anchor-heading" aria-labelledby="the-main-object-oriented-classes"><svg viewbox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> The main object-oriented classes</h3>
+<h4 id="signed-distance-function--sdfm"> <a href="#signed-distance-function--sdfm" class="anchor-heading" aria-labelledby="signed-distance-function--sdfm"><svg viewbox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Signed-distance function – <code class="language-plaintext highlighter-rouge">Sdf.m</code>
+</h4>
+<h4 id="mesh-generation--meshm"> <a href="#mesh-generation--meshm" class="anchor-heading" aria-labelledby="mesh-generation--meshm"><svg viewbox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Mesh generation – <code class="language-plaintext highlighter-rouge">Mesh.m</code>
+</h4>
 <hr>
 <footer><p><a href="#top" id="back-to-top">Back to top</a></p>
 <p class="text-small text-grey-dk-100 mb-0">Copyright © 2018-2021 Brandon Caasenbrood. Distributed by a <a href="https://github.com/BJCaasenbrood/SorotokiCode/tree/master/LICENSE.md">MIT license.</a></p>

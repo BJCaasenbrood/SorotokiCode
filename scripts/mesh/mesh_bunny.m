@@ -1,6 +1,6 @@
 clr;
 %% generate mesh
-msh = Mesh('Sphere.stl');
+msh = Mesh('Bunny.stl','Hmesh',[1,10,100]);
 
 %% show bunny mesh
 msh.show();

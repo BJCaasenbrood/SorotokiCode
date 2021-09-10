@@ -27,15 +27,6 @@ methods
 %---------------------------------------------------------------- Fem Class
 function obj = Rig(fnc,varargin) 
     
-%     obj.Model  = mdl;
-%     if isa(mdl,'Model')
-%         obj.Domain = mdl.get('Sdomain');
-%         obj.XTangent = true;
-%     else,
-%         obj.Domain = 1;
-%         obj.XTangent = false;
-%     end
-%     
     obj.FK = fnc;
     obj.Frame = 1;
     obj.AutoScale = true;
@@ -126,13 +117,9 @@ end
 function Rig = computeFK(Rig,q,varargin)
     
     Rig = Rig.reset();
-%     if isempty(varargin)
-%         [Rig.g] = Rig.Model.string(t);
-%     else
-%         [Rig.g] = Rig.Model.string(t,200,varargin{1});
-%     end
+
     Rig.g = Rig.FK(q);
-%     
+     
     s = Rig.Domain;
     X = linspace(0,s,size(Rig.g,1));
     N = length(Rig.List);
@@ -146,7 +133,7 @@ function Rig = computeFK(Rig,q,varargin)
             [~,id] = min(abs(X - s*Rig.IKlist(I,3)));
             Instr{ii,2} = id;
 
-        else, 
+        else
             Instr{ii,1} = 'Sweep';
             [a,~] = find(Rig.IKlist(I,2) == 0);
             [b,~] = find(Rig.IKlist(I,2) == 1);
@@ -235,7 +222,7 @@ function [Rig,Q0] = computeIK(Rig,x,varargin)
     
     for ii = 1:N
         [I,~] = find(Rig.IKlist(:,1) == ii);
-        if numel(I) == 1, 
+        if numel(I) == 1
             Instr{ii,1} = 'SE3';
 
             [~,id] = min(abs(X - s*Rig.IKlist(I,3)));
@@ -322,6 +309,7 @@ function Rig = showSweep(Rig)
     
 end
 
+%---------------------------------------------------------------------- rig
 function Groundplane(Rig,B)
 Nx = 4;
 Ny = 4;

@@ -10,11 +10,11 @@ nav_order: 2
 
 The toolkit is easy to install. The fastest and easiest way to acquire the toolkit is through [git](https://git-scm.com/downloads). You can directly clone the repository using the command:
 
-```fortran
+```bash
 git clone --depth 1  https://github.com/BJCaasenbrood/SorotokiCode.git
 ```
 
-Alternatively, you can download the latest version of the toolkit below, and unpack the compressed folder at any desired working directory. 
+Alternatively, you can download the latest version of the toolkit below, and unpack the compressed folder at any desired working directory.
 
 [Stable V3.03 (.zip)](https://github.com/BJCaasenbrood/SorotokiCode/zipball/master){: .btn .btn .fs-3 .mb-4 .mb-md-0 .mr-2}  [Stable V3.03 (.tar)](https://github.com/BJCaasenbrood/SorotokiCode/tarball/master){: .btn .btn .fs-3 .mb-4 .mb-md-0 .mr-2} [Download from Github](https://github.com/BJCaasenbrood/SorotokiCode){: .btn .fs-3 .mb-4 .mb-md-0}  
 
@@ -36,14 +36,14 @@ To use SOROTOKI optimally, make sure you have the following dependencies install
 
 Once you've opened MATLAB, you first have to configure the toolkit with MATLAB's search paths. Setting up these paths is relatively straightforward. Simply run `sorotoki()`{: .text-purple-000}:
 
-<img src="./img/installing.gif" width="725"> 
+<img src="./img/installing.gif" width="725">
 
-During install, the installer will ask you if SOROTOKI should can set as the *main* directory of MATLAB. This implies every time you open MATLAB, it will automatically go this directory. 
+During install, the installer will ask you if SOROTOKI should can set as the *main* directory of MATLAB. This implies every time you open MATLAB, it will automatically go this directory.
 
 By using the command: `cdsoro`{: .text-purple-000}, you can quickly go back to the main directory from any other directory (super useful!). It will also generate the file `startup.m`{: .text-purple-000} that loads the toolkit automatically. This start-up file is typically located under `./Documents/MATLAB/startup.m` for Linux/Windows OS.
 
 ## That's all folks!
-The soft robotics toolkit is now ready-to-use. The toolkit can be verified using the command `sorotoki('check')`{: .text-purple-000}. 
+The soft robotics toolkit is now ready-to-use. The toolkit can be verified using the command `sorotoki('check')`{: .text-purple-000}.
 
 # Checking for future updates
 It is also worth mentioning that the command above is also used to update the toolkit. It is recommended to run `sorotoki()`{: .text-purple-000} to check for updates occasionally. Or type:

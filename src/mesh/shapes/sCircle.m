@@ -5,7 +5,7 @@ if nargin < 2
     yc = 0;
 end
 
-sdf = SDF(@(P) dCircle(P,xc,yc,r));
+sdf = Sdf(@(P) dCircle(P,xc,yc,r));
 sdf.BdBox = [xc-r-1e-6,xc+r+1e-6,yc-r-1e-6,yc+r+1e-6];
 end
 

@@ -1,10 +1,12 @@
 ---
 layout: default
-title: Contributors 
-nav_order: 5
+title: Contact
+nav_order: 4
 ---
+## Contacting the developers
+Bug reports and pull requests are welcome, see [https://github.com/BJCaasenbrood/SorotokiCode](https://github.com/BJCaasenbrood/SorotokiCode). This toolkit is intended to be a safe, open space for collaboration.
 
-# List of contributors
+## Contributors
 ## Brandon Caasenbrood  -- *Lead developer*
 {: .fs-6}
 ![image](./documentation/img/Brandon.png){: style="float: left" width="110"}
@@ -18,7 +20,7 @@ nav_order: 5
 {: .fs-6}
 ![image](./documentation/img/mystery.png){: style="float: left" width="110"}
 
-	Please do not hesistate contact me via email at b.j.caasenbrood@tue.nl.
+	Please do not hesistate contact the developer via email at sorotokicode@gmail.com.
 	We are open for discussions and actively looking for ways to improve the toolkit!
 	-
 	-

@@ -1,13 +1,18 @@
 ---
 layout: default
-title: Example 1 - Uni-axial test
+title: Ex1 - Material fit
 parent: Design and Analysis
 grand_parent: Examples
 nav_order: 1
 permalink: /docs/examples/design/pull/
 ---
 
-#  Hyper-elastic material fit
+<script type="text/javascript" charset="utf-8"
+src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML,
+https://vincenttam.github.io/javascripts/MathJaxLocal.js"></script>
+
+
+#  Example 1: Hyper-elastic material fit
 {: .no_toc }
 
 <details open markdown="block">
@@ -20,18 +25,22 @@ permalink: /docs/examples/design/pull/
 </details>
 ---
 
-#### Difficulty: `easy`{: .fs-3 .text-green-200}
+#### Difficulty: `intermediate`{: .fs-3 .text-green-200}
 {: .no_toc }
- - Required classes: `Sdf.m`{: .text-purple-000}, `Mesh.m`{: .text-purple-000}, `Fem.m`{: .text-purple-000}
- - Code length: `~25 lines`{: .text-purple-000} (without comments)
+- Required classes: `Mesh.m`{: .text-purple-000}, `Fem.m`{: .text-purple-000}
+- Code length: `~25 lines`{: .text-purple-000} (without comments)
 
 ---
 
 ### Introduction
-In this illustrative example, we will perform a uni-axial pull test to fit a hyper-elastic model (in this Yeoh model) for some unknown elastic material. Assuming a two-dimensional problem, we consider a 20x20 specimen and perform an uni-axial elongation of <img src="https://render.githubusercontent.com/render/math?math=%5Clambda_%7B1%7D%20%3D%20500%5C%25"> (assuming incompressibility <img src="https://render.githubusercontent.com/render/math?math=%5Clambda_2%20%3D%20%5Clambda_3">). We model this a quadrilateral finite-element mesh subjected to plane-stress conditions. Below see such a conventional uni-axial tension test, and also the material fit using SOROTOKI.
+In this illustrative example, we will perform a tension test to fit a hyper-elastic material model for some unknown elastic material. A collection of these measurements have been performed and are saved in under `.\script\tutorial\T1_materialfit.mat`{: .text-purple-000}. Assuming a two-dimensional problem, we consider a $20 \times 20$ mm material specimen and numerically simulate a uni-axial elongation of $\lambda_1 = 500 \%$. Using SOROTOKI, we can run the simulated model through an **constrained optimization routine** (`fmincon.m`) to find the unknown material coefficients for a the Yeoh model:
+
+$$\Psi = \sum^3_{i = 1} c_i \left(J_1 - 1 \right)^{i},$$
+
+where $J_1$ denotes the first strain invariant of the Lagrangian strain tensor. The results of the material fit are shown below.
 
 <div align="center"> <img src="./img/intro.png" width="500"> </div>
-<div align="center"> Stock image of uni-axial test (left, see [1]). Produced result from SOROTOKI (right). </div>
+<div align="center"> Stock image of uni-axial test (left). Produced result from SOROTOKI (right). </div>
 
 ### Generating the mesh through SDFs
 Lets start generating a planar rectangular mesh. To discretize the material domain, we use the Signed Distance Function (SDF) Class and Meshing Class -- `Sdf.m`{: .text-purple-000} and `Mesh.m`{: .text-purple-000}, respectively. We can define the rectangular domain using SDFs and convert it to a quadtrilateral mesh, consider the following code:
