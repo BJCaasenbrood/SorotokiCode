@@ -83,7 +83,7 @@ Please visit [**Sorotoki**](https://bjcaasenbrood.github.io/SorotokiCode/) for t
 </details>
 
 
-### Dynamic Model  -- `Model.m`{: .text-purple-000}
+### Dynamic Model  -- `Model.m`
 
 #### MODEL: Simulation of two-link soft robot
 
