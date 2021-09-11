@@ -6,3 +6,7 @@ _layouts
 _sass
 assets
 _data
+.jekyll-cache
+.sass-cache
+Gemfile
+Gemfile.lock
