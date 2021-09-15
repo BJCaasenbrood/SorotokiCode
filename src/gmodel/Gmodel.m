@@ -69,7 +69,7 @@ function obj = Gmodel(varargin)
     
     obj.Texture = base;
     obj.TextureStretch = .99;
-    obj.Quality = 80;
+    obj.Quality = 32;
     obj.FlipNormals = false;
     obj.AOBias = 0.01;
     obj.AOBit = 3;
@@ -92,11 +92,14 @@ function obj = Gmodel(varargin)
     obj.SSSTextureMap = 1;
     obj.Shading = 'Vertex';
     
-    for ii = 2:2:length(varargin)
-        if isfloat(varargin{2})
-            break;
+    if isfloat(varargin{2})
+        for ii = 3:2:length(varargin)
+            obj.(varargin{ii}) = varargin{ii+1};
         end
-        obj.(varargin{ii}) = varargin{ii+1};
+    else
+        for ii = 2:2:length(varargin)
+            obj.(varargin{ii}) = varargin{ii+1};
+        end
     end
 
     obj = GenerateObject(obj,varargin);   
@@ -105,7 +108,6 @@ function obj = Gmodel(varargin)
     obj.Node0 = obj.Node;
     
 end
-
 %---------------------------------------------------------------------- get     
 function varargout = get(Gmodel,varargin)
     if nargin > 1
@@ -116,15 +118,13 @@ function varargout = get(Gmodel,varargin)
     else
         varargout = Gmodel.(varargin);
     end
-end
-        
+end     
 %---------------------------------------------------------------------- set
 function Gmodel = set(Gmodel,varargin)
     for ii = 1:2:length(varargin)
         Gmodel.(varargin{ii}) = varargin{ii+1};
     end
 end
-
 %--------------------------------------------------------------------- copy
 function obj = copy(Gmodel,varargin)
     if nargin > 2
@@ -134,23 +134,19 @@ function obj = copy(Gmodel,varargin)
     end
     
 end
-
 %--------------------------------------------------------------------- copy
 function Gmodel = fix(Gmodel)
         Gmodel.Node0 = Gmodel.Node;
 end
-
 %-------------------------------------------------------------- plot ground
 function Gmodel = ground(Gmodel,gnd)
     if nargin < 2, Groundplane(Gmodel);
     else, Groundplane(Gmodel,gnd); end
 end
-
 %-------------------------------------------------------------- plot ground
 function Gmodel = box(Gmodel)
     BoundingBox(Gmodel);
 end
-
 %--------------------------------------------------------------------- show
 function Gmodel = render(Gmodel,varargin)
     
@@ -199,7 +195,6 @@ function Gmodel = render(Gmodel,varargin)
     end
 
 end
-
 %--------------------------------------------------------------------- show
 function vargout = update(Gmodel,varargin)
     
@@ -229,18 +224,15 @@ function vargout = update(Gmodel,varargin)
     end
     
 end
-
 %--------------------------------------------------------------------- show
 function Gmodel = reset(Gmodel)
     Gmodel.Node = Gmodel.Node0;
     Gmodel.Element = Gmodel.Element0;
 end
-
 %--------------------------------------------------------------------- show
 function Gmodel = center(Gmodel)
     Gmodel.BdBox = boxhull(Gmodel.Node); 
 end
-
 %--------------------------------------------------------------------- show
 function Gmodel = updateNode(Gmodel,varargin)
     
@@ -253,19 +245,15 @@ function Gmodel = updateNode(Gmodel,varargin)
     Gmodel.VNormal = vertexNormal(TR);
     Gmodel.Normal = faceNormal(TR);
     
-    %[Gmodel.VNormal,Gmodel.Normal] = TriangleNormal(V,...
-    %    Gmodel.Element);
 
     set(Gmodel.FigHandle,'Vertices',Gmodel.Node);
     
     %drawnow limitrate;
 end
-
 %--------------------------------------------------------------------- show
 function Gmodel = updateElements(Gmodel,varargin)
     set(Gmodel.FigHandle,'Faces',Gmodel.Element);
 end
-
 %--------------------------------------------------------------------- show
 function [Gmodel,map] = updateTexture(Gmodel)
     
@@ -311,7 +299,6 @@ function [Gmodel,map] = updateTexture(Gmodel)
     map = N;
     
 end
-
 %--------------------------------------------------------------------- show
 function showMap(Gmodel,Request)
     
@@ -328,7 +315,6 @@ function showMap(Gmodel,Request)
     colormap(Gmodel.Colormap);
     drawnow;
 end
-
 %--------------------------------------------------------------------- bake
 function Gmodel = bake(Gmodel)
     
@@ -352,7 +338,6 @@ function Gmodel = bake(Gmodel)
         
 
 end
-
 %---------------------------------------------------------------- export
 function export(Gmodel,filename,type)
 if nargin < 3, type = 'stl'; end
@@ -385,7 +370,6 @@ end
 
 
 end
-
 %---------------------------------------------------------------- slice
 function Gmodel = slice(Gmodel,dim,s)
     
@@ -453,14 +437,21 @@ function Gmodel = GenerateObject(Gmodel,varargin)
     fprintf(['* Loaded mesh = ']);
     cprintf('hyper', [msh{1}, '\n']);   
        
-    elseif isa(msh{1},'function_handle')
-       if length(msh{2}) ~= 6
-           cout('err','* specify a correct bounding box of size 6 x 1');
+    elseif isa(msh{1},'function_handle') || isa(msh{1},'Sdf')
+
+       if isa(msh{1},'Sdf')
+           Gmodel.SDF = @(x) msh{1}.eval(x);  
+           Gmodel.BdBox = msh{1}.BdBox;  
+       else
+           if length(msh{2}) ~= 6
+               cout('err','* specify a correct bounding box of size 6 x 1');
+           end
+
+           Gmodel.SDF   = msh{1};
+           Gmodel.BdBox = msh{2};
        end
        
-       Gmodel.SDF = msh{1};
-       Gmodel.BdBox = msh{2};
-       [X,Y,Z,P] = MeshGridding((1+1e-6)*Gmodel.BdBox+1e-6,Gmodel.Quality);
+       [X,Y,Z,P] = MeshGridding((1+1e-6)*Gmodel.BdBox,Gmodel.Quality);
        P = single(P);
        D = Gmodel.SDF(single(P));
        D = reshape(D(:,end),size(X));
@@ -468,7 +459,7 @@ function Gmodel = GenerateObject(Gmodel,varargin)
        [f,v,~] = MarchingCubes(single(X),single(Y),...
           single(Z),single(D),1e-6);
 
-    elseif length(msh) == 2
+    elseif isa(msh{1},'double') && isa(msh{2},'double')
        v = msh{1};
        f = msh{2};       
     elseif isa(msh{1},'Fem')
@@ -515,7 +506,6 @@ function Gmodel = GenerateObject(Gmodel,varargin)
     c = cellfun(@(V) mean(V,1),VCell,'UniformOutput',false);
     Gmodel.Center = vertcat(c{:});
 end
-
 %------------------------------------------------------------ bake cubemaps
 function Gmodel = BakeCubemap(Gmodel,Cubemap)
       
@@ -575,7 +565,6 @@ function Gmodel = BakeCubemap(Gmodel,Cubemap)
         
     Gmodel.TextureMap = RGB;    
 end
-
 %-------------------------------------------------------- bake texture maps
 function Gmodel = BakeAmbientOcclusion(Gmodel)
 Bias = Gmodel.AOBias;
@@ -659,7 +648,6 @@ if Gmodel.SSSRenderComplete == false
 end
 
 end
-
 %----------------------------------------------------- generate groundplane
 function Groundplane(Gmodel,gnd)
 if nargin < 2
@@ -708,7 +696,6 @@ patch('Faces',f,'Vertices',v,...
     'Linewidth',1.5,'linestyle','-','FaceColor','none',...
     'EdgeColor',[1 1 1]*0.5);
 end
-
 %---------------------------------------------------- generate bounding box
 function BoundingBox(Gmodel)
 

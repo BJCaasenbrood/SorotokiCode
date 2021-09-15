@@ -11,6 +11,7 @@ switch(Request)
     case('Curve');        x = CurveMesh(x,Arg);
     case('Sweep');        x = SweepMesh(x,Arg);
     case('SE3');          x = SE3Mesh(x,Arg);
+    case('SO3');          x = SO3Mesh(x,Arg);
     case('SE3x');         x = SE3MeshXTangent(x,Arg);
     case('Twist');        x = TwistMesh(x,Arg);
 end
@@ -147,6 +148,15 @@ H(4,4) = 1;
 
 Node = H*Node0.';
 mesh.Node = Node(1:3,:).';
+end
+
+%-------------------------------------------------------------- ROTATE MESH
+function mesh = SO3Mesh(mesh,Arg)
+Node0 = [mesh.Node]; 
+
+R = Arg;
+Node = R*Node0.';
+mesh.Node = Node.';
 end
 
 %-------------------------------------------------------------- ROTATE MESH

@@ -1,15 +1,21 @@
-function sdf = sLine(xc,yc,r)
+function sdf = sLine(x1,x2,y1,y2)
 if nargin < 2
-    r = xc; 
-    xc = 0;
-    yc = 0;
+    if nume(x1) == 4
+       y2 = x1(4);
+       y1 = x1(3);
+       x2 = x1(2);
+       x1 = x1(1);
+    end
 end
 
-sdf = SDF(@(P) dCircle(P,xc,yc,r));
-sdf.BdBox = [xc-r-1e-6,xc+r+1e-6,yc-r-1e-6,yc+r+1e-6];
+sdf = SDF(@(P) sdfLine(P,x1,x2,y1,y2));
+sdf.BdBox = [x1,x2,y1,y2];
 end
 
-function d = dCircle(P,xc,yc,r)
-d = sqrt((P(:,1)-xc).^2+(P(:,2)-yc).^2)-r;
-d=[d,d];
+function d = sdfLine(P,x1,x2,y1,y2)
+a = [x2-x1,y2-y1]; 
+a = a/norm(a);
+b = [P(:,1)-x1,P(:,2)-y1];
+d = b(:,1)*a(2) - b(:,2)*a(1);
+d = [d,d];
 end

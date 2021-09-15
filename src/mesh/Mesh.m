@@ -741,7 +741,7 @@ end
 
 %------------------------------------------------------- extract nodal data
 function [Node,Element] = RemoveDuplicates(Mesh,Node0,Element0)
-[~,~,cNode] = unique(Node0,'rows');%uniquetol(Node0,'ByRows',1e-3);
+[~,~,cNode] = unique(Node0,'rows');
 
 [Node,Element] = Rebuild(Mesh,Node0,Element0(1:Mesh.NElem),cNode');
 end

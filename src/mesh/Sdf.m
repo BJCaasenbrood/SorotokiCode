@@ -5,7 +5,7 @@ classdef Sdf
     properties
         sdf;
         BdBox;
-        cmap;
+        cmap = turbo;
     end
     
     methods
@@ -86,7 +86,7 @@ function show(Sdf,Quality)
         D(D>0) = NaN;
         figure(101);
         C = reshape(D,[Quality Quality,Quality]);
-        scatter3(X(:),Y(:),Z(:),15,C(:),'Marker','.');
+        scatter3(X(:),Y(:),Z(:),85,C(:),'Marker','.');
         axis equal; hold on;
 
         colormap(Sdf.cmap);
