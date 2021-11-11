@@ -7,12 +7,12 @@ msh = msh.generate();
 
 %% generate fem model
 fem = Fem(msh);
-fem = fem.set('TimeStep',1/100,'PrescribedDisplacement',true);
+fem = fem.set('TimeStep',1/100);
 
 %% add constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,1]);
 fem = fem.AddConstraint('Support',fem.FindNodes('Right'),[0,1]);
-fem = fem.AddConstraint('Load',fem.FindNodes('Right'),[-5,0]);
+fem = fem.AddConstraint('Displace',fem.FindNodes('Right'),[-5,0]);
 
 %% add logger nodes
 fem = fem.AddConstraint('Output',fem.FindNodes('SE'),[0,0]);

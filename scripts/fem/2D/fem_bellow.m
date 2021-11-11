@@ -11,16 +11,12 @@ msh = msh.generate();
 msh.show();
 
 %% generate fem model from mesh
-fem = Fem(msh,'TimeStep',1/5,'PrescribedDisplacement',true,...
-    'SigmoidFactor',0.5,'Linestyle','none');
+fem = Fem(msh,'TimeStep',1/5,'SigmoidFactor',0.5,'Linestyle','none');
 
 %% add constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[1,1]);
 fem = fem.AddConstraint('Support',fem.FindNodes('Top'),[1,0]);
-fem = fem.AddConstraint('Load',fem.FindNodes('Top'),[0,-10]);
-
-%id = fem.FindEdges('EdgeSelect',[12,6],60);
-%fem = fem.AddConstraint('Pressure',id,[P,0]);
+fem = fem.AddConstraint('Displace',fem.FindNodes('Top'),[0,-10]);
 
 %% add logger nodes
 trackerNodeid = fem.FindNodes('Location',[6,22]);

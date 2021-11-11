@@ -7,14 +7,13 @@ msh = Mesh(sdf,'BdBox',[0,10,0,10],'NElem',500);
 msh = msh.generate();
 
 %% generate fem model from mesh
-fem = Fem(msh,'TimeStep',1/25,'PrescribedDisplacement',true,...
-         'Linestyle','none');
+fem = Fem(msh,'TimeStep',1/25,'Linestyle','none');
 
 %% add boundary conditions
 fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,0]);
 fem = fem.AddConstraint('Support',fem.FindNodes('Right'),[1,0]);
 fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[0,1]);
-fem = fem.AddConstraint('Load',fem.FindNodes('Top'),[0,9]);
+fem = fem.AddConstraint('Displace',fem.FindNodes('Top'),[0,9]);
 fem = fem.AddConstraint('Output',fem.FindNodes('Location',[1,4]),[0,1]);
 
 %% assign material

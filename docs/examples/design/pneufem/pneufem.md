@@ -7,7 +7,7 @@ nav_order: 2
 permalink: /docs/examples/design/pneufem/
 ---
 
-#  Uni-axial tensile test (hyper-elastic)
+#  Finite element analysis of PneuNet
 {: .no_toc }
 
 <details open markdown="block">
@@ -20,7 +20,7 @@ permalink: /docs/examples/design/pneufem/
 </details>
 ---
 
-#### Difficulty: `easy`{: .fs-3 .text-green-200} 
+#### Difficulty: `easy`{: .fs-3 .text-green-200}
 {: .no_toc }
  - Required classes: `Mesh.m`{: .text-purple-000}, `Fem.m`{: .text-purple-000}
  - Code length: `~25 lines`{: .text-purple-000} (without comments)
@@ -56,10 +56,9 @@ subplot(2,1,2); msh.show();
 
 The code above should produce the following:
 
-<div align="center"> <img src="./img/mesh.png" width="550"> </div> 
+<div align="center"> <img src="./img/mesh.png" width="550"> </div>
 <div align="center"> Source image of Pneunet cross-section (top). Triangular mesh (right). </div>
 
 
 [**[1]**](https://www.rubbernews.com/blogs/new-products-james-heal-makes-move-rubber-testing-markets) **Titan10** a pull-test instrument for rubber and elastomers.
-{: .fs-3} 
-
+{: .fs-3}

@@ -14,13 +14,12 @@ msh = Mesh(sdf,'Quads',1);
 msh = msh.generate();
 
 %% converting mesh to fem
-fem = Fem(msh,'TimeStep',1/20,'PrescribedDisplacement',true,...
-          'SolverPlot',false,'ShowProcess',false);
+fem = Fem(msh,'TimeStep',1/20,'SolverPlot',false,'ShowProcess',false);
       
 %% assign boundary conditions
 fem.AddConstraint('Support',fem.FindNodes('Bottom'),[0,1]);
 fem.AddConstraint('Support',fem.FindNodes('Left'),[1,0]);
-fem.AddConstraint('Load',fem.FindNodes('Top'),[0,dL]);
+fem.AddConstraint('Displace',fem.FindNodes('Top'),[0,dL]);
 
 %% add output
 fem.AddConstraint('Output',fem.FindNodes('NW'),[0,0]);

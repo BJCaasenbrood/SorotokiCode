@@ -26,18 +26,28 @@ git clone --depth 1  https://github.com/BJCaasenbrood/SorotokiCode.git
 {: .text-purple-000}
 [Stable V1.03 (.zip)](https://github.com/BJCaasenbrood/SorotokiCode/zipball/master){: .btn .btn-purple .fs-5 .mb-4 .mb-md-0 .mr-2} [Stable V1.03 (.tar)](https://github.com/BJCaasenbrood/SorotokiCode/tarball/master){: .btn .btn-purple .fs-5 .mb-4 .mb-md-0 .mr-2} [View on Github](https://github.com/BJCaasenbrood/SorotokiCode){: .btn .fs-5 .mb-4 .mb-md-0}  
 
+## What's new?
+{: .text-purple-000}
+- **Nov 11, 2021**: We recently added the functionality to perform real-time control of
+soft robotic systems using a desktop-sized developement platform, see [Github repo](https://github.com/chukhanhhoang/SoftRoboticSetupFesto). Using `Model.m`{: .text-purple-000}, we developed a model-based controller which we see in action below!
+
+<div align="center"> <img src="./docs/documentation/img/bdog_closed_loop_control.gif" width="500"> </div>
+
+{: .text-purple-000}
+**REMARK**: The controller shown above is not a 'elementary' PID controller, we actively use gravity compensation, and hyper-elastic and visco-elastic material compensation! To envelop these entities in a dynamic model, we used the SOROTOKI toolkit.
+{: .fs-2}
+
 ## Applications highlights
 {: .text-purple-000}
-- [x] Implicit modeling with Signed Distance Functions (SDFs),
-- [x] Finite element method (FEM) using hyper-elastic materials,
-- [x] Topology optimization of (pressure-driven) soft robots,
-- [x] Dynamical modeling through geometric theory,
-- [x] (NEW!) Real-time control of soft robots via Raspi-interface,
-- [x] Fast graphics rendering with responsive textures.
+- Implicit modeling with Signed Distance Functions (SDFs),
+- Finite element method (FEM) using hyper-elastic materials,
+- Topology optimization of (pressure-driven) soft robots,
+- Dynamical modeling through differential geometric theory,
+- (NEW!) Real-time control of soft robots via Raspi-interface,
+- Fast graphics rendering with responsive textures.
 
 {: .text-purple-000}
-
-**REMARK**: All images are produced using only MATLAB and SOROTOKI, no additional software was used!
+**REMARK**: All images below are produced using only MATLAB and the SOROTOKI toolkit, no additional software was used!
 {: .fs-2}
 
 ### Signed Distance Functions and Meshing -- `Sdf.m`{: .text-purple-000}, `Mesh.m`{: .text-purple-000}

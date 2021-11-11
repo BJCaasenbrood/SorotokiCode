@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Ex1 - Material fit
+title: Example 1 - Fitting a hyper-elastic material
 parent: Design and Analysis
 grand_parent: Examples
 nav_order: 1

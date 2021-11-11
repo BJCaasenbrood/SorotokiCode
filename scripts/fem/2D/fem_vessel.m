@@ -9,20 +9,20 @@ msh = Mesh(sdf,'BdBox',[0,R,0,R],'NElem',120);
 msh = msh.generate();
 
 %% generate fem model from mesh
-fem = Fem(msh,'TimeStep',1/120,'Linestyle','-');
+fem = Fem(msh,'TimeStep',1/120);
 
 %% add constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[0,1]);
 fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,0]);
 
 id = fem.FindEdges('EdgeSelect',(R-r)*[cos(pi/6),sin(pi/6)],30);
-fem = fem.AddConstraint('Pressure',id,[50*kpa,0]);
+fem = fem.AddConstraint('Pressure',id,[15*kpa,0]);
 
 % add output nodes
 fem = fem.AddConstraint('Output',id{:},[0,0]);
 
 %% assign material
-fem.Material = Ecoflex0030();
+fem.Material = Ecoflex0030(50);
 
 %% solving
 fem.solve();

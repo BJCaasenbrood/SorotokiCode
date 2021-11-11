@@ -21,14 +21,14 @@ class Gmodel {
 }
 
 class Fem {
-	<<finite elements>>
+	<<finite element & topology optimization>>
 	Material
   	solve()
   	optimize()
 }
 
 class Model {
-	<<dynamic beam models>>
+	<<Cosserat-beam models>>
 	Rig
 	Shapes
   	build()
@@ -57,4 +57,3 @@ Model ..> Bdog : Model-based control
 Fem ..> Bdog : FEM-based IK-control
 
 ```
-

@@ -703,6 +703,11 @@ for ii = 1:3:length(varargin)
          Fem.VolumetricPressure = true; 
          Fem.(varargin{ii}) = [varargin{ii+1},repmat(varargin{ii+2},...
           [length(varargin{ii+1}),1])];
+      elseif strcmp(varargin{ii},'Displace')
+          Fem.PrescribedDisplacement = true;
+          BC = [varargin{ii+1},repmat(transpose(varargin{ii+2}(:)),...
+          [length(varargin{ii+1}),1])];
+          Fem.Load = [Fem.Load;BC];
       elseif strcmp(varargin{ii},'Contact')
           Fem.(varargin{ii}) = {varargin{ii+1},varargin{ii+2}};
       elseif strcmp(varargin{ii},'Pressure')

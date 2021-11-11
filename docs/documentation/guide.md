@@ -19,71 +19,12 @@ parent: Documentation
 
 
 ---
-
 # SOROTOKI architecture
-
-
-```mermaid!
-classDiagram
-class Sdf {
-	<<signed distance function>>
-	eval()
-  	show()
-}
-
-class Mesh {
-	<<mesh generation>>
-	Blender
-  	generate()
-}
-
-class Gmodel {
-	<<graphical models>>
-	Material
-  	render()
-  	bake()
-  	update()
-}
-
-class Fem {
-	<<finite element & topology optimization>>
-	Material
-  	solve()
-  	optimize()
-}
-
-class Model {
-	<<Cosserat-beam models>>
-	Rig
-	Shapes
-  	build()
-  	simulate()
-}
-
-
-class Bdog {
-	<<Real-time interface via Balloondog>>
-	SetPoint
-  	connect()
- 	execute()
-  	shell()
-  	close()
-}
-
-Sdf --> Mesh : Meshing domain
-Sdf ..> Gmodel : Implicit modeling
-Mesh ..> Gmodel
-Gmodel ..> Model : Rendering
-
-Mesh --> Fem : Import
-Fem --> Mesh  : Export topology
-Fem ..> Model : FEM-driven data
-Model ..> Bdog : Model-based control
-Fem ..> Bdog : FEM-based IK-control
-
-```
+The software diagram below shows how each class interact. For instance, **Sdf** can inputted into **Mesh**, and **Mesh** can be used for **Fem**. Then, solving some quasi-static problems, the FEM-driven data can be imported into **Model** -- from which we can develop model-based controllers that can tested using the class **Bdog**.
+<div align="center"> <img src="./img/diagram.svg" height="1520"> </div>
 
 # Useful commands within SOROTOKI
+
 <div class="code-example" markdown="1">
 ## `sorotoki(arg)`{: .fs-6 .text-purple-000 .text-alpha}
 {: .no_toc }
@@ -92,13 +33,14 @@ Fem ..> Bdog : FEM-based IK-control
 
 ```matlab
 # USAGE
-sorotoki();		      % calls the installer
+sorotoki();	% calls the installer
 sorotoki('check');	% performs complete check of toolkit
 sorotoki('update');	% updates SOROTOKI to newest version
 sorotoki('unload');	% removes toolkit from search path
 sorotoki('demo');	% provides a list of demos
 ```
 </div>
+
 
 <div class="code-example" markdown="1">
 ## `clr()`{: .fs-6 .text-purple-000 .text-alpha}

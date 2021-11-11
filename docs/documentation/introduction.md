@@ -13,8 +13,16 @@ SOROTOKI is an object-oriented toolkit that aims for a minimalistic code style. 
 
 <div align="center"> <img src="./img/diagram.svg" height="1520"> </div>
 
-### The main object-oriented classes
+### The Object-oriented classes of SOROTOKI
 
 #### Signed-distance function -- `Sdf.m`
 
 #### Mesh generation -- `Mesh.m`
+
+#### Finite elements -- `Fem.m`
+
+#### Graphical models -- `Gmodel.m`
+
+#### Dynamic models -- `Model.m`
+
+#### Real-time control -- `Bdog.m`

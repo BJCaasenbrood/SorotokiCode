@@ -1,5 +1,7 @@
 *.zip
 *.asv
+vendor
+_vendor
 _site
 _includes
 _layouts
@@ -10,3 +12,5 @@ _data
 .sass-cache
 Gemfile
 Gemfile.lock
+slprj/
+*.mat

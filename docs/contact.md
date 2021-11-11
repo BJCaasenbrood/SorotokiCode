@@ -4,7 +4,7 @@ title: Contact
 nav_order: 4
 ---
 ## Contacting the developers
-Bug reports and pull requests are welcome, see [https://github.com/BJCaasenbrood/SorotokiCode](https://github.com/BJCaasenbrood/SorotokiCode). This toolkit is intended to be a safe, open space for collaboration.
+Bug and issue reports are highly appreciated, see [SorotokiCode/issues](https://github.com/BJCaasenbrood/SorotokiCode/issues). This toolkit is intended to be a safe, open space for collaboration.
 
 ## Contributors
 ## Brandon Caasenbrood  -- *Lead developer*

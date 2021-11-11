@@ -21,7 +21,7 @@ permalink: /docs/examples/design/pneunet/
 
 ---
 
-#### Difficulty: `intermediate`{: .fs-3 .text-green-200} 
+#### Difficulty: `intermediate`{: .fs-3 .text-green-200}
 {: .no_toc }
  - Required classes: `Sdf.m`{: .text-purple-000}, `Mesh.m`{: .text-purple-000}, `Fem.m`{: .text-purple-000}
  - Code length: `~25 lines`{: .text-purple-000} (without comments)
@@ -34,8 +34,8 @@ In this illustrative example, we will exploit topology optimization to find a su
 <div align="center"> <img src="./img/sampleFigure.png" height="1520"> </div>
 <div align="center"> Source image is taken from the work of (see [1]) </div>
 
-<div align="center"> <img src="./img/opt_pneunet.gif" width="550"> </div> 
-<div align="center"> Topology optimization process of a PneuNet using SOROTOKI (see [2]) 
+<div align="center"> <img src="./img/opt_pneunet.gif" width="550"> </div>
+<div align="center"> Topology optimization process of a PneuNet using SOROTOKI (see [2])
  </div>
 
 ### Generating the mesh
@@ -73,7 +73,7 @@ msh.show();
 ```
 In SOROTOKI, figures can be produced through a `show()`{: .text-purple-000} request of the class. The figure will automatically be called `figure(101)` if no figures are opened. The polygonal mesh of the PneuNet domain is shown below.
 
-<div align="center"> <img src="./img/mesh.png" width="350"> </div> 
+<div align="center"> <img src="./img/mesh.png" width="350"> </div>
 <div align="center"> Polygonal mesh of single PneuNet chamber.</div>
 
 ---
@@ -83,7 +83,7 @@ We can now convert this polygonal mesh to a two-dimensional finite element model
 ```matlab
 %% generate fem model
 fem = Fem(msh);
-fem = fem.set('OptimizationProblem','Compliant'); 
+fem = fem.set('OptimizationProblem','Compliant');
 fem = fem.set('VolumeInfill',0.4);
 fem = fem.set('FilterRadius',H/15);
 fem = fem.set('Penal',4);
@@ -98,7 +98,7 @@ Alternatively, we can rewrite the code above more compactly.
 fem = Fem(msh,'OptimizationProblem','Compliant','VolumeInfill',0.4,'FilterRadius',H/15,...
   'Penal',4,'Nonlinear',false,'MaxIterationMMA',50,'ChangeMax',0.05);
 ```
-Lets discuss these settings in more detail: The setting `OptimizationProblem`{: .text-purple-000} sets the optimization objective to a compliant problem (default is `'Compliance'`{: .text-purple-000}); `VolumeInfill`{: .text-purple-000} sets the desired volume infill (default is set to `0.3`{: .text-purple-000}); `FilterRadius`{: .text-purple-000} the radius of the spatial filter needed for spatial regularization; `Penal`{: .text-purple-000} penalty power-factor for low-density regions; `Nonlinear`{: .text-purple-000} turns on/off the geometrical and material nonlinearities (default is set to `true`{: .text-purple-000}, i.e.,  active by default); `MaxIterationMMA`{: .text-purple-000} maximum number of optimization steps; and `ChangeMax`{: .text-purple-000} the maximum allowable change in material densities during optimization. 
+Lets discuss these settings in more detail: The setting `OptimizationProblem`{: .text-purple-000} sets the optimization objective to a compliant problem (default is `'Compliance'`{: .text-purple-000}); `VolumeInfill`{: .text-purple-000} sets the desired volume infill (default is set to `0.3`{: .text-purple-000}); `FilterRadius`{: .text-purple-000} the radius of the spatial filter needed for spatial regularization; `Penal`{: .text-purple-000} penalty power-factor for low-density regions; `Nonlinear`{: .text-purple-000} turns on/off the geometrical and material nonlinearities (default is set to `true`{: .text-purple-000}, i.e.,  active by default); `MaxIterationMMA`{: .text-purple-000} maximum number of optimization steps; and `ChangeMax`{: .text-purple-000} the maximum allowable change in material densities during optimization.
 
 **Important!** It shall be clear that `Nonlinear = true`{: .text-purple-000} will significantly increase the numerical solver time, please check if your system can handle the computational loads during optimization. If not, please use lower-order meshes or have nonlinear deformation turned off.
 
@@ -116,10 +116,10 @@ fem = fem.set('Periodic',[0.5, 0],'Repeat',ones(8,1));
 
 ```matlab
 %% add boundary condition
-id = fem.FindNodes('Left'); 
+id = fem.FindNodes('Left');
 fem = fem.AddConstraint('Support',id,[1,1]);
 
-id = fem.FindNodes('Right'); 
+id = fem.FindNodes('Right');
 fem = fem.AddConstraint('Spring',id,[0,1]);
 fem = fem.AddConstraint('Output',id,[0,-1]);
 ```
@@ -157,10 +157,10 @@ fem = Fem(msh,'VolumeInfill',0.3,'Penal',4,'FilterRadius',4,...
 fem = fem.set('Periodic',[0.5, 0],'Repeat',ones(8,1));
 
 %% add boundary condition
-id = fem.FindNodes('Left'); 
+id = fem.FindNodes('Left');
 fem = fem.AddConstraint('Support',id,[1,1]);
 
-id = fem.FindNodes('Right'); 
+id = fem.FindNodes('Right');
 fem = fem.AddConstraint('Spring',id,[0,1]);
 fem = fem.AddConstraint('Output',id,[0,-1]);
 
@@ -188,4 +188,4 @@ end
 ```
 
 [**[1]**](https://ieeexplore.ieee.org/abstract/document/9116010/metrics#metrics) B. Caasenbrood, A. Pogromsky and H. Nijmeijer, **A Computational Design Framework for Pressure-driven Soft Robots through Nonlinear Topology Optimization**, 2020 3rd IEEE Inter. Conf. on Soft Robotics (RoboSoft), pp. 633-638, 2020. [ 10.1109/RoboSoft48309.2020.9116010](https://doi.org/10.1109/RoboSoft48309.2020.9116010)
-{: .fs-3} 
+{: .fs-3}
