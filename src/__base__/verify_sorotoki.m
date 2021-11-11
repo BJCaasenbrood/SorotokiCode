@@ -123,11 +123,12 @@ global dt
 
 F = [1,2,3,4];
 V = [0,0;5,0;5,5;0,5];
+
 sdf = @(x) dCircle(x,0,0,1);
 
 cout('\t Mesh(V,F)'); bic; 
-msh1 = Mesh(V,F);
-msh1 = msh1.generate();
+%msh1 = Mesh(V,F);
+%msh1 = msh1.generate();
 boc;
 
 cout('\t Mesh(Sdf)'); bic;

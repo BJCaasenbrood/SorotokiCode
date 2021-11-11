@@ -1,7 +1,7 @@
 %clr; 
 X = 1;
 %% preview
-obj = Gmodel(@(x) dSphere(x,0,0,0,1),[-1,1,-1,1,-1,1]);
+obj = Gmodel(sSphere(1));
 
 mat = {aniso, bluered, bump, chroma, chromium, ...
        clean, copper, egg, grey, hotmetal, jade, ...
@@ -11,7 +11,6 @@ mat = {aniso, bluered, bump, chroma, chromium, ...
        skin, studioclay};
    
 f = figure(101);
-obj.set('TextureStretch',0.65);
 obj.bake().render();
 
 b = uicontrol('Parent',f,'Style','slider','Position',[81,24,419,23],...

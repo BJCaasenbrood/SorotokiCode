@@ -1,8 +1,8 @@
 clr;
 %% set signed distance function
-sdf = @(x) dRectangle(x,0,1,0,1);
+sdf = sRectangle(0,1,0,1);
 
 %% generate mesh
-msh = Mesh(sdf,'BdBox',[-1,1,-1,1],'NElem',250,'Movie',true);
+msh = Mesh(sdf,'NElem',250);
 msh = msh.generate();
-
+msh.show();

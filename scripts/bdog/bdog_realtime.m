@@ -1,28 +1,41 @@
 clr;
 %% assign free DOF
-ip = '10.42.0.168';
 usr = 'pi';
-pwd = 'raspberry';
+pwd = 'softroboticsSA';
+ip  = '192.168.4.1';
 
-board = Bdog(ip,usr,pwd);
-
-%% generate dynamic model
-board = board.connect();
-%board = board.run();
+brd = Bdog(usr,ip,pwd,'autoConnect',true);
 
 %% get data
-% A = board.read('soro.log');
-% 
-% figure;
-% hold on;
-% plot(A(:,1),A(:,2));
-% plot(A(:,1),A(:,3));
-% plot(A(:,1),A(:,4));
-% 
-% figure;
-% hold on;
-% plot(A(:,1),A(:,5));
-% plot(A(:,1),A(:,6));
-% plot(A(:,1),A(:,7));
+brd = brd.set('Frequency',400);
+% brd.transfer('baseSoftRobot.py');
+% brd.transfer('SoftRobot.py');
+% brd.transfer('runme.py');
 
-%board = board.disconnect();
+%% execute control loop
+Kp = 0.65;
+
+while brd.loop(40)
+    
+    % read data
+    data = brd.tcpRecvData(1);
+
+    % control law: 
+    %u = yd(brd.t) - Kp*(data/10-yd(brd.t));
+    u = yd(brd.t);
+    
+    % send data 
+    brd.tcpSendData(u);
+end
+
+brd.disconnect();
+
+%% plotting
+t = brd.Log.Time;
+plot(t,yd(t)); hold on;
+plot(brd.Log.Time,brd.Log.Data/10);
+
+%%dy additional functions
+function y = yd(t)
+    y = 0.7 + 0.3*sin(2*t);
+end

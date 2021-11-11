@@ -45,19 +45,21 @@ figure(101); clf;
 subplot(1,2,1);
 fem.show('Uy'); 
 subplot(1,2,2);
+
 plot(lam,svm,'-','linewidth',2,'Color',col(1)); hold on;
-plot(lam,Data.Svm,'.','MarkerSize',15,'Color',col(4));
+plot(lam,Data.Svm,'.','MarkerSize',15,'Color',rgb2gray(col(4))); 
+
 xaxis('Elongation strain $\lambda$','-')
 yaxis('Engineering stress','Mpa');
 axis([1,6,0,25]);
 
-legend('Material fit','Uni-axial Exp.','Fontsize',16,...
+legend('Uni-axial Exp.','Material fit','Fontsize',16,...
     'Interpreter','Latex','Location','NorthWest');
 grid on;
 
 %% cost function
 function J = Objective(fem,p,SvmExp)
-% solve job
+% solve fem with parameters p
 [~,svm] = solverJob(fem,p);
 
 % compute cost function LEAST-SQUARES -> min J:= \SUM ||Sexp - S||_2

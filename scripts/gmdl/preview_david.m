@@ -3,5 +3,5 @@ clr;
 obj = Gmodel('David.stl');
 
 %% set texture
-obj.Texture = metal;
+obj.Texture = porcelain;
 obj = obj.bake().render();

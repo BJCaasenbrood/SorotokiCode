@@ -34,8 +34,8 @@ fem.solve();
 
 %% plotting displacement
 figure(102);
-time = fem.Log{1,2};
-uy   = fem.Log{3,2};
+time = fem.Log.t;
+uy   = fem.Log.Uy;
 
 plot(P*time/kpa,uy,'-o','Color',col(1),'linewidth',2);
 xaxis('Quasi-static pressure','kpa');

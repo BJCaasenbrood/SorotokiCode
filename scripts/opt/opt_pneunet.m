@@ -16,7 +16,7 @@ fem = Fem(msh,'VolumeInfill',0.4,'Penal',4,'FilterRadius',H/15,...
               'MaxIterationMMA',25,'ChangeMax',0.05,'Movie',0);
 
 %% set spatial settings
-fem = fem.set('Periodic',[1/2, 0],'Repeat', ones(7,1));
+fem = fem.set('Periodic',[1/2, 0],'Repeat',ones(7,1));
 
 %% add boundary condition
 id = fem.FindNodes('Left'); 
@@ -25,7 +25,6 @@ fem = fem.AddConstraint('Support',id,[1,1]);
 id = fem.FindNodes('Right'); 
 fem = fem.AddConstraint('Spring',id,[0,1]);
 fem = fem.AddConstraint('Output',id,[0,-1]);
-
 id = fem.FindElements('Location',[W/2,0.625*H],1);
 fem = fem.AddConstraint('PressureCell',id,[5*kpa,0]);
 
@@ -37,7 +36,7 @@ fem.Material = Ecoflex0030();
 
 %% solving
 fem.optimize();
-fem.show('ISO',0.3);
+fem.show('ISO',0.25);
 
 %% convert topology result to mesh
 ISO  = 0.3;
@@ -49,21 +48,21 @@ MaxH = 40;
 mshr = fem.exportMesh(ISO,Simp,[GrowH,MinH,MaxH]); 
 mshr.show(); pause(2);
 
-femr = Fem(mshr,'Nonlinear',true,'TimeStep',1/15,'Linestyle','none');
+femr = Fem(mshr,'Nonlinear',true,'TimeStep',1/35,'Linestyle','none');
 
 %% assign boundary conditions to reduced fem
 id = femr.FindNodes('Left'); 
 femr = femr.AddConstraint('Support',id,[1,1]);
 
 id = femr.FindEdges('TopHole');
-femr = femr.AddConstraint('Pressure',id,[5*kpa,0]);
+femr = femr.AddConstraint('Pressure',id,[10*kpa,0]);
 
 id = femr.FindNodes('Bottom');
 femr = femr.AddConstraint('Output',id,[0,0]);
 
 %% assign material to reduced fem
 D = 25; % compress. factor (more stable)
-femr.Material = Dragonskin10(D);
+femr.Material = Ecoflex0030(D);
 
 %% solve final finite-element problem
 femr.solve();

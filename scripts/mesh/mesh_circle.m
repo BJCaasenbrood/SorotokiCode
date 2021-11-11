@@ -1,9 +1,9 @@
 clr;
 %% set signed distance function
-sdf = @(x) dCircle(x,0,0,1);
+sdf = sCircle(1);
 
 %% generate mesh
-msh = Mesh(sdf,'BdBox',[-1,1,-1,1],'NElem',250,'Movie',true);
+msh = Mesh(sdf,'NElem',250);
 msh = msh.generate(); 
 
 %% show mesh

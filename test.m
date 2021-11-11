@@ -17,6 +17,7 @@ fem = fem.AddConstraint('Load',fem.FindNodes('Top'),[0,dL]);
 fem = fem.AddConstraint('Output',fem.FindNodes('NW'),[0,0]);
 fem.Material = Ecoflex0030(0.1);
 fem = fem.solve();
+
 %% post-processing data and plotting
 Eyy = (dL/H)*fem.Log.t + 1;
 Syy = fem.Log.Svm;

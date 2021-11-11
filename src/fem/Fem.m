@@ -1,6 +1,6 @@
 % class Fem(msh,varargin)
 %--------------------------------------------------------------------------
-% FEM is an class used for (nonlinear) finite element methods and topology
+% FEM is a class used for (nonlinear) finite element methods and topology
 % optimization.  
 % -------------------------------------------------------------------------  
 % main usage:
@@ -17,11 +17,11 @@
 %
 %   fem = fem.AddConstraint('Load',id,[A,0]);      % apply load A in x-axis
 %   fem = fem.AddConstraint('Load',id,[0,A]);      % apply load A in y-axis
-%   (Note: id are Nodal indices)
+%   (Note: id are Node indices)
 %
 %   fem = fem.AddConstraint('Displace',id,[A,0]);    % displace A in x-axis
 %   fem = fem.AddConstraint('Displace',id,[0,A]);    % displace A in y-axis
-%   (Note: id are Nodal indices)
+%   (Note: id are Node indices)
 %
 %   fem = fem.AddConstraint('Pressure',id,A);            % apply pressure A 
 %   (Note: id are Edge/Surface indices)

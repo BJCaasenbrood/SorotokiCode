@@ -1,6 +1,6 @@
 clr;
 %% loading .stl file
-obj = Gmodel('Manifold.stl');
+obj = Gmodel('Bunny.stl');
 
 %% rendering    
 obj.Texture = bump;

@@ -1,6 +1,6 @@
 clr;
 %% settings
-P0  = 6*kpa;
+P0  = 50*kpa;
 
 %% generate mesh
 Simp  = 0.02;
@@ -30,44 +30,44 @@ fem = fem.AddConstraint('Support',fem.FindNodes('Box',[0,0,0,10]),[1,1]);
 fem = fem.AddConstraint('Pressure',fem.FindEdges('AllHole'),[P0,0]);
 
 %% add output nodes
-id = fem.FindNodes('Right');
+id  = fem.FindNodes('Bottom');
 fem = fem.AddConstraint('Output',id,[0,0]);
 
 %% assign material
-fem.Material = Ecoflex0030(2);
+fem.Material = Dragonskin30(2);
 
 %% solve
+clf;
 fem.solve();
 
 %% post-processing
 t   = fem.Log.t;
-Ux  = fem.Ux;
-Uy  = fem.Uy;
-Psi = fem.Psi;
+Ux  = fem.Log.Ux;
+Uy  = fem.Log.Uy;
+Psi = fem.Log.Psi;
 N0  = fem.get('Node0');
 
 figure(103); cla; subplot(1,2,1);
 for ii = 1:1:size(Ux,2)
     Nx = N0(id,1) + Ux(:,ii);
     Ny = N0(id,2) + Uy(:,ii);
-    plot(Nx,Ny,'Linewidth',2,...
-        'Color',col(4,ii/(1.05*size(Ux,2))));
+    plot(Nx,Ny,'Linewidth',3,...
+        'Color',col(4,(3+ii)/(1.00*size(Ux,2))));
     hold on;
     Y{ii} = 1e-3*[Nx,Ny];
 end
 
-axis([-20 100 -20 130]); axis equal;
+axis([-30 130 -20 130]); axis equal;
 xaxis('$x$-dimension','mm');
 yaxis('$y$-dimension','mm');
-set(gca,'linewidth',1)
+set(gca,'linewidth',1.5)
 grid on;
 
 subplot(1,2,2);
-plot([0;t],[0;Ve],'Linewidth',2,...
+plot(t,Psi,'Linewidth',4,...
         'Color',col(1));
 xaxis('Normalized loading','-');
 yaxis('Potential energy','J');
-set(gca,'linewidth',1)
+set(gca,'linewidth',1.5)
 grid on;
 
-%% shape fitting

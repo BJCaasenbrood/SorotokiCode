@@ -3,7 +3,6 @@ function [F,V] = DualContour(Sdf,N)
 if nargin < 2
    N = 16; 
 end
-tic;
 F = []; 
 V = [];
 
@@ -27,7 +26,7 @@ dz = (Sdf.BdBox(6) - Sdf.BdBox(5))/(N-1);
 
 % generate [8x3xN^3] matrix of cube vertices
 Vmat = repmat(Uv,1,1,N^3) + ...
-    repmat(reshape([X(:),Y(:),Z(:)].',1,3,N^3),8,1,1);
+       repmat(reshape([X(:),Y(:),Z(:)].',1,3,N^3),8,1,1);
 
 %% check for sign changes
 Vopt    = zeros(N^3,3);
@@ -81,12 +80,6 @@ Clist = 1:(N^3);
 Clist = Clist(Sdetect);
 Elist = 1:12;
 
-% plot3(Vopt(:,1),Vopt(:,2),Vopt(:,3),'b.');
-% axis equal
-% grid on;
-% hold all;
-% view(30,30);
-
 % SEMI-IDEA how ;)
 for ii = Clist
     edge = Elist(Edetect(:,ii));
@@ -108,19 +101,58 @@ for ii = Clist
         
         
         % construct quad;
-        if length(unique(Ftmp)) == 4        
-            %F = [F;Ftmp(1),Ftmp(2),Ftmp(3);
-            %       Ftmp(1),Ftmp(3),Ftmp(4)];
-            F = [F;Ftmp];
+        if length(unique(Ftmp)) == 4    
+            P  = Vopt(Ftmp,:);
+            Gi = df(P);                % find gradients
+            Ni = Gi./vecnorm(Gi.').';  % normalize vectors
+            Ni = mean(Ni,1);
+            Ni = Ni/norm(Ni);
+            R = PlanarProjection(Ni);
+            P2 = (R.'*P.').';
+%             
+            b = sign(poly_area(P2(:,1),P2(:,2)));
+            
+            if b == -1
+                %plot(P2(:,1),P2(:,2)); hold on
+                %P2 = flipud(P2);
+               F = [F;Ftmp(3),Ftmp(2),Ftmp(1);
+                   Ftmp(4),Ftmp(3),Ftmp(1)]; 
+            else
+               F = [F;Ftmp(1),Ftmp(2),Ftmp(3);
+                   Ftmp(1),Ftmp(3),Ftmp(4)];
+            end
+            
+%             hold on;
+%             plot3(P(:,1),P(:,2),P(:,3));
+%             plotvector(mean(P),Ni);
+            
+            %cla;
+            %plot(P2(:,1),P2(:,2));
+            %plot(P2([1 2 3 1],1),P2([1 2 3 1],2)); hold on;
+            %plot(P2([1 3 4 1],1),P2([1 3 4 1],2));
+            
+
+            %F = [F;Ftmp];
         end
       
     end
     
 end
-
+%V = Vopt;
 %Vopt(Id == 0,:) = NaN;
 [V,~,Ic] = unique(Vopt,'rows');
 F = Ic(F);
+
+[~,Ia] = unique(sort(F,2),'rows');
+F = F(Ia,:);
+% nel1 = size(F,1) ;          % total number of QUA4 elements 
+% nel2 = 2*nel1 ;
+% F2 = zeros(nel2,3) ;
+% %
+% F2(1:2:end,:) = F(:,[1 2 3]) ;
+% F2(2:2:end,:) = F(:,[1 3 4]) ;
+% F = F2;
+
 %F = unique(sort(F,2),'rows');
 %V = Vopt;
 
@@ -189,4 +221,20 @@ F0 = zeros(nel2,3) ;
 F0(1:2:end,:) = F0(:,1:3);
 F0(2:2:end,:) = F0(:,[1 3 4]);
 
+end
+
+function  a = poly_area(x,y)
+%POLY_AREA  SIGNED area of a planar polygon (+ for counterclockwise)
+ % Make polygon closed ( even if it already is) .............
+%x = [x(:); x(1)];
+%y = [y(:); y(1)];
+
+ % Calculate contour integral Int -y*dx  (same as Int x*dy).
+ 
+lx = length(x);
+if isfloat(x) && isfloat(y) 
+a  = -(x(2:lx)-x(1:lx-1))'*(y(1:lx-1)+y(2:lx))/2;
+else % mtimes can not handle ints: return double
+a  = -sum((x(2:lx)-x(1:lx-1)).*(y(1:lx-1)+y(2:lx)))/2;
+end
 end

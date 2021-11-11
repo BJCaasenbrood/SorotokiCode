@@ -113,7 +113,7 @@ function obj = Mesh(Input,varargin)
           obj.Type = 'C3T4';  
        elseif obj.Dim == 3 && size(varargin{1},2) == 8
           obj.Type = 'C3H8';  
-       elseif obj.Dim == 2 && size(varargin{1},2) == 4,
+       elseif obj.Dim == 2 && size(varargin{1},2) == 4
           obj.Type = 'C2Q4'; 
        else
           obj.Type = 'C2T3'; 
@@ -124,7 +124,7 @@ function obj = Mesh(Input,varargin)
        
        [Pc,~] = computeCentroid(obj,obj.Element,v); 
        
-       obj.MaxIteration = 0;
+       obj.MaxIteration = -1;
        obj.Center = Pc;
        obj.SDF = @(x) -1*ones(length(Pc),1);
        
@@ -178,7 +178,7 @@ function obj = Mesh(Input,varargin)
         
         [Pc,~] = computeCentroid(obj,obj.Element,v); 
        
-        obj.MaxIteration = 0;
+        obj.MaxIteration = -1;
         obj.Center = Pc;
         obj.SDF = @(x) -1*ones(length(Pc),1);
         
@@ -194,7 +194,6 @@ function varargout = get(Mesh,varargin)
 % example usage: 
 %  
 %   [n,m] = msh.get('NNode','NElem')
-
     if nargin > 1
         varargout{nargin-1,1} = [];
         for ii = 1:length(varargin)
@@ -204,7 +203,6 @@ function varargout = get(Mesh,varargin)
         varargout = Mesh.(varargin);
     end
 end
-        
 %---------------------------------------------------------------------- set
 function Mesh = set(Mesh,varargin)
 % sets any variable(s) in Class hierarchy.
@@ -255,7 +253,7 @@ Anew = (Mesh.BdBox(2)-Mesh.BdBox(1))*(Mesh.BdBox(4)-Mesh.BdBox(3))*...
        (Mesh.BdBox(6)-Mesh.BdBox(5));
 end
 
-if Mesh.MaxIteration < 1
+if Mesh.MaxIteration < 0
     flag = 1;
     f = Mesh.Element;
     v = Mesh.Node;

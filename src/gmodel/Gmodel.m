@@ -1,3 +1,29 @@
+% class Gmodel(file,varargin)
+%--------------------------------------------------------------------------
+% GMODEL is a class used for computer graphic 3D-models that allow for 
+% interactive lighting/reflections; ambient occlusion; and subsurface
+% scattering. 
+% 
+% -------------------------------------------------------------------------  
+% main usage:
+%   obj = Gmodel('file.stl');        % converts .stl file into GMODEL class
+%   obj = Gmodel('file.obj');        % converts .obj file into GMODEL class
+%   obj = Gmodel(sdf);               % converts Sdf class to GMODEL class
+%   obj = Gmodel(V,F);               % aka patch('Vertex',V,'Face',F)
+%
+% ------------------------------------------------------------------------- 
+% options:
+%   obj = Gmodel(sdf,'Quality',32);  % set rendering quality (grid level)
+%
+% -------------------------------------------------------------------------  
+% assign texture material: (please see ./src/gmodel/matcap)
+%   obj.Texture = base;
+%   obj.Texture = bump;
+%   obj.Texture = diffuse(0.5);      % input between 
+% 
+%  Also see: SOROTOKI, RIG, BLENDER
+% -------------------------------------------------------------------------    
+
 classdef Gmodel < handle
 
     properties (Access = public)
@@ -67,31 +93,32 @@ methods
 %---------------------------------------------------------------- Fem Class
 function obj = Gmodel(varargin) 
     
-    obj.Texture = base;
+    obj.Texture        = base;
     obj.TextureStretch = .99;
-    obj.Quality = 32;
+    obj.Quality        = 32;
+    
     obj.FlipNormals = false;
-    obj.AOBias = 0.01;
-    obj.AOBit = 3;
-    obj.AORadius = 0.3;
+    obj.AOBias    = 0.01;
+    obj.AOBit     = 3;
+    obj.AORadius  = 0.3;
     obj.SSSRadius = 0.3;
-    obj.AOInvert = false;
-    obj.Colormap = turbo;
+    obj.AOInvert  = false;
+    obj.Colormap  = turbo;
     obj.LineStyle = 'none';
     obj.LineColor = col(1);
-    obj.Alpha = 1.0;
-            
-    obj.AO = false;
-    obj.SSS = false;
-    obj.SSSPower = 2.2;
-    obj.AOPower = 1;
+    obj.Alpha     = 1.0;
+    obj.AO        = false;
+    obj.SSS       = false;
+    obj.SSSPower  = 2.2;
+    obj.AOPower   = 1;
     obj.Occlusion = [.2,.2,.2];
     obj.SSSRenderComplete = true;
-    obj.AORenderComplete = true;
+    obj.AORenderComplete  = true;
     obj.AOTextureMap = 1;
     obj.SSSTextureMap = 1;
     obj.Shading = 'Vertex';
     
+    if length(varargin) > 1
     if isfloat(varargin{2})
         for ii = 3:2:length(varargin)
             obj.(varargin{ii}) = varargin{ii+1};
@@ -100,6 +127,7 @@ function obj = Gmodel(varargin)
         for ii = 2:2:length(varargin)
             obj.(varargin{ii}) = varargin{ii+1};
         end
+    end
     end
 
     obj = GenerateObject(obj,varargin);   
@@ -134,20 +162,20 @@ function obj = copy(Gmodel,varargin)
     end
     
 end
-%--------------------------------------------------------------------- copy
+%-------------------------------- store current nodes as base configuration
 function Gmodel = fix(Gmodel)
         Gmodel.Node0 = Gmodel.Node;
 end
-%-------------------------------------------------------------- plot ground
+%------------------------------------------ plot groundplane based on BdBox
 function Gmodel = ground(Gmodel,gnd)
     if nargin < 2, Groundplane(Gmodel);
     else, Groundplane(Gmodel,gnd); end
 end
-%-------------------------------------------------------------- plot ground
+%------------------------------------------------------------- return Bdbox
 function Gmodel = box(Gmodel)
     BoundingBox(Gmodel);
 end
-%--------------------------------------------------------------------- show
+%------------------------------------ renders the graphics: MatCap, AO, SSS
 function Gmodel = render(Gmodel,varargin)
     
     if nargin < 2, H = figure(101);
@@ -155,10 +183,6 @@ function Gmodel = render(Gmodel,varargin)
     end
     h = rotate3d;
     h.Enable = 'on';
-    
-%     if strcmp(Gmodel.Shading,'Face'), shd = 'flat'; 
-%     else, shd = 'interp';
-%     end
     
     hp = patch('Vertices',Gmodel.Node,'Faces',Gmodel.Element,'linestyle',...
         Gmodel.LineStyle,'edgecolor',Gmodel.LineColor,'FaceVertexCData',...
@@ -195,7 +219,7 @@ function Gmodel = render(Gmodel,varargin)
     end
 
 end
-%--------------------------------------------------------------------- show
+%-------------------------- update nodes and graphics: Matcap only required
 function vargout = update(Gmodel,varargin)
     
     if nargout < 1 && isempty(Gmodel.Slice)
@@ -224,16 +248,16 @@ function vargout = update(Gmodel,varargin)
     end
     
 end
-%--------------------------------------------------------------------- show
+%---------------------------------------- return mesh to base configuration
 function Gmodel = reset(Gmodel)
     Gmodel.Node = Gmodel.Node0;
     Gmodel.Element = Gmodel.Element0;
 end
-%--------------------------------------------------------------------- show
+%---------------------------------- seeks middle and pull to origin (0,0,0)
 function Gmodel = center(Gmodel)
     Gmodel.BdBox = boxhull(Gmodel.Node); 
 end
-%--------------------------------------------------------------------- show
+%---------------------------------------------- update nodes (not graphics)
 function Gmodel = updateNode(Gmodel,varargin)
     
     if ~isempty(varargin), V = varargin{1};
@@ -243,18 +267,18 @@ function Gmodel = updateNode(Gmodel,varargin)
         V(:,1), V(:,2), V(:,3));
     
     Gmodel.VNormal = vertexNormal(TR);
-    Gmodel.Normal = faceNormal(TR);
+    Gmodel.Normal  = faceNormal(TR);
     
 
     set(Gmodel.FigHandle,'Vertices',Gmodel.Node);
     
     %drawnow limitrate;
 end
-%--------------------------------------------------------------------- show
+%------------------------------------------- update elements (not graphics)
 function Gmodel = updateElements(Gmodel,varargin)
     set(Gmodel.FigHandle,'Faces',Gmodel.Element);
 end
-%--------------------------------------------------------------------- show
+%-------------------------------------- update the texture: Matcap, OA, SSS
 function [Gmodel,map] = updateTexture(Gmodel)
     
     if strcmp(Gmodel.Shading,'Face'), M = length(Gmodel.Element);
@@ -292,14 +316,13 @@ function [Gmodel,map] = updateTexture(Gmodel)
     end
     
     if strcmp(Gmodel.Shading,'face')
-       N =  TextureSmoothing(Gmodel.Element,N,5);
+       map =  TextureSmoothing(Gmodel.Element,N,5);
     end
     
-    Gmodel.TextureMap = N;
-    map = N;
+    Gmodel.TextureMap = map;
     
 end
-%--------------------------------------------------------------------- show
+%--------------------------------------- show OA map or SSS map as colormap
 function showMap(Gmodel,Request)
     
     if ~isfloat(Request)
@@ -315,15 +338,12 @@ function showMap(Gmodel,Request)
     colormap(Gmodel.Colormap);
     drawnow;
 end
-%--------------------------------------------------------------------- bake
+%---------------------------------------baking the normals, OA map, SSS map 
+% (required only once before obj.render() call)
 function Gmodel = bake(Gmodel)
     
     Gmodel = BakeCubemap(Gmodel,Gmodel.Texture);
     
-%     if Gmodel.SSS, Gmodel.AOInvert = true; end
-%     if Gmodel.AO || Gmodel.SSS
-%     Gmodel = BakeAmbientOcclusion(Gmodel);
-%     end
     if Gmodel.SSS
         Gmodel.SSSRenderComplete = false;
         Gmodel.AOInvert = true;
@@ -338,7 +358,7 @@ function Gmodel = bake(Gmodel)
         
 
 end
-%---------------------------------------------------------------- export
+%---------------------------------------------------- export Gmodel as .stl
 function export(Gmodel,filename,type)
 if nargin < 3, type = 'stl'; end
 if nargin < 2
@@ -370,7 +390,7 @@ end
 
 
 end
-%---------------------------------------------------------------- slice
+%--------------------------------------------------- compute and show slice
 function Gmodel = slice(Gmodel,dim,s)
     
 if ~isempty(Gmodel.Slice), 
@@ -514,7 +534,7 @@ function Gmodel = BakeCubemap(Gmodel,Cubemap)
     
     if ishandle(101)
         Phi = view;
-    else, 
+    else
         Phi = eye(4); 
     end
     

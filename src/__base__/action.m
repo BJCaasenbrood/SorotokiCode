@@ -4,10 +4,10 @@ CommandSymbol = '*';
 fprintf('* Please, make a selection: \n');
 
 for i = 1:length(list)
-   if isempty(varargin),
-       cprintf('Green',['\t','  ','[',num2str(i),'] ',list{i}]);
+   if isempty(varargin)
+       cprintf('Keyword',['\t','  ','[',num2str(i),'] ',list{i}]);
    else
-       cprintf('Green',['\t','  ',list{i}]);
+       cprintf('Keyword',['\t','  ',list{i}]);
    end
    fprintf('\n'); 
 end

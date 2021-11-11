@@ -1,11 +1,11 @@
-function [normal,normalf] = TriangleNormal(vertex,face)
+function [normal, normalf] = TriangleNormal(vertex,face)
+% Copyright (c) 2004 Gabriel Peyr?
 
-%   Copyright (c) 2004 Gabriel Peyr?
-
-face = face.';
+face   = face.';
 vertex = vertex.';
-nface = size(face,2);
-nvert = size(vertex,2);
+nface  = size(face,2);
+nvert  = size(vertex,2);
+
 %normal = zeros(3, nvert);
 % unit normals to the faces
 normalf = crossp( vertex(:,face(2,:))-vertex(:,face(1,:)), ...

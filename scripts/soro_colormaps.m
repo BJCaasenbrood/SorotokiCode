@@ -1,3 +1,4 @@
+%% SOROTOKI: colormap overview
 clr; 
 %% loop over colormaps
 figure(102);
