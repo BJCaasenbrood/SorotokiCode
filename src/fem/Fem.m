@@ -51,19 +51,27 @@ classdef Fem < handle
     end
     
     properties (Access = private)
-        Node0;
-        Support;
-        Load;
-        Spring;
-        Output;
-        Pressure;
-        PressureCell;
-        Contact;
+        Node0;         % list of nodes in reference configuration
+        Center0;       % list of element centers in reference configuration
+        Support;       % list of boundary conditions (i.e., supports)
+        Load;          % list of applied forces
+        Tendon;        % list of applied follower forces (i.e., tendons)
+        Spring;        % list of sping attachments to nodes
+        Output;        % list of nodes that are logged
+        Pressure;      % list of edges subjected to pressures
+        PressureCell;  % list of elements undergoing volumetric expansion
+        Contact;       % SDF contact function
         Contraction;
-        ElemNDof;
+        
+        ElemNDof;      % Degrees-of-freedom of elements
         ElemSort;
-        Normal;
+        ElemRot;
+        Normal;        
         Edge;
+        
+        PrescribedDisplacement = false;
+        VolumetricPressure     = false;
+        TendonForces           = false;
         
         VonMisesNodal; 
         sxxNodal; syyNodal; sxyNodal;
@@ -90,10 +98,10 @@ classdef Fem < handle
         ShowProcess;
         
         ResidualNorm = 1e-3;
-        StressNorm = 1e-9;
+        StressNorm   = 1e-9;
         DisplaceNorm = 1e-9;
-        Objective = 1e-4;
-        Constraint = 1e-4;
+        Objective    = 1e-4;
+        Constraint   = 1e-4;
         
         IterationMMA = 1;
         Iteration = 1;
@@ -117,8 +125,6 @@ classdef Fem < handle
         BisectLimit = 5;
         BisectCounter = 1;
         AssembledSystem = false;
-        PrescribedDisplacement = false;
-        VolumetricPressure = false;
         PressureLoad = 0;
         Type = 'PlaneStrain'
         Linestyle = '-';
@@ -179,6 +185,8 @@ function obj = Fem(Mesh,varargin)
     obj.Mesh     = Mesh;
     obj.Node     = Mesh.get('Node');
     obj.Node0    = Mesh.get('Node');
+    obj.Center   = Mesh.get('Center');
+    obj.Center0  = Mesh.get('Center');
     obj.NNode    = Mesh.get('NNode');
     obj.Dim      = Mesh.get('Dim');
     obj.Element  = Mesh.get('Element');
@@ -462,8 +470,8 @@ Fem.Density       = clamp(Fem.Density,Fem.Ersatz,1);
 Fem.Utmp          = zeros(Fem.Dim*Fem.NNode,1);
 Fem.Node          = Fem.Node0;
 
-TempNode = cell(1);
-TempNode{1} = Fem.Node;
+TempNode          = cell(1);
+TempNode{1}       = Fem.Node;
 
 if Fem.ShowProcess
     showInformation(Fem,'NonlinearFem');
@@ -512,7 +520,7 @@ while true
         
         Delta = Fem.Utmp;
 
-        if rcond(full(A)) >= 1e-10
+        %if rcond(full(A)) >= 1e-10
             %if Fem.SolverStartMMA
                 DeltaU = A\B; % topology optimization needs exact mid-solution
             %else
@@ -520,9 +528,9 @@ while true
             %    [DeltaU,flag] = lsqr(A,B);
             %    flag
             %end
-        else, Singular = true; 
-            DeltaU = Fem.Utmp(FreeDofs)*0;
-        end
+        %else, Singular = true; 
+        %    DeltaU = Fem.Utmp(FreeDofs)*0;
+        %end
             
         if Fem.Nonlinear, Delta(FreeDofs,1)=Delta(FreeDofs,1)-DeltaU(:,1);
         else, Delta(FreeDofs,1) = DeltaU(:,1); B = Fem.ResidualNorm; end
@@ -547,12 +555,19 @@ while true
         if flag == 0 && Fem.Nonlinear
             Fem.Utmp = Delta;
         elseif flag == 1 && ~Fem.Nonlinear
-            Fem.Utmp = Delta;
-            Fem.Node = UpdateNode(Fem,Delta);
+            Fem.Utmp   = Delta;
+            Fem.Node   = UpdateNode(Fem,Delta);
+            Fem.Center = UpdateCenter(Fem,Delta);
         elseif flag == 1 && Fem.Nonlinear
-            Fem.Utmp = Delta;
-            Fem.Node = UpdateNode(Fem,Delta);
+            Fem.Utmp   = Delta;
+            Fem.Node   = UpdateNode(Fem,Delta);
+            Fem.Center = UpdateCenter(Fem,Delta);
         end
+        
+        % update mesh class
+        Fem.Mesh = Fem.Mesh.set('Node',Fem.Node);
+        Fem.Mesh = Fem.Mesh.set('Center',Fem.Center);
+
     end 
     
     if ~Fem.SolverStartMMA
@@ -575,9 +590,11 @@ while true
     end
     
     if ~isempty(Fem.Output) && ~Fem.SolverStartMMA
+        
        [ux,uy,un] = DisplacementField(Fem,Fem.Utmp);
        [fx,fy,fn] = DisplacementField(Fem,Fem.fInternal);
        idNodes = Fem.Output(:,1);
+       
        if isempty(Fem.Log)
            Fem.Log = struct;
            Fem.Log.t = [0*Fem.Time,Fem.Time]; 
@@ -1186,12 +1203,12 @@ for el = 1:Fem.NElem
             3*Fem.Element{el}],NDof,1);
     end
     
-    [Fe,Fb,Qe,Me,Ce,Ke,Kte,Svme,SS,EE,Te,Ve] = ...
+    [Fe,Fb,Qe,Me,Ce,Ke,Kte,Svme,SS,EE,Te,Ve,Re] = ...
     Locals(Fem,Fem.Element{el},eDof,dV,V(el));
     
-    ind1 = index+1:index+NDof^2;
-    ind2 = index+1:index+NDof;
-    ind3 = subindex+1:subindex+NDof/Fem.Dim;
+    ind1 = index+1:index+NDof^2;               % matrix indexing
+    ind2 = index+1:index+NDof;                 % vector indexing
+    ind3 = subindex+1:subindex+NDof/Fem.Dim;   % dimension indexing
 
     I = repmat(eDof,1,NDof); J = I';
     Fem.e(ind1)  = el;
@@ -1215,6 +1232,8 @@ for el = 1:Fem.NElem
     Fem.l(ind3)   = Fem.Element{el}(:);
     Fem.Potential = Fem.Potential + Ve;
     Fem.v(ind3)   = Qe(:);
+    
+    Fem.ElemRot{el} = Re;
     
     index    = index + NDof^2;
     subindex = subindex + NDof/Fem.Dim;
@@ -1249,11 +1268,11 @@ if NOutput ~=0
     L(2*Fem.Output(1:NOutput,1))   = Fem.Output(1:NOutput,3);
 end
     
-K   = sparse(Fem.i,Fem.j,E(Fem.e).*Fem.k);
-Ktr = sparse(Fem.i,Fem.j,E(Fem.e).*Fem.t);
-Fe  = sparse(Fem.i,1,E(Fem.e).*Fem.fi);
-Fb  = sparse(Fem.i,1,E(Fem.e).*Fem.fb);
-F   = sparse(Fem.Dim*Fem.NNode,1);
+K   = sparse(Fem.i,Fem.j,E(Fem.e).*Fem.k);  % init global stiffness
+Ktr = sparse(Fem.i,Fem.j,E(Fem.e).*Fem.t);  % init global tangent stiffness
+Fe  = sparse(Fem.i,1,E(Fem.e).*Fem.fi);     % init elastic force vector
+Fb  = sparse(Fem.i,1,E(Fem.e).*Fem.fb);     % init body force vector
+F   = sparse(Fem.Dim*Fem.NNode,1);          % init global force vector
 
 if Fem.Nonlinear
     beta = Fem.OptFactor*Fem.LoadingFactor;
@@ -1263,12 +1282,47 @@ end
 
 if ~isempty(Fem.Load) && ~Fem.PrescribedDisplacement
     NLoad = size(Fem.Load,1);
-    W = 1.0;
     
     for ii = 1:Fem.Dim
         F(Fem.Dim*Fem.Load(1:NLoad,1)+(ii-Fem.Dim),1) = ...
-            beta*W.*Fem.Load(1:NLoad,1+ii);
+            beta*Fem.Load(1:NLoad,1+ii);
     end
+    
+end
+
+if ~isempty(Fem.Tendon) && ~Fem.PrescribedDisplacement
+    Ftmp     = F*0;
+    List     = 1:Fem.NElem;
+    N2F      = Fem.Mesh.NodeToFace;
+    NTendons = size(Fem.Tendon,1);
+    
+
+    for jj = 1:NTendons
+        
+        el  = List(N2F(Fem.Tendon(jj,1),:) > 0);
+        
+        % compute mean rotation matrix between elements
+        Rot = zeros(3);
+        for kk = 1:numel(el)
+            Rot = Rot + (1/numel(el))*Fem.ElemRot{kk};
+        end
+        
+        [Ur,~,Vr] = svd(Rot);
+        Rot       = Ur*Vr.';
+        
+        if Fem.Dim == 2
+            Ft = Rot(1:2,1:2)*Fem.Tendon(jj,2:end).';
+        else
+            Ft = Rot*Fem.Tendon(jj,2:end).';
+        end
+        
+        for ii = 1:Fem.Dim
+            Ftmp(Fem.Dim*Fem.Tendon(jj,1)+(ii-Fem.Dim),1) = ...
+                beta*Ft(ii);
+        end
+    end
+    
+    F = F + Ftmp;
     
 end
 
@@ -1376,9 +1430,9 @@ if ~isempty(Fem.Pressure)
 
         dsx = diff(V(:,1));
         dsy = diff(V(:,2));
-        dl = sqrt(dsx.^2+dsy.^2);
-        Nx = -dsy./dl;
-        Ny = dsx./dl;
+        dl  = sqrt(dsx.^2+dsy.^2);
+        Nx  = -dsy./dl;
+        Ny  = dsx./dl;
         
         S = [NodeID(1:end-1),NodeID(2:end)].';
 
@@ -1455,7 +1509,7 @@ AllDofs = 1:Fem.Dim*Fem.NNode;
 FreeDofs = setdiff(AllDofs,FixedDofs);
 end
 %--------------------------------------------------- local element matrices
-function [Fe,Fb,Qe,Me,Ce,Ke,Kte,Svme,SS,EE,Te,Ve] = Locals(Fem,eNode,eDof,dV,Rb)
+function [Fe,Fb,Qe,Me,Ce,Ke,Kte,Svme,SS,EE,Te,Ve,Re] = Locals(Fem,eNode,eDof,dV,Rb)
 % get order
 nn = length(eNode);
 mm = Fem.Dim;
@@ -1472,6 +1526,7 @@ Ke  = zeros(mm*nn,mm*nn);
 Kte = zeros(mm*nn,mm*nn);
 SGP = zeros(length(W),6);
 EGP = zeros(length(W),6);
+RRe = zeros(3);
 Qe  = ones(nn,1);
 Ve  = 0;
 
@@ -1502,7 +1557,7 @@ for q = 1:length(W)
     F = DeformationGradient(Fem,Delta,dNdx);
     
     % polar decompostion
-    [R,S,~] = PolarDecomposition(Fem,F);
+    [R, S, ~] = PolarDecomposition(Fem,F);
 
     % increase robustness low density
     S = Rb*(S-eye(3)) + eye(3);
@@ -1518,7 +1573,7 @@ for q = 1:length(W)
     end
 
     % get internal stress matrix
-    [S0,D0,Psi] = Fem.Material.PiollaStress(C);
+    [S0, D0, Psi] = Fem.Material.PiollaStress(C);
     
     % voigt-notation vectorize
     S = VoightNotation(S0);
@@ -1528,6 +1583,9 @@ for q = 1:length(W)
     
     % nonlinear strain-displacement operator
     [Bnl,Bg,NN,tau] = NonlinearStrainOperator(Fem,N,dNdx,F);
+    
+    % local elemental rotation
+    RRe = RRe + R/nn;
     
     % internal force vector
     Fe = Fe + tau*W(q)*Bnl.'*Se*dJ;
@@ -1551,7 +1609,7 @@ for q = 1:length(W)
     Te = Te + tau*W(q)*Bnl.'*De*Et*dJ;
     
     % elemental potential energy
-    Ve = Ve + tau*W(q)*Psi;
+    Ve = Ve + tau*W(q)*Psi*dJ;
     
     % lagrangian strain
     Elagran = (1/2)*(C - eye(3));
@@ -1564,9 +1622,14 @@ for q = 1:length(W)
     NNe(((q-1)*Nshp + 1):(q*Nshp)) = N(:).';
 end
 
+[Ur,~,Vr] = svd(RRe);
+
+Re = (Ur*Vr.');
+
 SS = NNe.'*SGP;
 EE = NNe.'*EGP;
-[Svm, ~] = VonMises(SS(:,1),SS(:,2),SS(:,3),SS(:,4),SS(:,5),SS(:,6));
+[Svm, ~] = VonMises(SS(:,1),SS(:,2),SS(:,3),...
+                    SS(:,4),SS(:,5),SS(:,6));
 Svme = Svm(:); 
 
 end
@@ -2279,4 +2342,14 @@ function [Node,Node0] = UpdateNode(Fem,U)
         end
 
     end
+end
+%----------------------------------------------------- update nodes of MESH
+function Ctr = UpdateCenter(Fem,U)
+    Ctr =  Fem.get('Center0'); 
+
+    for el = 1:Fem.NNode
+        E = Fem.Element{el};
+        Ctr(el,:) = mean(Fem.Node(E,:),1);
+    end
+
 end

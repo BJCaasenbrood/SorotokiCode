@@ -3,6 +3,6 @@ clr;
 sdf = sRectangle(0,1,0,1);
 
 %% generate mesh
-msh = Mesh(sdf,'NElem',250);
+msh = Mesh(sdf,'Quads',[20,20]);
 msh = msh.generate();
 msh.show();

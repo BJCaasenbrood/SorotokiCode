@@ -2,8 +2,8 @@ clr;
 %% generate mesh
 Simp  = 0.001;
 GrowH = 1;
-MinH  = 0.15;
-MaxH  = 1.5;
+MinH  = 1;
+MaxH  = 3;
 
 msh = Mesh('Octarm.png','BdBox',[0,120,0,12],'SimplifyTol',Simp,...
     'Hmesh',[GrowH,MinH,MaxH]);
@@ -12,21 +12,29 @@ msh = msh.show();
 
 %% generate fem model
 fem = Fem(msh);
-fem = fem.set('TimeStep',1/30,'Linestyle','none','PrescribedDisplacement',true,...
-    'Movie',true,'MovieAxis',[0 130 -50 20]);
+fem = fem.set('TimeStep',1/55);
 
 %% add boundary constraint
-CP1 = [60,10.5];  % control point 1
+CP1 = [65,6];  % control point 1
 CP2 = [60,1.5];   % control point 1
-CP3 = [120,8.7];  % control point 1
+CP3 = [120,6];  % control point 1
 CP4 = [120,3.3];  % control point 1
-F1  = 30e-3;      % control force 1
+
+F1  = -52e-2;     % control force 1
 F2  = 0;          % control force 1
-F4  = -10e-3;      % control force 1
-F3  = 0;          % control force 1
+F4  = 0;          % control force 1
+F3  = 5e-2;       % control force 1
+
+theta1 = pi/2;
+theta2 = pi/2;
 
 fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,1]);
-fem = fem.AddConstraint('Load',fem.FindNodes('Location',[120,8.9]),[-62,-18]);
+fem = fem.AddConstraint('Tendon',fem.FindNodes('Location',CP1),...
+    F1*[cos(theta1),sin(theta1)]);
+
+fem = fem.AddConstraint('Tendon',fem.FindNodes('Location',CP3),...
+    F3*[cos(theta2),sin(theta2)]);
+
 %fem = fem.AddConstraint('Load',fem.FindNodes('Location',[120,3.3]),[-60,-15]);
 % fem = fem.AddConstraint('Load',fem.FindNodes('Location',CP1),[0,F1]);
 % fem = fem.AddConstraint('Load',fem.FindNodes('Location',CP2),[0,F2]);
@@ -38,7 +46,7 @@ fem = fem.AddConstraint('Load',fem.FindNodes('Location',[120,8.9]),[-62,-18]);
 % fem = fem.AddConstraint('Output',id,[0,0]);
 % 
 % %% assign material
-fem.Material = Dragonskin10;
+fem.Material = Dragonskin30(10);
 % 
 % %% solve
 f = figure(101);

@@ -10,6 +10,9 @@ classdef Mesh
         Dim;
         Type;
         Center;
+        FaceToNode;
+        NodeToFace;
+        ElementToFace;
     end
     
     properties (Access = private)
@@ -17,9 +20,6 @@ classdef Mesh
         Convergence;
         Velocity;
         Adjecency;
-        FaceToNode;
-        NodeToFace;
-        ElementToFace;
         Boundary;
         Normal;
         Edge;
@@ -187,7 +187,6 @@ function obj = Mesh(Input,varargin)
     end
     
 end
-
 %---------------------------------------------------------------------- get     
 function varargout = get(Mesh,varargin)
 % gets any variable(s) in Class hierarchy.
@@ -219,7 +218,6 @@ function Mesh = set(Mesh,varargin)
         end
     end
 end
-
 %---------------------------------------------------------------------- set
 function Mesh = generate(Mesh)
 
@@ -334,7 +332,6 @@ if Mesh.Dim < 3
 end
 
 end
-
 %---------------------------------------------------------------- show mesh
 function Mesh = show(Mesh,varargin)
 if nargin<2, Request = -1; 
@@ -357,7 +354,7 @@ switch(Request)
 end
 
 if ~strcmp(Request,'Node') && ~strcmp(Request,'Element') ...
-        && ~strcmp(Request,'Holes');
+        && ~strcmp(Request,'Holes')
     
 cla; axis equal; axis off; hold on;
     
@@ -374,7 +371,8 @@ hold on;
 
 elseif strcmp(Request,'Node')
     if size(Mesh.Node,2) == 2
-        plot(Mesh.Node(Z,1),Mesh.Node(Z,2),'.','Color',col(2));
+        plot(Mesh.Node(Z,1),Mesh.Node(Z,2),'.','Color',col(2),...
+        'Markersize',20);
     else
         plot3(Mesh.Node(Z,1),Mesh.Node(Z,2),Mesh.Node(Z,3),'.',...
             'Color',col(2),'Markersize',20);
@@ -411,7 +409,6 @@ if Mesh.Movie
 end
 
 end
-
 %----------------------------------------------------------------- show SDF
 function showSDF(Mesh,varargin)
 Bd = 1.05*Mesh.BdBox; 
@@ -438,7 +435,6 @@ plotbox;
 set(gca, 'YDir','normal');
 view(0,90);
 end
-
 %--------------------------------------------------------------- find nodes
 function NodeList = FindNodes(Mesh,Request)
     NodeList = FindNodes(Mesh.Node,Request);

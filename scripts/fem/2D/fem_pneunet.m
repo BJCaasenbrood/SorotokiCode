@@ -1,6 +1,6 @@
 clr;
 %% settings
-P0  = 50*kpa;
+P0  = 20*kpa;
 
 %% generate mesh
 Simp  = 0.02;
@@ -22,7 +22,7 @@ subplot(2,1,2); msh.show();
 
 %% generate fem model
 fem = Fem(msh);
-fem = fem.set('TimeStep',1/50,'Linestyle','none',...
+fem = fem.set('TimeStep',1/15,'Linestyle','none',...
     'MovieAxis',[-25 120 -60 130],'Movie',0);
 
 %% add boundary constraint
