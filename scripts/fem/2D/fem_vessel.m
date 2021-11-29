@@ -5,11 +5,11 @@ r = 3;
 sdf = @(x) QuarterVessel(x,R,r);
 
 %% generate mesh
-msh = Mesh(sdf,'BdBox',[0,R,0,R],'NElem',120);
+msh = Mesh(sdf,'BdBox',[0,R,0,R],'NElem',50,'Triangulate',true);
 msh = msh.generate();
 
 %% generate fem model from mesh
-fem = Fem(msh,'TimeStep',1/120);
+fem = Fem(msh,'TimeStep',1/150);
 
 %% add constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[0,1]);
@@ -22,7 +22,7 @@ fem = fem.AddConstraint('Pressure',id,[15*kpa,0]);
 fem = fem.AddConstraint('Output',id{:},[0,0]);
 
 %% assign material
-fem.Material = Ecoflex0030(50);
+fem.Material = Ecoflex0030(150);
 
 %% solving
 fem.solve();

@@ -2,12 +2,12 @@ classdef NeoHookeanMaterial
 
     properties (Access = public)
         Type = 'NeoHookean';
-        E = 10;
-        Nu = 1;
+        E    = 10;
+        Nu   = 0.33;
         C10;
-        D1 = 10;
-        Zeta;
-        Rho;
+        D1   = 10;
+        Rho  = 1e-9;
+        Zeta = 0.1;
     end
     
     properties (Access = private)
@@ -26,12 +26,14 @@ function obj = NeoHookeanMaterial(varargin)
     end
     
     if isempty(obj.C10)
-    E0 = obj.E;
-    Nu0 = obj.Nu;
+    E0         = obj.E;
+    Nu0        = obj.Nu;
+    
     obj.Lambda = (Nu0*E0)/((1+Nu0)*(1-2*Nu0));
-    obj.Mu = E0/(2*(1+Nu0));
-    obj.C10 = obj.Mu/2;
-    obj.D1 = obj.Lambda/2;
+    obj.Mu     = E0/(2*(1+Nu0));
+    obj.C10    = obj.Mu/2;
+    obj.D1     = obj.Lambda/2;
+    
     end
     
 end

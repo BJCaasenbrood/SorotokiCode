@@ -171,7 +171,7 @@ end
 end
 
 function id = Line(Node,Line,tol)
-d = dLine(Node,Line(1)-eps,Line(2)+eps,Line(3)-eps,Line(4)+eps);
+d  = dLine(Node,Line(1)-eps,Line(2)+eps,Line(3)-eps,Line(4)+eps);
 id = find(abs(d(:,end))<tol);
 end
 

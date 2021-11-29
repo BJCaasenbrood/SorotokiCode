@@ -2,9 +2,9 @@ classdef MooneyMaterial
 
     properties (Access = public)
         Type = 'Mooney';
-        C10 = 10;
-        C01 = 0;
-        K = 500;
+        C10  = 1;
+        C01  = 0;
+        K    = 5;
         Rho  = 1e-9;
         Zeta = 0.1;
     end
@@ -97,6 +97,7 @@ J3EE = -W8*(J3E*J3E') + W9*I3EE;
 %
 D = MooneyMaterial.C10*J1EE + MooneyMaterial.C01*J2EE ...
 + MooneyMaterial.K*(J3E*J3E') + MooneyMaterial.K*J3M1*J3EE;
+
 end
 
 %---------------------------------------------------------------------- set

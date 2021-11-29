@@ -34,11 +34,12 @@ id  = fem.FindNodes('Bottom');
 fem = fem.AddConstraint('Output',id,[0,0]);
 
 %% assign material
-fem.Material = Dragonskin30(2);
+fem.Material = Ecoflex0030_Ogden;%Dragonskin30(2);
 
 %% solve
 clf;
-fem.solve();
+f = figure(101);
+[~,tmpNode] = fem.solve();
 
 %% post-processing
 t   = fem.Log.t;
@@ -70,4 +71,26 @@ xaxis('Normalized loading','-');
 yaxis('Potential energy','J');
 set(gca,'linewidth',1.5)
 grid on;
+
+%% animate
+b = uicontrol('Parent',f,'Style','slider','Position',[81,24,419,23],...
+              'value',1,'min',1, 'max',length(tmpNode));
+          
+b.Callback = @(s,e) updateNode(s,e,tmpNode,[0 140 -120 120]);
+
+function updateNode(src,~,Nd,Axis)
+    class = whoClasses('Fem');
+    
+    low = floor(src.Value);
+    upp = ceil(src.Value);
+
+    N = lerp(Nd{low},Nd{upp},src.Value - low);
+    
+    for i = 1:length(class)
+        class{i}.set('Node',N);
+        class{i}.show('Un');
+    end
+    
+    axis(Axis);
+end
 

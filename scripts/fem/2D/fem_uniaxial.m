@@ -13,7 +13,7 @@ msh = msh.generate();
 
 %% generate fem model from mesh
 fem = Fem(msh,'TimeStep',1/20,'PrescribedDisplacement',true,...
-              'Linestyle','none','ColorAxis',[0 1],'SolverPlot',false);
+              'Linestyle','none','ColorAxis',[0 1],'SolverPlot',true);
 
 %% add boundary conditions
 fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[0,1]);
@@ -22,7 +22,8 @@ fem = fem.AddConstraint('Load',fem.FindNodes('Top'),[0,dL]);
 
 fem = fem.AddConstraint('Output',fem.FindNodes('Location',[0,H]),[0,0]);
 %% assign material
-fem.Material = Ecoflex0050;
+%fem.Material = Ecoflex0050;
+fem.Material = Ecoflex0030_Ogden;
 
 %% solving extension
 fem.solve();

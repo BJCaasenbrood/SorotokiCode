@@ -439,13 +439,11 @@ end
 function NodeList = FindNodes(Mesh,Request)
     NodeList = FindNodes(Mesh.Node,Request);
 end
-
 %--------------------------------------------------------------- find nodes
 function ElementList = FindElements(Mesh,Request)
     n = Mesh.Center;
     ElementList = FindNodes(n,Request);
 end
-
 %---------------------------------------------------------- find boundaries
 function BndList = ConstructBounds(Mesh)
     
@@ -495,12 +493,10 @@ function BndList = ConstructBounds(Mesh)
     end
     
 end
-
 %-------------------------------------------------------------- END METHODS
 end
 
 methods (Access = private)
-    
 %----------------------------------------------- generate a random pointset
 function P = randomPointSet(Mesh)
 P = zeros(Mesh.NElem,Mesh.Dim);
@@ -518,7 +514,6 @@ while(Ctr < Mesh.NElem)
     Ctr = Ctr+NumAdded;
 end
 end 
-
 %--------------------------------------------------------- reflect pointset
 function Rp = pointSetReflect(Mesh,P,A)
 Alpha = 1.5*(A/Mesh.NElem)^(1/2);
@@ -553,7 +548,6 @@ if Mesh.NElem > 1 % temporary fix
 end
 Rp   = unique(Rp,'rows');
 end
-
 %------------------------------------------------ compute centroid polygons
 function Rb = boundingReflect(Mesh)
     
@@ -583,7 +577,6 @@ Rb = [X(:),Y(:),Z(:)];
 end
 
 end
-
 %------------------------------------------------ compute centroid polygons
 function [Pc,A] = computeCentroid(Mesh,f,v)
     
@@ -621,7 +614,6 @@ for el = 1:Mesh.NElem
 end
 
 end
-
 %-------------------------------------- compute centroid convex poly-hedron
 function [Pc,W] = CentroidPolyhedron(~,Node,Element)
     
@@ -648,7 +640,6 @@ function [Pc,W] = CentroidPolyhedron(~,Node,Element)
     Pc = sum(Mg)./W;
     
 end
-
 %----------------------------------------------- triangulate polygonal mesh
 function [v, f] = MeshTriangulation(~,Center,v0,f0,Nel,Nvr)
 f = [];
@@ -664,7 +655,6 @@ end
 f = num2cell(f,2);
 v = [v0;Center];
 end
-
 %--------------------------------------------------- collapse smaller edges
 function [Node0,Element0] = CollapseEdges(Mesh,Node0,Element0)
 
@@ -699,7 +689,6 @@ while(true)
 end
 
 end
-
 %------------------------------------------------------------------ rebuild
 function [Node,Element] = Rebuild(Mesh,Node0,Element0,cNode)
 
@@ -722,7 +711,6 @@ for el=1:size(Element0,1)
 end
 
 end
-
 %------------------------------------------------------- extract nodal data
 function [Node,Element] = ExtractNode(Mesh,Node0,Element0)
 map = unique([Element0{1:Mesh.NElem}]);
@@ -732,14 +720,12 @@ cNode(tmp) = max(map);
 
 [Node,Element] = Rebuild(Mesh,Node0,Element0(1:Mesh.NElem),cNode);
 end
-
 %------------------------------------------------------- extract nodal data
 function [Node,Element] = RemoveDuplicates(Mesh,Node0,Element0)
 [~,~,cNode] = unique(Node0,'rows');
 
 [Node,Element] = Rebuild(Mesh,Node0,Element0(1:Mesh.NElem),cNode');
 end
-
 %---------------------------------------------------------- resequence mesh
 function [Node,Element] = ResequenceNodes(Mesh,Node0,Element0)
 NNode0=size(Node0,1); NElem0=size(Element0,1);
@@ -765,7 +751,6 @@ p = symrcm(K);
 cNode(p(1:NNode0))=1:NNode0;
 [Node,Element] = Rebuild(Mesh,Node0,Element0,cNode);
 end
-
 %---------------------------------------------------------- resequence mesh
 function [Node,Element] = HexahedronOrder(Mesh,Node0,Element0)
 Element = cell(Mesh.NElem,1);
@@ -828,7 +813,6 @@ end
 end
 
 end
-
 %------------------------------------------------ generate elemental matrix
 function [ElemMat,RawConnect,id] = GenerateElementalMatrix(Mesh)
 El = Mesh.Element(1:Mesh.NElem)';   
@@ -860,7 +844,6 @@ PadWNaN = @(E) [E, NaN(size(E,1), MaxN- size(E,2))];
 ElemMat = cellfun(PadWNaN,El,'UniformOutput',false);
 ElemMat = vertcat(ElemMat{:});       
 end
-
 %------------------------------------------------ generate elemental matrix
 function [Node,Element] = GenerateMeshImage(Mesh,Image)
     
@@ -898,19 +881,18 @@ function [Node,Element] = GenerateMeshImage(Mesh,Image)
     Element = Tesselation.Elements.';
     
 end
-
 %----------------------------------------------- generate elemental adjency
-function [Node,Element] = GenerateMeshSTL(Mesh,filename)
+function [Node,Element] = GenerateMeshSTL(Mesh,name)
     
     model = createpde(3);
-    importGeometry(model,filename);
-    msh = generateMesh(model,'GeometricOrder','linear',...
-        'Hgrad', Mesh.Hmesh(1), 'Hmin', Mesh.Hmesh(2), 'Hmax', Mesh.Hmesh(3));
+    importGeometry(model,name);
+%     msh = generateMesh(model,'GeometricOrder','linear',...
+%         'Hgrad', Mesh.Hmesh(1), 'Hmin', Mesh.Hmesh(2), 'Hmax', Mesh.Hmesh(3));
+    msh = generateMesh(model,'GeometricOrder','linear');
     Node = msh.Nodes';
     Element = msh.Elements';
     
 end
-
 %----------------------------------------------- generate elemental adjency
 function Mesh = ElementAdjecency(Mesh)
 if Mesh.Dim == 2
@@ -993,7 +975,6 @@ Mesh.FaceToNode  = ((M')./sum(M,2)')';
 Mesh.Boundary = B;
 %end
 end
-
 %------------------------------------------------------ compute edge matrix
 function [e,n] = EdgeMatrix(Mesh,face)
 q = Mesh.NElem;
@@ -1001,7 +982,6 @@ n = numel(face);
 v = 1:n;
 e = [v(:),[v(2:end)';v(1)]];
 end
-
 %------------------------------------------------------- get gradient field
 function RGB = GradientField(Mesh,P)
 d = Mesh.SDF(P);  
@@ -1011,7 +991,6 @@ n2 = (Mesh.SDF(P+repmat([0,Mesh.eps],N,1))-d)/Mesh.eps;
 
 RGB = atan2(n2(:,end),n1(:,end));
 end
-
 %------------------------------------------------------ isotropic reduction
 function [flag,Mesh] = CheckConvergence(Mesh)
 Criteria = (Mesh.Convergence(end) > Mesh.ConvNorm);
@@ -1026,7 +1005,6 @@ else
 end
 if Mesh.ShowProcess; ProcessMonitor(Mesh); end
 end
-
 %---------------------------------------------------------- material filter 
 function ProcessMonitor(Mesh)
 if Mesh.Iteration == 1
@@ -1061,13 +1039,12 @@ if Mesh.Movie
 end
 
 end
-
+%------------------------------------------ PLANAR PROJECTION OF 3D-POLYGON
 function R = PlanarProjection(a)
 a = a(:); b = [0;0;1];
 v = cross(a,b); vs = [0,-v(3),v(2);v(3),0,-v(1);-v(2),v(1),0];
 R = eye(3,3) + vs + vs*vs/(1+abs(dot(a,b))+1e-9);
 end
-
 %------------------------------------------ PLANAR PROJECTION OF 3D-POLYGON
 function Poly = CollectCoplanar(Node,Element,Element0)
 %finding the vector span of triangle
@@ -1094,7 +1071,6 @@ Poly = cellfun(@(E) Element0(E(:)), Poly,'UniformOutput',false);
 Poly = NaNPadding(Poly);
 Poly = vertcat(Poly{:}); 
 end
-
 %------------------------------------------ PLANAR PROJECTION OF 3D-POLYGON
 function A = NaNPadding(A0)
 

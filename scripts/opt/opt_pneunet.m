@@ -10,7 +10,7 @@ msh = Mesh(sdf,'BdBox',[0,W,0,H],'NElem',800);
 msh = msh.generate();
 
 %% show generated mesh
-fem = Fem(msh,'VolumeInfill',0.4,'Penal',4,'FilterRadius',H/15,...
+fem = Fem(msh,'VolumeInfill',0.35,'Penal',4,'FilterRadius',H/15,...
               'Nonlinear',false,'TimeStep',1/3,...
               'OptimizationProblem','Compliant',...
               'MaxIterationMMA',25,'ChangeMax',0.05,'Movie',0);
@@ -62,7 +62,7 @@ femr = femr.AddConstraint('Output',id,[0,0]);
 
 %% assign material to reduced fem
 D = 25; % compress. factor (more stable)
-femr.Material = Ecoflex0030(D);
+femr.Material = Ecoflex0030(15);
 
 %% solve final finite-element problem
 femr.solve();

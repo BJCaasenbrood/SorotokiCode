@@ -2,10 +2,12 @@ classdef LinearMaterial
 
     properties (Access = public)
         Type = 'Linear';
-        E = 1;
-        Nu = 0.4;
+        E    = 100;
+        Nu   = 0.4;
         Mu;
         Lambda;
+        Rho  = 1e-9;
+        Zeta = 0.1;
     end
    
 %--------------------------------------------------------------------------
@@ -40,16 +42,18 @@ function LinearMaterial = set(LinearMaterial,varargin)
 end
     
 %------------------------------ 2ND PIOLLA STRESSAND STIFFNESS FOR YEOH
-function [S, D] = PiollaStress(LinearMaterial,F)
+function [S, D, P] = PiollaStress(LinearMaterial,F)
 %Se = 2nd PK stress [S11, S22, S33, S12, S23, S13];
-E0 = LinearMaterial.E;
+E0  = LinearMaterial.E;
 Nu0 = LinearMaterial.Nu;
-D=E0/(1-Nu0^2)*[1 Nu0 Nu0 0;Nu0 1 Nu0 0; Nu0 Nu0 1 0;0 0 0 (1-Nu0)/2];
-D2=E0/(1-Nu0^2)*[1 Nu0 0; Nu0 1 0;0 0 (1-Nu0)/2];
-C = F.'*F;
+D  = E0/(1-Nu0^2)*[1 Nu0 Nu0 0;Nu0 1 Nu0 0; Nu0 Nu0 1 0;0 0 0 (1-Nu0)/2];
+D2 = E0/(1-Nu0^2)*[1 Nu0 0; Nu0 1 0;0 0 (1-Nu0)/2];
+C  = F.'*F;
 
 e = (1/2)*(C - eye(3));
 S = D2*e;
+ee = [e(1,1);e(2,2);e(3,3);e(2,1)];
+P = ee.'*D*ee;
 end
 
 %---------------------------------------------------------------------- set

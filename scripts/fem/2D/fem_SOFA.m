@@ -12,7 +12,7 @@ msh = msh.show();
 
 %% generate fem model
 fem = Fem(msh);
-fem = fem.set('TimeStep',1/10,'Linestyle','none');
+fem = fem.set('TimeStep',1/10,'Linestyle','none','SolverPlotType','Un');
 
 %% assign material
 fem.Material = TPU90;
@@ -29,14 +29,15 @@ fem = fem.AddConstraint('Load',fem.FindNodes('Location',CP2),[F2,0]);
 
 %% solve
 f = figure(101);
-[~,tmp1] = fem.solve('SolverPlotType','Un');
+[~,tmp1] = fem.solve();
 
 %% reverse-boundary solve
 fem = fem.reset();
 fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[1,1]);
 fem = fem.AddConstraint('Load',fem.FindNodes('Location',CP1),[-F1,0]);
 fem = fem.AddConstraint('Load',fem.FindNodes('Location',CP2),[F2,0]);
-[~,tmp2] = fem.solve('SolverPlotType','Un');
+
+[~,tmp2] = fem.solve();
 
 tmpNode = [tmp1(end),tmp2(end)];%[fliplr(tmp1(2:end)),tmp2];
 
