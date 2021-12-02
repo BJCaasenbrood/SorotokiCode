@@ -67,7 +67,7 @@ disp(' - Press enter to play simulation - ');
 
 text(0.055,0.00,-0.005,'\textbf{$g_d$}','interpreter','latex','fontsize',16);
 
-for ii = 1:fps(t,5):length(mdl.q)
+for ii = 1:fps(t,15):length(mdl.q)
     rig = rig.computeFK(mdl.q(ii,:));
     rig = rig.update();
    
@@ -79,10 +79,10 @@ for ii = 1:fps(t,5):length(mdl.q)
     setupFigure(ii);
     view(0,0);
     
-    if ii == 1, gif('srm3_octarm.gif','frame',gcf,'nodither');
-        pause; framepause(5);
-    else, gif;
-    end
+%     if ii == 1, gif('srm3_octarm.gif','frame',gcf,'nodither');
+%         pause; framepause(5);
+%     else, gif;
+%     end
 end
 
 framepause(15);

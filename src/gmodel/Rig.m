@@ -155,7 +155,7 @@ function Rig = computeFK(Rig,q,varargin)
     for ii = 1:size(Instr,1)
         if strcmp(Instr{ii,1},'Sweep')
            id = Instr{ii,2};
-           LinkID = knnsearch(X(id).',Rig.List{ii}.Node(:,3));
+           LinkID = knnsearch(Rig.List{ii}.Node(:,3),X(id).');
            Rig.List{ii} = Blender(Rig.List{ii},'Sweep', {LinkID,Rig.g(id,:)});
         elseif strcmp(Instr{ii,1},'SE3')
             if Rig.XTangent

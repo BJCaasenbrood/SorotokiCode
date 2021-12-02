@@ -108,7 +108,7 @@ gmdl1 = Gmodel('SoftActuatorPlanarRedux.stl');
 gmdl1.set('TextureStretch',.85);
 assignin('base','gmdl1',gmdl1);
 
-rig = Rig(@(x) mdl.string(x),'Domain', 0.063);
+rig = Rig((@(x) mdl.string(x)),'Domain', 0.063);
 rig = rig.add(gmdl1);
 rig = rig.parent(1,0,0);
 rig = rig.parent(1,1,0.99);

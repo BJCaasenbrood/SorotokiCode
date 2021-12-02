@@ -2,12 +2,12 @@ classdef NeoHookeanMaterial
 
     properties (Access = public)
         Type = 'NeoHookean';
-        E    = 10;
+        E    = 2;
         Nu   = 0.33;
         C10;
         D1   = 10;
-        Rho  = 1e-9;
-        Zeta = 0.1;
+        Rho  = 1070e-12;
+        Zeta = 0.01;
     end
     
     properties (Access = private)

@@ -1,6 +1,4 @@
-% function SOROTOKI(arg)
-%--------------------------------------------------------------------------
-% Calls the SoRoToKi installation manager, can also be used for demonstra-
+% SOROTOKI is the installation manager, can also be used for demonstra-
 % tion, uninstalling, and general update notifications.  
 %
 % arg - `(empty)`, 'check', 'update', 'demo', 'update'.
@@ -12,6 +10,8 @@
 %   sorotoki('unload');	  % removes toolkit from search path
 %   sorotoki('demo');	  % provides a list of demos
 % -------------------------------------------------------------------------
+% Also see: FEM
+%
 function sorotoki(arg)
 
 if nargin < 1, clc; clear; arg = 'install'; end

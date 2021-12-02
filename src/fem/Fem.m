@@ -77,8 +77,11 @@ classdef Fem < handle
         sxxNodal; syyNodal; sxyNodal;
         exxNodal; eyyNodal; exyNodal;
         fxNodal;  fyNodal;
+        rotNodal;
+        
         SPxyNodal;
         Potential;
+        Kinetic;
         ElemMat;
         Gravity;
         fInternal = rand(1)*1e-8;
@@ -111,16 +114,19 @@ classdef Fem < handle
         SolverId;
         
         IterationMMA = 1;
-        Iteration = 1;
-        Increment = 1;
-        Divergence = 0;
+        Iteration    = 1;
+        Increment    = 1;
+        Divergence   = 0;
         ShapeFnc;
         
         U      = 0;
         Utmp   = 0;
         dUtmp  = 0;
         ddUtmp = 0;
-        Utmp_ = 0;
+        Ftmp   = 0;
+        Utmp_  = 0;
+        dUtmp_  = 0;
+        ddUtmp_  = 0;
         
         MaxIteration = 50;
         MaxIterationMMA = 50;
@@ -263,6 +269,7 @@ switch(Request)
     case('Exy'), Z = Fem.exyNodal;
     case('Fx'),  Z = Fem.fxNodal;
     case('Fy'),  Z = Fem.fyNodal;
+    case('Rot'), Z = Fem.rotNodal;
     case('Fin'), [~,~,Z] = DisplacementField(Fem,Fem.fInternal);
     case('Fex'), [~,~,Z] = DisplacementField(Fem,Fem.fExternal);
     case('Un'),  [~,~,Z] = DisplacementField(Fem,Fem.Utmp);
@@ -502,7 +509,7 @@ while true
     Fem.Divergence = 0;
         
     % load increment
-    Fem.LoadingFactor = sigmoid(Fem.Time/Fem.TimeEnd,Fem.SigmoidFactor);
+    Fem.LoadingFactor = sigmoid(Fem.Time,Fem.SigmoidFactor);
     
     % reset iteration
     Fem.Iteration = 1;
@@ -662,13 +669,14 @@ while true
         drawnow;
     end
     
-    if ~Fem.Nonlinear, break; end
+    if ~Fem.Nonlinear || Fem.Time >= 1, 
+        break; 
+    end
 end
 
 end
 %-------------------------------------------------------------------- solve
 function [Fem, TempNode] = simulate(Fem)
-
 gam               = 1/2;    
 bet               = 1/4;
 Fem.Log           = [];    
@@ -685,6 +693,7 @@ Fem.Density       = clamp(Fem.Density,Fem.Ersatz,1);
 Fem.Utmp          = zeros(Fem.Dim*Fem.NNode,1);
 Fem.dUtmp         = zeros(Fem.Dim*Fem.NNode,1);
 Fem.ddUtmp        = zeros(Fem.Dim*Fem.NNode,1);
+Fem.Ftmp          = zeros(Fem.Dim*Fem.NNode,1);
 Fem.Node          = Fem.Node0;
 
 TempNode          = cell(1);
@@ -701,8 +710,8 @@ if Fem.SolverPlot || (Fem.SolverStartMMA && Fem.SolverPlot)
 end
 
 % pre-build
-Fem.LoadingFactor = 1; 
-
+Fem.LoadingFactor = sigmoid(Fem.Time/bet,Fem.SigmoidFactor);
+   
 % assemble global system matrices
 Fem = AssembleGlobalSystem(Fem);
 
@@ -718,71 +727,73 @@ C  = Fem.DampingMatrix(FreeDofs,FreeDofs);
 Fi = Fem.fInternal(FreeDofs);
 Fe = Fem.fExternal(FreeDofs);
 dt = Fem.TimeStep;
-        
-Fem.ddUtmp(FreeDofs) = (M)\(Fe - C*Fem.ddUtmp(FreeDofs) - Fi);
+       
+Fem.ddUtmp(FreeDofs) = (M)\(Fe - C*Fem.dUtmp(FreeDofs) - Fi);
 
 % update newmark coefficients
-a1 = (1/(bet*dt))*M + (gam/bet)*C;
-a2 = (1/(2*bet))*M  + dt*(gam/(2*bet) - 1)*C;
+a = zeros(8,1);
+a(1) = 1/(bet*dt*dt);
+a(2) = gam/(bet*dt);
+a(3) = 1/(bet*dt);
+a(4) = 1/(2*bet)-1;
+a(5) = gam/bet-1;
+a(6) = (1/2)*(gam/bet-2);
+a(7) = dt*gam;
+a(8) = dt*(1-gam);
 
 while true 
     
     [Fem, Terminate] = SolverTimer(Fem);
     
-    if Terminate, break; end
-        
+    if Terminate
+        break; 
+    end
+    
     flag           = 0;
     Singular       = false;
     Fem.Divergence = 0;
-    
+    Fem.Utmp_      = Fem.Utmp;
+    Fem.dUtmp_     = Fem.dUtmp;
+    Fem.ddUtmp_    = Fem.ddUtmp;
+   
     % reset iteration
     Fem.Iteration = 1;
-        
+    
     while flag == 0
-        
-        % assemble global system matrices
-        Fem = AssembleGlobalSystem(Fem);
-        
-        % assemble force/boundary conditions
-        Fem = AssembleBoundaryConditions(Fem);
         
         % get free DOFs
         FreeDofs = GetFreeDofs(Fem);
         
-        % compute residual and tangent stiffness
-        if Fem.Nonlinear
-            Kt = Fem.TangentStiffness(FreeDofs,FreeDofs);
-            Fi = Fem.fExternal(FreeDofs);
-        elseif ~Fem.Nonlinear
-            Kt = Fem.Stiffness(FreeDofs,FreeDofs);
-            Fr = sparse(Fem.fExternal(FreeDofs));
-        end
+        % update intermediate displacement
+        ddDelta    = Fem.ddUtmp;
+        Fem.dUtmp  = Fem.dUtmp_ + (1-gam)*dt*Fem.ddUtmp_ + gam*dt*ddDelta;
+        Fem.Utmp   = Fem.Utmp_  + dt*Fem.dUtmp_ + (0.5-bet)*dt*dt*Fem.ddUtmp_ + dt*dt*bet*ddDelta;
         
-%         M = Fem.MassMatrix(FreeDofs,FreeDofs);
-%         C = Fem.DampingMatrix(FreeDofs,FreeDofs);
+        % assemble global system matrices
+        %Fem.dUtmp = dDelta;
+        Fem.LoadingFactor = sigmoid(Fem.Time/bet,Fem.SigmoidFactor);
+        Fem = AssembleGlobalSystem(Fem);
+        Fem = AssembleBoundaryConditions(Fem);
+        %Fem.dUtmp = Fem.dUtmp_;
         
-        Delta   = Fem.Utmp;
-        dDelta  = Fem.dUtmp;
-        ddDelta = Fem.ddUtmp;
+        % compute tangent stiffness and internal
+        M  = Fem.MassMatrix(FreeDofs,FreeDofs);
+        C  = Fem.DampingMatrix(FreeDofs,FreeDofs);
+        Kt = Fem.TangentStiffness(FreeDofs,FreeDofs);
+        Fi = Fem.fInternal(FreeDofs);
+        Fe  = Fem.fExternal(FreeDofs);
         
-        % newmark matrices
-        A = Kt + (a1/dt);
-        b = Fi + a1*dDelta(FreeDofs) + a2*ddDelta(FreeDofs);
+        % newmark matrices A        
+        A = bet*dt*dt*Kt + gam*dt*C + M;  
+        b = Fe - Fi - C*Fem.dUtmp(FreeDofs);
         
         [L,D,P] = ldl(A,'vector');
-        
-        DeltaU = sparse(P,1,(L'\(D\(L\b(P))))); % thanks Ondrej ;) 
-            
-        if Fem.Nonlinear
-            Delta(FreeDofs,1) = Delta(FreeDofs,1) - DeltaU(:,1);
-        else
-            Delta(FreeDofs,1) = DeltaU(:,1); 
-            b = Fem.ResidualNorm; 
-        end
+        DeltaU = sparse(P,1,(L'\(D\(L\b(P))))); % thanks Ondrej ;)    
+        ddDelta(FreeDofs,1) = ddDelta(FreeDofs,1) + DeltaU(:,1);
         
         % evaluate convergence criteria
         Fem.SolverResidual = vappend(Fem.SolverResidual,...
-            max(abs(b)));
+            norm(b));
         
         Fem.SolverVonMises = vappend(Fem.SolverVonMises,...
             max(Fem.s(:,1)));
@@ -791,7 +802,7 @@ while true
             max(DeltaU(:,1)));
         
         % check convergence of solution
-        [flag,Fem] = CheckConvergence(Fem,Singular); 
+        [flag, Fem] = CheckConvergence(Fem,Singular); 
         
         % add iteration
         Fem.Iteration = Fem.Iteration + 1;
@@ -799,33 +810,16 @@ while true
         % update mesh 
         if flag == 0 && Fem.Nonlinear
 
-            Fem.Utmp = Delta;
-            
-        elseif flag == 1 && ~Fem.Nonlinear
-            
-            Fem.Utmp  = Delta;
-            
-            Fem.dUtmp = Fem.dUtmp + (gam/(bet*dt))*Delta - (gam/bet)*dDelta ... 
-                + dt*(1-(gam/(2*bet)))*ddDelta;
-            
-            Fem.ddUtmp = Fem.ddUtmp + (gam/(bet*dt^2))*Delta - (gam/(bet*dt))*dDelta ... 
-                + (1/(2*bet))*(gam/bet)*ddDelta;
-  
-            Fem.Node   = UpdateNode(Fem,Delta);
-            Fem.Center = UpdateCenter(Fem,Delta);
+            Fem.ddUtmp = ddDelta;  
             
         elseif flag == 1 && Fem.Nonlinear
             
-            Fem.Utmp  = Delta;
-            
-            Fem.dUtmp = Fem.dUtmp + (gam/(bet*dt))*Delta - (gam/bet)*dDelta ... 
-                + dt*(1-(gam/(2*bet)))*ddDelta;
-            
-            Fem.ddUtmp = Fem.ddUtmp + (gam/(bet*dt^2))*Delta - (gam/(bet*dt))*dDelta ... 
-                + (1/(2*bet))*(gam/bet)*ddDelta;
-            
-            Fem.Node   = UpdateNode(Fem,Delta);
-            Fem.Center = UpdateCenter(Fem,Delta);
+            Fem.ddUtmp = ddDelta;
+            Fem.dUtmp  = dt*dt*(0.5-bet)*Fem.ddUtmp_ + dt*dt*bet*ddDelta;
+            %Fem.Utmp   = dt*(0.5-bet)*Fem.dUtmp_ + dt*bet*Fem.dUtmp;
+                  
+            Fem.Node   = UpdateNode(Fem,Fem.Utmp);
+            Fem.Center = UpdateCenter(Fem,Fem.Utmp);
             
         end
         
@@ -835,72 +829,19 @@ while true
 
     end
     
-    
-    
-    if ~Fem.SolverStartMMA
-        Fem = AssembleGlobalSystem(Fem, true);
-        
-        Fem.VonMisesNodal = full(sparse(Fem.l,1,Fem.s(:,1))./sparse(Fem.l,1,Fem.v));
-        Fem.sxxNodal = full(sparse(Fem.l,1,Fem.s(:,2))./sparse(Fem.l,1,Fem.v));
-        Fem.syyNodal = full(sparse(Fem.l,1,Fem.s(:,3))./sparse(Fem.l,1,Fem.v));
-        Fem.sxyNodal = full(sparse(Fem.l,1,Fem.s(:,4))./sparse(Fem.l,1,Fem.v));
-        Fem.exxNodal = full(sparse(Fem.l,1,Fem.p(:,1))./sparse(Fem.l,1,Fem.v));
-        Fem.eyyNodal = full(sparse(Fem.l,1,Fem.p(:,2))./sparse(Fem.l,1,Fem.v));
-        Fem.exyNodal = full(sparse(Fem.l,1,Fem.p(:,3))./sparse(Fem.l,1,Fem.v));
-        
-        force        = full(sparse(Fem.i,1,Fem.fi));
-        Fem.fxNodal  = force(2*(1:Fem.NNode)-1);
-        Fem.fyNodal  = force(2*(1:Fem.NNode));
-
-    end
-    
     if ~Fem.SolverStartMMA
        TempNode{length(TempNode)+1} = Fem.Node;
     end
     
-    if ~isempty(Fem.Output) && ~Fem.SolverStartMMA
-        
-       [ux,uy,un] = DisplacementField(Fem,Fem.Utmp);
-       [fx,fy,fn] = DisplacementField(Fem,Fem.fInternal);
-       
-       idNodes = Fem.Output(:,1);
-       
-       if isempty(Fem.Log)
-           Fem.Log     = struct;
-           Fem.Log.t   = [0*Fem.Time,Fem.Time]; 
-           Fem.Log.Ux  = [0*ux(idNodes),ux(idNodes)]; 
-           Fem.Log.Uy  = [0*uy(idNodes),uy(idNodes)]; 
-           Fem.Log.Un  = [0*un(idNodes),un(idNodes)]; 
-           Fem.Log.Fx  = [0*fx(idNodes),fx(idNodes)]; 
-           Fem.Log.Fy  = [0*fy(idNodes),fy(idNodes)]; 
-           Fem.Log.Fn  = [0*fn(idNodes),fn(idNodes)]; 
-           Fem.Log.Svm = [0*Fem.VonMisesNodal(idNodes),Fem.VonMisesNodal(idNodes)];
-           Fem.Log.Sxx = [0*Fem.sxxNodal(idNodes),Fem.sxxNodal(idNodes)];
-           Fem.Log.Syy = [0*Fem.syyNodal(idNodes),Fem.syyNodal(idNodes)];
-           Fem.Log.Sxy = [0*Fem.sxyNodal(idNodes),Fem.sxyNodal(idNodes)];
-           Fem.Log.Psi = [0*Fem.Potential,Fem.Potential];
-       else
-           Fem.Log.t   = vappend(Fem.Log.t,Fem.Time,2);
-           Fem.Log.Ux  = vappend(Fem.Log.Ux,ux(idNodes),2);
-           Fem.Log.Uy  = vappend(Fem.Log.Uy,uy(idNodes),2);
-           Fem.Log.Un  = vappend(Fem.Log.Un,un(idNodes),2);
-           Fem.Log.Fx  = vappend(Fem.Log.Fx,fx(idNodes),2);
-           Fem.Log.Fy  = vappend(Fem.Log.Fy,fy(idNodes),2);
-           Fem.Log.Fn  = vappend(Fem.Log.Fn,fn(idNodes),2);
-           Fem.Log.Svm  = vappend(Fem.Log.Svm,Fem.VonMisesNodal(idNodes),2);
-           Fem.Log.Sxx  = vappend(Fem.Log.Sxx,Fem.sxxNodal(idNodes),2);
-           Fem.Log.Syy  = vappend(Fem.Log.Syy,Fem.syyNodal(idNodes),2);
-           Fem.Log.Sxy  = vappend(Fem.Log.Sxy,Fem.sxyNodal(idNodes),2);
-           Fem.Log.Psi  = vappend(Fem.Log.Psi,Fem.Potential,2);
-       end
+    if ~Fem.SolverStartMMA
+        Fem = FiniteElementDataLog(Fem);
     end
     
     if Fem.SolverPlot || (Fem.SolverStartMMA && Fem.SolverPlot)
         Fem.show(Fem.SolverPlotType); 
         drawnow;
     end
-    
-    if ~Fem.Nonlinear, break; end
+   
 end
 
 end
@@ -1463,6 +1404,7 @@ end
 [E,~,V] = MaterialField(Fem);
 
 Fem.Potential = 0;
+Fem.Kinetic   = 0;
 
 index    = 0; 
 subindex = 0;
@@ -1509,6 +1451,7 @@ for el = 1:Fem.NElem
     Fem.p(ind3,3) = E(el)*EE(:,4);
     Fem.l(ind3)   = Fem.Element{el}(:);
     Fem.Potential = Fem.Potential + Ve;
+    Fem.Kinetic   = Fem.Kinetic + Fem.dUtmp(eDof).'*Me*Fem.dUtmp(eDof);
     Fem.v(ind3)   = Qe(:);
     
     if Fem.Iteration == 1
@@ -1644,6 +1587,7 @@ if ~isempty(Fem.Contact)
     SDF  = Fem.Contact{1};
     Move = Fem.Contact{2};
     Emod = Fem.Material.Emod();
+    vmod = Fem.TimeStep;
     
     Y0 = Fem.Node0;
     
@@ -1652,31 +1596,32 @@ if ~isempty(Fem.Contact)
     Y(:,1) = Y0(:,1) + Ux - beta*Move(1);
     Y(:,2) = Y0(:,2) + Uy - beta*Move(2);
     
-    eps = 1e-2;
+    eps = 1e-5;
     
     d = SDF(Y); I = find((d(:,end))<eps);
     
+    if ~isempty(I)
     n1 = (SDF(Y(I,:)+repmat([eps,0],size(Y(I,:),1),1))-d(I,end))/eps;
     n2 = (SDF(Y(I,:)+repmat([0,eps],size(Y(I,:),1),1))-d(I,end))/eps;
     
-    Ux = min(d(I,end),0).*n1(:,end);
-    Uy = min(d(I,end),0).*n2(:,end);
+    Ux = (d(I,end)).*n1(:,end);
+    Uy = (d(I,end)).*n2(:,end);
+    Vx = Fem.ddUtmp(2*I(1:size(Y(I,:),1),1)-1,1);
+    Vy = Fem.ddUtmp(2*I(1:size(Y(I,:),1),1),1);
     
-    Ftmp(2*I(1:size(Y(I,:),1),1)-1,1) = Emod*Ux - 0.0*Emod*Fem.Utmp(2*I(1:size(Y(I,:),1),1)-1,1);
-    Ftmp(2*I(1:size(Y(I,:),1),1),1)   = Emod*Uy - 0.0*Emod*Fem.Utmp(2*I(1:size(Y(I,:),1),1),1);
+    V = sqrt(Vx.^2 + Vy.^2);
+    
+    Ftmp(2*I(1:size(Y(I,:),1),1)-1,1) = -0.5*Emod*Ux;%.*n1(:,end);             % - 0.0*Emod*Fem.Utmp(2*I(1:size(Y(I,:),1),1)-1,1);
+    Ftmp(2*I(1:size(Y(I,:),1),1),1)   = -0.5*Emod*Uy;            % - 0.0*Emod*Fem.Utmp(2*I(1:size(Y(I,:),1),1),1);
+    
+%     C(2*I(1:size(Y(I,:),1),1)-1,2*I(1:size(Y(I,:),1),1)-1) = ...
+%     C(2*I(1:size(Y(I,:),1),1)-1,2*I(1:size(Y(I,:),1),1)-1) + diag(Emod + 0*abs(Ux));
+%     
+%     C(2*I(1:size(Y(I,:),1),1)-1,2*I(1:size(Y(I,:),1),1)) = ...
+%     C(2*I(1:size(Y(I,:),1),1)-1,2*I(1:size(Y(I,:),1),1)) + diag(Emod + 0*abs(Uy));
     
     F = F + Ftmp;
-%     pDof = zeros(2*length(I),1);
-%     fDof = zeros(2*length(I),1);
-%     
-%     for kk = 1:length(I)
-%         pDof(2*kk-1) = 2*I(kk)-1; 
-%         pDof(2*kk) = 2*I(kk);
-%         fDof(2*kk-1) = Ux(kk); 
-%         fDof(2*kk) = Uy(kk);
-%     end
-    
-    %Fem.PrescribedDisplacement = true;
+    end
 end
 
 if Fem.PrescribedDisplacement
@@ -1939,7 +1884,7 @@ for q = 1:length(W)
     Me = Me + tau*W(q)*Fem.Material.Rho*(NN.')*NN*dJ;
     
     % dampings matrix
-    Ce = Ce + tau*W(q)*Fem.Material.Zeta*(NN.')*NN*dJ;
+    Ce = Ce + Me*Fem.Material.Zeta;
     
     % thermal expansion force
     Te = Te + tau*W(q)*Bnl.'*De*Et*dJ;
@@ -2110,7 +2055,7 @@ end
 G = kron(eye(mm),SIG);
 end
 %------------------------------------------------------ isotropic reduction
-function [flag,Fem] = CheckConvergence(Fem,SingularKt)
+function [flag, Fem] = CheckConvergence(Fem,SingularKt)
 
 CriteriaResidual = (Fem.SolverResidual(end) > Fem.ResidualNorm);
 
@@ -2137,8 +2082,8 @@ else
         flag = 2; 
         Fem.Convergence = false;
         Fem.Utmp = Fem.U;
-    elseif (Fem.Iteration == 1 && Fem.Nonlinear)
-        flag = 0;    
+    %elseif (Fem.Iteration == 1 && Fem.Nonlinear)
+    %    flag = 0;    
     elseif (Fem.Divergence >= 5)
         flag = 2;        
         Fem.Utmp = Fem.U;
@@ -2214,6 +2159,83 @@ if (Fem.SolverStartMMA && Terminate)||(Fem.SolverStartMMA && ~Fem.Nonlinear)
     %ProcessMonitor(Fem); 
 end
 
+end
+%-------------------------------------------------- solver logging function
+function Fem = FiniteElementDataLog(Fem)
+        
+Fem.VonMisesNodal = full(sparse(Fem.l,1,Fem.s(:,1))./sparse(Fem.l,1,Fem.v));
+Fem.sxxNodal = full(sparse(Fem.l,1,Fem.s(:,2))./sparse(Fem.l,1,Fem.v));
+Fem.syyNodal = full(sparse(Fem.l,1,Fem.s(:,3))./sparse(Fem.l,1,Fem.v));
+Fem.sxyNodal = full(sparse(Fem.l,1,Fem.s(:,4))./sparse(Fem.l,1,Fem.v));
+Fem.exxNodal = full(sparse(Fem.l,1,Fem.p(:,1))./sparse(Fem.l,1,Fem.v));
+Fem.eyyNodal = full(sparse(Fem.l,1,Fem.p(:,2))./sparse(Fem.l,1,Fem.v));
+Fem.exyNodal = full(sparse(Fem.l,1,Fem.p(:,3))./sparse(Fem.l,1,Fem.v));
+
+force        = full(sparse(Fem.i,1,Fem.fi));
+Fem.fxNodal  = force(2*(1:Fem.NNode)-1);
+Fem.fyNodal  = force(2*(1:Fem.NNode));
+
+Fem.rotNodal = 0*force((1:Fem.NNode));
+F2V = Fem.Mesh.FaceToNode;
+
+list = 1:Fem.NElem;
+for ii = 1:Fem.NNode
+    idE = list(F2V(:,ii) > 0);
+    R = 0;
+    
+    for jj = idE
+        R = R + Fem.ElemRot{jj};
+    end
+    
+    [Ur,~,Vr] = svd(R);
+    R = (Ur*Vr.');
+    %eta = (Ur*Vr.').'*logm((Ur*Vr.'));
+    Fem.rotNodal(ii) = acos( (trace(R)-1)/2 );
+end
+
+[ux,uy,un] = DisplacementField(Fem,Fem.Utmp);
+[fx,fy,fn] = DisplacementField(Fem,Fem.fInternal);
+
+if isempty(Fem.Log)
+   Fem.Log     = struct;
+   Fem.Log.t   = [0*Fem.Time,Fem.Time]; 
+   Fem.Log.Psi = [0*Fem.Potential,Fem.Potential];
+   Fem.Log.Kin = [0*Fem.Kinetic,Fem.Kinetic];
+
+   if ~isempty(Fem.Output)
+   idNodes = Fem.Output(:,1);
+   initVec = 0*ux(idNodes);
+   Fem.Log.Ux  = [initVec,ux(idNodes)]; 
+   Fem.Log.Uy  = [initVec,uy(idNodes)]; 
+   Fem.Log.Un  = [initVec,un(idNodes)]; 
+   Fem.Log.Fx  = [initVec,fx(idNodes)]; 
+   Fem.Log.Fy  = [initVec,fy(idNodes)]; 
+   Fem.Log.Fn  = [initVec,fn(idNodes)]; 
+   Fem.Log.Svm = [initVec,Fem.VonMisesNodal(idNodes)];
+   Fem.Log.Sxx = [initVec,Fem.sxxNodal(idNodes)];
+   Fem.Log.Syy = [initVec,Fem.syyNodal(idNodes)];
+   Fem.Log.Sxy = [initVec,Fem.sxyNodal(idNodes)];
+   end
+
+else
+   Fem.Log.t    = vappend(Fem.Log.t,Fem.Time,2);
+   Fem.Log.Psi  = vappend(Fem.Log.Psi,Fem.Potential,2);
+   Fem.Log.Kin  = vappend(Fem.Log.Kin,Fem.Kinetic,2);
+   if ~isempty(Fem.Output)       
+   idNodes = Fem.Output(:,1);   
+   Fem.Log.Ux   = vappend(Fem.Log.Ux,ux(idNodes),2);
+   Fem.Log.Uy   = vappend(Fem.Log.Uy,uy(idNodes),2);
+   Fem.Log.Un   = vappend(Fem.Log.Un,un(idNodes),2);
+   Fem.Log.Fx   = vappend(Fem.Log.Fx,fx(idNodes),2);
+   Fem.Log.Fy   = vappend(Fem.Log.Fy,fy(idNodes),2);
+   Fem.Log.Fn   = vappend(Fem.Log.Fn,fn(idNodes),2);
+   Fem.Log.Svm  = vappend(Fem.Log.Svm,Fem.VonMisesNodal(idNodes),2);
+   Fem.Log.Sxx  = vappend(Fem.Log.Sxx,Fem.sxxNodal(idNodes),2);
+   Fem.Log.Syy  = vappend(Fem.Log.Syy,Fem.syyNodal(idNodes),2);
+   Fem.Log.Sxy  = vappend(Fem.Log.Sxy,Fem.sxyNodal(idNodes),2);
+   end
+end
+       
 end
 %----------------------------------------------------------- mesh smoothing
 function f = Smoothing(Fem,f,naver)

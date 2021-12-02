@@ -2,7 +2,7 @@ clr;
 %% assign free DOF
 usr = 'pi';
 pwd = 'softroboticsSA';
-ip  = '192.168.4.1';
+ip  = '192.168.0.2';
 
 brd = Bdog(usr,ip,pwd,'autoConnect',true);
 
@@ -15,7 +15,7 @@ brd = brd.set('Frequency',400);
 %% execute control loop
 Kp = 0.65;
 
-while brd.loop(40)
+while brd.loop(5)
     
     % read data
     data = brd.tcpRecvData(1);
@@ -31,11 +31,11 @@ end
 brd.disconnect();
 
 %% plotting
-t = brd.Log.Time;
-plot(t,yd(t)); hold on;
-plot(brd.Log.Time,brd.Log.Data/10);
+% t = brd.Log.Time;
+% plot(t,yd(t)); hold on;
+% plot(brd.Log.Time,brd.Log.Data/10);
 
 %%dy additional functions
 function y = yd(t)
-    y = 0.7 + 0.3*sin(2*t);
+    y = 0.4 + 0.1*sin(t);
 end

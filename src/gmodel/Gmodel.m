@@ -279,7 +279,7 @@ function Gmodel = updateElements(Gmodel,varargin)
     set(Gmodel.FigHandle,'Faces',Gmodel.Element);
 end
 %-------------------------------------- update the texture: Matcap, OA, SSS
-function [Gmodel,map] = updateTexture(Gmodel)
+function [Gmodel,N] = updateTexture(Gmodel)
     
     if strcmp(Gmodel.Shading,'Face'), M = length(Gmodel.Element);
     else, M = length(Gmodel.Node);
@@ -316,10 +316,10 @@ function [Gmodel,map] = updateTexture(Gmodel)
     end
     
     if strcmp(Gmodel.Shading,'face')
-       map =  TextureSmoothing(Gmodel.Element,N,5);
+       N =  TextureSmoothing(Gmodel.Element,N,5);
     end
     
-    Gmodel.TextureMap = map;
+    Gmodel.TextureMap = N;
     
 end
 %--------------------------------------- show OA map or SSS map as colormap
