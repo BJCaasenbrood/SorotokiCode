@@ -214,6 +214,7 @@ function obj = Fem(Mesh,varargin)
     obj.Density  = ones(obj.NElem,1);
     obj.Residual = zeros(obj.Dim*obj.NNode,1);
     obj.Utmp     = zeros(obj.Dim*obj.NNode,1);
+    obj.dUtmp    = zeros(obj.Dim*obj.NNode,1);
     obj.Gravity  = zeros(obj.Dim,1);
     
     obj.SigmoidFactor  = 0;
@@ -609,7 +610,7 @@ while true
         elseif flag == 1 && Fem.Nonlinear
             Fem.Utmp   = Delta;
             Fem.Node   = UpdateNode(Fem,Delta);
-            Fem.Center = UpdateCenter(Fem,Delta);
+            Fem.Center = UpdateCenter(Fem);
         end
         
         % update mesh class
@@ -1826,10 +1827,8 @@ NNe  = zeros(length(W),Nshp);
 
 if mm == 2
     Et = [dV;dV;0];
-    Fg = [0;Fem.Gravity];
 else
     Et = [dV;dV;dV;0;0;0];
-    Fg = [0;Fem.Gravity;0];
 end
 
 % get displacement field
@@ -2238,10 +2237,10 @@ if isempty(Fem.Log)
    Fem.Log.U{1} = Fem.Utmp;
    Fem.Log.U{2} = Fem.Utmp;
    
-   Fem.Log.Rotation{1} = {R(:)};
-   Fem.Log.Rotation{2} = {R(:)};
-   Fem.Log.Stretch{1}  = {Q(:)};
-   Fem.Log.Stretch{2}  = {Q(:)};
+   Fem.Log.Rotation{1} = R(:);
+   Fem.Log.Rotation{2} = R(:);
+   Fem.Log.Stretch{1}  = Q(:);
+   Fem.Log.Stretch{2}  = Q(:);
    Fem.Log.Stress{1}  = Fem.VonMisesNodal;
    Fem.Log.Stress{2}  = Fem.VonMisesNodal;
 
@@ -2277,8 +2276,8 @@ else
    Fem.Log.Kin  = vappend(Fem.Log.Kin,Fem.Kinetic,2);
    
    Fem.Log.Node{end + 1}     = Fem.Node;
-   Fem.Log.Rotation{end + 1} = {R(:)};
-   Fem.Log.Stretch{end + 1}  = {Q(:)};
+   Fem.Log.Rotation{end + 1} = R(:);
+   Fem.Log.Stretch{end + 1}  = Q(:);
    Fem.Log.Stress{end + 1}   = Fem.VonMisesNodal;
    Fem.Log.U{end + 1}   = Fem.Utmp;
 

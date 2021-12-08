@@ -10,9 +10,10 @@ for nn = min(ElemNNode):max(ElemNNode)
     fem.ShapeFnc{nn}.Q = Q;
     
     for q = 1:size(W,1)
-        [N,dNdxi] = PolyShapeFnc(nn,Q(q,:));
+        [N, dNdxi] = PolyShapeFnc(nn,Q(q,:));
         fem.ShapeFnc{nn}.N(:,:,q) = N;
         fem.ShapeFnc{nn}.dNdxi(:,:,q) = dNdxi;
+        fem.ShapeFnc{nn}.fnc = @(x) PolyShapeFnc(nn,x);
     end
 end
 

@@ -151,18 +151,27 @@ function Shapes = rebuild(Shapes,varargin)
     
 end     
 %--------------------------------------------------------------------------
-function Shapes = fit(Shapes)
-fem = Shapes.Fem;
-P = Shapes.Filter;
-t = fem.Log.t;
-
-for ii = 50:numel(t)
-    N = fem.Log.Node{ii};
+function Shapes = reconstructAlgebra(Shapes)
     
+fem = Shapes.Fem;
+P   = Shapes.Filter;
+t   = fem.Log.t;
+
+for ii = 2:numel(t)
+    N = fem.Log.Node{ii};
+    R = fem.Log.Rotation{ii};
+    
+    th = cellfun(@(x) so3Extract(x), R, 'UniformOutput',false);
+    
+    Th =  horzcat(th{:}); 
+    Th = (P*Th(3,:).');
+    Th = unwrap(Th) - Th(1);
+    Tfit = gradient(Th);
     Nfit = P*N;
-    plot(Nfit(:,1),Nfit(:,2),'-x'); hold on;
-    plot(fem.Log.Nx(:,ii),fem.Log.Ny(:,ii),'-o'); 
-    axis equal;
+    plot(Th); hold on;
+    %plot(Nfit(:,1),Nfit(:,2),'-x'); hold on;
+    %plot(fem.Log.Nx(:,ii),fem.Log.Ny(:,ii),'-o'); 
+    %axis equal;
  1   
 end
 
@@ -368,6 +377,9 @@ end
 % matrix of indices and distance value
 d = cell2mat(d); 
 end
-
-
+%---------------------------------------------------------- material filter 
+function th = so3Extract(R)
+S = logm(R);
+th = [S(3,2);S(1,3);S(2,1)];
+end
 

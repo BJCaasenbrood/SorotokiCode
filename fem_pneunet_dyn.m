@@ -23,7 +23,7 @@ subplot(2,1,2); msh.show();
 %% generate fem model
 fem = Fem(msh);
 fem = fem.set('TimeStep',1/125,'BdBox',[0,120,-80,20],'Linestyle','none',...
-    'MovieAxis',[-25 120 -60 130],'Movie',0,'TimeEnd',1);
+    'MovieAxis',[-25 120 -60 130],'Movie',0,'TimeEnd',5);
 
 %% add boundary constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Box',[0,0,0,10]),[1,1]);
@@ -55,10 +55,10 @@ clc;
 clearvars -except fem;
 shp = Shapes(fem,[0,1,0,1,0,0]);
 
-
 shp = shp.reference([0,0],[120,0]);
 
-shp.fit();
+shp.reconstructAlgebra();
+
 %% post-processing
 % figure(105);
 % clf;
