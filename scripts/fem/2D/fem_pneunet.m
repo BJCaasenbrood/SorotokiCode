@@ -55,15 +55,15 @@ N0  = fem.get('Node0');
 figure(103); cla; 
 subplot(1,2,1);
 
-for ii = 1:1:size(Ux,2)
-    Nx = N0(id,1);
-    Ny = fem.Log.Fth(:,ii);
+for ii = 1:1:size(Ux,2)*0.75
+%     Nx = N0(id,1);
+%     Ny = fem.Log.Fth(:,ii);
     %Ny = Ny - Ny(end);
     %Ny = diff(Ny)*120;
-    %Nx = N0(id,1) + Ux(:,ii);
-    %Ny = N0(id,2) + Uy(:,ii);
+    Nx = N0(id,1) + Ux(:,ii);
+    Ny = N0(id,2) + Uy(:,ii);
     plot(Nx(1:end),Ny,'Linewidth',3,...
-        'Color',col(1,min((ii +1 )/(1.00*size(Ux,2)),1)));
+        'Color',col(1,min((ii +55)/(1.00*size(Ux,2)),1)));
     hold on;
     %Y{ii} = 1e-3*[Nx,Ny];
 end
@@ -87,10 +87,10 @@ t = fem.Log.t; close all;
 figure(105);
 
 for ii = 1:fps(t,60):numel(t)
-    N = tmpNode{ii};
+    N = fem.Log.Node{ii};
     %subplot(1,2,1);
     fem.set('Node',N);
-    fem.show('Svm');
+    fem.show('Field',fem.Log.Stress{ii}{1});
     axis([-60 130 -120 30]);
     background(gitpage);
     

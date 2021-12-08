@@ -273,15 +273,16 @@ switch(Request)
     case('Fx'),  Z = Fem.fxNodal;
     case('Fy'),  Z = Fem.fyNodal;
     case('Rot'), Z = Fem.rotNodal;
+    case('Field'), Z = varargin{2}; varargin = varargin{1};
     case('Fin'), [~,~,Z] = DisplacementField(Fem,Fem.fInternal);
     case('Fex'), [~,~,Z] = DisplacementField(Fem,Fem.fExternal);
     case('Un'),  [~,~,Z] = DisplacementField(Fem,Fem.Utmp);
     case('Ux'),  [Z,~,~] = DisplacementField(Fem,Fem.Utmp);
     case('Uy'),  [~,Z,~] = DisplacementField(Fem,Fem.Utmp);
     case('E'),   [~,~,Z] = MaterialField(Fem); S = 'flat'; 
-    V = Fem.Node0; colormap(noir(-1)); background('w');
+                 V = Fem.Node0; colormap(noir(-1)); background('w');
     case('E+'),  [~,~,Z] = MaterialField(Fem); S = 'flat'; 
-    colormap(noir(-1)); background('w');
+                 colormap(noir(-1)); background('w');
     otherwise;   flag = 1; Z = 0;
 end
 
@@ -438,7 +439,13 @@ if Fem.Movie
     background(metropolis);
     if Fem.MovieStart == false
        Fem.MovieStart = true;
-       if ~Fem.SolverStartMMA, Name = 'fem'; else, Name = 'topo'; end
+       
+       if ~Fem.SolverStartMMA
+            Name = 'fem'; 
+       else 
+            Name = 'topo'; 
+       end
+       
        MovieMaker(Fem,Name,'Start');
     else
        MovieMaker(Fem);
@@ -817,10 +824,10 @@ while true
           
             Fem.ddUtmp = ddDelta;
             Fem.dUtmp  = dt*dt*(1.0-bet)*Fem.ddUtmp_ + dt*dt*bet*ddDelta;
-            %Fem.Utmp   = dt*(0.5-bet)*Fem.dUtmp_ + dt*bet*Fem.dUtmp;
+            %Fem.Utmp  = dt*(0.5-bet)*Fem.dUtmp_ + dt*bet*Fem.dUtmp;
             
             Fem.Node    = UpdateNode(Fem,Fem.Utmp);
-            Fem.Center  = UpdateCenter(Fem,Fem.Utmp);
+            Fem.Center  = UpdateCenter(Fem);
            
         end
         
@@ -2220,11 +2227,23 @@ end
 if isempty(Fem.Log)
     
    Fem.Log     = struct;
-   Fem.Log.t   = [0*Fem.Time,Fem.Time]; 
-   Fem.Log.Psi = [Fem.Potential,Fem.Potential];
+   Fem.Log.t   = [0,Fem.Time]; 
+   Fem.Log.Psi = [0,Fem.Potential];
    Fem.Log.Vg  = [Fem.PotentialG,Fem.PotentialG];
    Fem.Log.Vf  = [Fem.PotentialF,Fem.PotentialF];
-   Fem.Log.Kin = [0*Fem.Kinetic,Fem.Kinetic];
+   Fem.Log.Kin = [Fem.Kinetic,Fem.Kinetic];
+   
+   Fem.Log.Node{1} = Fem.Node0;
+   Fem.Log.Node{2} = Fem.Node;
+   Fem.Log.U{1} = Fem.Utmp;
+   Fem.Log.U{2} = Fem.Utmp;
+   
+   Fem.Log.Rotation{1} = {R(:)};
+   Fem.Log.Rotation{2} = {R(:)};
+   Fem.Log.Stretch{1}  = {Q(:)};
+   Fem.Log.Stretch{2}  = {Q(:)};
+   Fem.Log.Stress{1}  = Fem.VonMisesNodal;
+   Fem.Log.Stress{2}  = Fem.VonMisesNodal;
 
    if ~isempty(Fem.Output)
        idNodes = Fem.Output(:,1);
@@ -2257,10 +2276,16 @@ else
    Fem.Log.Vf   = vappend(Fem.Log.Vf ,Fem.PotentialF,2);
    Fem.Log.Kin  = vappend(Fem.Log.Kin,Fem.Kinetic,2);
    
+   Fem.Log.Node{end + 1}     = Fem.Node;
+   Fem.Log.Rotation{end + 1} = {R(:)};
+   Fem.Log.Stretch{end + 1}  = {Q(:)};
+   Fem.Log.Stress{end + 1}   = Fem.VonMisesNodal;
+   Fem.Log.U{end + 1}   = Fem.Utmp;
+
    if ~isempty(Fem.Output)
        idNodes = Fem.Output(:,1);
-       Fem.Log.Nx   = vappend(Fem.Log.Ux,Fem.Node(idNodes,1),2);
-       Fem.Log.Ny   = vappend(Fem.Log.Uy,Fem.Node(idNodes,2),2);
+       Fem.Log.Nx   = vappend(Fem.Log.Nx,Fem.Node(idNodes,1),2);
+       Fem.Log.Ny   = vappend(Fem.Log.Ny,Fem.Node(idNodes,2),2);
        Fem.Log.Ux   = vappend(Fem.Log.Ux,ux(idNodes),2);
        Fem.Log.Uy   = vappend(Fem.Log.Uy,uy(idNodes),2);
        Fem.Log.Un   = vappend(Fem.Log.Un,un(idNodes),2);
@@ -2478,16 +2503,18 @@ B = Fem.BdBox;
 d = cell(size(PS1,1),1);
 B1 = B(1); B2 = B(2); B12 = lerp(B1,B2,0.5);
 B3 = B(3); B4 = B(4); B34 = lerp(B3,B4,0.5);
+
 if Fem.Dim == 3
-B5 = B(5); B6 = B(6); B56 = lerp(B5,B6,0.5);
+B5  = B(5); B6 = B(6); 
+B56 = lerp(B5,B6,0.5);
 end
     
 for el = 1:size(PS1,1)   
     if Fem.Dim == 3
-    dist = sqrt((PS1(el,1)-PS2(:,1)).^2 + (PS1(el,2)-PS2(:,2)).^2 + ...
-       (PS1(el,3)-PS2(:,3)).^2 );    
+        dist = sqrt((PS1(el,1)-PS2(:,1)).^2 + (PS1(el,2)-PS2(:,2)).^2 + ...
+            (PS1(el,3)-PS2(:,3)).^2 );    
     else    
-    dist = sqrt((PS1(el,1)-PS2(:,1)).^2 + (PS1(el,2)-PS2(:,2)).^2);
+        dist = sqrt((PS1(el,1)-PS2(:,1)).^2 + (PS1(el,2)-PS2(:,2)).^2);
     end
     
     if ~isempty(Fem.Periodic)
@@ -2629,6 +2656,8 @@ fprintf('* Element degree = P%1.0f-P%1.0f \n',MinNVer,MaxNVer);
 fprintf('* Max iteration = %i \n', Fem.MaxIteration);
 if Fem.Nonlinear, fprintf('* Nonlinear geometric = true\n');
 else, fprintf('* Nonlinear geometric = false \n'); end
+fprintf('* Solver time horizon = %i \n', Fem.TimeEnd);
+fprintf('* Solver time step    = %i1.1e \n', Fem.TimeStep);
 showMaterialInfo(Fem)
 fprintf('--------------------------------------------------------------\n');
     
@@ -2667,6 +2696,8 @@ fprintf('* Material model = Neo-Hookean \n');
 E = Fem.Material.E*1e3; Nu = Fem.Material.Nu; 
 fprintf('\tE = %1.1e kPa, Nu = %1.2f [-] \n', E,Nu);
 end
+fprintf('\tRho  = %1.1e kg/mm2 \n', Fem.Material.Rho);
+fprintf('\tZeta = %1.1e (-) \n', Fem.Material.Zeta);
 end
 %-------------------------------------------------------------- movie maker
 function MovieMaker(Fem,Name,Request)
@@ -2726,7 +2757,7 @@ end
 function Sv = VoightNotation(S)
 Sv = [S(1,1); S(2,2); S(3,3); S(1,2); S(2,3); S(1,3)]; 
 end
-%---------------------------------------------- compute von-Mises stresses
+%----------------------------------------------- compute von-Mises stresses
 function [Svm, Svmm] = VonMises(S11,S22,S33,S12,S23,S13)
 s11 = S11; s22 = S22; s33 = S33; s12 = S12; s23 = S23; s13 = S13;
 Svm = sqrt(0.5*((s11-s22).^2 + (s22-s33).^2 + (s33-s11).^2 ...
@@ -2759,12 +2790,12 @@ function [Node,Node0] = UpdateNode(Fem,U)
     end
 end
 %----------------------------------------------------- update nodes of MESH
-function Ctr = UpdateCenter(Fem,U)
-    Ctr =  Fem.get('Center0'); 
+function Center = UpdateCenter(Fem)
+    Center =  Fem.get('Center0'); 
 
     for el = 1:Fem.NElem
         E = Fem.Element{el};
-        Ctr(el,:) = mean(Fem.Node(E,:),1);
+        Center(el,:) = mean(Fem.Node(E,:),1);
     end
 
 end

@@ -1,54 +1,66 @@
 classdef Shapes
 
     properties (Access = public)
+        Fem;
+        BdBox;
         Table;
-        Log;
-        NModal;
-        NDof;
-        NDim;
-        Phi;
+        Node;
+        NNode;
+        %NModal;
+        %NDof;
+        %NDim;
+        %Phi;
         POD;
         PODEnergy;
-        posData;
-        xiData;
-        Sdomain;
+        %Tracker;
+        %posData;
+        %xiData;
+        %Sdomain;
     end
     
     properties (Access = private)
         Ba;
         xia0;
-        Quality;
+        Phi0;
         DiffStepSize;
+        Filter;
+        FilterRadius;
     end
    
 %--------------------------------------------------------------------------
 methods  
 %----------------------------------------------- MODAL SHAPE RECONSTRUCTION
-function obj = Shapes(Table,femLog,varargin) 
+function obj = Shapes(Fem,Table,varargin) 
     
-    obj.Table   = Table; 
-    obj.Log     = femLog;
-    obj.xia0    = [0,0,0,1,0,0].';
-    obj.NModal  = 8;
-    obj.Quality = 80;
-    
+    obj.Table = Table; 
+    obj.Fem   = Fem;  
+    obj.xia0  = [0,0,0,1,0,0].';
+    obj.BdBox = Fem.BdBox;
+    obj.NNode = 300;
     obj.DiffStepSize = 1e-4;
-     
-    BdBox = boxhull(NodeList{1});
-    obj.Sdomain = BdBox(end);
     
-    set = 1:6;
-    I6 = eye(6);
-    xa = set(logical(Table));
+    obj.FilterRadius = 0.02*mean([obj.BdBox(2)-obj.BdBox(1);...
+                                  obj.BdBox(4)-obj.BdBox(3)]);
+     
+%     if ~isempty(Fem.get('Output'))
+%         list = Fem.get('Output');
+%         obj.Tracker = list(:,1);
+%     else
+%         error('Fem.Output is empty -- no tracker nodes selected in Fem');
+%     end
+%     
+%     set = 1:6;
+%     I6  = eye(6);
+%     xa  = set(logical(Table));
    
     for ii = 1:2:length(varargin)
         obj.(varargin{ii}) = varargin{ii+1};
     end
-    
-    obj.Ba   = I6(:,xa);
-    obj.NDof = size(obj.Ba,2);
-    obj.Phi  = @(x) ShapeFunction(obj,x);
-    obj.NDim = obj.NDof*obj.NModal;
+%     
+%     obj.Ba   = I6(:,xa);
+%     obj.NDof = size(obj.Ba,2);
+%     obj.Phi  = @(x) ShapeFunction(obj,x);
+%     obj.NDim = obj.NDof*obj.NModal;
    
 end
 %---------------------------------------------------------------------- get     
@@ -104,6 +116,23 @@ if strcmp(Request,'Base') || strcmp(Request,'POD')
 end
 
 end
+%---------------------------------------------------------------- show mesh
+function Shapes = reference(Shapes,varargin)
+X0 = varargin{1};
+XL = varargin{2};
+
+dX = XL(:) - X0(:);
+if dX(2) < dX(1)
+    Shapes.Node = [linspace(X0(1),XL(1),Shapes.NNode).',...
+                   zeros(Shapes.NNode,1)];
+else
+    Shapes.Node = [zeros(Shapes.NNode,1),...
+                   linspace(X0(2),XL(2),Shapes.NNode).'];
+end
+
+Shapes = GenerateRadialFilter(Shapes);
+
+end
 %---------------------------------------------------------------------- set
 function Shapes = rebuild(Shapes,varargin)
     
@@ -121,6 +150,23 @@ function Shapes = rebuild(Shapes,varargin)
     Shapes.NDim = Shapes.NDof*Shapes.NModal;
     
 end     
+%--------------------------------------------------------------------------
+function Shapes = fit(Shapes)
+fem = Shapes.Fem;
+P = Shapes.Filter;
+t = fem.Log.t;
+
+for ii = 50:numel(t)
+    N = fem.Log.Node{ii};
+    
+    Nfit = P*N;
+    plot(Nfit(:,1),Nfit(:,2),'-x'); hold on;
+    plot(fem.Log.Nx(:,ii),fem.Log.Ny(:,ii),'-o'); 
+    axis equal;
+ 1   
+end
+
+end
 %------------------------------------------------------------------ fitting
 function [Shapes, P] = fitPOD(Shapes)
     
@@ -189,7 +235,7 @@ function [Shapes, P] = fitPOD(Shapes)
     
 end
 %-------------------------------------------------- compute Cosserat string
-function [p,g,X] = string(Shapes,q)
+function [p, g, X] = string(Shapes,q)
     
     g0 = [1,0,0,0,0,0,0];
     X = linspace(0,Shapes.Sdomain,Shapes.Quality);
@@ -201,7 +247,27 @@ function [p,g,X] = string(Shapes,q)
     
 end
 end
+
 methods (Access = private)
+%-------------------------------------------------- compute Cosserat string
+function Shapes = GenerateRadialFilter(Shapes)
+
+PS2 = Shapes.Node;    
+PS1 = Shapes.Fem.get('Node0');
+
+d = DistancePointSet(PS1,PS2,Shapes.FilterRadius);
+
+if ~isempty(d)
+    P = sparse(d(:,1),d(:,2),1-d(:,3)/Shapes.FilterRadius,...
+        Shapes.NNode,Shapes.Fem.NNode);
+    P = spdiags(1./sum(P,2),0,size(P,1),size(P,1))*P;
+else
+    P = 1;
+end
+
+Shapes.Filter = P;
+
+end
 %---------------------------------------------------------------------- set
 function P = ShapeFunction(Shapes,X)
 
@@ -266,7 +332,6 @@ dg(5:7)   = R*Gamma(:);
 end    
 end
 end
-
 %----------------------------------------------------------- strain mapping
 function A = StrainMap(K)
 k1 = K(1); k2 = K(2); k3 = K(3);
@@ -281,6 +346,27 @@ Ryx = 2*(x*y + z*w); Ryy = 1 - 2*(x^2 + z^2); Ryz = 2*(y*z - x*w );
 Rzx = 2*(x*z - y*w ); Rzy = 2*(y*z + x*w ); Rzz = 1 - 2 *(x^2 + y^2);
 
 R = [Rxx, Rxy, Rxz; Ryx, Ryy, Ryz; Rzx, Rzy, Rzz];
+end
+%---------------------------------------------------------- material filter 
+function d = DistancePointSet(PS1,PS2,R)
+
+d = cell(size(PS1,1),1);
+    
+for el = 1:size(PS1,1)   
+    
+    if size(PS1,2) == 3
+        dist = sqrt((PS1(el,1)-PS2(:,1)).^2 + (PS1(el,2)-PS2(:,2)).^2 + ...
+            (PS1(el,3)-PS2(:,3)).^2 );    
+    else    
+        dist = sqrt((PS1(el,1)-PS2(:,1)).^2 + (PS1(el,2)-PS2(:,2)).^6);
+    end
+
+    [I,J] = find(dist<=R);   
+    d{el} = [I,J+(el-1),dist(I)];
+end
+
+% matrix of indices and distance value
+d = cell2mat(d); 
 end
 
 

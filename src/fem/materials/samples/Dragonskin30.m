@@ -13,7 +13,7 @@ Material = YeohMaterial(...
 
 
 Material.Rho  = 1070e-12;
-Material.Zeta = 1.75;
+Material.Zeta = 0.75;
 
 %Material = YeohMaterial('C1',1.19e-3,'C2',2.3028e-2,'C3',1e-12,...
 %    'D1',D,'D2',1e-3,'D3',1e-3);
