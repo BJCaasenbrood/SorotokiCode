@@ -2,12 +2,12 @@ classdef LinearMaterial
 
     properties (Access = public)
         Type = 'Linear';
-        E    = 100;
+        E    = 10e6;
         Nu   = 0.4;
         Mu;
         Lambda;
-        Rho  = 1e-9;
-        Zeta = 0.1;
+        Rho  = 1070e-12;
+        Zeta = 2;
     end
    
 %--------------------------------------------------------------------------

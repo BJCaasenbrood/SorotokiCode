@@ -1,9 +1,10 @@
-clr;
+%clr;
+load('matlab.mat');
 %% generate mesh
 Simp  = 0.001;
 GrowH = 1;
 MinH  = 0.75;
-MaxH  = 1;
+MaxH  = 5;
 
 msh = Mesh('Octarm.png','BdBox',[0,120,0,12],'SimplifyTol',Simp,...
     'Hmesh',[GrowH,MinH,MaxH]);
@@ -11,14 +12,15 @@ msh = Mesh('Octarm.png','BdBox',[0,120,0,12],'SimplifyTol',Simp,...
 msh = msh.show();
 
 %% generate fem model
-fem = Fem(msh,'TimeStep',1/50,'BdBox',[0,120,-50,50],'TimeEnd',2,'Linestyle','none');
+fem = Fem(msh,'TimeStep',1/500,'BdBox',[0,120,-50,50],'TimeEnd',1.5,...
+    'Linestyle','none','SolverPlot',1);
 
 %% add boundary constraint
 CP1 = [50,6];   % control point 1
 CP2 = [120,6];  % control point 2
 
 F1  = 0e-3;     % control force 1
-F2  = 0e-2;     % control force 2
+F2  = 1e-3;     % control force 2
 
 theta1 = pi/2;
 theta2 = -pi/2;
@@ -37,20 +39,39 @@ fem = fem.AddConstraint('Tendon',fem.FindNodes('Location',CP2),...
     F2*[cos(theta2),sin(theta2)]);
 
 % assign material
-fem.Material = Ecoflex0030(25);
+fem.Material = NeoHookeanMaterial;%Ecoflex0030(5);
+
+%fem = fem.set('Utmp',U);
 
 %% solve
 f = figure(101);
 [~,tmpNode] = fem.simulate();
 
 %%
-figure(102);
-plot(fem.Log.t,fem.Log.Psi + fem.Log.Kin,'Linewidth',4,...
-        'Color',col(1)); 
-hold on;
-plot(fem.Log.t,fem.Log.Kin,'Linewidth',4,...
+figure(102); clf;
+plot(fem.Log.t, -fem.Log.Vg,'Linewidth',4,...
+              'Color',col(1)); 
+hold on
+
+H = (fem.Log.Kin);
+plot(fem.Log.t,H,'Linewidth',4,...
         'Color',col(2)); 
     
+plot(fem.Log.t, fem.Log.Psi,'Linewidth',4,...
+              'Color',col(3)); 
+hold on
+
+H = (fem.Log.Kin) - fem.Log.Vf + fem.Log.Psi;
+plot(fem.Log.t,H,'Linewidth',4,...
+        'Color',col(4)); 
+% %     
+%hold on;
+%plot(fem.Log.t,-fem.Log.Vg,'Linewidth',4,...
+%           'Color',col(3)); 
+%       
+%plot(fem.Log.t,fem.Log.Kin,'Linewidth',4,...
+%          'Color',col(4)); 
+%     
 xaxis('Time','-');
 yaxis('Potential and Kinetic energy','J');
 set(gca,'linewidth',1.5)

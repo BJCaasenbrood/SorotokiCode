@@ -2,7 +2,6 @@ classdef Shapes
 
     properties (Access = public)
         Table;
-        Log;
         NModal;
         NDof;
         NDim;
@@ -23,17 +22,16 @@ classdef Shapes
    
 %--------------------------------------------------------------------------
 methods  
-%----------------------------------------------- MODAL SHAPE RECONSTRUCTION
-function obj = Shapes(Table,femLog,varargin) 
+%--------------------------------------------------------------- Mesh Class
+function obj = Shapes(Table,NodeList,varargin) 
     
-    obj.Table   = Table; 
-    obj.Log     = femLog;
+    obj.Table   = Table;
+    obj.posData = NodeList;
     obj.xia0    = [0,0,0,1,0,0].';
     obj.NModal  = 8;
     obj.Quality = 80;
-    
     obj.DiffStepSize = 1e-4;
-     
+    
     BdBox = boxhull(NodeList{1});
     obj.Sdomain = BdBox(end);
     
@@ -51,6 +49,7 @@ function obj = Shapes(Table,femLog,varargin)
     obj.NDim = obj.NDof*obj.NModal;
    
 end
+
 %---------------------------------------------------------------------- get     
 function varargout = get(Shapes,varargin)
     if nargin > 1
@@ -61,13 +60,15 @@ function varargout = get(Shapes,varargin)
     else
         varargout = Shapes.(varargin);
     end
-end       
+end
+        
 %---------------------------------------------------------------------- set
 function Shapes = set(Shapes,varargin)
     for ii = 1:2:length(varargin)
         Shapes.(varargin{ii}) = varargin{ii+1};
     end
 end
+
 %---------------------------------------------------------------- show mesh
 function Shapes = show(Shapes,varargin)
 if nargin<2, Request = -1; 
@@ -201,7 +202,9 @@ function [p,g,X] = string(Shapes,q)
     
 end
 end
+
 methods (Access = private)
+    
 %---------------------------------------------------------------------- set
 function P = ShapeFunction(Shapes,X)
 
@@ -273,6 +276,7 @@ k1 = K(1); k2 = K(2); k3 = K(3);
 A = [ 0, -k1, -k2, -k3; k1,   0, -k3,  k2; 
      k2,  k3,   0, -k1; k3, -k2,  k1,  0];
 end
+
 %----------------------------------------------- quaterion to rotation mat.
 function R = Quat2Rot(q)
 w = q(1); x = q(2); y = q(3); z = q(4);
