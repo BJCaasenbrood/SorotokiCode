@@ -1,3 +1,16 @@
+% class Mesh(msh,varargin)
+%--------------------------------------------------------------------------
+% MESH is a class used for mesh tesselation in 2D material domains. The 
+% class can generate triangular, quad, and polygonal finite elements. It
+% works seamlessly with SDF.m
+%--------------------------------------------------------------------------
+% main usage:
+%   msh = Mesh(sdf);                     % converts SDF class to MESH class
+%--------------------------------------------------------------------------
+% options:
+%   msh = Mesh(sdf,'NElem',1e3);         % mesh with 1000 poly elements
+%--------------------------------------------------------------------------
+
 classdef Mesh
 
     properties (Access = public)
@@ -71,8 +84,10 @@ function obj = Mesh(Input,varargin)
     if isa(Input,'char')
        [~,~,ext] = fileparts(Input);
        if strcmp(ext,'.stl')
-           if strcmp(varargin{1},'Hmesh'), obj.Hmesh = varargin{2};
-           else, error('Requested inputs is Hmesh with [Hgrad,Hmin,Hmax]');
+           if strcmp(varargin{1},'Hmesh')
+               obj.Hmesh = varargin{2};
+           else
+               error('Requested inputs is Hmesh with [Hgrad,Hmin,Hmax]');
            end
            warning off % Matlab, please fix your stuff...
            [v,f] = GenerateMeshSTL(obj,Input);
@@ -224,12 +239,12 @@ function Mesh = generate(Mesh)
 if isempty(Mesh.Center)
     Pc = randomPointSet(Mesh); 
 elseif strcmp(Mesh.Type,'C3H8')    
-    Mesh.MaxIteration = 1;
+    %Mesh.MaxIteration = 1;
     Pc = Mesh.Center; 
     Mesh.NElem = length(Pc);
 elseif strcmp(Mesh.Type,'C2Q4')    
-    if ~isempty(Mesh.Center)
-        Mesh.MaxIteration = 1;
+    if ~isempty(Mesh.Center) 
+        %Mesh.MaxIteration = 1;
         Pc = Mesh.Center; 
         Mesh.NElem = size(Pc,1);
     else
@@ -1073,10 +1088,8 @@ Poly = vertcat(Poly{:});
 end
 %------------------------------------------ PLANAR PROJECTION OF 3D-POLYGON
 function A = NaNPadding(A0)
-
 A0 = reshape(A0,[],1); MaxN = max(cellfun(@(E) size(E,2),A0));        
 PadWNaN = @(E) [E, NaN(size(E,1),MaxN- size(E,2))]; 
 A = cellfun(PadWNaN,A0,'UniformOutput',false);
-
 end
 

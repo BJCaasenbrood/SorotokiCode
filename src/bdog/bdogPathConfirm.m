@@ -1,6 +1,4 @@
-function LatestRelease = bdogPathConfirm
-lib = 'bdog.lib';
-ver = '3.0';
-LatestRelease = CheckLibary(lib,ver);
+function foundPath = bdogPathConfirm
+foundPath = true;
 end
 

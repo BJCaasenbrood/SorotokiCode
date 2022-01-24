@@ -20,9 +20,9 @@ NDISC   = 1
 NDOF    = 2
 
 [solver] 
-TDOMAIN = 35
-SPACESTEP = 30
-TIMESTEP  = 0.033333
+TDOMAIN = 10
+SPACESTEP = 24
+TIMESTEP  = 0.03
 INTSTEP   = 100
 ATOL      = 1e-2
 RTOL      = 1e-2
@@ -47,12 +47,12 @@ J_YY     = 2.5e-05
 J_ZZ     = 2.5e-05
 
 [control] 
-KP = 0.1
-KD = 0.1
+KP = 0.01
+KD = 0.001
 LK = 0
 KF1 = 1e-09
 KF2 = 1
-LAMBDA    = 0.1
+LAMBDA    = 0.001
 LAMBDAK   = 0
 SPLINEORDER    = 1
 
@@ -61,6 +61,6 @@ Q1d = 1
 Q2d = 0
 Q3d = 0
 Q4d = 0
-Xd =  0.07
+Xd =  0.04
 Yd =  0
-Zd =  0.01
+Zd =  0.005

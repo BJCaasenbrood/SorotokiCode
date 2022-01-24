@@ -42,10 +42,11 @@ end
 function C = C1(MooneyMaterial), C = MooneyMaterial.C10; end
 
 %------------------------------ 2ND PIOLLA STRESSAND STIFFNESS FOR YEOH
-function [S, D, P] = PiollaStress(MooneyMaterial,C)
+function [S, D, P] = PiollaStress(MooneyMaterial,F)
 %Se = 2nd PK stress [S11, S22, S33, S12, S23, S13];
 X12 = 1/2; X13 = 1/3; X23 = 2/3; X43 = 4/3; X53 = 5/3; X89 = 8/9;
 
+C = F.'*F;
 C1=C(1,1); C2=C(2,2); C3=C(3,3); C4=C(1,2); C5=C(2,3); C6=C(1,3);
 I1 = C1+C2+C3;
 I2 = C1*C2+C1*C3+C2*C3-C4^2-C5^2-C6^2;

@@ -4,6 +4,8 @@ mdl = Model([0,1,0,1,0,0],'NModal',6,'NDisc',1);
 mdl = setupSoftRobot(mdl,0.05,0,1e2);
 mdl = mdl.set('Controller',1);
 mdl = mdl.set('Tdomain',10); 
+mdl = mdl.set('TimeStep', 1/30);
+
 
 %% generate and solve dynamic model
 mdl = mdl.generate();
@@ -58,8 +60,9 @@ grid on;
 if 1
 [rig, sph] = setupRig(mdl);
 
-text(0.05,0,-0.06,'\textbf{$g_d$}','interpreter','latex','fontsize',16);
+%text(0.05,0,-0.06,'\textbf{$g_d$}','interpreter','latex','fontsize',16);
 
+h = [];
 for ii = 1:fps(t,8):length(mdl.q)
     
     rig = rig.computeFK(mdl.q(ii,:).');
@@ -71,10 +74,20 @@ for ii = 1:fps(t,8):length(mdl.q)
     sph.update();
    
     setupFigure(ii);
-    title(['T = ',num2str(t(ii),3)]);
+    %title(['T = ',num2str(t(ii),3)]);
     
-    if ii == 1, pause(0.5); end
-    mdl = mdl.updateFrame();
+    delete(h);
+    h = shadowplot(5);
+    
+    background();
+    
+    if mod(ii,15) <= 1
+        pause;
+        t(ii)
+    end
+    
+%     if ii == 1, pause(0.5); end
+%     mdl = mdl.updateFrame();
 end
 end
 
@@ -96,7 +109,7 @@ mdl = mdl.set('Lambda',     [Kp/Lam,Kp*1e-2]);
 
 mdl = mdl.set('ActuationSpace',1);
 
-[px,py] = SpherePosition(-15,L0*1.2)
+[px,py] = SpherePosition(-15,L0*1.1);
 
 mdl = mdl.set('Point',...
     [0,0,0,0,py,0,px]);
@@ -104,8 +117,13 @@ end
 
 % setup rig
 function [rig, sph] = setupRig(mdl)
-gmdl1 = Gmodel('SoftActuatorPlanarRedux.stl');
+%gmdl1 = Gmodel('SoftActuatorPlanarRedux.stl');
+gmdl1 = Gmodel('Pneulink.stl');
 gmdl1.set('TextureStretch',.85);
+
+gmdl1 = gmdl1.set('Emission', [0.9 0.8 0.8],...
+    'SSSPower',0.1,'SSSRadius',0.01,'SSS',true);
+
 assignin('base','gmdl1',gmdl1);
 
 rig = Rig((@(x) mdl.string(x)),'Domain', 0.063);

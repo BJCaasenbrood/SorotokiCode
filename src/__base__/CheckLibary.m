@@ -1,19 +1,20 @@
-function LatestRelease = CheckLibary(lib,ver)
-ver_ = vernum(lib);
-% if length(lib) > 7
-% cprintf('Keyword',['* \t -',lib,spc,'version: ',ver,spc]);
-% else
-cout('Keyword',['* \t -',lib,spc,'version: ',ver,spc]);
-% end
+function folderFound = CheckLibary(lib,fnc)
+folderFound = true;
+cout('Keyword',['* \t -',lib,spc,'version: ',soropatch(1),spc]);
 
-if strcmp(ver,ver_)
-cout('Green', '[ok]') 
-LatestRelease = true;
-else
-cprintf('UnterminatedStrings', 'outdated...')
-LatestRelease = false;
+try 
+    fnc(1);
+catch
+    folderFound = false;
 end
-cprintf('Text','\n')
+
+if folderFound
+    cout('Green', '[ok]') 
+else
+    cout('UnterminatedStrings', 'outdated...')
+end
+
+cout('Text','\n')
 end
 
 %-------------------------------------------------------------------- SPACE

@@ -56,6 +56,7 @@ classdef Gmodel < handle
         Colormap;
         LineStyle;
         LineColor;
+        ShowProcess;
         
         Normal;
         VNormal;
@@ -117,6 +118,7 @@ function obj = Gmodel(varargin)
     obj.AOTextureMap = 1;
     obj.SSSTextureMap = 1;
     obj.Shading = 'Vertex';
+    obj.ShowProcess = true;
     
     if length(varargin) > 1
     if isfloat(varargin{2})
@@ -269,10 +271,8 @@ function Gmodel = updateNode(Gmodel,varargin)
     Gmodel.VNormal = vertexNormal(TR);
     Gmodel.Normal  = faceNormal(TR);
     
-
     set(Gmodel.FigHandle,'Vertices',Gmodel.Node);
-    
-    %drawnow limitrate;
+
 end
 %------------------------------------------- update elements (not graphics)
 function Gmodel = updateElements(Gmodel,varargin)
@@ -454,8 +454,10 @@ function Gmodel = GenerateObject(Gmodel,varargin)
        else, cout('err','* extension not recognized');
        end
        
-    fprintf(['* Loaded mesh = ']);
-    cprintf('hyper', [msh{1}, '\n']);   
+    if Gmodel.ShowProcess   
+        fprintf('* Loaded mesh = ');
+        cprintf('hyper', [msh{1}, '\n']);   
+    end
        
     elseif isa(msh{1},'function_handle') || isa(msh{1},'Sdf')
 
@@ -512,9 +514,11 @@ function Gmodel = GenerateObject(Gmodel,varargin)
     Gmodel.RMatrix = eye(4);
     Gmodel.BdBox = boxhull(Gmodel.Node); 
     
-    fprintf(['* Vertices  = ', num2str(length(v)/1e3,4), 'k \n']); 
-    pause(0.01);
-    fprintf(['* Polycount = ', num2str(length(f)/1e3,4), 'k \n']);
+    if Gmodel.ShowProcess
+        fprintf(['* Vertices  = ', num2str(length(v)/1e3,4), 'k \n']);
+        pause(0.01);
+        fprintf(['* Polycount = ', num2str(length(f)/1e3,4), 'k \n']);
+    end
     
     fcell = num2cell(Gmodel.Element,2);
     [~,Gmodel.V2F,Gmodel.F2V] = ElementAdjecency(fcell);

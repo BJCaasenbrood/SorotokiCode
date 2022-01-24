@@ -51,7 +51,6 @@ function setupToolkit
 clc; clear; close all; warning off; beep off;
 
 addpath('src');
-addpath('src/__version__');
 addpath('src/__base__');
 addpath('src/__base__/fnc');
 
@@ -60,25 +59,33 @@ Path = cd;
 DisplayLogo;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-fprintf(['* Thank you for installing SOROTOKI, we will',...
+cout(['* Thank you for installing SOROTOKI, we will',...
     ' start the installation shortly \n']); pause(1.0);
 
-fprintf('* Starting installation - SOROTOKI');
-verFolder = 'config';
+cout('* Starting installation - SOROTOKI');
+verFolder = 'src/__version__';
 if ~exist(verFolder, 'dir')
 mkdir(verFolder);
-fprintf(['* Created directory ',verFolder, ' \n']);
-fprintf(['* Directory ',verFolder, ' added to path \n']);
+cout(['* Created directory ',verFolder, ' \n']);
+cout(['* Directory ',verFolder, ' added to path \n']);
 else
-fprintf(['* Directory ',verFolder, ' added to path \n']);
+cout(['* Directory ',verFolder, ' added to path \n']);
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 AddPath([Path,verFolder]);
+global FIT FID
+InstallerFile = [Path,'/src/__version__/install.log'];
 
-if exist([Path,'/config/vernum.m'], 'file')
-    delete([Path,'/config/vernum.m']); 
+if exist(InstallerFile,'file')
+    delete(InstallerFile); 
 end
+
+FIT = fopen(InstallerFile,'w');
+fprintf(FIT,'%% started sorotoki installer on ');
+fprintf(FIT,[datestr(datetime('today')),'\n']);
+fprintf(FIT,'%% install directory = ');
+fprintf(FIT,[Path,'\n']);
 
 if ~pingserver
     cout('err','No internet connection! '); 
@@ -89,13 +96,13 @@ if ~pingserver
 end
 
 if ~skipUpdate
-fprintf('* Getting version_file_check from Git repository config/vernum.m \n');
+cout('* Getting version_file_check from Git repository src/soropatch.m \n');
 url = ['https://raw.githubusercontent.com/BJCaasenbrood/',...
-    'SorotokiCode/master/config/vernum.m'];
-filename = [verFolder,'/vernum.m'];
-websave(filename,url);
+    'SorotokiCode/master/src/'];
+filename = [verFolder,'/soropatch.m'];
+%websave(filename,url);
 
-fprintf(['* Succesfully downloaded contents', filename, '\n']);
+cout(['* Succesfully downloaded latest patchnotes -- ', filename, '\n']);
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 libs(1) = IncludeBase(Path,0);
@@ -107,10 +114,10 @@ libs(6) = IncludeControl(Path,0);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if min(libs) == 1
-fprintf('\n* Libary check completed - all libaries are up-to-date - \n');
+cout('\n* Libary check completed - all libaries are up-to-date - \n');
 else
 cout('err','\n* Libary check completed - some libaries are outdated!\n');
-fprintf('* Get the latest version at: ');
+cout('* Get the latest version at: ');
 
 fprintf(['<a href="https://github.com/BJCaasenbrood/SorotokiCode">',...
     'https://github.com/BJCaasenbrood/SorotokiCode</a> \n'])
@@ -134,12 +141,14 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if bool == 1
-    global FID;
-    StartUpFile = [userpath,'/startup.m'];
+    %global FID;
+    StartUpFile   = [userpath,'/startup.m'];
     delete(StartUpFile);
+    
     FID = fopen(StartUpFile,'w');
     
     fprintf('* Assigning fixed search paths to MATLAB: \n');
+    
     if libs(1), IncludeBase(Path,1); end
     if libs(2), IncludeGraphicsModel(Path,1); end
     if libs(3), IncludeMesh(Path,1); end
@@ -233,6 +242,20 @@ cout('green','* INSTALLATION DONE! \n');
 cout('Text', '\n');
 cout('* SOROTOKI toolkit is succesfully installed and ready-to-use! \n');
 
+Request = input(['* Do you want to run a check-up if SORTOKI',...
+    ' is installed correctly? (y/n)'],'s');
+
+bool = 1;
+switch(Request)
+    case('y'); fprintf('* Proceeding verify_sorotoki.m file... \n'); pause(.1);
+    case('n'); bool = 0;
+    otherwise; bool = 0;
+end
+
+if bool
+   verify_sorotoki; 
+end
+
 pause(.01);
 cout(['* The documentation can be found in doc/SorotokiManual.pdf',...
     '. For more in-\nformation on the Soft Robotics Toolkit, visit',...
@@ -253,19 +276,15 @@ if print, disp(['* cd: ',Path]); end
 end
 % ------------------------------------------------------------------ BASICS
 function x = IncludeBase(Path,Request)
-global FID
+global FID FIT
 cout(['* Adding SOROTOKI libraries to path, ',...
     'this might take a minute...\n\n']);
 
 if Request == 1
-%str = strrep(Path,'/','\');
 fprintf(FID,['%%!INSTALDIR:',strrep(Path,'\','/'),' \n']);
 fprintf(FID,'%% base.lib \n');
-%WriteToFile(Path);
-WriteToFile([Path,'\config\']);
-%WriteToFile([Path,'\src\']);
-WriteToFile([Path,'\src\__version__']);
 WriteToFile([Path,'\src\__base__']);
+WriteToFile([Path,'\src\__version__']);
 WriteToFile([Path,'\src\__base__\fnc']);
 WriteToFile([Path,'\data\']);
 WriteToFile([Path,'\data\color']);
@@ -277,7 +296,6 @@ WriteToFile([Path,'\data\contours']);
 WriteToFile([Path,'\scripts\']);
 else
 AddPath(Path);
-AddPath([Path,'\config\']);
 AddPath([Path,'\src\']);
 AddPath([Path,'\src\__version__']);
 AddPath([Path,'\src\__base__']);
@@ -291,12 +309,20 @@ AddPath([Path,'\data\stl']);
 AddPath([Path,'\data\contours']);
 AddPath([Path,'\scripts\']);
 pause(.3);
-x = basePathConfirm;
+
+x = CheckLibary('base.lib',@(x) basePathConfirm);
+
+if x
+    fprintf(FIT,'%% base.lib installed succesfully! \n');
+else
+    fprintf(FIT,'%% base.lib missing! \n');
+end
+
 end
 end
 % ---------------------------------------------------------------- GRAPHICS
 function x = IncludeGraphicsModel(Path,Request)
-global FID
+global FID FIT
 
 if Request == 1
 fprintf(FID,'%% gmodel.lib \n');
@@ -313,12 +339,20 @@ AddPath([Path,'\src\gmodel\matcap\']);
 AddPath([Path,'\src\gmodel\matcap\img\']);
 AddPath([Path,'\src\gmodel\matcap\tools\']);
 pause(.3);
-x = graphicsmodelPathConfirm;
+
+x = CheckLibary('gmodel.lib',@(x) graphicsmodelPathConfirm);
+
+if x
+    fprintf(FIT,'%% gmodel.lib installed succesfully! \n');
+else
+    fprintf(FIT,'%% gmodel.lib missing! \n');
+end
+
 end
 end
 % -------------------------------------------------------------------- MESH
 function x = IncludeMesh(Path,Request)
-global FID
+global FID FIT
 
 if Request == 1
 fprintf(FID,'%% mesh.lib \n');
@@ -336,12 +370,20 @@ AddPath([Path,'\src\mesh\tools\']);
 AddPath([Path,'\src\mesh\shapes\']);
 AddPath([Path,'\src\mesh\operators\']);
 pause(.3);
-x = meshPathConfirm;
+
+x = CheckLibary('mesh.lib',@(x) meshPathConfirm);
+
+if x
+    fprintf(FIT,'%% mesh.lib installed succesfully! \n');
+else
+    fprintf(FIT,'%% mesh.lib missing! \n');
+end
+
 end
 end
 % --------------------------------------------------------------------- FEM
 function x = IncludeFiniteElement(Path,Request)
-global FID
+global FID FIT
 
 if Request == 1
 fprintf(FID,'%% fem.lib \n');
@@ -367,12 +409,20 @@ AddPath([Path,'\src\fem\tools\mma']);
 AddPath([Path,'\src\fem\materials\']);
 AddPath([Path,'\src\fem\materials\samples']);
 pause(.3);
-x = femPathConfirm;
+
+x = CheckLibary('fem.lib',@(x) femPathConfirm);
+
+if x
+    fprintf(FIT,'%% fem.lib installed succesfully! \n');
+else
+    fprintf(FIT,'%% fem.lib missing! \n');
+end
+
 end
 end
 % ---------------------------------------------------------------- DYNAMICS
 function x = IncludeDynamicModel(Path,Request)
-global FID
+global FID FIT
 
 if Request == 1
 fprintf(FID,'%% mdl.lib \n');
@@ -385,12 +435,20 @@ AddPath([Path,'\scripts\mdl']);
 AddPath([Path,'\src\model']);
 AddPath([Path,'\src\model\tools']);
 pause(.3);
-x = modelPathConfirm;
+
+x = CheckLibary('model.lib',@(x) modelPathConfirm);
+
+if x
+    fprintf(FIT,'%% model.lib installed succesfully! \n');
+else
+    fprintf(FIT,'%% model.lib missing! \n');
+end
+
 end
 end
 % ----------------------------------------------------------------- CONTROL
 function x = IncludeControl(Path,Request)
-global FID
+global FID FIT
 
 if Request == 1
 fprintf(FID,'%% bdog.lib \n');
@@ -402,7 +460,16 @@ AddPath([Path,'\scripts\bdog']);
 AddPath([Path,'\src\bdog']);
 AddPath([Path,'\src\bdog\tools']);
 pause(.3);
-x = bdogPathConfirm;
+
+x = CheckLibary('control.lib',@(x) bdogPathConfirm);
+
+if x
+    fprintf(FIT,'%% control.lib installed succesfully! \n');
+else
+    fprintf(FIT,'%% control.lib missing! \n');
 end
+
+end
+
 end
 

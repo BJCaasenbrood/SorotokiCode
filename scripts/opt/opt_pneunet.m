@@ -22,11 +22,11 @@ fem = fem.set('Periodic',[1/2, 0],'Repeat',ones(7,1));
 id = fem.FindNodes('Left'); 
 fem = fem.AddConstraint('Support',id,[1,1]);
 
-id = fem.FindNodes('Right'); 
+id  = fem.FindNodes('Right'); 
 fem = fem.AddConstraint('Spring',id,[0,1]);
 fem = fem.AddConstraint('Output',id,[0,-1]);
-id = fem.FindElements('Location',[W/2,0.625*H],1);
-fem = fem.AddConstraint('PressureCell',id,[5*kpa,0]);
+id  = fem.FindElements('Location',[W/2,0.625*H],1);
+fem = fem.AddConstraint('PressureCell',id,5*kpa);
 
 %% set density
 fem = fem.initialTopology('Hole',[W/2,0.625*H],0.85);
@@ -55,7 +55,7 @@ id = femr.FindNodes('Left');
 femr = femr.AddConstraint('Support',id,[1,1]);
 
 id = femr.FindEdges('TopHole');
-femr = femr.AddConstraint('Pressure',id,[10*kpa,0]);
+femr = femr.AddConstraint('Pressure',id,10*kpa);
 
 id = femr.FindNodes('Bottom');
 femr = femr.AddConstraint('Output',id,[0,0]);

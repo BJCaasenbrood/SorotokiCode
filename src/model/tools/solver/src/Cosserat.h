@@ -10,7 +10,7 @@
 #include "readFile.h"
 #include "DEBUGGER.h"
 
-//#define DISCONTINIOUS
+#define DISCONTINIOUS
 
 #ifdef DISCONTINIOUS
 #include "ShapesX.cpp"

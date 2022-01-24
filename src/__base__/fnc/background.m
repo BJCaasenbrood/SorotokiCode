@@ -1,4 +1,3 @@
-function background(Color)
 % function background(color)
 %--------------------------------------------------------------------------
 % Function set the background color of the current figure (i.e. gcf);
@@ -7,7 +6,7 @@ function background(Color)
 % background([1,1,1]); % set background to white
 % background('w');     % set background to white
 %--------------------------------------------------------------------------
-
+function background(Color)
 if nargin < 1
     Color = 'w';
 end
@@ -15,6 +14,5 @@ end
 fig = gcf;
 set(fig,'color', Color);
 fig.InvertHardcopy = 'off';
-
 end
 

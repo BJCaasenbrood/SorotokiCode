@@ -1,4 +1,4 @@
-%CLR executes clc + clear + close all 
+%CLR executes clc + clear + close all - SOROTOKI
 clc;
 clear;
 close all;

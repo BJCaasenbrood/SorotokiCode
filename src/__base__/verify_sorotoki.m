@@ -1,7 +1,12 @@
-function out = verify_sorotoki
-%VERIFY_SOROTOKI Summary of this function goes here
-%   Detailed explanation goes here
-clr;
+% VERIFY_SOROTOKI is the installation checker, and ensures all the functions
+% and classes of SOROTOKI are working accordingly.
+%
+% Usage:
+%   x = verify_sorotoki();	          % calls the installation checker
+%
+%   x is a cell with Exception Catches -- showing the errrors that might 
+%       occuring during the verification.
+function vargout = verify_sorotoki
 
 global dt;
 dt = 0.01;
@@ -25,10 +30,13 @@ close(101);
 List = verifySorotoki(List,@(x) checkFem,'Class Fem.m');
 close(101);
 
+List = verifySorotoki(List,@(x) checkGmodel,'Class Gmodel.m');
+close(101);
 
-out = List;
+
+vargout = List;
 end
-
+%---------------------------------------------------------- check Plotting
 function checkPlot
 global dt
 figure(101);
@@ -69,10 +77,10 @@ boc;
 subplot(2,2,4);
 cout('\t verify images')
 bic;
-imshow('FEMbot.png');
+imshow('Pneunet.png');
 boc;
 end
-
+%---------------------------------------------------------- check Sdf class
 function checkSDF
 global dt
 f1 = @(x) sqrt((x(:,1)).^2+(x(:,2)).^2)-0.75;
@@ -117,22 +125,22 @@ s = sdf2/sdf3; cla;
 s.show(); boc; 
 drawnow; pause(5*dt);
 end
-
+%--------------------------------------------------------- check Mesh class
 function checkMesh
 global dt
 
 F = [1,2,3,4];
 V = [0,0;5,0;5,5;0,5];
 
-sdf = @(x) dCircle(x,0,0,1);
+sdf = sCircle(1);
 
 cout('\t Mesh(V,F)'); bic; 
-%msh1 = Mesh(V,F);
-%msh1 = msh1.generate();
+msh1 = Mesh(V,F);
+msh1 = msh1.generate();
 boc;
 
 cout('\t Mesh(Sdf)'); bic;
-msh2 = Mesh(sdf,'BdBox',[-1,1,-1,1],'NElem',250);
+msh2 = Mesh(sdf,'BdBox',[-1,1,-1,1],'NElem',50);
 msh2 = msh2.generate(); 
 boc;
 
@@ -144,36 +152,96 @@ msh2.show();
 drawnow; pause(5*dt);
 boc;
 end
-
+%---------------------------------------------------------- check FEM class
 function checkFem
-global dt
-
-F = [1,2,3,4];
-V = [0,0;5,0;5,5;0,5];
+sdf = sRectangle(0,2,0,1);
 
 cout('\t Fem(Mesh)'); bic; 
-msh = Mesh(V,F);
+msh = Mesh(sdf,'Quads',[15,7]);
 msh = msh.generate();
-fem = Fem(msh,'TimeStep',1/5,'PrescribedDisplacement',true,'ShowProcess',false);
+fem = Fem(msh,'ShowProcess',false);
 boc;
 
-cout('\t Fem.AddConstraint'); bic(1); 
-fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,0]);
-fem = fem.AddConstraint('Support',fem.FindNodes('SW'),[1,1]);
-fem = fem.AddConstraint('Load',fem.FindNodes('Right'),[5,0]);
+cout('\t Fem.show()'); bic; 
+%fem.show();
+boc;
+
+cout('\t Fem.AddConstraint()'); bic(1); 
+fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,1]);
+fem = fem.AddConstraint('Support',fem.FindNodes('Right'),[0,1]);
+%fem = fem.AddConstraint('Gravity',[],[0,-9.81e3]);
+fem = fem.AddConstraint('Displace',fem.FindNodes('Right'),[1,0]);
 boc;
 
 cout('\t Fem.Material'); bic; 
-fem.Material = Ecoflex0050(0.1);
+fem.Material = Ecoflex0050(10);
 boc;
 
 cout('\t Fem.solve()'); bic; 
-[~,U] = fem.solve();
+fem.solve();
 boc;
 
+cout('\t Fem.optimize()'); bic; 
+sdf = sRectangle(0,4,0,1);
+msh = Mesh(sdf,'Quads',[40,12]);
+msh = msh.generate();
+fem = Fem(msh,'ShowProcess',false,'Nonlinear',0,'Penal',4,...
+    'FilterRadius',0.15,'ChangeMax',2,'MaxIterationMMA',20);
+
+fem = fem.set('Periodic',[1, 0],'ReflectionPlane',[-1,0]);        
+fem = fem.AddConstraint('Support',fem.FindNodes('Right'),[1,1]);
+fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,0]);
+fem = fem.AddConstraint('Load',fem.FindNodes('SW'),[0,-1e-4]);
+fem = fem.initialTopology('Hole',[0,0.5],.25);
+fem.Material = Ecoflex0030;
+fem.optimize();
+boc;
+
+end
+%---------------------------------------------------------- check FEM class
+function checkGmodel
+global dt
+cout('\t Gmodel(.stl)'); bic; 
+obj = Gmodel('Bunny.stl','ShowProcess',false); boc;
+
+cout('\t Gmodel.bake()'); bic; 
+obj = obj.bake(); boc;
+
+cout('\t Gmodel.render()'); bic(1); 
+obj = obj.render(); view(20,20); drawnow; pause(2*dt);
+boc
+
+cout('\t Gmodel.update()'); bic(1); 
+shading = linspace(0,1,10);
+for ii = shading
+    obj.Texture = diffuse(ii);
+    obj.update(); 
+end
+boc;
+
+cout('\t Scale \t'); bic(); 
+    obj1 = Blender(obj,'Scale',{'z',1.5});
+    obj1.update; drawnow;
+boc;     
+    
+cout('\t Rotate '); bic(); 
+    obj1 = Blender(obj,'Rotate',{'y',50});
+    obj1.update; drawnow;
+boc;    
+
+cout('\t Twist \t\t\t'); bic(); 
+    obj = obj.reset;
+    obj1 = Blender(obj,'Twist',{'z',220});
+    obj1.update; drawnow;
+boc; 
+    
+
+boc;
 
 end
 
+%--------------------------------------------------------------------------
+%--------------------------------------------------------------------------
 function list = verifySorotoki(list,exec,label)
 list = verifyFunction(list,label,0);
 try
@@ -184,7 +252,6 @@ catch e
 end
 
 end
-
 function List = verifyFunction(List,input,index)
 if index == 0
     cout('text','* ');
@@ -206,11 +273,14 @@ else
 end
 
 end
-
+%--------------------------------------------------------------------------
 function bic(n)
 if nargin < 1, cout('\t\t ');
 else,  cout('\t ');
 end
 cout('key','Checking...'); 
 end
-function boc, cout('\b\b\b\b\b\b\b\b\b\b\b\b '); cout('green','Passed \n'); end
+function boc
+cout('\b\b\b\b\b\b\b\b\b\b\b\b '); 
+cout('green','Passed \n'); 
+end

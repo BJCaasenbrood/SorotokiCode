@@ -1,8 +1,8 @@
 clear; close all; clc;
 
 %% set signed distance function
-W = 10;
-H = 17.5;
+W = 17;
+H = 10.5;
 sdf = @(x) Bellow(x,W,H);
 
 %% generate mesh
@@ -13,8 +13,8 @@ msh.show(); pause(2);
 %% show generated mesh
 fem = Fem(msh);
 fem = fem.set('TimeStep',1/3,'ResidualNorm',1e-3,'VolumeInfill',0.43,...
-              'Penal',4,'VolumetricPressure',true,'FilterRadius',1.25,...
-              'Nonlinear',0,'ReflectionPlane',[1,1],'Repeat',[2],...
+              'Penal',4,'VolumetricPressure',true,'FilterRadius',2,...
+              'Nonlinear',0,'ReflectionPlane',[1,1],'Repeat',[1,2,2],...
               'MaxIterationMMA',75,'OptimizationProblem','Compliant','Movie',0);
 
 %% add constraint
@@ -30,10 +30,10 @@ fem = fem.AddConstraint('Output',id,[.01,0]);
 fem = fem.AddConstraint('Spring',id,[2,0]);
 
 id = fem.FindElements('Location',[0,0],1);
-fem = fem.AddConstraint('PressureCell',id,[-1e-2,0]);
+fem = fem.AddConstraint('PressureCell',id,[-2*kpa,0]);
 
 %% set density
-fem = fem.initialTopology('Hole',[0,0;0,H/2],  6.0);
+fem = fem.initialTopology('Hole',[0,0;H/2,0],3.0);
 % fem = fem.initialTopology('Hole',[0,H/3],6.0);
 % fem = fem.initialTopology('Hole',[0,H/2],6.0);
 
@@ -48,8 +48,8 @@ fem.show('ISO',0.3);
 ISO  = 0.3;
 Simp = 0.05;
 GrowH = 1.0;
-MinH = W/5;
-MaxH = H/5;
+MinH = H/10;
+MaxH = W/10;
 
 mshr = fem.exportMesh(ISO,Simp,[GrowH,MinH,MaxH]); 
 mshr.show(); pause(2);
@@ -61,7 +61,7 @@ id = femr.FindNodes('Top');
 femr = femr.AddConstraint('Support',id,[1,1]);
 
 id = femr.FindEdges('AllHole');
-femr = femr.AddConstraint('Pressure',id,[5*kpa,0]);
+femr = femr.AddConstraint('Pressure',id,-2*kpa);
 
 id = femr.FindNodes('Bottom');
 femr = femr.AddConstraint('Support',id,[1,0]);
@@ -76,7 +76,7 @@ femr.solve();
 
 function D = Bellow(x,W,H)
 R1 = dRectangle(x,0,W,0,H);
-C2 = dCircle(x,W,H,W/3);
+C2 = dCircle(x,W,H,W/5);
 
 D = dDiff(R1,C2);
 end

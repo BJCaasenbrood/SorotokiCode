@@ -114,15 +114,13 @@ function varargout = get(Model,varargin)
     else
         varargout = Model.(varargin);
     end
-end
-        
+end        
 %---------------------------------------------------------------------- set
 function Model = set(Model,varargin)
     for ii = 1:2:length(varargin)
         Model.(varargin{ii}) = varargin{ii+1};
     end
 end
-
 %---------------------------------------------------------------------- set
 function Model = generate(Model)
     Model.Length0 = Model.Length;
@@ -139,7 +137,6 @@ function Model = generate(Model)
                          T, X1 + 1e-6];
     end
 end
-
 %--------------------------------------------------------------------- make
 function Model = make(Model)
 
@@ -176,7 +173,6 @@ system(CMD);
 toc;
 
 end
-
 %---------------------------------------------------------------------- set
 function Model = csolve(Model)   
 
@@ -235,7 +231,6 @@ Model.gd = y(:,2:end);
 y = load([dir_path ,'/log/endeffector_Acc.txt']);
 Model.detae = y(:,2:end);
 end
-
 %-------------------------------------------------- compute Cosserat string
 function [g, X] = string(Model,z,varargin)
     

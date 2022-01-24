@@ -17,7 +17,7 @@ fem = fem.set('FilterRadius',0.2,'VolumeInfill',0.4,...
 fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,0]);
 fem = fem.AddConstraint('Support',fem.FindNodes('SE'),[0,1]);
 fem = fem.AddConstraint('Load',fem.FindNodes('Location',[0,2],1),[0,-1e-5]);
-%fem = fem.AddConstraint('Load',fem.FindNodes('Bottom'),[0,-1e-4]);
+
 %% assign material
 fem.Material = Dragonskin10(1);
 

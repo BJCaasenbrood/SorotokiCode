@@ -38,7 +38,6 @@ mesh.BdBox = [min(Node(:,1)), max(Node(:,1)),...
               min(Node(:,2)), max(Node(:,2)),...
               min(Node(:,3)), max(Node(:,3))];
 end
-
 %--------------------------------------------------------------- SCALE MESH
 function mesh = TranslateMesh(mesh,Arg)
 
@@ -60,7 +59,6 @@ end
 mesh.Node = Node;
 
 end
-
 %-------------------------------------------------------------- ROTATE MESH
 function mesh = RotateMesh(mesh,Arg)
 Ax = Arg{1};
@@ -103,7 +101,6 @@ Node = transpose(R*(Node0'));
 mesh.Node = Node;
 
 end
-
 %-------------------------------------------------------------- ROTATE MESH
 function Node = Transformation(mesh,Arg)
 
@@ -116,7 +113,6 @@ Node = HMat*Node0.';
 Node = Node(1:3,:).';
 mesh.Node = Node;
 end
-
 %-------------------------------------------------------------- ROTATE MESH
 function mesh = CenterMesh(mesh)
 
@@ -128,13 +124,11 @@ Z0 = mean(Node0(:,3));
 
 mesh.Node = Node0 - [X0,Y0,Z0];
 end
-
 %-------------------------------------------------------------- ROTATE MESH
 function mesh = FixMesh(mesh)
 Node0 = mesh.Node; 
 mesh.set('Node0',Node0);
 end
-
 %-------------------------------------------------------------- ROTATE MESH
 function mesh = SE3Mesh(mesh,Arg)
 Node0 = [mesh.Node, ones(mesh.NNode,1)]; 
@@ -149,7 +143,6 @@ H(4,4) = 1;
 Node = H*Node0.';
 mesh.Node = Node(1:3,:).';
 end
-
 %-------------------------------------------------------------- ROTATE MESH
 function mesh = SO3Mesh(mesh,Arg)
 Node0 = [mesh.Node]; 
@@ -158,7 +151,6 @@ R = Arg;
 Node = R*Node0.';
 mesh.Node = Node.';
 end
-
 %-------------------------------------------------------------- ROTATE MESH
 function mesh = SE3MeshXTangent(mesh,Arg)
 Node0 = [mesh.Node, ones(mesh.NNode,1)]; 
@@ -173,7 +165,6 @@ H(4,4) = 1;
 Node = H*Node0.';
 mesh.Node = Node(1:3,:).';
 end
-
 %--------------------------------------------------------------- SCALE MESH
 function mesh = ScaleMesh(mesh,Arg)
 if isa(Arg,'cell')
@@ -209,7 +200,6 @@ end
 mesh.Node = Node;
 
 end
-
 %--------------------------------------------------------------- SCALE MESH
 function mesh = SweepMesh(mesh,Arg)
 
@@ -239,7 +229,6 @@ end
 mesh.Node = V;
 
 end
-
 %---------------------------------------------------------------- CURL MESH
 function mesh = CurveMesh(mesh,Arg)
 
@@ -275,7 +264,6 @@ Node = vertcat(CellDelta{:});
 mesh.Node = Node;
 
 end
-
 %---------------------------------------------------------------- CURL MESH
 function mesh = TwistMesh(mesh,Arg)
 
@@ -318,7 +306,6 @@ end
 mesh.Node = Node;
 
 end
-
 %------------------------------------------------------- CURVATURE OPERATOR 
 function V = CurveCellOperation(Node,kx,ky)
 
@@ -345,7 +332,6 @@ H = H0*H1;
 V = reshape(H(1:3,4),1,3);
 
 end
-
 %------------------------------------------------ CURVATURE ROTATION MATRIX
 function R = CurveRotationMatrix(sigma, kappa, theta)
 
@@ -363,7 +349,6 @@ R = [(kx^2)*va + ca, kx*ky*va, ky*sa;
      -ky*sa, kx*sa,  ca];
 
 end
-
 function V = TwistCellOperation(Node,NodeC,theta,sigmalow,sigmaupp)
 
 vx = Node(1);
@@ -388,7 +373,6 @@ H = H0*H1;
 V = reshape(H(1:3,4),1,3);
 
 end
-
 function R = TwistRotationMatrix(sigma, theta)
 gamma = theta*sigma;
 

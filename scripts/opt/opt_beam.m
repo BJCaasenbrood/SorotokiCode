@@ -1,13 +1,13 @@
 clr;
 %% generate mesh from sdf
-sdf = @(x) dRectangle(x,0,5,0,2);
+sdf = sRectangle(0,5,0,2);
 
 %% generate mesh
-msh = Mesh(sdf,'BdBox',[0,5,0,2],'NElem',1000);      
+msh = Mesh(sdf,'Quads',[30,10]);      
 msh = msh.generate();
 
 %% show generated mesh
-fem = Fem(msh,'TimeStep',1/5,'ResidualNorm',1e-3,'FilterRadius',0.3,...
+fem = Fem(msh,'TimeStep',1/15,'ResidualNorm',1e-3,'FilterRadius',0.3,...
         'VolumeInfill',0.3,'Penal',4,'Nonlinear',0,...
               'OptimizationProblem','Compliance');
 

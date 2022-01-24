@@ -3,14 +3,14 @@ clr;
 sdf = @(x) PneuGrip(x);
 
 %% generate mesh
-msh = Mesh(sdf,'BdBox',[-5,13,0,5],'NElem',1e3);%'Quads',[50 25]);
+msh = Mesh(sdf,'BdBox',[-5,13,0,5],'NElem',5e3);%'Quads',[50 25]);
 msh = msh.generate();
 
 %% generate fem model
-fem = Fem(msh,'VolumeInfill',0.25,'Penal',4,'FilterRadius',1,...
+fem = Fem(msh,'VolumeInfill',0.3,'Penal',4,'FilterRadius',0.5,...
               'Nonlinear',false,'TimeStep',1/3,...
               'OptimizationProblem','Compliant',...
-              'MaxIterationMMA',25,'ChangeMax',0.05,'Movie',false);
+              'MaxIterationMMA',65,'ChangeMax',0.05,'Movie',false);
           
 %% set spatial settings
 fem = fem.set('ReflectionPlane',[0 -1]);

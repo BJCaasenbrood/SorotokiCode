@@ -155,7 +155,7 @@ weight = xw(:,3);
 end
 
 %----------------------------------------------- TRIANGULAR SHAPE FUNCTIONS
-function [N,dNds] = TriShapeFnc(s)
+function [N, dNds] = TriShapeFnc(s)
 N = [1-s(1)-s(2); s(1); s(2)];
 dNds=[-1,-1; 1, 0; 0, 1];
 end

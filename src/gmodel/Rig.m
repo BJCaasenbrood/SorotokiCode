@@ -50,15 +50,13 @@ function varargout = get(Rig,varargin)
     else
         varargout = Rig.(varargin);
     end
-end
-        
+end      
 %---------------------------------------------------------------------- set
 function Rig = set(Rig,varargin)
     for ii = 1:2:length(varargin)
         Rig.(varargin{ii}) = varargin{ii+1};
     end
 end
-
 %---------------------------------------------------------------------- add
 function Rig = add(Rig,varargin)
     
@@ -77,19 +75,16 @@ function Rig = add(Rig,varargin)
         Rig.ListDraw{end+1} = true;
     end
 end
-
 %---------------------------------------------------------------------- add
 function Rig = reset(Rig)
     for ii = 1:length(Rig.List)
         Rig.List{ii} = Rig.List{ii}.reset();
     end
 end
-
 %---------------------------------------------------------------------- rig
 function Rig = parent(Rig,Child,ChildNode,ParentNode)
     Rig.IKlist(end+1,:) = [Child,ChildNode,ParentNode];
 end
-
 %---------------------------------------------------------------------- rig
 function Rig = scale(Rig,Child,Scale)
     gmdl = Rig.List{Child};
@@ -98,21 +93,18 @@ function Rig = scale(Rig,Child,Scale)
     gmdl = gmdl.bake();
     Rig.List{Child} = gmdl;
 end
-
 %---------------------------------------------------------------------- rig
 function Rig = texture(Rig,Child,TexMap)
     for ii = 1:length(Child)
         Rig.List{Child(ii)}.Texture = TexMap;
     end
 end
-
 %---------------------------------------------------------------------- rig
 function Rig = hide(Rig,varargin)
     for ii = 1:length(varargin)
         Rig.ListDraw{varargin{ii}} = false;
     end
 end
-
 %----------------------------------------------------------- compute ik rig
 function Rig = computeFK(Rig,q,varargin)
     
@@ -173,7 +165,6 @@ function Rig = computeFK(Rig,q,varargin)
     end
        
 end
-
 %----------------------------------------------------------- compute ik rig
 function [Rig,Q0] = computeIK(Rig,x,varargin)
     
@@ -268,7 +259,6 @@ function [Rig,Q0] = computeIK(Rig,x,varargin)
     end
        
 end
-
 %---------------------------------------------------------------------- rig
 function Rig = render(Rig) 
     
@@ -279,7 +269,6 @@ function Rig = render(Rig)
    end
    
 end
-
 %---------------------------------------------------------------------- rig
 function Rig = update(Rig) 
     
@@ -290,7 +279,6 @@ function Rig = update(Rig)
    end
    
 end
-
 %---------------------------------------------------------------------- rig
 function Rig = showSweep(Rig)
     
@@ -308,7 +296,6 @@ function Rig = showSweep(Rig)
     'Linewidth',2,'Color',col(2));
     
 end
-
 %---------------------------------------------------------------------- rig
 function Groundplane(Rig,B)
 Nx = 4;
@@ -344,7 +331,6 @@ patch('Faces',f,'Vertices',v,...
     'Linewidth',1.5,'linestyle','-','FaceColor','none',...
     'EdgeColor',[1 1 1]*0.5);
 end
-
 end
 
 methods (Access = private)

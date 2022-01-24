@@ -2,16 +2,17 @@ classdef NeoHookeanMaterial
 
     properties (Access = public)
         Type = 'NeoHookean';
-        E    = 0.1;
+        E    = 1;
         Nu   = 0.33;
         C10;
         D1   = 10;
         Rho  = 1070e-12;
-        Zeta = 0.5;
+        Zeta = 0.35;
     end
     
     properties (Access = private)
-        Lambda
+        Alpha;
+        Lambda;
         Mu; 
     end
 
@@ -21,23 +22,25 @@ methods
 %--------------------------------------------------------------- Mesh Class
 function obj = NeoHookeanMaterial(varargin) 
     
-    for ii = 1:2:length(varargin)
-        obj.(varargin{ii}) = varargin{ii+1};
-    end
+%     for ii = 1:2:length(varargin)
+%         obj.(varargin{ii}) = varargin{ii+1};
+%     end
     
-    if isempty(obj.C10)
-    E0         = obj.E;
-    Nu0        = obj.Nu;
+    if isempty(varargin)
+        E0   = obj.E;
+        Nu0  = obj.Nu;
+    else
+        E0 = varargin{1};
+        Nu0 = varargin{2};
+    end
     
     obj.Lambda = (Nu0*E0)/((1+Nu0)*(1-2*Nu0));
     obj.Mu     = E0/(2*(1+Nu0));
+
     obj.C10    = obj.Mu/2;
     obj.D1     = obj.Lambda/2;
     
-    end
-    
 end
-
 %---------------------------------------------------------------------- get     
 function varargout = get(NeoHookeanMaterial,varargin)
     if nargin > 1
@@ -48,30 +51,28 @@ function varargout = get(NeoHookeanMaterial,varargin)
     else
         varargout = NeoHookeanMaterial.(varargin);
     end
-end
-        
+end      
 %---------------------------------------------------------------------- set
 function NeoHookeanMaterial = set(NeoHookeanMaterial,varargin)
     for ii = 1:2:length(varargin)
         NeoHookeanMaterial.(varargin{ii}) = varargin{ii+1};
     end
 end
-
 %------------------------------ 2ND PIOLLA STRESSAND STIFFNESS FOR YEOH
-function [S, D, P] = PiollaStress(NeoHookeanMaterial,C,Robustness)
+function [S, D, P] = PiollaStress(NeoHookeanMaterial,F,Robustness)
 %Se = 2nd PK stress [S11, S22, S33, S12, S23, S13];
 
 if (nargin > 2) && Robustness
 %Nu0 = Nu0*0.75;
 end
 
-C100 = NeoHookeanMaterial.C10; K = NeoHookeanMaterial.D1;
+C100 = NeoHookeanMaterial.C10; 
+K    = NeoHookeanMaterial.D1;
 
 X12 = 1/2; X13 = 1/3; X23 = 2/3; X43 = 4/3; X89 = 8/9;
-
+C = F.'*F;
 C1=C(1,1); C2=C(2,2); C3=C(3,3); C4=C(1,2); C5=C(2,3); C6=C(1,3);
 I1 = C1+C2+C3;
-I2 = C1*C2+C1*C3+C2*C3-C4^2-C5^2-C6^2;
 I3 = det(C);
 J1 = I1*I3^(-X13);
 J3 = sqrt(I3);

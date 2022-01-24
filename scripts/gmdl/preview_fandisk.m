@@ -6,10 +6,8 @@ obj.set('Shading','Face');
 obj.Texture = diffuse(0.95);
 obj.Emission = [0.15 0.75 0.15];
 
-obj.bake();
-    
 %% set view
-obj.render(); 
-obj.update();
+obj.bake().render().update();
 obj.ground();
 axis tight;
+view(30,30);

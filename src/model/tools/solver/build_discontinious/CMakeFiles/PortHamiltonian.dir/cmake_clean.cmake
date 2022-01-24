@@ -1,5 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/PortHamiltonian.dir/src/PortHamiltonian.cpp.o"
+  "CMakeFiles/PortHamiltonian.dir/src/PortHamiltonian.cpp.o.d"
   "libPortHamiltonian.a"
   "libPortHamiltonian.pdb"
 )

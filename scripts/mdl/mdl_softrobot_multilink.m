@@ -1,9 +1,9 @@
 clr; cdsoro;
 %% assign free DOF
 mdl = Model([0,1,1,0,0,0],'NModal',6,'NDisc',2);
-mdl = setupSoftRobot(mdl,1e2,1,10);
+mdl = setupSoftRobot(mdl,100,2,15);
 mdl = mdl.set('Controller',1);
-mdl = mdl.set('TimeStep',1/150);
+mdl = mdl.set('TimeStep',1/33.33333);
 mdl = mdl.set('Tdomain',25); 
 
 %% generate trajectory
@@ -34,8 +34,9 @@ legend('$x$','$y$','$z$',...
 %% generate rig
 [rig, sph] = setupRig(mdl);
 
-text(-0.31,0.08,-0.17,'\textbf{$g_d$}','interpreter','latex','fontsize',16);
+%text(-0.31,0.08,-0.17,'\textbf{$g_d$}','interpreter','latex','fontsize',16);
 
+h  = [];
 for ii = 1:fps(t,6):length(mdl.q)
     rig = rig.computeFK(mdl.q(ii,:));
     rig = rig.update();
@@ -46,13 +47,23 @@ for ii = 1:fps(t,6):length(mdl.q)
     sph.update();
 
     setupFigure(ii);
+    background();
+    
+    delete(h);
+    h = shadowplot(5);
+    
+%     if mod(ii,15) <= 1
+%         t(ii)
+%         pause;
+%     end
+    
     %title(['T = ',num2str(t(ii),3)]);
     
 %         
-    if ii == 1, gif('srm_multiarm.gif','frame',gcf,'nodither');
-        pause; framepause(15);
-    else, gif;
-    end
+%     if ii == 1, gif('srm_multiarm.gif','frame',gcf,'nodither');
+%         pause; framepause(15);
+%     else, gif;
+%     end
 end
 
 framepause(15);
@@ -65,22 +76,24 @@ mdl = mdl.set('Controller',1);
 L0 = 0.36;
 
 mdl = mdl.set('Sdomain',   L0);
-mdl = mdl.set('SpaceStep', 50);
+mdl = mdl.set('SpaceStep', 75);
 mdl = mdl.set('Density',   550);
 mdl = mdl.set('Radius',    0.05);
 mdl = mdl.set('Gravity',   [0,0,0]);
-mdl = mdl.set('E',         50);
+mdl = mdl.set('E',         30);
 mdl = mdl.set('Mu',        0.45);
 mdl = mdl.set('Gain',      [Kp,Kd,0]);
-mdl = mdl.set('Spring',    [0,1]);
-mdl = mdl.set('Lambda',    [Kp/Lam,0]);
+mdl = mdl.set('Spring',    [0.0001,1]);
+mdl = mdl.set('Lambda',    [Kp/Lam,Kp*1e-2]);
 mdl = mdl.set('ActuationSpace',0);
 
-R = 0.2;
+R = 0.3;
 theta = 1;
 
+Phi = roty(-pi/2);
+
 mdl = mdl.set('Point',...
-    [0,0,0,0,0.200,R*cos(theta),R*sin(theta)]);
+    [rot2quat(Phi),.125,R*cos(theta),R*sin(theta)]);
 end
 
 % setup rig
@@ -89,6 +102,16 @@ gmdl1 = Gmodel('Pneulink.stl');
 gmdl2 = Gmodel('Pneulink.stl');
 gmdl3 = Gmodel('SoftGripperRedux.stl');
 gmdl3 = Blender(gmdl3,'Scale',0.475);
+
+gmdl1 = gmdl1.set('Emission', [0.9 0.8 0.8],...
+    'SSSPower',0.1,'SSSRadius',0.01,'SSS',true);
+
+gmdl2 = gmdl2.set('Emission', [0.9 0.8 0.8],...
+    'SSSPower',0.1,'SSSRadius',0.01,'SSS',true);
+
+gmdl3 = gmdl3.set('Emission', [0.9 0.8 0.8],...
+    'SSSPower',0.1,'SSSRadius',0.01,'SSS',true);
+
 
 assignin('base','gmdl1',gmdl1);
 assignin('base','gmdl2',gmdl2);
@@ -117,7 +140,7 @@ end
 
 % setup figure
 function setupFigure(ii)
-axis(3*[-0.06 0.06 -0.06 0.06 -0.12 0]);
+axis(3*[-0.06 0.06 -0.06 0.06 -0.16 0]);
 box on;
 axis off;
 if (ii == 1)

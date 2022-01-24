@@ -1,3 +1,4 @@
+
 clr;
 %% pressure settings
 P0  = 30*kpa;
@@ -5,8 +6,8 @@ P0  = 30*kpa;
 %% generate mesh
 Simp  = 0.02;
 GrowH = 1;
-MinH  = 1;
-MaxH  = 2;
+MinH  = 3;
+MaxH  = 4;
 
 msh = Mesh('Pneunet.png','BdBox',[0,120,0,20],'SimplifyTol',Simp,...
     'Hmesh',[GrowH,MinH,MaxH]);
@@ -22,12 +23,12 @@ subplot(2,1,2); msh.show();
 
 %% generate fem model
 fem = Fem(msh);
-fem = fem.set('TimeStep',1/100,'BdBox',[0,120,-80,20],'Linestyle','none',...
-    'MovieAxis',[-25 120 -60 130],'Movie',0,'TimeEnd',0.5);
+fem = fem.set('TimeStep',1/170,'BdBox',[0,120,-80,20],'Linestyle','none',...
+    'MovieAxis',[-25 120 -60 130],'Movie',0,'TimeEnd',2,'SolverPlot',1);
 
 %% add boundary constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Box',[0,0,0,10]),[1,1]);
-fem = fem.AddConstraint('Gravity',[],[0,-9.81e3]);
+%fem = fem.AddConstraint('Gravity',[],[0,-9.81e3]);
 fem = fem.AddConstraint('Pressure',fem.FindEdges('AllHole'),...
     @(t) P0*sigmoid(t));
 
@@ -38,12 +39,14 @@ id  = fem.FindNodes('Bottom');
 fem = fem.AddConstraint('Output',id,[0,0]);
 
 %% assign material
-fem.Material = Dragonskin30(25);
+fem.Material = NeoHookeanMaterial(1,0.2);%Dragonskin30(25);
 
 %% solve
 clf;
 f = figure(101);
-[~,tmpNode] = fem.simulate();
+tic;
+[~,tmpNode] = fem.solve();
+toc;
 
 %% post-processing
 t   = fem.Log.t;

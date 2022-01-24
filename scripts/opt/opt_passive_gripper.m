@@ -2,14 +2,14 @@ clr;
 %% generate mesh from sdf
 sdf = @(x) Gripper(x);
 
-msh = Mesh(sdf,'BdBox',[0,80,0,50],'NElem',1e3);
+msh = Mesh(sdf,'BdBox',[0,80,0,50],'NElem',3e3);
 msh = msh.generate();
 
 msh.show(); pause(2);
 
 %% show generated mesh
-fem = Fem(msh,'VolumeInfill',0.3,'Penal',4,'FilterRadius',7,...
-              'Nonlinear',false,'TimeStep',1/3,'ChangeMax',0.05,...
+fem = Fem(msh,'VolumeInfill',0.3,'Penal',4,'FilterRadius',2,...
+              'Nonlinear',false,'TimeStep',1/3,'ChangeMax',0.01,...
               'OptimizationProblem','Compliant',...
               'MaxIterationMMA',75);
 
@@ -28,7 +28,7 @@ alpha = atan(40/80);
 Fn = -[-sin(alpha),cos(alpha)];
 id = fem.FindNodes('Line',[0 80 0 40]); 
 fem = fem.AddConstraint('Output',id,Fn);
-fem = fem.AddConstraint('Spring',id,[0 1]);
+fem = fem.AddConstraint('Spring',id,abs(Fn));
 
 %% set density
 fem = fem.initialTopology('Hole',[10,30;30,35;50,40],5);

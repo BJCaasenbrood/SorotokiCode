@@ -12,16 +12,16 @@ msh = msh.show();
 
 %% generate fem model
 fem = Fem(msh);
-fem = fem.set('TimeStep',1/10,'Linestyle','none','SolverPlotType','Un');
+fem = fem.set('TimeStep',1/40,'Linestyle','none','SolverPlotType','Svm');
 
 %% assign material
-fem.Material = TPU90;
+fem.Material = NeoHookeanMaterial;
 
 %% add boundary constraint
 CP1 = [20,48];  % control point 1
 CP2 = [150,48]; % control point 2
-F1  = -50;     % control force 1
-F2  = 50;      % control force 2
+F1  = -5;     % control force 1
+F2  = 0;      % control force 2
 
 fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[1,1]);
 fem = fem.AddConstraint('Load',fem.FindNodes('Location',CP1),[F1,0]);

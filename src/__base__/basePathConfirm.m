@@ -1,5 +1,3 @@
-function LatestRelease = basePathConfirm
-lib = 'base.lib';
-ver = '3.0';
-LatestRelease = CheckLibary(lib,ver);
+function foundPath = basePathConfirm
+foundPath = true;
 end

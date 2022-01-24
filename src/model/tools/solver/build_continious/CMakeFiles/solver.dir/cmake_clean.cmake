@@ -1,5 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/solver.dir/src/_main.cpp.o"
+  "CMakeFiles/solver.dir/src/_main.cpp.o.d"
   "solver"
   "solver.pdb"
 )
