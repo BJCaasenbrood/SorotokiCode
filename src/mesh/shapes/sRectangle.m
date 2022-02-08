@@ -19,6 +19,9 @@ eps = 1e-2*norm([x1;x2;y1;y2]);
 
 sdf = Sdf(@(P) sdfRectangle(P,x1,x2,y1,y2));
 sdf.BdBox = [x1-eps,x2+eps,y1-eps,y2+eps];
+sdf.Node = [x1,y1;x2,y1;x2,y2;x1,y2;x1,y1];
+sdf.Element = [(1:4).',(2:5).'];
+
 end
 
 function d = sdfRectangle(P,x1,x2,y1,y2)

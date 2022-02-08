@@ -9,7 +9,6 @@ classdef Shapes
         ds;
         xia0;
         
-        NDof;
         NModal;
         NDim;
         NNode;
@@ -32,6 +31,7 @@ classdef Shapes
     
     properties (Access = private)
         Table;
+        NDof;
         Node;
         Node0;
         Center;
@@ -53,39 +53,60 @@ classdef Shapes
 %--------------------------------------------------------------------------
 methods  
 %----------------------------------------------- MODAL SHAPE RECONSTRUCTION
-function obj = Shapes(Fem,Table,varargin) 
+function obj = Shapes(Input,NModal,varargin) 
     
-    obj.Table  = Table; 
-    obj.Fem    = Fem;  
-    obj.NNode  = 30;
-    obj.NModal = 2;
-    obj.NDof   = sum(Table);
+    obj.NModal = NModal;
+    obj.Table  = double(NModal > 0); 
+    obj.NDof   = sum(obj.Table);
+    obj.xia0   = [0,0,0,1,0,0].';
     
-    obj.xia0 = [0,0,0,1,0,0].';
-    
+    if isa(Input,'Fem')
+        obj.Fem    = Fem;
+        obj.NNode  = 30;
+        %obj.NModal = 2;
+        
+        obj.Rho  = Fem.Material.Rho;
+        obj.Zeta = Fem.Material.Zeta;
+        
+    elseif isa(Input,'double')
+        obj.NNode = size(Input,1);
+        obj.PODQ = Input;
+        obj.PODR = Input;
+        
+        obj.L0    = 1;
+        obj.Sigma = linspace(0,1,obj.NNode); 
+        obj.ds    = obj.L0/(obj.NNode);
+
+        obj.PODEnergy{2} = ones(size(Input,2),1);
+        obj.PODEnergy{1} = ones(size(Input,2),1);
+        
+        obj.Rho  = 1070e-9;
+        obj.Zeta = 1;
+    end
+
     % cross-section SDF
-    obj.Sdf = sCircle(5);
+    obj.Sdf    = sCircle(5);
     obj.Center = zeros(3,1);
-    obj.Rho  = Fem.Material.Rho;
-    obj.Zeta = Fem.Material.Zeta;
-    obj.E    = 5;
-    obj.Nu   = 0.33;
+
+    obj.E  = 5;
+    obj.Nu = 0.33;
     
     for ii = 1:2:length(varargin)
         obj.(varargin{ii}) = varargin{ii+1};
     end
     
+    if ~isempty(obj.Fem)
     if ~isempty(obj.Fem.get('Output'))
         out = obj.Fem.get('Output');
         Nd0 = obj.Fem.get('Node0');
         
         BdBox = boxhull(Nd0(out(:,1),:));
         obj   = reference(obj,[BdBox(1),BdBox(3)],...
-                              [BdBox(2),BdBox(2)]);
+            [BdBox(2),BdBox(2)]);
+    end
     end
     
-    obj.g0 = [1,0,0,0,BdBox(1),0,BdBox(3)];
-    
+    obj.g0 = [1,0,0,0,0,0,0];
     obj = rebuild(obj);
     
 end
@@ -109,10 +130,8 @@ end
 %---------------------------------------------------------------- show mesh
 function Shapes = show(Shapes,varargin)
     
-if nargin<2
-    Request = -1; 
-else
-    Request = varargin{1}; 
+if nargin<2, Request = -1; 
+else, Request = varargin{1}; 
 end
 
 figure(101);
@@ -132,7 +151,7 @@ if strcmp(Request,'POD')
         else, theta = Shapes.PODQ;
         end
             
-        k = 1;
+        k   = 1;
         leg = cell(1);
         % loop through selected modes
         for ii = 1:Shapes.NModal(jj)
@@ -155,8 +174,7 @@ if strcmp(Request,'POD')
         Enp = cumsum(En);
         plot(Enp,'--','LineW',3); 
         axis([1 10 0 max(En)*1.2]);
-        
-        
+
     end
 
 end
@@ -179,7 +197,9 @@ Shapes.Sigma = linspace(0,Shapes.L0,Shapes.NNode);
 Shapes.ds = Shapes.L0/(Shapes.NNode);
 
 % finds associated nodes from Fem mesh.
-Shapes = GenerateRadialFilter(Shapes);
+if isempty(Shapes.Fem)
+    Shapes = GenerateRadialFilter(Shapes);
+end
 
 end   
 %------------------------------------------------------------ set reference
@@ -191,25 +211,44 @@ end
 
 set = 1:6;
 I6  = eye(6);
-xa  = set(logical(Shapes.Table));
 Xa  = [];
 
-for ii = 1:numel(xa)
+for ii = 1:6
     for jj = 1:Shapes.NModal(ii)
-        Xa = [Xa,xa(ii)];
+        Xa = [Xa,set(ii)];
     end
 end
 
-Shapes.NDof = sum(Shapes.Table);
 Shapes.NDim = sum(Shapes.NModal);
 Shapes.Ba   = I6(:,Xa);
 
 Shapes = BuildInertia(Shapes);
-Shapes.Dtt = Shapes.Zeta*Shapes.Mtt;
-Shapes.Ktt = LinearStiffnessTensor(Shapes);
+Shapes.Dtt  = Shapes.Zeta*Shapes.Mtt;
+Shapes.Ktt  = LinearStiffnessTensor(Shapes);
 Shapes.Ktt0 = Shapes.Ktt;
+  
+if ~isempty(Shapes.Fem)
+    Shapes = GenerateRadialFilter(Shapes);
+end
+
+if ~isempty(Shapes.PODR) || ~isempty(Shapes.PODR)
     
-Shapes = GenerateRadialFilter(Shapes);
+    k = 1;
+    Shapes.POD = [];
+    for ii = 1:numel(Shapes.NModal)
+        for jj = 1:Shapes.NModal(ii)
+            if ii == 1
+                Shapes.POD(:,k) = Shapes.PODR(:,jj);
+            else
+                Shapes.POD(:,k) = Shapes.PODQ(:,jj);
+            end
+            k = k+1;
+        end
+    end
+    
+    % rebuild shape-function matrix
+    Shapes.Theta = @(x) ShapeFunction(Shapes,x);
+end
 
 end 
 %--------------------------------------------------------------------------
@@ -296,92 +335,45 @@ end
 Shapes.Theta = @(x) ShapeFunction(Shapes,x);
 
 end
-%------------------------------------------------------------------ fitting
-function [Shapes, P] = fitPOD(Shapes)
+%--------------------------------------------------------- compute jacobian
+function [g, J] = string(Shapes,q)
     
-    x0 = zeros(Shapes.NDim,1);    
-    X  = cell(length(Shapes.posData)-1,1);
-        
-    % setting optimization settings
-    options = optimoptions('fmincon','Display','iter','Algorithm','sqp',...
-        'FiniteDifferenceStepSize',Shapes.DiffStepSize);
-    
-    for jj = 1:Shapes.NDof
-        Shapes.xiData{jj} = zeros(Shapes.Quality,1);
-    end
-    
-    for ii = 2:4:length(Shapes.posData)
-        
-        fun = @(x) Objective(x,Shapes,ii);
-
-        % solve optimization problem
-        x = fmincon(fun,x0,[],[],[],[],[],[],[],options);
-        X{ii-1} = x;
-        
-        % overwrite initial conditions
-        x0 = x;
-        
-        cla; 
-        [P,~,S] = string(Shapes,x);
-        plot(P(:,1),P(:,3),'-'); axis equal; hold on;
-        N = Shapes.posData{ii};
-        plot(N(:,1),N(:,2),'.'); axis equal; hold on;
-        pause(0.5);
-        
-        ee = zeros(Shapes.NDof,length(S));
-        for jj = 1:length(S)
-            ee(:,jj) = Shapes.Phi(S(jj))*x + Shapes.Ba.'*Shapes.xia0(:);
-        end
-        
-        for jj = 1:Shapes.NDof
-            Shapes.xiData{jj} = vappend(Shapes.xiData{jj},ee(jj,:).',2);
-        end
-    end
-    
-    XI = Shapes.xiData{1};
-    C = XI*XI.';
-    
-    [Shapes.POD,E,~] = svd(C);
-    Shapes.PODEnergy = diag(E);
-
-    function f = Objective(x,Shapes,id)
-       p = string(Shapes,x);
-       
-       if size(Shapes.posData{id},2) == 2
-           p = [p(:,1),p(:,3)];
-       end
-       
-       [~,dist] = distance2curve(p,Shapes.posData{id},'linear'); 
-       f1 = sum(abs(dist));
-       
-       Gl = Shapes.posData{id}(end,:);
-       Pl = p(end,:);
-       f2 = norm(abs(Gl - Pl));
-       
-       f = f1 + 0.01*f2;
-    end
-    
-end
-%-------------------------------------------------- compute Cosserat string
-function [p, R] = string(Shapes,q)
-
 if numel(q) ~= Shapes.NDim
    error(['Dimension of joint inconstisten with POD matrix. Please ', ...
        'check your input dimensions dim(q).']) 
-end
-    
-% forward (explicit) integration of kinematics    
-[~,g] = ode23t(@(t,x) ForwardODE(Shapes,t,x,q(:)),...
-    Shapes.Sigma,Shapes.g0);
+end    
 
-q = g(:,1:4);               % quaternions
-p = [g(:,5),g(:,6),g(:,7)]; % position vector
+Ndim = Shapes.NDim;
+Ns   = Shapes.NNode;
+q    = q(:) + 1e-6;
+s    = 0;
+h    = Shapes.ds;
+X    = MDE(Shapes.NDim);
 
-R = {};
-for ii = 1:Shapes.NNode
-    R{ii,1} = quat2rot(q(ii,:));
-end
+gtmp = zeros(4,4,Ns);    % cell(numel(Shapes.Sigma),1);
+Jtmp = zeros(6,Ndim,Ns); % cell(numel(Shapes.Sigma),1);
+
+for ii = 1:Ns
     
+   K1 = ForwardKinematicODE(Shapes,s,q,X);
+   K2 = ForwardKinematicODE(Shapes,s+(2/3)*h,q,X + (((2/3)*h)*K1));
+    
+   s = s + h; 
+   X = X + 0.25*h*(K1 + 3*K2);
+   
+   gtmp(:,:,ii) = SE3(X.Phi,X.p);
+   Jtmp(:,:,ii) = Admapinv(X.Phi,X.p)*X.J;
+
+end
+
+J = Jtmp;
+g = gtmp;
+    
+end
+%--------------------------------------------------------- compute jacobian
+function p = FK(Shapes,q)
+    g = string(Shapes,q);
+    p = reshape(g(1:3,4,:),3,[]).';
 end
 %------------------------------------------------- estimate Cosserat string
 function q = estimateJointSpace(Shapes,fem)
@@ -437,10 +429,48 @@ XQ = PODq.'*inv(PODq*PODq.' + 1e-4*eye(Shapes.NNode))*Gamma_;
 q = [XR;XQ];
 
 end
+%----------------------------------------------------- tangent point energy
+function E = energy(Shapes,q,varargin)
+% compute string   
+[g,~] = string(Shapes,q);
+pa = reshape(g(1:3,4,:),3,[]).';
+xa = linspace(0,1,Shapes.NNode);
 
+if isempty(varargin)
+   type = 'tangentpoint';
+   pb = gamA;    
+   xb = xa;
+end
+
+end
 end
 
 methods (Access = private)
+%---------------------------------------------------------------------- set
+function P = ShapeFunction(Shapes,X)
+
+    k  = 1;
+    X0 = Shapes.Sigma;
+    Pc = cell(Shapes.NDof,1); 
+    X  = zclamp(X,0,Shapes.L0); % make bounded
+
+    % construct shape-matrix 
+    for jj = 1:6
+        for ii = 1:Shapes.NModal(jj)
+            
+            if jj <= 3,THETA = Shapes.POD(:,ii); % angular strains
+            else, THETA = Shapes.PODQ(:,ii);     % linear strains
+            end
+            % not sure if interp1 is best/fastest option? 
+            % maybe inverse lerp?
+            Pc{k,1} = interp1(X0,THETA,X);
+            k = k + 1;
+        end
+    end
+
+    P = blkdiag(Pc{:});
+
+end
 %-------------------------------------------------- compute Cosserat string
 function Shapes = GenerateRadialFilter(Shapes)
    
@@ -493,32 +523,6 @@ P = sparse(d(:,1),d(:,2),d(:,3),Shapes.NNode,Shapes.Fem.NNode);
 P = spdiags(1./sum(P,2),0,size(P,1),size(P,1))*P;
 
 Shapes.Filter = P;
-
-end
-%---------------------------------------------------------------------- set
-function P = ShapeFunction(Shapes,X)
-
-    Pc  = cell(Shapes.NDof,1); 
-    
-    % make bounded
-    X0 = Shapes.Sigma;
-    X  = zclamp(X,0,Shapes.L0);
-    
-    k = 1;
-    % construct shape-matrix for angular strains
-    for ii = 1:Shapes.NModal(1)
-        % not sure if interp1 is best/fastest option? maybe inverse lerp?
-        Pc{k,1} = interp1(X0,Shapes.POD(:,ii),X);  
-        k = k + 1;
-    end
-    
-    % construct shape-matrix for linear strains
-    for ii = 1:Shapes.NModal(2)
-        Pc{k,1} = interp1(X0,Shapes.PODQ(:,ii),X);
-        k = k + 1;
-    end
-
-    P = blkdiag(Pc{:});
 
 end
 %-------------------------------------------------- compute Cosserat string
@@ -677,15 +681,51 @@ Kap = xi(1:3);  % get curvature-torsion
 Gam = xi(4:6);  % get stretch-shear
 Q   = g(1:4);   % get quaternions
 
-R = Quat2Rot(Q);
+R = Quat2Rot(Q); % thanks for your inspiring work Frederic Boyer ;)
 A = StrainMap(R*Kap(:));
 
-dg = zeros(7,1);
-
-dg(1:4) = ((2*norm(Q))^(-1))*A*Q;
+dg      = zeros(7,1);
+dg(1:4) = ((2*norm(Q)))\A*Q;
 dg(5:7) = R*Gam(:);
 
 end    
+%--------------------------------------- forwards integration of kinematics
+function Y = ForwardKinematicODE(Shapes,s,q,X)
+
+% recover variables from struct
+Y    = X;
+Phi_ = X.Phi;
+p_   = X.p;
+    
+%compute strain field    
+xi = Shapes.Ba*Shapes.Theta(s)*q + Shapes.xia0(:);
+
+% construct geometric vectors
+Kap = xi(1:3);  % get curvature-torsion
+Gam = xi(4:6);  % get stretch-shear
+
+% build forward kin - position
+Y.p   = Phi_*Gam;
+Y.Phi = Phi_*isomSO3(Kap);
+Y.J   = Admap(Phi_,p_)*Shapes.Ba*Shapes.Theta(s);
+
+end
+%--------------------------------------- forwards integration of kinematics
+function [dp,dPhi,dJ] = ForwardKinematicODE2(Shapes,s,q,Phi_,p_)
+    
+%compute strain field    
+xi = Shapes.Ba*Shapes.Theta(s)*q + Shapes.xia0(:);
+
+% construct geometric vectors
+Kap = xi(1:3);  % get curvature-torsion
+Gam = xi(4:6);  % get stretch-shear
+
+% build forward kin - position
+dp   = Phi_*Gam;
+dPhi = Phi_*isomSO3(Kap);
+dJ   = Admap(Phi_,p_)*Shapes.Ba*Shapes.Theta(s)*q;
+
+end
 %--------------------------------------- forwards integration of kinematics
 function Shapes = BuildInertia(Shapes)
     
@@ -711,7 +751,7 @@ X0 = X0 - Shapes.Center(1);
 Y0 = Y0 - Shapes.Center(2);
 
 % evaluate slice volume
-Shapes.Att   = sum(sum(I0*dv));
+Shapes.Att = sum(sum(I0*dv));
 
 % evaluate 2nd-moment inertia
 Jxx = trapz(y0,trapz(x0,(Y0.^2).*I0,2))/Shapes.Att;
@@ -729,6 +769,15 @@ Shapes.Jtt = P.'*[Jxx,Jxy,Jxz;Jxy,Jyy,Jyz;Jxz,Jyz,Jzz]*P;
 Shapes.Mtt = Shapes.Rho*blkdiag(Shapes.Jtt,Shapes.Att*eye(3));
 
 end
+
+end
+end
+
+%--------------------------------------------- isomorphism from R3 to so(3)
+function y = isomSO3(x)
+x1 = x(1); x2 = x(2); x3 = x(3);
+y = [0, -x3, x2; x3, 0, -x1; -x2, x1, 0];
+end
 %----------------------------------------------------------- strain mapping
 function Ktt = LinearStiffnessTensor(Shapes)
     E0 = Shapes.E;
@@ -737,24 +786,4 @@ function Ktt = LinearStiffnessTensor(Shapes)
     QE  = diag([E0,G0,G0]);
     QR  = diag([G0,E0,E0]);    
     Ktt = blkdiag(QR*Shapes.Jtt,QE*Shapes.Att);    
-end
-
-end
-end
-
-
-%----------------------------------------------------------- strain mapping
-function A = StrainMap(K)
-k1 = K(1); k2 = K(2); k3 = K(3);
-A = [ 0, -k1, -k2, -k3; k1,   0, -k3,  k2; 
-     k2,  k3,   0, -k1; k3, -k2,  k1,  0];
-end
-%----------------------------------------------- quaterion to rotation mat.
-function R = Quat2Rot(q)
-w = q(1); x = q(2); y = q(3); z = q(4);
-Rxx = 1 - 2*(y^2 + z^2); Rxy = 2*(x*y - z*w); Rxz = 2*(x*z + y*w); 
-Ryx = 2*(x*y + z*w); Ryy = 1 - 2*(x^2 + z^2); Ryz = 2*(y*z - x*w );
-Rzx = 2*(x*z - y*w ); Rzy = 2*(y*z + x*w ); Rzz = 1 - 2 *(x^2 + y^2);
-
-R = [Rxx, Rxy, Rxz; Ryx, Ryy, Ryz; Rzx, Rzy, Rzz];
 end

@@ -2,7 +2,8 @@ clr;
 %% loop over colormaps
 figure(101);
 
-map = {viridis(),viridis(5),viridis(25),viridis(500),viridis(0),viridis(-1)};
+cm = @(x) turbo(x);
+map = {cm([]),cm(5),cm(25),cm(500),cm(0),cm(-1)};
 
 opts = {'','5','25','500','0','-1'};
 
@@ -15,4 +16,4 @@ for ii = 1:length(opts)
    axis tight;
 end
 
-background(gitpage*0.75)
+background(gitpage)

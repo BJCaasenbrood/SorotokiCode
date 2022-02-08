@@ -12,15 +12,15 @@ msh = msh.show();
 
 %% generate fem model
 fem = Fem(msh);
-fem = fem.set('TimeStep',1/50);
+fem = fem.set('TimeStep',1/10);
 
 %% add boundary constraint
-
 fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,1]);
 fem = fem.AddConstraint('Displace',fem.FindNodes('Right'),so2(0.5*pi));
 
 % assign material
-fem.Material = Dragonskin30(25);
+fem.Material = NeoHookeanMaterial;
+%Dragonskin30(25);
 
 %% solve
 f = figure(101);

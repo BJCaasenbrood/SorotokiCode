@@ -35,11 +35,7 @@ function obj = Model(Shapes,varargin)
     
     obj.MaxIteration = 10;
     obj.ResidualNorm = 0.01;
-    
-%     obj.E    = 1;
-%     obj.Nu   = 0.33;
-%     obj.Rho  = 1090e-12;
-%     obj.Zeta = 0.35;
+
     G0 = Shapes.get('g0');
     obj.Phi0 = eye(3);
     obj.p0   = G0(5:7).';    

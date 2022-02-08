@@ -396,7 +396,8 @@ void logmapSE3(M4d X, V6d &Y){
 	W << X(0,3),X(1,3),X(2,3);
 
 	// IS THIS CORRECT?
-	Y.block(3,0,3,1).noalias() = Wh.transpose()*W;
+	//Y.block(3,0,3,1).noalias() = Wh.transpose()*W;
+	Y.block(3,0,3,1).noalias() = Wh*W;
 
 }
 

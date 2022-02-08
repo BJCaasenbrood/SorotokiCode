@@ -21,7 +21,9 @@ end
 end
 
 function h = plotarrow(p,n,id)
-hold on; h = quiver3(p(1),p(2),p(3), n(1), n(2), n(3),'Color',col(id));
+hold on; 
+h = quiver3(p(1),p(2),p(3),...
+    n(1), n(2), n(3),'Color',col(id));
 end
 
 

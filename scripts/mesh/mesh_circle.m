@@ -3,7 +3,7 @@ clr;
 sdf = sCircle(1);
 
 %% generate mesh
-msh = Mesh(sdf,'NElem',20,'Triangulate',1);
+msh = Mesh(sdf,'NElem',150,'Triangulate',1);
 msh = msh.generate(); 
 
 %% show mesh

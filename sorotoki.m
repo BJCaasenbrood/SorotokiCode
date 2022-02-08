@@ -53,6 +53,9 @@ clc; clear; close all; warning off; beep off;
 addpath('src');
 addpath('src/__base__');
 addpath('src/__base__/fnc');
+addpath('src/__base__/fnc/thirdparty');
+addpath('src/__base__/colormap');
+addpath('src/__base__/color');
 
 skipUpdate = false;
 Path = cd;
@@ -253,7 +256,23 @@ switch(Request)
 end
 
 if bool
-   verify_sorotoki; 
+   arg = verify_sorotoki; 
+   cout('Text', '* Finalizing the verification check-up \n');
+   cout('Text', '\n');
+   if isempty(vertcat(arg{:,2}))
+    cout('green','* VERIFICATION PASSED! \n');
+   else
+    out = cellfun(@(x) ~isempty(x),arg(:,2));
+    cout('error','* VERIFICATION FAILED! \n');
+    cout('error','* Error(s) in :');
+    errors = arg(out,1);
+    for ii = 1:length(errors)
+        cout('error',['\t',errors{ii}]); 
+        cout('\n');
+    end
+   end
+   cout('Text', '\n');
+   
 end
 
 pause(.01);
@@ -286,6 +305,8 @@ fprintf(FID,'%% base.lib \n');
 WriteToFile([Path,'\src\__base__']);
 WriteToFile([Path,'\src\__version__']);
 WriteToFile([Path,'\src\__base__\fnc']);
+WriteToFile([Path,'\src\__base__\color']);
+WriteToFile([Path,'\src\__base__\colormap']);
 WriteToFile([Path,'\data\']);
 WriteToFile([Path,'\data\color']);
 WriteToFile([Path,'\data\colormap']);
@@ -300,6 +321,8 @@ AddPath([Path,'\src\']);
 AddPath([Path,'\src\__version__']);
 AddPath([Path,'\src\__base__']);
 AddPath([Path,'\src\__base__\fnc']);
+AddPath([Path,'\src\__base__\color']);
+AddPath([Path,'\src\__base__\colormap']);
 AddPath([Path,'\data\']);
 AddPath([Path,'\data\color']);
 AddPath([Path,'\data\colormap']);

@@ -57,8 +57,7 @@ classdef Model
     end
     
 %--------------------------------------------------------------------------
-methods  
-    
+methods     
 %-------------------------------------------------------------- Model Class
 function obj = Model(Table,varargin) 
     
@@ -103,7 +102,6 @@ function obj = Model(Table,varargin)
     
     cdsoro;
 end
-
 %---------------------------------------------------------------------- get     
 function varargout = get(Model,varargin)
     if nargin > 1

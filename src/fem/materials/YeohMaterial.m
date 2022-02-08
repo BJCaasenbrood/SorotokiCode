@@ -30,7 +30,6 @@ function obj = YeohMaterial(varargin)
         obj.(varargin{ii}) = varargin{ii+1};
     end
 end
-
 %---------------------------------------------------------------------- get     
 function varargout = get(YeohMaterial,varargin)
     if nargin > 1
@@ -41,15 +40,13 @@ function varargout = get(YeohMaterial,varargin)
     else
         varargout = YeohMaterial.(varargin);
     end
-end
-        
+end       
 %---------------------------------------------------------------------- set
 function YeohMaterial = set(YeohMaterial,varargin)
     for ii = 1:2:length(varargin)
         YeohMaterial.(varargin{ii}) = varargin{ii+1};
     end
-end
-    
+end  
 %------------------------------ 2ND PIOLLA STRESSAND STIFFNESS FOR YEOH
 function [S, D, P] = PiollaStress(YeohMaterial,F,R)
 %Se = 2nd PK stress [S11, S22, S33, S12, S23, S13];
@@ -73,7 +70,6 @@ I1iso = J^(-2/3)*I1;
 for ii = 1:3
     P = P + YeohC(ii)*(I1iso - 3)^(ii) + (1/YeohD(ii))*(J-1)^(2*ii);
 end
-
 
 for ii = 1:3
     S = S + 2*(ii*YeohC(ii)*(I1iso - 3)^(ii-1))*J^(-2/3)*(I - (I1/3)*Cinv)...

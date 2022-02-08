@@ -48,7 +48,7 @@ classdef Fem < handle
         Center;     % Element centers
         Topology;   % current save of topology
         Log;        % Log structure
-        Time = 0;
+        Time;       % Time (solver)
     end
     
     properties (Access = private)
@@ -67,11 +67,11 @@ classdef Fem < handle
         ElemNDof;      % Degrees-of-freedom of elements
         ElemSort;      % Elements in sorted list
         ElemRot;       % Rotation mat. each elements
-        ElemStr;       % ?? 
+        ElemStr;       % 
         Normal;        % Normals of each elements
         Edge;          % Cell of edges/boundaries
-        Rotation;
-        Stretch;
+        Rotation;      % F = RQ: rotational part
+        Stretch;       % F = RQ: stretch part
         
         PrescribedDisplacement = false;
         VolumetricPressure     = false;
@@ -90,9 +90,11 @@ classdef Fem < handle
         Kinetic;
         ElemMat;
         Gravity;
+        
         fInternal = rand(1)*1e-8;
         fExternal = rand(1)*1e-8;
         fInput    = rand(1)*1e-8;
+        
         Stiffness; 
         TangentStiffness;
         MassMatrix;
@@ -116,7 +118,9 @@ classdef Fem < handle
         Objective    = 1e-4;
         Constraint   = 1e-4;
         
-        Solver = 'mr';
+        
+        Type     = 'PlaneStrain'
+        Solver   = 'mr';
         SolverId;
         
         IterationMMA = 1;
@@ -141,20 +145,20 @@ classdef Fem < handle
         
         PlTmp = 0;
         
-        MaxIteration    = 500;
-        MaxIterationMMA = 50;
-        SolverStart = false;
-        SolverStartMMA = false;
-        SolverPlot = true;
-        SolverPlotType = 'Svm';
-        Assemble = false;
-        Convergence = false; 
-        Nonlinear = true;
-        BisectLimit = 5;
-        BisectCounter = 1;
-        AssembledSystem = false;
-        PressureLoad = 0;
-        Type = 'PlaneStrain'
+        MaxIteration     = 500;
+        MaxIterationMMA  = 50;
+        SolverStart      = false;
+        SolverStartMMA   = false;
+        SolverPlot       = true;
+        SolverPlotType   = 'Svm';
+        Assemble         = false;
+        Convergence      = false; 
+        Nonlinear        = true;
+        BisectLimit      = 5;
+        BisectCounter    = 1;
+        AssembledSystem  = false;
+        PressureLoad     = 0;
+        
         Linestyle = '-';
         Linestyle0 = '-';
         Colormap = turbo;
@@ -646,8 +650,8 @@ end
 end
 %-------------------------------------------- NL dynamic newmark-beta solve
 function [Fem, TempNode] = simulate(Fem)
-gam               = 1/2;    
-bet               = 1/4;
+gam               = 1/2; % its not recommended to change these   
+bet               = 1/4; % its not recommended to change these
 Fem.Log           = [];    
 Fem.TimeDelta     = Fem.TimeEnd;
 Fem.BisectCounter = 1;
@@ -659,6 +663,7 @@ Fem.EndIncrement  = false;
 Fem.Convergence   = true;
 Fem.TimeStep      = Fem.TimeStep0 + 1e-6;
 Fem.Density       = clamp(Fem.Density,Fem.Ersatz,1);
+Fem.BisectLimit   = 500;
 
 if norm(Fem.Utmp) == 0
     Fem.Utmp      = zeros(Fem.Dim*Fem.NNode,1);
@@ -683,7 +688,7 @@ if Fem.SolverPlot || (Fem.SolverStartMMA && Fem.SolverPlot)
 end
 
 % pre-build
-Fem.LoadingFactor = sigmoid(0.5*Fem.Time/Fem.TimeStep);
+Fem.LoadingFactor = sigmoid(Fem.Time/(5*Fem.TimeStep));
    
 % assemble global system matrices
 Fem = AssembleGlobalSystem(Fem);
@@ -728,11 +733,16 @@ while true
         
         % update intermediate displacement
         ddDelta    = Fem.ddUtmp;
-        Fem.dUtmp  = Fem.dUtmp_ + (1-gam)*dt*Fem.ddUtmp_ + gam*dt*ddDelta;
-        Fem.Utmp   = Fem.Utmp_  + dt*Fem.dUtmp_ + (0.5-bet)*dt*dt*Fem.ddUtmp_ + dt*dt*bet*ddDelta;
+        
+        if Fem.Iteration == 1
+            Fem.dUtmp  = Fem.dUtmp_ + ... %(1/dt)*(Fem.Utmp - Fem.Utmp_) + ...
+                (1-gam)*dt*Fem.ddUtmp_ + gam*dt*ddDelta;
+            Fem.Utmp   = Fem.Utmp_ + dt*Fem.dUtmp_ + ...
+                (0.5-bet)*dt*dt*Fem.ddUtmp_ + dt*dt*bet*ddDelta;
+        end
         
         % compute loading factor (converges to 1 quickly).
-        Fem.LoadingFactor = sigmoid(3*Fem.Time);
+        Fem.LoadingFactor = sigmoid(Fem.Time/(5*Fem.TimeStep));
         
         % assemble global system matrices
         Fem = AssembleGlobalSystem(Fem);      
@@ -740,7 +750,7 @@ while true
         
         % compute tangent stiffness and internal
         M  = Fem.MassMatrix(FreeDofs,FreeDofs);
-        C  = Fem.DampingMatrix(FreeDofs,FreeDofs);
+        R  = Fem.DampingMatrix(FreeDofs,FreeDofs);
         Kt = Fem.TangentStiffness(FreeDofs,FreeDofs);
        
         Fi = Fem.fInternal(FreeDofs);
@@ -748,24 +758,25 @@ while true
         Fu = Fem.fInput(FreeDofs);
         
         % newmark matrices A        
-        A = bet*dt*dt*Kt + gam*dt*C + M;  
-        b = Fe + Fu - Fi - C*Fem.dUtmp(FreeDofs);
+        A = bet*dt*dt*Kt + gam*dt*R + M;  
+        b = Fe + Fu - Fi - R*Fem.dUtmp(FreeDofs);
         
-        % solve for acceleration
-        %[L,D,P] = ldl(A,'vector');
-        %DeltaU = sparse(P,1,(L'\(D\(L\b(P))))); % thanks Ondrej ;)    
-        DeltaU = A\b;
+        % solve for acceleration    
+        %DeltaU = A\b;
+        [L,D,P] = ldl(A,'vector');
+        DeltaU = sparse(P,1,(L'\(D\(L\b(P))))); % thanks Ondrej ;)
+ 
         ddDelta(FreeDofs,1) = ddDelta(FreeDofs,1) + DeltaU(:,1);
         
         % evaluate convergence criteria
         Fem.SolverResidual = vappend(Fem.SolverResidual,...
-            norm(b));
+            norm(maxk(abs(b),round(0.1*Fem.NNode*2))));
         
         Fem.SolverVonMises = vappend(Fem.SolverVonMises,...
-            max(Fem.s(:,1)));
+            norm(Fem.s(:,1)));
         
         Fem.SolverDisplace = vappend(Fem.SolverDisplace,...
-            norm(DeltaU(:,1)));
+            norm(b));
         
         % check convergence of solution
         [flag, Fem] = CheckConvergence(Fem,Singular); 
@@ -776,16 +787,23 @@ while true
         % update mesh 
         if flag == 0 && Fem.Nonlinear
 
-            Fem.ddUtmp = ddDelta;  
+            Fem.ddUtmp          = ddDelta;  
+            Fem.dUtmp(FreeDofs) = Fem.dUtmp(FreeDofs) + gam*dt*DeltaU;
+            Fem.Utmp(FreeDofs)  = Fem.Utmp(FreeDofs)  + bet*dt*dt*DeltaU;
             
         elseif flag == 1 && Fem.Nonlinear
-
-            dq = (Fem.Utmp - Fem.Utmp_)/dt;
-            Fem.Kinetic    = 0.5*dq(FreeDofs).'*M*dq(FreeDofs);
+            
+            beta = Fem.LoadingFactor;
+            
+            dq = (1/dt)*(Fem.Utmp - Fem.Utmp_); 
+            Fem.Kinetic    = 0.5*beta*dq(FreeDofs).'*M*dq(FreeDofs);
             Fem.PotentialF = Fem.PotentialF + dt*dq(FreeDofs).'*Fu;
-          
+            
             Fem.ddUtmp = ddDelta;
-            Fem.dUtmp  = dt*dt*(1.0-bet)*Fem.ddUtmp_ + dt*dt*bet*ddDelta;
+             Fem.dUtmp  = Fem.dUtmp_ + dt*dt*(1.0-gam)*Fem.ddUtmp_ ...
+                 + dt*dt*gam*ddDelta;
+             Fem.Utmp   = Fem.Utmp_ + dt*Fem.dUtmp_ + ...
+                 (0.5-bet)*dt*dt*Fem.ddUtmp_ + dt*dt*bet*ddDelta;
 
             Fem.Node    = UpdateNode(Fem,Fem.Utmp);
             Fem.Center  = UpdateCenter(Fem);
@@ -804,13 +822,11 @@ while true
     
     if ~Fem.SolverStartMMA
         Fem = AssembleGlobalSystem(Fem);
-        
         Fem = FiniteElementDataLog(Fem);
     end
     
     if Fem.SolverPlot || (Fem.SolverStartMMA && Fem.SolverPlot)
         Fem.show(Fem.SolverPlotType); 
-        %Fem.Pressure{1,2}(Fem);
         drawnow;
     end
    
@@ -911,7 +927,7 @@ while true
         Fu = Fem.fInput(FreeDofs);
         
         if Fem.Iteration == 1
-            Minv = M\(eye(n,n));
+            Minv = invchol(M);
         end
         
         % Hamiltonian gradients
@@ -1575,7 +1591,7 @@ end
 if Fem.VolumetricPressure
     beta = Fem.OptFactor*Fem.LoadingFactor;
     dV   = beta*Fem.PressureCell(:,2);
-else, 
+else 
     dV   = 0; 
 end
 
@@ -1584,7 +1600,6 @@ beta = Fem.LoadingFactor;
 
 Fem.Potential  = 0;
 Fem.PotentialG = 0;
-Fem.Kinetic    = 0;
 
 index    = 0; 
 subindex = 0;
@@ -1603,7 +1618,7 @@ for el = 1:Fem.NElem
             3*Fem.Element{el}],NDof,1);
     end
     
-    [Fe,Fb,Qe,Me,Ce,Ke,Kte,Svme,SS,EE,Te,Ve,Vge,Tke,Re,Ue] = ...
+    [Fe,Fb,Qe,Me,Ce,Ke,Kte,Svme,SS,EE,Te,Ve,Vge,~,Re,Ue] = ...
     Locals(Fem,Fem.Element{el},eDof,dV,V(el));
     
     ind1 = index+1:index+NDof^2;               % matrix indexing
@@ -1631,9 +1646,9 @@ for el = 1:Fem.NElem
     Fem.p(ind3,3) = E(el)*EE(:,4);
     Fem.l(ind3)   = Fem.Element{el}(:);
     
-    Fem.Kinetic    = Fem.Kinetic    + Tke;
-    Fem.Potential  = Fem.Potential  + Ve;
-    Fem.PotentialG = Fem.PotentialG + Vge;
+    %Fem.Kinetic    = Fem.Kinetic    + Tke;
+    Fem.Potential  = Fem.Potential  + beta*Ve;
+    Fem.PotentialG = Fem.PotentialG + beta*Vge;
     Fem.v(ind3)    = Qe(:);
     
     if Fem.Iteration == 1
@@ -1644,9 +1659,6 @@ for el = 1:Fem.NElem
     index    = index + NDof^2;
     subindex = subindex + NDof/Fem.Dim;
 end
-
-% M = sparse(Fem.i,Fem.j,E(Fem.e).*Fem.m);
-% Fem.Kinetic = Fem.dUtmp.'*M*Fem.dUtmp;
 
 end
 
@@ -1979,7 +1991,8 @@ AllDofs   = 1:Fem.Dim*Fem.NNode;
 FreeDofs  = setdiff(AllDofs,FixedDofs);
 end
 %--------------------------------------------------- local element matrices
-function [Fe,Fb,Qe,Me,Ce,Ke,Kte,Svme,SS,EE,Te,Ve,Vge,Tke,Re,Ue] = Locals(Fem,eNode,eDof,dV,Rb)
+function [Fe,Fb,Qe,Me,Ce,Ke,Kte,Svme,SS,EE,Te,Ve,Vge,Tke,Re,Ue] = ...
+        Locals(Fem,eNode,eDof,dV,Rb)
 % get order
 nn = length(eNode);
 mm = Fem.Dim;
@@ -2001,6 +2014,7 @@ UUe = zeros(3);
 Qe  = ones(nn,1);
 Ve  = 0;
 Vge = 0;
+%Tke = 0;
 
 Nshp = length(Fem.ShapeFnc{nn}.N(:,:,1));
 NNe  = zeros(length(W),Nshp);
@@ -2017,6 +2031,7 @@ dDelta = Fem.dUtmp(eDof,:);
 
 % quadrature loop
 for q = 1:length(W)
+    
     % extract shape-functions
     N     = Fem.ShapeFnc{nn}.N(:,:,q);
     dNdxi = Fem.ShapeFnc{nn}.dNdxi(:,:,q);
@@ -2030,11 +2045,11 @@ for q = 1:length(W)
     % polar decompostion
     [R, Q, ~] = PolarDecomposition(Fem,F);
 
-    % increase robuWstness low density
-    Q = Rb*(Q-eye(3)) + eye(3);
+    % increase robustness low density
+    %Q = Rb*(Q-eye(3)) + eye(3);
     
     % reconstruct deformation gradient
-    F = R*Q;
+    %F = R*Q;
     
 %     % right cauchy-green strain
 %     C = F.'*F;
@@ -2080,11 +2095,8 @@ for q = 1:length(W)
     % thermal expansion force
     Te = Te + tau*W(q)*Bnl.'*De*Et*dJ;
     
-    % elemental potential energ
+    % elemental potential energy
     Ve = Ve  + tau*W(q)*Psi*dJ;
- 
-    %Vge = Vge - tau*W(q)*Fem.Material.Rho*N.'*Fem.Node(eNode,:)*Fem.Gravity(:)*dJ;
-    %Tke = Tke + 0.5*tau*W(q)*Fem.Material.Rho*(NN*dDelta).'*(NN*dDelta)*dJ;
     
     % graviational energy
     Vge = Vge - tau*W(q)*((N.'*Fem.Node0(eNode,:)) + ...
@@ -2129,20 +2141,6 @@ for node = 1:Fem.NNode
 end
 
 end
-%------------------------------------------------------ compute force field
-function [fx,fy,fn] = InternalForceField(Fem,F)
-
-fx = zeros(Fem.NNode,1);
-fy = zeros(Fem.NNode,1);
-fn = zeros(Fem.NNode,1);
-
-for node = 1:Fem.NNode
-    fx(node) = F(2*node - 1,1);
-    fy(node) = F(2*node,1);
-    fn(node) = sqrt(fx(node)^2 + fy(node)^2);
-end
-
-end
 %----------------------------------------------------- deformation gradient
 function F = DeformationGradient(Fem,U,dNdx)
 nn = length(U)/Fem.Dim;
@@ -2175,33 +2173,38 @@ end
 function [Bn,Bg,NN,tau] = NonlinearStrainOperator(Fem,N,dNdx,F)
 nn = length(N);
 mm = Fem.Dim;
+zz = mm*nn;
 
-NN = zeros(mm,mm*nn);
-NN(1,1:mm:mm*nn) = N.';
-NN(2,2:mm:mm*nn) = N.';
+NN = zeros(mm,zz);
+
+id1 = 1:mm:zz;
+id2 = 2:mm:zz;
+
+NN(1,id1) = N.';
+NN(2,id2) = N.';
 dNdxX = dNdx(:,1).';
 dNdxY = dNdx(:,2).';
 
-if Fem.Dim == 3
-    NN(3,3:mm:mm*nn) = N.';
+if mm == 3
+    NN(3,3:mm:zz) = N.';
     dNdxZ = dNdx(:,3).';
 end
 
-Bn = zeros((mm-1)*3,mm*nn);
-Bg = zeros((mm-1)*4+(mm-2),mm*nn);
+Bn = zeros((mm-1)*3,zz);
+Bg = zeros((mm-1)*4+(mm-2),zz);
 
 if mm == 2 % 2-dimensional
-    Bn(1,1:mm:mm*nn) = dNdxX*F(1,1);
-    Bn(1,2:mm:mm*nn) = dNdxX*F(2,1);
-    Bn(2,1:mm:mm*nn) = dNdxY*F(1,2);
-    Bn(2,2:mm:mm*nn) = dNdxY*F(2,2);
-    Bn(3,1:mm:mm*nn) = dNdxX*F(1,2) + dNdxY*F(1,1);
-    Bn(3,2:mm:mm*nn) = dNdxX*F(2,2) + dNdxY*F(2,1);
+    Bn(1,id1) = dNdxX*F(1,1);
+    Bn(1,id2) = dNdxX*F(2,1);
+    Bn(2,id1) = dNdxY*F(1,2);
+    Bn(2,id2) = dNdxY*F(2,2);
+    Bn(3,id1) = dNdxX*F(1,2) + dNdxY*F(1,1);
+    Bn(3,id2) = dNdxX*F(2,2) + dNdxY*F(2,1);
     
-    Bg(1,1:mm:mm*nn) = dNdxX;
-    Bg(2,1:mm:mm*nn) = dNdxY;
-    Bg(3,2:mm:mm*nn) = dNdxX;
-    Bg(4,2:mm:mm*nn) = dNdxY;
+    Bg(1,id1) = dNdxX;
+    Bg(2,id1) = dNdxY;
+    Bg(3,id2) = dNdxX;
+    Bg(4,id2) = dNdxY;
     
 else % 3-dimensional
     Bn(1,1:mm:mm*nn) = dNdxX*F(1,1);
@@ -2235,19 +2238,22 @@ else % 3-dimensional
 end
 
 tau = 1;
+
 end 
 %------------------------------------------------------ isotropic reduction
 function [S, D, G] = IsotropicReduction(Fem,D0,S0)
 mm = Fem.Dim;
 
-D = zeros((mm-1)*3,(mm-1)*3); 
-S = zeros((mm-1)*3,1);
+%D = zeros((mm-1)*3,(mm-1)*3); 
+%S = zeros((mm-1)*3,1);
 
 if mm == 2
-    D(1:2,1:2) = D0(1:2,1:2); D(3,3) = D0(4,4);
+    D = [D0(1,1),D0(1,2),0; D0(2,1),D0(2,2),0;0,0,D0(4,4)];
+    %D(1:2,1:2) = D0(1:2,1:2); D(3,3) = D0(4,4);
     SIG = [S0(1),S0(4); S0(4),S0(2)];
-    S(1) = S0(1); S(2) = S0(2);
-    S(3) = S0(4);
+    S   = [S0(1);S0(2);S0(4)]; 
+    %S(2) = S0(2);
+    %S(3) = S0(4);
 else
     D = D0;
     S = S0;
@@ -2291,7 +2297,7 @@ if Fem.SolverResidual(end,1) > Fem.SolverResidual(end-1,1)
 end
 
 if (Criteria && (Fem.Iteration <= Fem.MaxIteration) && ~SingularKt && ...
-         Fem.Divergence < 5)
+         Fem.Divergence < Fem.BisectLimit)
     flag = 0;
 else
     if (Fem.Iteration > Fem.MaxIteration) || SingularKt || ...
@@ -2301,7 +2307,7 @@ else
         Fem.Utmp = Fem.U;
     %elseif (Fem.Iteration == 1 && Fem.Nonlinear)
     %    flag = 0;    
-    elseif (Fem.Divergence >= 5)
+    elseif (Fem.Divergence >= Fem.BisectLimit)
         flag = 2;        
         Fem.Utmp = Fem.U;
         Fem.Convergence = false;

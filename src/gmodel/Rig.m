@@ -110,7 +110,12 @@ function Rig = computeFK(Rig,q,varargin)
     
     Rig = Rig.reset();
 
-    Rig.g = Rig.FK(q);
+    G = Rig.FK(q);
+    Rig.g = zeros(size(G,3),7);
+    for ii = 1:size(G,3)
+        Rig.g(ii,1:4) = rot2quat(G(1:3,1:3,ii));
+        Rig.g(ii,5:7) = G(1:3,4,ii).';
+    end
      
     s = Rig.Domain;
     X = linspace(0,s,size(Rig.g,1));

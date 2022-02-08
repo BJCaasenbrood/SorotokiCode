@@ -20,8 +20,8 @@ fem.Material = NeoHookeanMaterial;
 %% add boundary constraint
 CP1 = [20,48];  % control point 1
 CP2 = [150,48]; % control point 2
-F1  = -5;     % control force 1
-F2  = 0;      % control force 2
+F1  = 5;     % control force 1
+F2  = -1;      % control force 2
 
 fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[1,1]);
 fem = fem.AddConstraint('Load',fem.FindNodes('Location',CP1),[F1,0]);

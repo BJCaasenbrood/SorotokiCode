@@ -5,7 +5,7 @@
 % works seamlessly with SDF.m
 %--------------------------------------------------------------------------
 % main usage:
-%   msh = Mesh(sdf);                     % converts SDF class to MESH class
+%  3 msh = Mesh(sdf);                     % converts SDF class to MESH class
 %--------------------------------------------------------------------------
 % options:
 %   msh = Mesh(sdf,'NElem',1e3);         % mesh with 1000 poly elements
@@ -42,6 +42,7 @@ classdef Mesh
         eps; 
         eta; 
         Triangulate;
+        Laplacian;
         MaxIteration;
         Movie;
         MovieStart;
@@ -97,6 +98,8 @@ function obj = Mesh(Input,varargin)
        elseif strcmp(ext,'.obj')
            [v,f] = objreader(Input);
        elseif strcmp(ext,'.png') 
+           obj.Dim   = 2;
+           obj.Type  = 'C2T3'; 
            obj.Image = rgb2gray(imread(Input));
        else, cout('err','* extension not recognized');
        end
@@ -324,12 +327,19 @@ end
 if strcmp(Mesh.Type,'C3H8'), [v,f] = HexahedronOrder(Mesh,v,f); end
 
 if Mesh.Triangulate
-    Mesh.Node = v;
+    Mesh.Node    = v;
     Mesh.Element = f;
+    
     [v,f] = MeshTriangulation(Mesh,P,v,f,length(f), length(v));
     [v,f] = ResequenceNodes(Mesh,v,f);
+    
     Mesh.NElem = length(f);
-    Mesh.NNode = length(v);
+    Mesh.NNode = length(v);  
+    Mesh.Node    = v;
+    Mesh.Element = f;
+    
+%     Mesh = ComputeCotanLaplacian(Mesh);
+
 end
 
 [Pc,A] = computeCentroid(Mesh,f,v); 
@@ -342,8 +352,42 @@ Mesh.NElem   = length(f);
 Mesh.Area    = A;
 
 Mesh = ElementAdjecency(Mesh);
+
 if Mesh.Dim < 3
     Mesh.BndMat = ConstructBounds(Mesh);
+end
+
+if strcmp(Mesh.Type,'C3T3') || strcmp(Mesh.Type,'C2T3')
+    list  = (1:Mesh.NNode).';
+    Bnd = vertcat(Mesh.BndMat{:});
+    Pfix  = unique(Bnd(:));
+    Pfree = setdiff(list,Pfix);
+    N2F = Mesh.FaceToNode;
+    
+    f = Mesh.Element;
+    v = Mesh.Node;
+    dv = v;
+    dvm = mean(abs(dv(:,1)) + abs(dv(:,2)));
+    
+    jj = 1;
+    while dvm >= 1e-3 && jj < 150
+        
+       [Pc,A] = computeCentroid(Mesh,f,v);  
+       dv = v*0;
+       
+       for jj = 1:numel(Pfree)
+           id = Pfree(jj);
+           Am = diag(N2F(:,id))*A;
+           dv(id,:) = mean(diag(Am)*((Pc - v(id,:))),1)/(sum(Am)^2);
+       end
+       
+       dvm = mean(abs(dv(:,1)) + abs(dv(:,2)));
+       v(Pfree,:) = v(Pfree,:) + dv(Pfree,:);
+       jj = jj +1;
+    end
+    
+    Mesh.Node  = v;
+  
 end
 
 end
@@ -535,7 +579,7 @@ Alpha = 1.5*(A/Mesh.NElem)^(1/2);
 d = Mesh.SDF(P);  
 
 % number of assigned boundary segments
-NBdrySegs = size(d,2)-1;   
+NBdrySegs = (size(d,2)-1);   
 if Mesh.Dim == 2
 n1 = (Mesh.SDF(P+repmat([Mesh.eps,0],Mesh.NElem,1))-d)/Mesh.eps;
 n2 = (Mesh.SDF(P+repmat([0,Mesh.eps],Mesh.NElem,1))-d)/Mesh.eps;
@@ -670,6 +714,45 @@ end
 f = num2cell(f,2);
 v = [v0;Center];
 end
+%-------------------------------- compute cotang laplacian triangular mesh
+function Mesh = ComputeCotanLaplacian(Mesh)
+
+if Mesh.Dim == 2
+    V = [Mesh.Node.';zeros(1,Mesh.NNode)];
+else
+    V = Mesh.Node.';
+end
+
+F = vertcat(Mesh.Element{:,1}).';
+W = sparse(Mesh.NNode,Mesh.NNode);
+
+for i = 1:3
+    
+   i1 = mod(i-1,3)+1;
+   i2 = mod(i  ,3)+1;
+   i3 = mod(i+1,3)+1;
+   pp = V(:,F(i2,:)) - V(:,F(i1,:));
+   qq = V(:,F(i3,:)) - V(:,F(i1,:));
+   
+   % normalize the vectors
+   pp = pp ./ repmat( sqrt(sum(pp.^2,1)), [3 1] );
+   qq = qq ./ repmat( sqrt(sum(qq.^2,1)), [3 1] );
+   % compute angles
+   ang = acos(sum(pp.*qq,1));
+   u = cot(ang);
+   u = clamp(u, 0.01,100);
+   W = W + sparse(F(i2,:),F(i3,:),u,Mesh.NNode,Mesh.NNode);
+   W = W + sparse(F(i3,:),F(i2,:),u,Mesh.NNode,Mesh.NNode);
+end
+
+d = full( sum(W,1) );
+%D = spdiags(d(:),0,Mesh.NNode,Mesh.NNode);
+%L = D - W;
+L = speye(Mesh.NNode) - diag(sum(W,2).^(-1/2)) * W * diag(sum(W,2).^(-1/2));
+
+Mesh.Laplacian = L;
+
+end
 %--------------------------------------------------- collapse smaller edges
 function [Node0,Element0] = CollapseEdges(Mesh,Node0,Element0)
 
@@ -776,34 +859,9 @@ for i = 1:Mesh.NElem
     s = C3H8Order(v);
     Element{i} = Element0{i}(s);
 end
-
+%---------------------------------------------------------- resequence mesh
 function s = C3H8Order(points)
 
-% n = 8;
-% k = n-1;
-% s = 1:8;
-% while (k > 0)
-%     l = 0;
-%     for j = 1:k
-%     if (points(j,3) > points(j+1,3) ...
-%     || (points(j,3) == points(j+1,3) && points(j,1) > points(j+1,1)) ...
-%     || (points(j,3) == points(j+1,3) && points(j,1) == points(j+1,1)...
-%         && points(j,2) < points(j+1,2)) )
-%         for m = 1:3
-%             tmp = points(j,m);
-%             points(j,m)   = points(j+1,m);
-%             points(j+1,m) = tmp;
-%         end
-%         tmp = s(j);
-%         s(j) = s(j+1);
-%         s(j+1) = tmp;
-%         l = j;
-%     end
-%     end
-%     k = l;
-% end
-% 
-% s = [s(2),s(3),s(4),s(1),s(6),s(7),s(8),s(5)];
 s = 1:8;
 XD = [-1 1 1 -1 -1 1 1 -1; -1 -1 1 1 -1 -1 1 1; -1 -1 -1 -1 1 1 1 1];
 for k = 1:8
@@ -925,13 +983,15 @@ end
 
 edges = cellfun(@numel,face);
 n = Mesh.NElem;    
-p = max(cellfun(@max,face));    
+%p = max(cellfun(@max,face));    
+p = Mesh.NNode;
 MaxNVer = max(cellfun(@numel,face));     
 
 if Mesh.Dim < 3
     tri = GenerateElementalMatrix(Mesh);
     Mesh.ElemMat = tri;
 else
+    
     if ~strcmp(Mesh.Type,'C3T3')
         [A,tri,triID] = GenerateElementalMatrix(Mesh);
     else
@@ -939,11 +999,13 @@ else
         tri = vertcat(Mesh.Element{:});
         triID = (1:Mesh.NElem).';
     end
+    
     Mesh.ElemMat = A;
     MaxNVer = max(cellfun(@numel,num2cell(tri,2)));
     edges = cellfun(@numel,num2cell(tri,2));
-    p = max(cellfun(@max,num2cell(tri,2)));
+    %p = max(cellfun(@max,num2cell(tri,2)));
     Mesh.ElementToFace = sparse(1:length(A),triID,1);
+    
 end
 
 set = 1:n;
@@ -981,12 +1043,12 @@ end
 
 E = sort(EdgeMat')';
 [u,~,n] = unique(E,'rows');
-counts = accumarray(n(:), 1);
+counts  = accumarray(n(:), 1);
 B = u(counts==1,:);
 
-Mesh.Adjecency = sparse(double(C>1));
+Mesh.Adjecency  = sparse(double(C>1));
 Mesh.NodeToFace = (M./sum(M,1))';
-Mesh.FaceToNode  = ((M')./sum(M,2)')';
+Mesh.FaceToNode = ((M')./sum(M,2)')';
 Mesh.Boundary = B;
 %end
 end

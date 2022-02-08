@@ -4,4 +4,4 @@ clr;
 % not working...
 
 %% show bunny mesh
-msh.show();
+%msh.show();

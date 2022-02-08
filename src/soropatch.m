@@ -1,4 +1,18 @@
 %% ------------------------------------------------------------------------
+% % SOROTOKI - Alpha - 2.28.01 - Jan 28 - 2022
+% + Improved stability of Newmark solver.
+%% ------------------------------------------------------------------------
+% % SOROTOKI - Alpha - 2.24.01 - Jan 24 - 2022
+% - Fixed broken installer. `vernum.m` file was missing on Repo. It has been
+%   replaced with `soropatch.m` which also includes the patch notes.
+%
+% + **Sdf.m**:
+%   - Added a new function `Sdf.showcontour()`. It will show the contour of 2D
+%   signed distance functions. Currently not implemented for 3D Sdfs.
+% 
+% + **Open issue (2.24.01)**:    
+%   - @martijnschouten Missing DOI for citation, and long-term support/access.
+%% ------------------------------------------------------------------------
 % % SOROTOKI - Alpha - 2.13.01 - Jan 13 - 2022
 % + Moved SOROTOKI from early alpha to alpha (prepping for official release).
 % 
@@ -20,7 +34,7 @@
 %   orthonormal derived from the matrix X. X must be full-rank. This
 %   function is simply the gramm-smith method for the innerproduct space
 %   int_C y_i y_j ds on the domain C := [0,L].
-% 
+%% ------------------------------------------------------------------------
 % % SOROTOKI - Early Alpha - 1.12.06 - Dec 6 - 2021
 % - Fixed some numerical issues with Fem.simulate() function. Stability is 
 %   now further improved for larger timesteps.
@@ -40,7 +54,7 @@
 % ? Future implementation will have Load and Tendon-based dynamic forces
 % 
 % ? The potential energy of the extenal load is still missing...
-% % ------------------------------------------------------------------------
+%% ------------------------------------------------------------------------
 % % SOROTOKI - Early Alpha - 1.12.02 - Dec 2 - 2021
 % + Added Fem.simulate() function to the Nonlinear Finite Element. The
 %   function is a standard Newmark-Beta dynamic solver routine for NLFEM.

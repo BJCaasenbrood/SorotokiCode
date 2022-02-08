@@ -42,7 +42,7 @@ global dt
 figure(101);
 set(gcf,'Name','Checking Plotting tools');
 subplot(2,2,1);
-cout('\t col()\t');
+cout('\t color\t');
 bic;
 colorshow();
 boc;
@@ -61,7 +61,7 @@ colormap(inferno); drawnow; pause(dt);
 colormap(metro); drawnow; pause(dt);
 colormap(noir); drawnow; pause(dt);
 colormap(turbo); drawnow; pause(dt);
-colormap(viridis); drawnow; pause(dt); 
+colormap(viridi); drawnow; pause(dt); 
 boc;
 
 subplot(2,2,3);
@@ -157,7 +157,7 @@ function checkFem
 sdf = sRectangle(0,2,0,1);
 
 cout('\t Fem(Mesh)'); bic; 
-msh = Mesh(sdf,'Quads',[15,7]);
+msh = Mesh(sdf,'Quads',[8,3]);
 msh = msh.generate();
 fem = Fem(msh,'ShowProcess',false);
 boc;
@@ -268,7 +268,7 @@ else
     List{end,2} = input;
     cout(' ');
     cout('red','\t Unsuccesfull!\n');
-    cout('red', input.message);
+    %cout('red', input.message);
     cout('\n');
 end
 
