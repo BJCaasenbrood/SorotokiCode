@@ -31,7 +31,7 @@ elseif isflint(numel(g)/16)
     Rx0 = reshape(g(1:3,1,:),3,[]);
     Ry0 = reshape(g(1:3,2,:),3,[]);
     Rz0 = reshape(g(1:3,3,:),3,[]);
-    p = (p0.'*I');
+    p  = (p0.'*I');
     Rx = (Rx0.'*I');
     Ry = (Ry0.'*I');
     Rz = (Rz0.'*I');

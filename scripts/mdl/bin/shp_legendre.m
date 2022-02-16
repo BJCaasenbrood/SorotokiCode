@@ -10,10 +10,7 @@ x = linspace(0,1,N).';
 Y = [];
 
 for ii = 1:4
-    %Y(:,ii) = cos(2*pi*(ii-1)*x); % sinusoidal
-    %Y(:,ii) = legendre(x,ii-1);   % legendre
-    Y(:,ii) = chebyshev(x,ii-1);  % chebyshev
-    %Y(:,ii) = x.^(ii-1);           % affine curvature
+    Y(:,ii) = legendre(x,ii-1);   % legendre
 end
 
 Y = gsogpoly(Y);

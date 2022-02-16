@@ -61,7 +61,7 @@ colormap(inferno); drawnow; pause(dt);
 colormap(metro); drawnow; pause(dt);
 colormap(noir); drawnow; pause(dt);
 colormap(turbo); drawnow; pause(dt);
-colormap(viridi); drawnow; pause(dt); 
+colormap(viridis); drawnow; pause(dt); 
 boc;
 
 subplot(2,2,3);
@@ -239,7 +239,6 @@ boc;
 boc;
 
 end
-
 %--------------------------------------------------------------------------
 %--------------------------------------------------------------------------
 function list = verifySorotoki(list,exec,label)

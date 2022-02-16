@@ -133,13 +133,13 @@ end
 function mesh = SE3Mesh(mesh,Arg)
 Node0 = [mesh.Node, ones(mesh.NNode,1)]; 
 
-R = quat2rot(Arg(1:4));
-r = Arg(5:7);
-H = zeros(4);
-H(1:3,1:3) = R;
-H(1:3,4) = [r(1),r(2),r(3)].';
-H(4,4) = 1;
-
+% R = quat2rot(Arg(1:4));
+% r = Arg(5:7);
+% H = zeros(4);
+% H(1:3,1:3) = R;
+% H(1:3,4) = [r(1),r(2),r(3)].';
+% H(4,4) = 1;
+H = Arg;
 Node = H*Node0.';
 mesh.Node = Node(1:3,:).';
 end
@@ -155,13 +155,13 @@ end
 function mesh = SE3MeshXTangent(mesh,Arg)
 Node0 = [mesh.Node, ones(mesh.NNode,1)]; 
 
-R = Quat2Rot(Arg(1:4));
-r = Arg(5:7);
-H = zeros(4);
-H(1:3,1:3) = R.';
-H(1:3,4) = [r(3),r(2),r(1)].';
-H(4,4) = 1;
-
+% R = Quat2Rot(Arg(1:4));
+% r = Arg(5:7);
+% H = zeros(4);
+% H(1:3,1:3) = R.';
+% H(1:3,4) = [r(3),r(2),r(1)].';
+% H(4,4) = 1;
+H = Arg;
 Node = H*Node0.';
 mesh.Node = Node(1:3,:).';
 end
@@ -204,9 +204,9 @@ end
 function mesh = SweepMesh(mesh,Arg)
 
 Node0 = mesh.Node;
-List = Arg{1};
-Swp = Arg{2};
-V = 0*Node0;
+List  = Arg{1};
+Swp   = Arg{2};
+V     = 0*Node0;
 
 for ii = 1:length(Node0)
     v = Node0(ii,:);
@@ -215,8 +215,8 @@ for ii = 1:length(Node0)
     id = List(ii);
     
     p1 = [vx; vy; 0];
-    p0 = [Swp(id,7);Swp(id,6);Swp(id,5)];
-    R = Quat2Rot(Swp(id,1:4)).';
+    p0 = (Swp([3,2,1].',4,id)); %[Swp(id,7);Swp(id,6);Swp(id,5)];
+    R  = rot90(Swp(1:3,1:3,id),2);%Quat2Rot(Swp(id,1:4)).';
     %R = [R(:,3),R(:,2),R(:,1)];
     
     H0 = [R,p0;0,0,0,1];

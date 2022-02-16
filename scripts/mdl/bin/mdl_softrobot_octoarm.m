@@ -1,11 +1,11 @@
 %clr; cdsoro; beep off;
 %clc; clear;
 %% assign free DOF
-mdl = Model([0,1,1,0,0,0],'NModal',8,'NDisc',1);
+mdl = Modelcpp([0,1,1,0,0,0],'NModal',8,'NDisc',1);
 mdl = setupSoftRobot(mdl,0.01,0.001,0.001);
 %mdl = setupSoftRobot(mdl,1.0,0.1,0.1);
 mdl = mdl.set('Controller',1);
-mdl = mdl.set('TimeStep', 1/33.33333);
+mdl = mdl.set('TimeStep', 1/60);
 mdl = mdl.set('Tdomain', 10); 
 
 %% generate and solve dynamic model
@@ -66,37 +66,37 @@ grid on;
 %error(1);
 disp(' - Press enter to play simulation - ');
 %% generate rig
-[rig, sph] = setupRig(mdl);
-
-%text(0.055,0.00,-0.005,'\textbf{$g_d$}','interpreter','latex','fontsize',16);
-
-h = [];
-for ii = 1:fps(t,15):length(mdl.q)
-    rig = rig.computeFK(mdl.q(ii,:));
-    rig = rig.update();
-   
-    sph.reset();
-    sph = Blender(sph,'SE3x',mdl.gd(ii,:));
-    sph = Blender(sph,'SE3',rig.g0);
-    sph.update();
-
-    setupFigure(ii);
-    view(30,30);
-    
-    delete(h);
-    %h = shadowplot(5);
-    
-    background();
-    
-%     if mod(ii,15) <= 1
-%         pause;
-%         t(ii)
-%     end
-%     if ii == 1, gif('srm3_octarm.gif','frame',gcf,'nodither');
-%         pause; framepause(5);
-%     else, gif;
-%     end
-end
+% [rig, sph] = setupRig(mdl);
+% 
+% %text(0.055,0.00,-0.005,'\textbf{$g_d$}','interpreter','latex','fontsize',16);
+% 
+% h = [];
+% for ii = 1:fps(t,15):length(mdl.q)
+%     rig = rig.computeFK(mdl.q(ii,:));
+%     rig = rig.update();
+%    
+%     sph.reset();
+%     sph = Blender(sph,'SE3x',mdl.gd(ii,:));
+%     sph = Blender(sph,'SE3',rig.g0);
+%     sph.update();
+% 
+%     setupFigure(ii);
+%     view(30,30);
+%     
+%     delete(h);
+%     %h = shadowplot(5);
+%     
+%     background();
+%     
+% %     if mod(ii,15) <= 1
+% %         pause;
+% %         t(ii)
+% %     end
+% %     if ii == 1, gif('srm3_octarm.gif','frame',gcf,'nodither');
+% %         pause; framepause(5);
+% %     else, gif;
+% %     end
+% end
 
 %framepause(15);
 
@@ -106,7 +106,7 @@ function mdl = setupSoftRobot(mdl,Kp,Kd,Lam)
 L0 = 0.12;
 
 mdl = mdl.set('Sdomain',   L0);
-mdl = mdl.set('SpaceStep', 24);
+mdl = mdl.set('SpaceStep', 80);
 mdl = mdl.set('Density',   1200);
 mdl = mdl.set('Radius',    1e-2);
 mdl = mdl.set('Gravity',   [0,0,-9.81]);

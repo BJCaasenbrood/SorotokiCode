@@ -191,7 +191,8 @@ function Gmodel = render(Gmodel,varargin)
         Gmodel.TextureMap,'FaceColor','flat','FaceAlpha',Gmodel.Alpha);
     
     set(gcf,'color',gitpage); material dull;
-    axis equal; axis(Gmodel.BdBox); axis off; %view(30,15);
+    axis equal; axis(Gmodel.BdBox); axis off; 
+    %view(30,15);
     daspect([1,1,1]);
     
     ax = gca; 
@@ -567,7 +568,7 @@ function Gmodel = BakeCubemap(Gmodel,Cubemap)
     UV = SphereMapping(Normals,alpha);
        
     EnviromentReflect = zeros(N,3);
-    rgbImage = fliplr((Cubemap));
+    rgbImage = ((Cubemap));
       
     R = rgbImage(:,:,1);
     G = rgbImage(:,:,2);

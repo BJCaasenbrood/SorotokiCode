@@ -8,12 +8,8 @@ x = linspace(0,1,N).';
 Y = zeros(N,M);
 
 for ii = 1:M
-    %Y(:,ii) = chebyshev(x,ii-1); % legendre 
     Y(:,ii) = x.^(ii-1);          % affine curvature
-    %Y(:,ii) = cos(2*pi*(ii)*x);  % sinusoidal
 end
-
-Y = gsogpoly(Y);
 
 %% desired SE3
 Sd = sCircle(0.5,-0.2,0.1);
@@ -47,8 +43,9 @@ while norm(e) > 1e-3
     % plotting
     subplot(1,2,1)
     cplane(X,Y,Z); hold on;
-    plot(p(:,1),p(:,3),'w-','LineW',4); 
-    plot(pd(1),pd(3),'wo','LineW',3,'MarkerS',20);
+    plot(p(:,1),p(:,3),'w-','LineW',2); 
+    plot(pd(1),pd(3),'wo','LineW',2,'MarkerS',20);
+    
     %plotSE2(g);
     plot(XY(:,1),XY(:,2),'w.','MarkerS',10);
     quiver(XY(:,1),XY(:,2),T(:,1),T(:,2));

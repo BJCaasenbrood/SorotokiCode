@@ -315,6 +315,7 @@ WriteToFile([Path,'\data\matcap\img']);
 WriteToFile([Path,'\data\stl']);
 WriteToFile([Path,'\data\contours']);
 WriteToFile([Path,'\scripts\']);
+WriteToFile([Path,'\livescripts\']);
 else
 AddPath(Path);
 AddPath([Path,'\src\']);
@@ -331,6 +332,7 @@ AddPath([Path,'\data\matcap\img']);
 AddPath([Path,'\data\stl']);
 AddPath([Path,'\data\contours']);
 AddPath([Path,'\scripts\']);
+AddPath([Path,'\livescripts\']);
 pause(.3);
 
 x = CheckLibary('base.lib',@(x) basePathConfirm);
@@ -350,11 +352,13 @@ global FID FIT
 if Request == 1
 fprintf(FID,'%% gmodel.lib \n');
 WriteToFile([Path,'\scripts\gmdl\']);
+WriteToFile([Path,'\livescripts\gmdl\']);
 WriteToFile([Path,'\src\gmodel']);
 WriteToFile([Path,'\src\gmodel\tools\']);
 WriteToFile([Path,'\src\gmodel\matcap\']);
 WriteToFile([Path,'\src\gmodel\matcap\img']);
 else
+AddPath([Path,'\livescripts\gmdl\']);
 AddPath([Path,'\scripts\gmdl\']);
 AddPath([Path,'\src\gmodel']);
 AddPath([Path,'\src\gmodel\tools\']);
@@ -450,11 +454,13 @@ global FID FIT
 if Request == 1
 fprintf(FID,'%% mdl.lib \n');
 WriteToFile([Path,'\scripts\mdl']);
+WriteToFile([Path,'\livescripts\mdl']);
 WriteToFile([Path,'\src\model']);
 WriteToFile([Path,'\src\model\tools']);
 WriteToFile([Path,'\src\model\tools\solver']);
 else
 AddPath([Path,'\scripts\mdl']);
+AddPath([Path,'\livescripts\mdl']);
 AddPath([Path,'\src\model']);
 AddPath([Path,'\src\model\tools']);
 pause(.3);

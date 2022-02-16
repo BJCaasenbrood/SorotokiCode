@@ -15,6 +15,7 @@ classdef Shapes
         
         POD;
         Theta;
+        Xi0;
         
         Rho;
         Zeta;
@@ -48,6 +49,9 @@ classdef Shapes
         g0;
         Filter;
         Quality;
+        
+        ThetaEval;
+        Xi0Eval;
     end
    
 %--------------------------------------------------------------------------
@@ -80,8 +84,8 @@ function obj = Shapes(Input,NModal,varargin)
         obj.PODEnergy{2} = ones(size(Input,2),1);
         obj.PODEnergy{1} = ones(size(Input,2),1);
         
-        obj.Rho  = 1070e-9;
-        obj.Zeta = 1;
+        obj.Rho  = 1090e-12;
+        obj.Zeta = .15;
     end
 
     % cross-section SDF
@@ -106,7 +110,8 @@ function obj = Shapes(Input,NModal,varargin)
     end
     end
     
-    obj.g0 = [1,0,0,0,0,0,0];
+    %obj.g0 = [1,0,0,0,0,0,0];
+    obj.g0 = SE3(eye(3),zeros(3,1));
     obj = rebuild(obj);
     
 end
@@ -221,11 +226,14 @@ end
 
 Shapes.NDim = sum(Shapes.NModal);
 Shapes.Ba   = I6(:,Xa);
+Shapes.Sigma = linspace(0,1,Shapes.NNode);
+Shapes.ds    = Shapes.L0/(Shapes.NNode);
 
 Shapes = BuildInertia(Shapes);
-Shapes.Dtt  = Shapes.Zeta*Shapes.Mtt;
+
 Shapes.Ktt  = LinearStiffnessTensor(Shapes);
 Shapes.Ktt0 = Shapes.Ktt;
+Shapes.Dtt  = Shapes.Zeta*Shapes.Mtt;
   
 if ~isempty(Shapes.Fem)
     Shapes = GenerateRadialFilter(Shapes);
@@ -248,6 +256,23 @@ if ~isempty(Shapes.PODR) || ~isempty(Shapes.PODR)
     
     % rebuild shape-function matrix
     Shapes.Theta = @(x) ShapeFunction(Shapes,x);
+end
+
+Shapes.Xi0 = @(x) IntrinsicFunction(Shapes,x);
+
+% precompute Theta matrix
+FncT = @(x) Shapes.Theta(x);
+FncX = @(x) Shapes.Xi0(x);
+s   = sort([Shapes.Sigma*Shapes.L0,...
+            Shapes.Sigma*Shapes.L0+(2/3)*Shapes.ds]);
+
+[nx,ny]     = size(FncT(0));
+Shapes.ThetaEval = zeros(nx,ny,numel(s));
+Shapes.Xi0Eval   = zeros(6,1,numel(s));
+
+for ii = 1:numel(s)
+    Shapes.ThetaEval(:,:,ii) = FncT(s(ii));
+    Shapes.Xi0Eval(:,1,ii)   = FncX(s(ii));
 end
 
 end 
@@ -342,32 +367,41 @@ if numel(q) ~= Shapes.NDim
    error(['Dimension of joint inconstisten with POD matrix. Please ', ...
        'check your input dimensions dim(q).']) 
 end    
-
-Ndim = Shapes.NDim;
-Ns   = Shapes.NNode;
+% 
+% Ndim = Shapes.NDim;
+% Ns   = Shapes.NNode;
 q    = q(:) + 1e-6;
-s    = 0;
-h    = Shapes.ds;
-X    = MDE(Shapes.NDim);
+% s    = 0;
+% h    = Shapes.ds;
+% X    = MDE(Shapes.NDim);
 
-gtmp = zeros(4,4,Ns);    % cell(numel(Shapes.Sigma),1);
-Jtmp = zeros(6,Ndim,Ns); % cell(numel(Shapes.Sigma),1);
+[g,J] = computeForwardKinematicsFast_mex(q,... % states
+    Shapes.ds,...         % spatial steps
+    Shapes.g0(1:3,4),...         % position zero
+    Shapes.g0(1:3,1:3),...       % phi zeroclc
+    Shapes.Xi0Eval,...    % intrinsic strain vector
+    Shapes.ThetaEval,...  % evaluated Theta matrix
+    Shapes.Ba);
 
-for ii = 1:Ns
-    
-   K1 = ForwardKinematicODE(Shapes,s,q,X);
-   K2 = ForwardKinematicODE(Shapes,s+(2/3)*h,q,X + (((2/3)*h)*K1));
-    
-   s = s + h; 
-   X = X + 0.25*h*(K1 + 3*K2);
-   
-   gtmp(:,:,ii) = SE3(X.Phi,X.p);
-   Jtmp(:,:,ii) = Admapinv(X.Phi,X.p)*X.J;
 
-end
-
-J = Jtmp;
-g = gtmp;
+% gtmp = zeros(4,4,Ns);    % cell(numel(Shapes.Sigma),1);
+% Jtmp = zeros(6,Ndim,Ns); % cell(numel(Shapes.Sigma),1);
+% 
+% for ii = 1:Ns
+%     
+%    K1 = ForwardKinematicODE(Shapes,s,q,X);
+%    K2 = ForwardKinematicODE(Shapes,s+(2/3)*h,q,X + (((2/3)*h)*K1));
+%     
+%    s = s + h; 
+%    X = X + 0.25*h*(K1 + 3*K2);
+%    
+%    gtmp(:,:,ii) = SE3(X.Phi,X.p);
+%    Jtmp(:,:,ii) = Admapinv(X.Phi,X.p)*X.J;
+% 
+% end
+% 
+% J = Jtmp;
+% g = gtmp;
     
 end
 %--------------------------------------------------------- compute jacobian
@@ -452,14 +486,17 @@ function P = ShapeFunction(Shapes,X)
     k  = 1;
     X0 = Shapes.Sigma;
     Pc = cell(Shapes.NDof,1); 
-    X  = zclamp(X,0,Shapes.L0); % make bounded
+    %X  = zclamp(X,0,Shapes.L0); % make bounded
+    X = zclamp(X/Shapes.L0,0,1);
 
     % construct shape-matrix 
     for jj = 1:6
         for ii = 1:Shapes.NModal(jj)
             
-            if jj <= 3,THETA = Shapes.POD(:,ii); % angular strains
-            else, THETA = Shapes.PODQ(:,ii);     % linear strains
+            if jj < 4
+                THETA = Shapes.PODR(:,ii);   % angular strains
+            else
+                THETA = Shapes.PODQ(:,ii);  % linear strains
             end
             % not sure if interp1 is best/fastest option? 
             % maybe inverse lerp?
@@ -470,6 +507,14 @@ function P = ShapeFunction(Shapes,X)
 
     P = blkdiag(Pc{:});
 
+end
+%---------------------------------------------------------------------- set
+function P = IntrinsicFunction(Shapes,X)
+%    
+%     k  = 1;
+%     X0 = Shapes.Sigma;
+%     X = zclamp(X/Shapes.L0,0,1);  
+    P = Shapes.xia0;
 end
 %-------------------------------------------------- compute Cosserat string
 function Shapes = GenerateRadialFilter(Shapes)
@@ -739,7 +784,7 @@ dv = (x0(2) - x0(1))*(y0(2) - y0(1));
 
 % generate image from cross-section
 D   = Shapes.Sdf.eval([X0(:),Y0(:)]);
-rho = single(D(:,end)<1e-5);
+rho = (D(:,end)<1e-5);
 
 I0 = reshape(rho,[N,N]);
 

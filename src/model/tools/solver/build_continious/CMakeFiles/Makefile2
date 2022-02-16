@@ -92,13 +92,13 @@ clean: CMakeFiles/Config.dir/clean
 # Target rules for target CMakeFiles/solver.dir
 
 # All Build rule for target.
+CMakeFiles/solver.dir/all: CMakeFiles/AutoDiff.dir/all
 CMakeFiles/solver.dir/all: CMakeFiles/PortHamiltonian.dir/all
 CMakeFiles/solver.dir/all: CMakeFiles/PortController.dir/all
 CMakeFiles/solver.dir/all: CMakeFiles/Cosserat.dir/all
 CMakeFiles/solver.dir/all: CMakeFiles/LieAlgebra.dir/all
 CMakeFiles/solver.dir/all: CMakeFiles/ShapeFunctions.dir/all
 CMakeFiles/solver.dir/all: CMakeFiles/Config.dir/all
-CMakeFiles/solver.dir/all: CMakeFiles/AutoDiff.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/solver.dir/build.make CMakeFiles/solver.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/solver.dir/build.make CMakeFiles/solver.dir/build
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/brandon/Documents/MATLAB/SorotokiCode/src/model/tools/solver/build_continious/CMakeFiles --progress-num=14,15 "Built target solver"

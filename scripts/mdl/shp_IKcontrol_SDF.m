@@ -1,6 +1,6 @@
 clr; beep off;
 %% settings
-M = 7; 
+M = 5;    % number of modes
 N = 60;   % grid on SR
 
 %% build basis
@@ -9,19 +9,12 @@ Y = zeros(N,M);
 
 for ii = 1:M
     Y(:,ii) = chebyshev(x,ii-1); % legendre 
-    %Y(:,ii) = x.^(ii-1);        % affine curvature
-    %Y(:,ii) = cos(2*pi*(ii)*x); % sinusoidal
 end
 
-%Y = gsogpoly(Y);
+Y = gsogpoly(Y);
 
 %% desired SE3
 Sd = sCircle(0.5,-0.2,0.075);
-%Sd = sRectangle(0.4,0.6,0.2,0.4);
-% P = polyhex(6,0.1);
-% P(:,1) = P(:,1) + 0.4;
-% P(:,2) = P(:,2) - 0.3;
-% Sd = sPolyline(P);
 
 %% soft sobotics shapes
 shp = Shapes(Y,[0,M,0,0,0,0]);
@@ -48,7 +41,7 @@ while norm(e) > 1e-3 && k < 100
     p  = reshape(g(1:3,4,:),3,[]).';
     
     % compute SDF tangent mapping
-    [X,Y,Z,Sp] = TangentMap(p,BdBox);
+    %[X,Y,Z,Sp] = TangentMap(p,BdBox);
     
     % compute closest points
     V = Sd.Node;
@@ -57,8 +50,8 @@ while norm(e) > 1e-3 && k < 100
     
     % plotting
     subplot(1,2,1); hold on;
-    cplane(X,Y,Z);  hold on;
-    plot(p(:,1),p(:,3),'k-','LineW',4);
+    %cplane(X,Y,Z);  hold on;
+    plot(p(:,1),p(:,3),'k-','LineW',2);
     plot(V(:,1),V(:,2),'k--','MarkerS',10);
     colormap(bluesea(0));
     
@@ -104,7 +97,7 @@ while norm(e) > 1e-3 && k < 100
     
     % setup figure
     setupFigure(BdBox);
-    colorbar('location','NorthOutside');
+    %colorbar('location','NorthOutside');
     
     subplot(1,2,2);
     plot(E,'LineW',3);
@@ -113,12 +106,12 @@ while norm(e) > 1e-3 && k < 100
     title('Energy difference');
     drawnow;
     
-    if k == 1
-        gif('grasping.gif','frame',gcf,'nodither');
-        background('w');
-    else
-       gif; 
-    end
+%     if k == 1
+%         gif('grasping.gif','frame',gcf,'nodither');
+%         background('w');
+%     else
+%        gif; 
+%     end
     
 end
 
@@ -127,7 +120,7 @@ function [dq,E] = EnergyController(g,gd,J,k)
     k1 = 0.01;
     k2 = 1;
     
-    lam1 = .6;
+    lam1 = .3;
     lam2 = 1;
     
     Kp = diag([k1,k1,k1,k2,k2,k2]);
@@ -143,7 +136,7 @@ function [dq,E] = EnergyController(g,gd,J,k)
 end
 
 function [X,Y,T,Sf] = TangentMap(p,BdBox)
-    n = 100;
+    n = 2;
     x = linspace(BdBox(1),BdBox(2),n);
     y = linspace(BdBox(3),BdBox(4),n);
 
@@ -165,6 +158,6 @@ function setupFigure(B)
     axis equal;
     axis(B);
     %drawnow;
-    colormap(bluesea(0));
+    %colormap(bluesea(0));
     %pause(0.1);
 end

@@ -110,15 +110,18 @@ function Rig = computeFK(Rig,q,varargin)
     
     Rig = Rig.reset();
 
-    G = Rig.FK(q);
-    Rig.g = zeros(size(G,3),7);
-    for ii = 1:size(G,3)
-        Rig.g(ii,1:4) = rot2quat(G(1:3,1:3,ii));
-        Rig.g(ii,5:7) = G(1:3,4,ii).';
-    end
-     
+%     G = Rig.FK(q);
+%     Rig.g = zeros(size(G,3),7);
+    
+%     for ii = 1:size(G,3)
+%         Rig.g(ii,1:4) = rot2quat(G(1:3,1:3,ii));
+%         Rig.g(ii,5:7) = G(1:3,4,ii).';
+%     end
+%      
+    Rig.g = Rig.FK(q);
+
     s = Rig.Domain;
-    X = linspace(0,s,size(Rig.g,1));
+    X = linspace(0,s,size(Rig.g,3));
     N = length(Rig.List);
     Instr = cell(1,1);
     
@@ -153,14 +156,15 @@ function Rig = computeFK(Rig,q,varargin)
         if strcmp(Instr{ii,1},'Sweep')
            id = Instr{ii,2};
            LinkID = knnsearch(Rig.List{ii}.Node(:,3),X(id).');
-           Rig.List{ii} = Blender(Rig.List{ii},'Sweep', {LinkID,Rig.g(id,:)});
+           Rig.List{ii} = Blender(Rig.List{ii},'Sweep', ...
+               {LinkID,Rig.g(:,:,id)});
         elseif strcmp(Instr{ii,1},'SE3')
             if Rig.XTangent
                 Rig.List{ii} = Blender(Rig.List{ii},'SE3x', ...
-                    Rig.g(Instr{ii,2},:));
+                    Rig.g(:,:,Instr{ii,2}));
             else
                 Rig.List{ii} = Blender(Rig.List{ii},'SE3', ...
-                    Rig.g(Instr{ii,2},:));
+                    Rig.g(:,:,Instr{ii,2}));
             end
         end
     end

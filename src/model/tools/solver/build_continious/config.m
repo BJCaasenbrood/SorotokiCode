@@ -21,8 +21,8 @@ NDOF    = 2
 
 [solver] 
 TDOMAIN = 10
-SPACESTEP = 24
-TIMESTEP  = 0.03
+SPACESTEP = 80
+TIMESTEP  = 0.016667
 INTSTEP   = 100
 ATOL      = 1e-2
 RTOL      = 1e-2
