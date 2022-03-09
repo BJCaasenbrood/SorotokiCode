@@ -1,7 +1,7 @@
 function colorwheel()
 
-n = 100;
-r = (40:n)'/n;
+n = 30;
+r = (10:n)'/n;
 theta = pi*(-n:n)/n - pi/2;
 X = r*cos(theta);
 Y = r*sin(theta);

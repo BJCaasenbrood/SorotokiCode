@@ -33,15 +33,15 @@ classdef Bdog < handle
 methods  
 %-------------------------------------------------------- ballong-dog class 
 function obj = Bdog(usr,ip,pwd,varargin)
-    obj.Port = 12346;
+    
+    obj.Port = 8888;
     obj.Ip  = ip;
     obj.Usr = usr;
     obj.Pwd = pwd;
     
-    % setup TCP client
-    client = tcpip(obj.Ip,obj.Port,'NetworkRole', 'client');
-    client.ByteOrder = 'littleEndian';
-    obj.TCPclient    = client;
+    for ii = 1:2:length(varargin)
+        obj.(varargin{ii}) = varargin{ii+1};
+    end
     
     obj.t       = 0;
     obj.Ndev    = 0;
@@ -58,11 +58,14 @@ function obj = Bdog(usr,ip,pwd,varargin)
     obj.Frequency = 400;
     obj.Log = struct('Data',[],'Time',[]);
     
-    for ii = 1:2:length(varargin)
-        obj.(varargin{ii}) = varargin{ii+1};
+    % setup TCP client
+    client = tcpip(obj.Ip,obj.Port,'NetworkRole', 'client');
+    client.ByteOrder = 'littleEndian';
+    obj.TCPclient    = client;
+      
+    if obj.autoConnect
+        obj = connect(obj); 
     end
-    
-    if obj.autoConnect, obj = connect(obj); end
 end
 %---------------------------------------------------------------------- get     
 function varargout = get(Bdog,varargin)
@@ -132,7 +135,7 @@ function Bdog = disconnect(Bdog)
     cout('hyper',['',Bdog.Usr, '@' , Bdog.Ip,': ...']); pause(0.25);
     
     Bdog.SSH = ssh2_close(Bdog.SSH);
-    Bdog.SSH = [];
+    %Bdog.SSH = [];
 
     cout('\b\b\b');
     cout('key','Closed!\n');
@@ -193,8 +196,11 @@ function Bdog = tcpSendData(Bdog, data)
 end
 %-------------------------- Recv data as a TCP client (formatted as double)
 function data = tcpRecvData(Bdog,data_length)
-    data = fread(Bdog.TCPclient,data_length,"double");
-    Bdog.Log.Data = vappend(Bdog.Log.Data,data);
+    data1 = fread(Bdog.TCPclient,data_length,"double");
+    data2 = fread(Bdog.TCPclient,data_length,"double");
+    
+    data = [data1,data2];
+    Bdog.Log.Data = vappend(Bdog.Log.Data,[data1, data2]);
     
     Bdog.t = (1/Bdog.Frequency)*Bdog.LoopCounter;
     Bdog.Log.Time = vappend(Bdog.Log.Time,Bdog.t);

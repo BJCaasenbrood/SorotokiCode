@@ -6,36 +6,52 @@ ip  = '192.168.0.2';
 
 brd = Bdog(usr,ip,pwd,'autoConnect',true);
 
+%% desired pressure
+Pd = -10;
+
 %% get data
-brd = brd.set('Frequency',400);
-% brd.transfer('baseSoftRobot.py');
-% brd.transfer('SoftRobot.py');
-% brd.transfer('runme.py');
+brd = brd.set('Frequency',10);
 
 %% execute control loop
-Kp = 0.65;
-
-while brd.loop(5)
+while brd.loop(10)
     
     % read data
     data = brd.tcpRecvData(1);
+    
+    Pmeasure = padc(data(1),0.4);
 
     % control law: 
-    %u = yd(brd.t) - Kp*(data/10-yd(brd.t));
-    u = yd(brd.t);
+    u = ControlLaw(brd.t,Pd,Pmeasure);
     
     % send data 
-    brd.tcpSendData(u);
+    brd.tcpSendData([u, 0.5]);
+    
+    fprintf('time = %2.3f\n',brd.t);
 end
 
+brd.tcpSendData([0.5, 0.5]);
 brd.disconnect();
 
 %% plotting
-% t = brd.Log.Time;
-% plot(t,yd(t)); hold on;
-% plot(brd.Log.Time,brd.Log.Data/10);
+t = brd.Log.Time;
+plot(t,yd(t,Pd)); hold on;
+plot(t,padc(brd.Log.Data(:,1),0.4));
 
-%%dy additional functions
-function y = yd(t)
-    y = 0.4 + 0.1*sin(t);
+%% additional functions
+function u = ControlLaw(t,Pd,Pm)
+    
+    % P-gain
+    Kp = 0.25;
+    
+    % pressure-to-voltage
+    V = pdac(yd(t,Pd));
+    
+    % control action
+    u = V - Kp*(pdac(Pm)-V);
 end
+
+function z = yd(t,Pd)
+    z = lerp(0,Pd,smoothstep(0.2*t));
+end
+
+

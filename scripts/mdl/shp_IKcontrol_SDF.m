@@ -1,20 +1,21 @@
 clr; beep off;
 %% settings
-M = 5;    % number of modes
-N = 60;   % grid on SR
+M = 4;    % number of modes
+N = M*8;   % grid on SR
 
 %% build basis
 x = linspace(0,1,N).';
 Y = zeros(N,M);
 
 for ii = 1:M
-    Y(:,ii) = chebyshev(x,ii-1); % legendre 
+    %Y(:,ii) = chebyshev(x,ii-1); % legendre 
+    Y(:,ii) = pcc(x,ii,M);       % piece-wise constant
 end
 
-Y = gsogpoly(Y);
+%Y = gsogpoly(Y);
 
 %% desired SE3
-Sd = sCircle(0.5,-0.2,0.075);
+Sd = sCircle(0.6,-0.2,0.05);
 
 %% soft sobotics shapes
 shp = Shapes(Y,[0,M,0,0,0,0]);
@@ -28,6 +29,8 @@ figure(103); BdBox = [0,1.2,-.75,.75];
 EE = [];
 k  = 0;
 
+Pts = round(linspace(0,N-1,M+1))+1;
+
 while norm(e) > 1e-3 && k < 100
     clf;
     
@@ -35,7 +38,7 @@ while norm(e) > 1e-3 && k < 100
     k = k + 1;
     
     % compute Cosserat configuration
-    [g,J] = shp.string(q);
+    [g, J] = shp.string(q);
     
     % extract positions
     p  = reshape(g(1:3,4,:),3,[]).';
@@ -52,8 +55,8 @@ while norm(e) > 1e-3 && k < 100
     subplot(1,2,1); hold on;
     %cplane(X,Y,Z);  hold on;
     plot(p(:,1),p(:,3),'k-','LineW',2);
+    plot(p(Pts,1),p(Pts,3),'k.','MarkerS',15);
     plot(V(:,1),V(:,2),'k--','MarkerS',10);
-    colormap(bluesea(0));
     
     % update IK control law
     E(k) = 0;
@@ -74,14 +77,7 @@ while norm(e) > 1e-3 && k < 100
         [dr, dE] = EnergyController(g(:,:,ii),...
                                     gd,J(:,:,ii),k);                     
         
-        %dist = Sd.eval([g(1,4,ii),g(3,4,ii)]); 
-        %dist = clamp(-dist(end),0,Inf);  
-        %Fd = [0;0;0;Rd*[0;0;dist]];
-        
-        %Null = (eye(7) - pinv(J(:,:,ii))*J(:,:,ii));
-                                
-        %lambda = (J(:,:,ii).'*Fd);
-        dq = dq + dr ;%+ lambda;
+        dq = dq + dr;
         
         E(k) = E(k) + (dE.'*dE);
     end
@@ -97,57 +93,33 @@ while norm(e) > 1e-3 && k < 100
     
     % setup figure
     setupFigure(BdBox);
-    %colorbar('location','NorthOutside');
     
     subplot(1,2,2);
     plot(E,'LineW',3);
-    axis equal;
-    axis([0 100 0 45]);
+    %axis equal;
+    axis([0 100 0 5]);
     title('Energy difference');
     drawnow;
-    
-%     if k == 1
-%         gif('grasping.gif','frame',gcf,'nodither');
-%         background('w');
-%     else
-%        gif; 
-%     end
-    
+   
 end
 
-function [dq,E] = EnergyController(g,gd,J,k)
+function [dq, E] = EnergyController(g,gd,J,k)
     
     k1 = 0.01;
     k2 = 1;
     
-    lam1 = .3;
-    lam2 = 1;
+    lam1 = 3;
     
+    % conditioner
+    W  = smoothstep(k/10+0.1);
     Kp = diag([k1,k1,k1,k2,k2,k2]);
 
     Xi = logmapSE3(g\gd);
-    Fu = Kp*tmapSE3(smoothstep(k/30+0.1)*Xi)*isomse3(smoothstep(k/30+0.1)*Xi);
+    Fu = Kp*tmapSE3(W*Xi)*isomse3(W*Xi);
 
-    %dq = lam1*J.'*((J*J.' + lam2*eye(6))\Fu);
-    
-    dq = lam1*J.'*Fu;
+    dq = lam1*J.'*Fu/sqrt(norm(Xi)+0.05);
     
     E = Kp*isomse3(Xi);
-end
-
-function [X,Y,T,Sf] = TangentMap(p,BdBox)
-    n = 2;
-    x = linspace(BdBox(1),BdBox(2),n);
-    y = linspace(BdBox(3),BdBox(4),n);
-
-    [X,Y] = meshgrid(x,y);
-    Pv = [X(:),Y(:)];
-
-    Sf = sPolyline(p(:,[1 3]));
-    Sf.BdBox = BdBox;
-
-    [~,~,~,Z] = Sf.normal(Pv);
-    T = reshape(Z,n,n);
 end
 
 function [XY, D] = ClosestPointOnSDF(sdf,P)
@@ -157,7 +129,4 @@ end
 function setupFigure(B)
     axis equal;
     axis(B);
-    %drawnow;
-    %colormap(bluesea(0));
-    %pause(0.1);
 end

@@ -44,7 +44,7 @@ function obj = Model(Shapes,varargin)
     obj.Ba     = Shapes.Ba;
     obj.ShpFnc = Shapes.Theta;
     
-    obj.MaxIteration = 3;
+    obj.MaxIteration = 10;
     obj.ResidualNorm = 0.01;
 
     G0 = Shapes.get('g0');

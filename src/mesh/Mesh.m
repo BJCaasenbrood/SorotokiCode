@@ -419,12 +419,12 @@ cla; axis equal; axis off; hold on;
     
 % plot tesselation
 patch('Faces',Mesh.ElemMat,'Vertices',Mesh.Node,'FaceVertexCData',Z,...
-    'Facecolor',fs,'LineStyle',Mesh.LineStyle,'Linewidth',1.5,...
+    'Facecolor',fs,'LineStyle',Mesh.LineStyle,'Linewidth',1,...
     'EdgeColor','k');
 
 % plot boundaries
 patch('Faces',Mesh.Boundary,'Vertices',Mesh.Node,'LineStyle','-',...
-    'Linewidth',2,'EdgeColor','k');
+    'Linewidth',1,'EdgeColor','k');
 
 hold on;
 

@@ -1,6 +1,6 @@
 function fem = TabulateShapeFunctions(fem)
-ElemNNode     = cellfun(@length,fem.Element); 
-fem.ShapeFnc  = cell(max(ElemNNode),1);
+ElemNNode    = cellfun(@length,fem.Element); 
+fem.ShapeFnc = cell(max(ElemNNode),1);
 
 for nn = min(ElemNNode):max(ElemNNode)
     [W,Q] = PolyQuad(nn);

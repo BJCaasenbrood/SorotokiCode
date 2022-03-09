@@ -56,7 +56,7 @@ end
 
 % do we have enough to proceed?
 if (input_check == 0)
-    help ssh2.m;
+    %help ssh2.m;
     %fprintf('\n\n!!Incorrect input supplied to ssh2, please try again!!\n');
     if nargout == 0
         clear ssh2_struct

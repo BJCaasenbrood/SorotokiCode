@@ -94,10 +94,11 @@ function obj = Shapes(Input,NModal,varargin)
 
     obj.E  = 5;
     obj.Nu = 0.33;
+    obj.g0 = SE3(eye(3),zeros(3,1));
     
-    for ii = 1:2:length(varargin)
-        obj.(varargin{ii}) = varargin{ii+1};
-    end
+%     for ii = 1:2:length(varargin)
+%         obj.(varargin{ii}) = varargin{ii+1};
+%     end
     
     if ~isempty(obj.Fem)
     if ~isempty(obj.Fem.get('Output'))
@@ -112,6 +113,11 @@ function obj = Shapes(Input,NModal,varargin)
     
     %obj.g0 = [1,0,0,0,0,0,0];
     obj.g0 = SE3(eye(3),zeros(3,1));
+    
+    for ii = 1:2:length(varargin)
+        obj.(varargin{ii}) = varargin{ii+1};
+    end
+    
     obj = rebuild(obj);
     
 end
@@ -406,8 +412,9 @@ q    = q(:) + 1e-6;
 end
 %--------------------------------------------------------- compute jacobian
 function p = FK(Shapes,q)
+    p0 = Shapes.g0(1:3,4);
     g = string(Shapes,q);
-    p = reshape(g(1:3,4,:),3,[]).';
+    p = [p0.';reshape(g(1:3,4,:),3,[]).'];
 end
 %------------------------------------------------- estimate Cosserat string
 function q = estimateJointSpace(Shapes,fem)

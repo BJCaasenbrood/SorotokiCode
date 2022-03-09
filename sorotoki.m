@@ -422,6 +422,7 @@ WriteToFile([Path,'\src\fem']);
 WriteToFile([Path,'\src\fem\tools\']);
 WriteToFile([Path,'\src\fem\tools\tpswarp']);
 WriteToFile([Path,'\src\fem\tools\mma']);
+WriteToFile([Path,'\src\fem\mex\']);
 WriteToFile([Path,'\src\fem\materials\']);
 WriteToFile([Path,'\src\fem\materials\samples']);
 else
@@ -433,6 +434,7 @@ AddPath([Path,'\src\fem']);
 AddPath([Path,'\src\fem\tools\']);
 AddPath([Path,'\src\fem\tools\tpswarp']);
 AddPath([Path,'\src\fem\tools\mma']);
+AddPath([Path,'\src\fem\mex\']);
 AddPath([Path,'\src\fem\materials\']);
 AddPath([Path,'\src\fem\materials\samples']);
 pause(.3);
@@ -484,10 +486,14 @@ fprintf(FID,'%% bdog.lib \n');
 WriteToFile([Path,'\scripts\bdog']);
 WriteToFile([Path,'\src\bdog']);
 WriteToFile([Path,'\src\bdog\tools']);
+WriteToFile([Path,'\src\vision']);
+WriteToFile([Path,'\src\vision\tools']);
 else
 AddPath([Path,'\scripts\bdog']);
 AddPath([Path,'\src\bdog']);
 AddPath([Path,'\src\bdog\tools']);
+AddPath([Path,'\src\vision']);
+AddPath([Path,'\src\vision\tools']);
 pause(.3);
 
 x = CheckLibary('control.lib',@(x) bdogPathConfirm);

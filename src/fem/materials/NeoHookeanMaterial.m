@@ -58,20 +58,26 @@ function NeoHookeanMaterial = set(NeoHookeanMaterial,varargin)
         NeoHookeanMaterial.(varargin{ii}) = varargin{ii+1};
     end
 end
-%------------------------------ 2ND PIOLLA STRESSAND STIFFNESS FOR YEOH
-function [S, D, P] = PiollaStress(NeoHookeanMaterial,F,Robustness)
+%------------------------------ 2nd Piolla stress tensor for Neo-Hookean
+function [S, D, P] = PiollaStress(NeoHookeanMaterial,F,~)
 %Se = 2nd PK stress [S11, S22, S33, S12, S23, S13];
 
-if (nargin > 2) && Robustness
-%Nu0 = Nu0*0.75;
-end
+% if (nargin > 2) && Robustness
+% %Nu0 = Nu0*0.75;
+% end
 
 C100 = NeoHookeanMaterial.C10; 
 K    = NeoHookeanMaterial.D1;
 
-X12 = 1/2; X13 = 1/3; X23 = 2/3; X43 = 4/3; X89 = 8/9;
+X12 = 1/2; 
+X13 = 1/3; 
+X23 = 2/3; 
+X43 = 4/3; 
+X89 = 8/9;
 C = F.'*F;
+
 C1=C(1,1); C2=C(2,2); C3=C(3,3); C4=C(1,2); C5=C(2,3); C6=C(1,3);
+
 I1 = C1+C2+C3;
 I3 = det(C);
 J1 = I1*I3^(-X13);

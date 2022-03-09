@@ -30,24 +30,24 @@ figure(101);
 t = fem.Log.t;
 
 for ii = 1:fps(t,60):numel(t)
-    subplot(1,3,[1,2]);
+   % subplot(1,3,[1,2]);
         fem.set('Node',fem.Log.Node{ii});
         fem.show();
         axis([-10 10 -60 3 -30 50]);      
         view(30,10)
         box on;
     
-    subplot(1,3,3);
-        cla;
-        K  = fem.Log.Kin(1:ii);
-        U0 = fem.Log.Vg(end) + fem.Log.Psi(end);
-        U  = fem.Log.Psi(1:ii) + fem.Log.Vg(1:ii) - U0;
-        plot(t(1:ii),K,'LineW',2); hold on;
-        plot(t(1:ii),U,'LineW',2);
-        plot(t(1:ii),U+K,'LineW',2);
-        %axis([-10 10 -60 3 -30 50]);      
-        box on;    
-        
-    drawnow();
+%     subplot(1,3,3);
+%         cla;
+%         K  = fem.Log.Kin(1:ii);
+%         U0 = fem.Log.Vg(end) + fem.Log.Psi(end);
+%         U  = fem.Log.Psi(1:ii) + fem.Log.Vg(1:ii) - U0;
+%         plot(t(1:ii),K,'LineW',2); hold on;
+%         plot(t(1:ii),U,'LineW',2);
+%         plot(t(1:ii),U+K,'LineW',2);
+%         %axis([-10 10 -60 3 -30 50]);      
+%         box on;    
+%         
+%     drawnow();
 
 end

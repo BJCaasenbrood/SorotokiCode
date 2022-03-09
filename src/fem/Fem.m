@@ -161,10 +161,11 @@ classdef Fem < handle
         
         Linestyle = '-';
         Linestyle0 = '-';
-        Colormap = turbo;
+        Colormap    = turbo;
         ColormapOpt = barney(-1);
-        ColorAxis = [];
-        I3 = eye(3); O3 = zeros(3);
+        ColorAxis   = [];
+        I3 = eye(3); 
+        O3 = zeros(3);
         i; j; m; fi; t; e; c; s; p; v; l; k; fb; ed; fb0; ft;
         
         SolverResidual = 1e7;
@@ -187,9 +188,9 @@ classdef Fem < handle
         FilterRadius = 0.5;
         SpatialFilter;
         OptFactor = 1;
-        OptimizationSolver = 'MMA';
+        OptimizationSolver    = 'MMA';
         MaterialInterpolation = 'SIMP';
-        OptimizationProblem = 'Compliance';
+        OptimizationProblem   = 'Compliance';
         xold1; xold2; upp; low; fnorm;
         zMin = 0; zMax = 1;
         OutputVector; Change; dFdE;
@@ -303,7 +304,7 @@ switch(Request)
 end
 
 % ensures smooth plot
-if length(Z) == Fem.NNode, 
+if length(Z) == Fem.NNode
     Z = Smoothing(Fem,Z,1); 
 end
 
@@ -339,10 +340,10 @@ h{1} = patch('Faces',BoundMatrix,'Vertices',Fem.Node0,...
 
 h{2} = patch('Faces',FaceMatrix,'Vertices',V,...
     'FaceVertexCData',Z,'Facecolor',S,'LineStyle',Fem.Linestyle,...
-    'Linewidth',1.5,'FaceAlpha',1,'EdgeColor','k');
+    'Linewidth',1,'FaceAlpha',1,'EdgeColor','k');
 
 h{3} = patch('Faces',BoundMatrix,'Vertices',V,...
-    'LineStyle','-','Linewidth',1.5,'EdgeColor','k');
+    'LineStyle','-','Linewidth',1,'EdgeColor','k');
 
 if Fem.Dim == 3, view(30,10); end
 
@@ -580,7 +581,7 @@ while true
                if Fem.SolverId == 1
                     DeltaU = A\b;
                elseif Fem.SolverId == 2
-                    DeltaU = sparse(P,1,(L'\(D\(L\b(P))))); % thanks Ondrej ;)
+                   % DeltaU = sparse(P,1,(L'\(D\(L\b(P))))); % thanks Ondrej ;)
                elseif Fem.SolverId == 3
                    [DeltaU,~] = gmres(A,b,[],Fem.ResidualNorm,100);
                end
@@ -763,8 +764,9 @@ while true
         
         % solve for acceleration    
         %DeltaU = A\b;
-        [L,D,P] = ldl(A,'vector');
-        DeltaU = sparse(P,1,(L'\(D\(L\b(P))))); % thanks Ondrej ;)
+        [DeltaU,~] = gmres(A,b,[],Fem.ResidualNorm,100);
+        %[L,D,P] = ldl(A,'vector');
+        %DeltaU = sparse(P,1,(L'\(D\(L\b(P))))); % thanks Ondrej ;)
  
         ddDelta(FreeDofs,1) = ddDelta(FreeDofs,1) + DeltaU(:,1);
         
@@ -2029,6 +2031,9 @@ end
 Delta  = Fem.Utmp(eDof,:);
 dDelta = Fem.dUtmp(eDof,:);
 
+% computation of Piolla stress
+PiollaStress = @(x) Fem.Material.PiollaStress(x);
+
 % quadrature loop
 for q = 1:length(W)
     
@@ -2043,13 +2048,14 @@ for q = 1:length(W)
     F = DeformationGradient(Fem,Delta,dNdx);
     
     % polar decompostion
-    [R, Q, ~] = PolarDecomposition(Fem,F);
+    %[R, Q, ~] = PolarDecomposition(Fem,F);
+    [R, Q, ~] = PolarDecompositionFast_mex(F);
 
     % increase robustness low density
-    %Q = Rb*(Q-eye(3)) + eye(3);
+    Q = Rb*(Q-eye(3)) + eye(3);
     
     % reconstruct deformation gradient
-    %F = R*Q;
+    F = R*Q;
     
 %     % right cauchy-green strain
 %     C = F.'*F;
@@ -2059,7 +2065,8 @@ for q = 1:length(W)
 %     end
 
     % get internal stress matrix
-    [S0, D0, Psi] = Fem.Material.PiollaStress(F);
+    [S0, D0, Psi] = PiollaStress(F);
+    %[S0, D0, Psi] = PiollaStressNHFast_mex(F,C1,K);
     
     % voigt-notation vectorize
     S = VoightNotation(S0);
@@ -2068,7 +2075,8 @@ for q = 1:length(W)
     [Se, De, Ge] = IsotropicReduction(Fem,D0,S);
     
     % nonlinear strain-displacement operator
-    [Bnl,Bg,NN,tau] = NonlinearStrainOperator(Fem,N,dNdx,F);
+    %[Bnl,Bg,NN,tau] = NonlinearStrainOperator(Fem,N,dNdx,F);
+    [Bnl,Bg,NN,tau] = NonlinearStrainOperatorFast_mex(N,dNdx,F);
     
     % local elemental rotation
     RRe = RRe + R/nn;
@@ -2157,22 +2165,22 @@ end
 end
 %---------------------------------------------------------- polar decompose
 function [R,S,V] = PolarDecomposition(~,F)
-[M, N] = size(F);
-if M ~= N
-    error('Matrix must be square.');
-end
+
 C = F'*F;
 [Q0, lambdasquare] = eig(C);
+
 lambda = sqrt(diag((lambdasquare))); 
-Uinv = repmat(1./lambda',size(F,1),1).*Q0*Q0';
+Uinv   = repmat(1./lambda',size(F,1),1).*Q0*Q0';
+
 R = F*Uinv;
 S = R'*F;
 V = F*R';
+
 end
 %---------------------------------------------------------- strain operator
-function [Bn,Bg,NN,tau] = NonlinearStrainOperator(Fem,N,dNdx,F)
+function [Bn,Bg,NN,tau] = NonlinearStrainOperator(~,N,dNdx,F)
 nn = length(N);
-mm = Fem.Dim;
+mm = size(dNdx,2);
 zz = mm*nn;
 
 NN = zeros(mm,zz);
@@ -2260,7 +2268,18 @@ else
     SIG = [S0(1),S0(4),S0(6); S0(4),S0(2),S0(5); S0(6), S0(5),S0(3)];
 end
 
-G = kron(eye(mm),SIG);
+if mm == 2
+    G = zeros(4,4);
+    G(1:2,1:2) = SIG;
+    G(3:4,3:4) = SIG;
+else 
+    G = zeros(9,9);
+    G(1:3,1:3) = SIG;
+    G(4:6,4:6) = SIG;
+    G(7:9,7:9) = SIG;
+end
+
+%G = kron(eye(mm),SIG);
 end
 %------------------------------------------------------ isotropic reduction
 function A = HessianBuild(Fem,Mi,Kt,Rt)
@@ -2975,7 +2994,7 @@ if Fem.Movie
             if ~isempty(Fem.MovieCAxis), caxis(Fem.MovieCAxis); end
             drawnow;
             gif;
-            if abs(Fem.Time-Fem.TimeEnd) <= 1e-3,
+            if abs(Fem.Time-Fem.TimeEnd) <= 1e-3
                for ii = 1:14, gif; end
             end
     end
@@ -3016,10 +3035,7 @@ Svm = sqrt(0.5*((s11-s22).^2 + (s22-s33).^2 + (s33-s11).^2 ...
     + 6*(s12.^2 + s23.^2 + s13.^2)));
 Svmm = mean(Svm); 
 end
-%----------------------------------------------------- update nodes of MESH
-%----------------------------------------------------- update nodes of MESH
-
-%----------------------------------------------------- update nodes of MESH
+%--------------------------------------------------- update centers of MESH
 function Center = UpdateCenter(Fem)
     Center =  Fem.get('Center0'); 
 

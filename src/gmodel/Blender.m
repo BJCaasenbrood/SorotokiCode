@@ -215,8 +215,8 @@ for ii = 1:length(Node0)
     id = List(ii);
     
     p1 = [vx; vy; 0];
-    p0 = (Swp([3,2,1].',4,id)); %[Swp(id,7);Swp(id,6);Swp(id,5)];
-    R  = rot90(Swp(1:3,1:3,id),2);%Quat2Rot(Swp(id,1:4)).';
+    p0 = (Swp([3,2,1].',4,id));    %[Swp(id,7);Swp(id,6);Swp(id,5)];
+    R  = rot90(Swp(1:3,1:3,id),2); %Quat2Rot(Swp(id,1:4)).';
     %R = [R(:,3),R(:,2),R(:,1)];
     
     H0 = [R,p0;0,0,0,1];
@@ -379,16 +379,6 @@ gamma = theta*sigma;
 R = [ cos(gamma), sin(gamma), 0;
      -sin(gamma), cos(gamma), 0;
                0,          0, 1];
-end
-
-%---------------------------------------------------------------------- set
-function R = Quat2Rot(q)
-w = q(1); x = q(4); y = q(3); z = q(2);
-Rxx = 1 - 2*(y^2 + z^2); Rxy = 2*(x*y - z*w); Rxz = 2*(x*z + y*w); 
-Ryx = 2*(x*y + z*w); Ryy = 1 - 2*(x^2 + z^2); Ryz = 2*(y*z - x*w );
-Rzx = 2*(x*z - y*w ); Rzy = 2*(y*z + x*w ); Rzz = 1 - 2 *(x^2 + y^2);
-
-R = [Rxx, Rxy, Rxz; Ryx, Ryy, Ryz; Rzx, Rzy, Rzz];
 end
 
 

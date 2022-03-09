@@ -20,3 +20,5 @@ else
     ssh2_struct = [];
     help ssh2_close
 end
+
+end

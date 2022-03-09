@@ -23,14 +23,14 @@ subplot(2,1,2); msh.show();
 
 %% generate fem model
 fem = Fem(msh);
-fem = fem.set('TimeStep',1/170,'BdBox',[0,120,-80,20],'Linestyle','none',...
+fem = fem.set('TimeStep',1/50,'BdBox',[0,120,-80,20],'Linestyle','none',...
     'MovieAxis',[-25 120 -60 130],'Movie',0,'TimeEnd',2,'SolverPlot',1);
 
 %% add boundary constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Box',[0,0,0,10]),[1,1]);
 %fem = fem.AddConstraint('Gravity',[],[0,-9.81e3]);
 fem = fem.AddConstraint('Pressure',fem.FindEdges('AllHole'),...
-    @(t) P0*sigmoid(t));
+    @(fem) P0*sigmoid(fem.Time));
 
 %fem = fem.AddConstraint('Contact',@(x) SDF(x,20),[0,0]);
 
@@ -93,23 +93,10 @@ for ii = 1:fps(t,60):numel(t)
     N = fem.Log.Node{ii};
     %subplot(1,2,1);
     fem.set('Node',N);
-    fem.show('Field',fem.Log.Stress{ii}{1});
+    fem.show('Field',fem.Log.Stress{ii});
     axis([-60 130 -120 30]);
     background(gitpage);
     
-%     if ii == 1
-%         gif('fem_pneunet_dynamic.gif','frame',gcf,'nodither');
-%     else
-%        gif; 
-%     end
-%     subplot(1,2,2);
-%     plot(t(1:ii),fem.Log.Psi(1:ii),'Col',col(1),'LineW',3); hold on;
-%     plot(t(1:ii),fem.Log.Kin(1:ii),'Col',col(2),'LineW',3); hold on;
-%     axis([0 2 0 10]);
-%     legend('Elastic','Kinetic');
-%     drawnow;
-    %caxis([0 1e-5]);
-
     drawnow();
 end
 

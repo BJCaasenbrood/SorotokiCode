@@ -1,12 +1,12 @@
 clr; 
 %% 
-L = 100;  % length of robot
-N = 30;   % number of discrete points on curve
-M = 3;    % number of modes
-H = 1/60; % timesteps
-FPS = 30; % animation speed
+L = 100;   % length of robot
+M = 2;     % number of modes
+N = M*10;  % number of discrete points on curve
+H = 1/150; % timesteps
+FPS = 30;  % animation speed
 
-Modes = [0,M,M,0,0,0];  % pure-XY curvature
+Modes = [0,M,0,M,0,0];  % pure-XY curvature
 %%
 % generate nodal space
 X = linspace(0,L,N)';
@@ -23,13 +23,13 @@ shp.Zeta = 0.1;      % Damping coefficient
 shp = shp.rebuild();
 
 %%
-mdl = Model(shp,'Tstep',H,'Tsim',15);
+mdl = Model(shp,'Tstep',H,'Tsim',2);
 
 %% controller
 mdl.tau = @(M) Controller(M);
 
 %%
-mdl.q0(1)   = 0.6;
+mdl.q0(1)   = 0;
 mdl = mdl.simulate(); 
 
 %% 
@@ -58,6 +58,7 @@ Y = zeros(N,M);
 
 for ii = 1:M
    Y(:,ii) = chebyshev(X/L,ii-1); % chebyshev
+   %Y(:,ii) = pcc(X/L,ii,M);       % piece-wise constant
 end
 
 % ensure its orthonormal (gram–schmidt)
@@ -69,9 +70,12 @@ function tau = Controller(mdl)
 n = numel(mdl.Log.q);
 t = mdl.Log.t;
 
+w = 7;
+
 tau        = zeros(n,1);
-tau(1)     = 9*smoothstep(t)*sin(3*t);
-tau(n/2+1) = 9*smoothstep(t)*cos(t);
+tau(end)   = 5*sin(w*t);
+tau(end-1) = 5*sin(w*t);
+% tau(n/2+1) = 9*smoothstep(t)*cos(t);
 end
 
 %% setup rig

@@ -87,7 +87,7 @@ for ii = 1:3
 end
 
 II3 = I - (I1/3)*Cinv;
-TOa = TensorOperation(II3,II3,true);
+TOa  = TensorOperation(II3,II3,true);
 TOb1 = TensorOperation(Cinv,I,true);
 TOb2 = TensorOperation(I,Cinv,true);
 TOb3 = TensorOperation(Cinv,Cinv,true);
@@ -109,10 +109,10 @@ end
 
 %------------------------------ 2ND PIOLLA STRESSAND STIFFNESS FOR YEOH
 function y = dWdI(YeohMaterial,I1)
-C1 = YeohMaterial.C1; 
-C2 = YeohMaterial.C2; 
-C3 = YeohMaterial.C3;
-y = C1 + 2*C2*(I1 -3) + 3*C3*(I1 -3).^2;
+c1 = YeohMaterial.C1; 
+c2 = YeohMaterial.C2; 
+c3 = YeohMaterial.C3;
+y = c1 + 2*c2*(I1 -3) + 3*c3*(I1 -3).^2;
 end
 
 end
