@@ -683,7 +683,7 @@ dl0 = sqrt(sum(dgam0.^2,2));
 Gamma = dl./dl0;
 
 % compute tangents
-for ii = 1:Shapes.NNode
+for ii = 1:N
 %     if ii < Shapes.NNode
 %         dgam(ii,:) = Node(ii + 1,:) -  Node(ii,:);
 %     else

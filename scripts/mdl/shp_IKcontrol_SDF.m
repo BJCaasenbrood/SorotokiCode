@@ -8,14 +8,14 @@ x = linspace(0,1,N).';
 Y = zeros(N,M);
 
 for ii = 1:M
-    %Y(:,ii) = chebyshev(x,ii-1); % legendre 
-    Y(:,ii) = pcc(x,ii,M);       % piece-wise constant
+    Y(:,ii) = chebyshev(x,ii-1); % legendre 
+    %Y(:,ii) = pcc(x,ii,M);       % piece-wise constant
 end
 
-%Y = gsogpoly(Y);
+Y = gsogpoly(Y);
 
 %% desired SE3
-Sd = sCircle(0.6,-0.2,0.05);
+Sd = sCircle(0.25,-0.1,0.075);
 
 %% soft sobotics shapes
 shp = Shapes(Y,[0,M,0,0,0,0]);
@@ -29,8 +29,6 @@ figure(103); BdBox = [0,1.2,-.75,.75];
 EE = [];
 k  = 0;
 
-Pts = round(linspace(0,N-1,M+1))+1;
-
 while norm(e) > 1e-3 && k < 100
     clf;
     
@@ -43,9 +41,6 @@ while norm(e) > 1e-3 && k < 100
     % extract positions
     p  = reshape(g(1:3,4,:),3,[]).';
     
-    % compute SDF tangent mapping
-    %[X,Y,Z,Sp] = TangentMap(p,BdBox);
-    
     % compute closest points
     V = Sd.Node;
     [XY,D]  = ClosestPointOnSDF(Sd,p(:,[1 3]));
@@ -54,8 +49,9 @@ while norm(e) > 1e-3 && k < 100
     % plotting
     subplot(1,2,1); hold on;
     %cplane(X,Y,Z);  hold on;
-    plot(p(:,1),p(:,3),'k-','LineW',2);
-    plot(p(Pts,1),p(Pts,3),'k.','MarkerS',15);
+    %plot(p(:,1),p(:,3),'k-','LineW',2);
+    %plot(p(Pts,1),p(Pts,3),'k.','MarkerS',15);
+    plotSE2(g);
     plot(V(:,1),V(:,2),'k--','MarkerS',10);
     
     % update IK control law
@@ -97,7 +93,7 @@ while norm(e) > 1e-3 && k < 100
     subplot(1,2,2);
     plot(E,'LineW',3);
     %axis equal;
-    axis([0 100 0 5]);
+    axis([0 100 0 0.05]);
     title('Energy difference');
     drawnow;
    
@@ -105,21 +101,21 @@ end
 
 function [dq, E] = EnergyController(g,gd,J,k)
     
-    k1 = 0.01;
-    k2 = 1;
-    
-    lam1 = 3;
+    k1 = 0.000;
+    k2 = 0.25;
+    lam1 = 1;
     
     % conditioner
-    W  = smoothstep(k/10+0.1);
+    W  = smoothstep(k/5+0.1);
     Kp = diag([k1,k1,k1,k2,k2,k2]);
 
     Xi = logmapSE3(g\gd);
     Fu = Kp*tmapSE3(W*Xi)*isomse3(W*Xi);
 
-    dq = lam1*J.'*Fu/sqrt(norm(Xi)+0.05);
+    dq = lam1*J.'*Fu;
     
     E = Kp*isomse3(Xi);
+    
 end
 
 function [XY, D] = ClosestPointOnSDF(sdf,P)

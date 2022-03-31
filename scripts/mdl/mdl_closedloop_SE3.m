@@ -2,8 +2,8 @@ clr;
 %% 
 L = 100;   % length of robot
 M = 5;     % number of modes
-N = 50;   % number of discrete points on curve
-H = 1/60; % timesteps
+N = 30;    % number of discrete points on curve
+H = 1/60;  % timesteps
 FPS = 30;  % animation speed
 
 Modes = [0,M,M,0,0,0];  % pure-XY curvature
@@ -23,7 +23,7 @@ shp.Zeta = 0.1;      % Damping coefficient
 shp = shp.rebuild();
 
 %%
-mdl = Model(shp,'Tstep',H,'Tsim',5);
+mdl = Model(shp,'Tstep',H,'Tsim',15);
 
 %% controller
 mdl.tau = @(M) Controller(M);

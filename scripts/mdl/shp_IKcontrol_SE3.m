@@ -1,7 +1,7 @@
 clr; warning off;
 %% settings
-M = 5; 
-N = 50;   % grid on SR
+M = 7; 
+N = 70;   % grid on SR
 
 %% build basis
 x = linspace(0,1,N).';
@@ -12,7 +12,8 @@ for ii = 1:M
 end
 
 %% desired SE3
-Sd = sCircle(0.5,-0.2,0.1);
+Sd = sCircle(0.25,-0.1,0.075);
+
 gd = SE3(roty(pi/2),[0.5,0,-0.2]);
 pd = gd(1:3,4);
 %% soft sobotics shapes

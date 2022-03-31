@@ -3,7 +3,7 @@ clr;
 sdf = sRectangle(0,5,0,2);
 
 %% generate mesh
-msh = Mesh(sdf,'Quads',[30,10]);      
+msh = Mesh(sdf,'NElem',2500);      
 msh = msh.generate();
 
 %% show generated mesh

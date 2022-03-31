@@ -419,12 +419,12 @@ cla; axis equal; axis off; hold on;
     
 % plot tesselation
 patch('Faces',Mesh.ElemMat,'Vertices',Mesh.Node,'FaceVertexCData',Z,...
-    'Facecolor',fs,'LineStyle',Mesh.LineStyle,'Linewidth',1,...
+    'Facecolor',fs,'LineStyle',Mesh.LineStyle,'Linewidth',1.5,...
     'EdgeColor','k');
 
 % plot boundaries
 patch('Faces',Mesh.Boundary,'Vertices',Mesh.Node,'LineStyle','-',...
-    'Linewidth',1,'EdgeColor','k');
+    'Linewidth',2,'EdgeColor','k');
 
 hold on;
 
@@ -486,7 +486,7 @@ DistBnd = -wthresh(-Dist,'h',1e-6);
 surf(x,y,Dist,'linestyle','none'); hold on;
 contour3(X,Y,DistBnd,5,'w-','linewidth',1);
 contour(X,Y,Dist,[0 1e-6],'w-','linewidth',2); 
-colormap(viridis);
+colormap(Mesh.Colormap);
 caxis([-1,2 + 1e-6]);
 axis equal;
 axis off;
@@ -933,6 +933,7 @@ function [Node,Element] = GenerateMeshImage(Mesh,Image)
     
     c_cell0 = {};
     c_cell = {};
+    figure(101);
     
     for ii=1:length(bnd)
         bnd_tmp = bnd{ii};
@@ -945,12 +946,16 @@ function [Node,Element] = GenerateMeshImage(Mesh,Image)
         c_red = decimatePoly(c_tmp,[simplify_tol, 2],false);
         if (nnz(c_red(:,1))>0)&&(nnz(c_red(:,2))>0)
             c_cell{end+1,1} = [Xscale*c_red(:,1), (Yscale)*c_red(:,2)];
+            %plot(Xscale*c_red(:,1), (Yscale)*c_red(:,2),'k.-'); hold on;
         end
     end
 
     H = Mesh.Hmesh;
+    %axis equal; drawnow;    
+    %pause();
     Tesselation = triangulationCreate(c_cell, H(1), H(2), H(3),'linear');
-    Node = Tesselation.Nodes.';    
+    
+    Node    = Tesselation.Nodes.';    
     Element = Tesselation.Elements.';
     
 end

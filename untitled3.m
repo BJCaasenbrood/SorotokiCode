@@ -61,16 +61,15 @@ for ii = 1:100
         A = [Cmat,-dcdq.';-dcdq,1e-12];
         b = [f*smoothstep(0.02*ii)-0*dcdq.'*lam;c];
         
-        [L,D,P] = ldl(A,'vector');
+        %clc[L,D,P] = ldl(A,'vector');
         %     %minDiag = full(min(diag(D)));
-        dx = sparse(P,1,(L'\(D\(L\b(P)))));
+        %dx = sparse(P,1,(L'\(D\(L\b(P)))));
         
-        %dx = A\b;
+        dx = A\b;
         
-        lam = 0.01*dx(end);
+        lam = 0.05*dx(end);
         q   = q + dx(1:shp.NDim);
-        k = k+1;
-        c
+        k   = k + 1;
     end
 
     cla;
@@ -86,7 +85,6 @@ end
 
 %% functions
 function [c] = Cfunc(q,sdf,shp)
-    
     % stiffness
     k = 0.0;
     
@@ -133,7 +131,7 @@ function [XY] = ClosestProjection(sdf,g)
 p = reshape(g(1:3,4,:),3,[]).';
 
 % compute closest points
-[XY,~]  = distance2curve(sdf.Node,p(:,[1 3]));
+[XY,~] = distance2curve(sdf.Node,p(:,[1 3]));
 
 end
 
@@ -189,17 +187,9 @@ function [dr] = EnergyBasedController(g,gd)
     k1 = 0.01;
     k2 = 1.5;
     
-    %lam1 = .3;
-    %lam2 = 1;
-    
     Kp = diag([k1,k1,k1,k2,k2,k2]);
 
     Xi = logmapSE3(g\gd);
     dr = Kp*tmapSE3(Xi)*isomse3(Xi);
 
-    %dq = lam1*J.'*((J*J.' + lam2*eye(6))\Fu);
-    
-    %dq = lam1*J.'*Fu;
-    
-    %E = Kp*isomse3(Xi);
 end

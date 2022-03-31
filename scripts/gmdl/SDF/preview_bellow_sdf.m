@@ -1,12 +1,12 @@
 clr;
 %% model
 Dist = @(x) SDF(x);
-BdBox =[-50,80,-50,50,0,132];
+BdBox =[-50,80,-50,50,0,90];
 
 obj = Gmodel(Dist,BdBox,'Quality',70);
 
 %% set texture
-obj.Texture = studioclay;
+obj.Texture = bump;
 obj.bake();
 
 %% show

@@ -34,13 +34,13 @@ Id      = zeros(N^3,1);
 Sdetect = false(N^3,1);
 Edetect = false(12,N^3);
 
-% opt     = optimoptions('lsqlin','Display','none',...
-%     'MaxIterations',1e3,'Algorithm','trust-region-reflective',...
-%     'ConstraintTolerance',1e-8,...
-%     'OptimalityTolerance',1e-8); %'');
+opt     = optimoptions('lsqlin','Display','none',...
+    'MaxIterations',1e3,'Algorithm','trust-region-reflective',...
+    'ConstraintTolerance',1e-8,...
+    'OptimalityTolerance',1e-8); %'');
 
-opt = optimoptions(@lsqlin,'Algorithm','active-set',...
-    'MaxIterations',1,'Display','off');
+% opt = optimoptions(@lsqlin,'Algorithm','active-set',...
+%     'MaxIterations',1,'Display','off');
 
 for ii = 1:size(Vmat,3)
     D = f(Vmat(:,:,ii)); 
@@ -80,7 +80,7 @@ Clist = 1:(N^3);
 Clist = Clist(Sdetect);
 Elist = 1:12;
 
-% SEMI-IDEA how ;)
+% SEMI-IDEA how to do this haha ;)
 for ii = Clist
     edge = Elist(Edetect(:,ii));
     
@@ -231,10 +231,10 @@ function  a = poly_area(x,y)
 
  % Calculate contour integral Int -y*dx  (same as Int x*dy).
  
-lx = length(x);
-if isfloat(x) && isfloat(y) 
-a  = -(x(2:lx)-x(1:lx-1))'*(y(1:lx-1)+y(2:lx))/2;
-else % mtimes can not handle ints: return double
-a  = -sum((x(2:lx)-x(1:lx-1)).*(y(1:lx-1)+y(2:lx)))/2;
-end
+ lx = length(x);
+ if isfloat(x) && isfloat(y)
+     a  = -(x(2:lx)-x(1:lx-1))'*(y(1:lx-1)+y(2:lx))/2;
+ else % mtimes can not handle ints: return double
+     a  = -sum((x(2:lx)-x(1:lx-1)).*(y(1:lx-1)+y(2:lx)))/2;
+ end
 end

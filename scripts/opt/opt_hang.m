@@ -3,7 +3,7 @@ clr;
 sdf = @(x) SDF(x);
 
 %% generate mesh
-msh = Mesh(sdf,'BdBox',[0,30,0,50],'Quads',1e3);    
+msh = Mesh(sdf,'BdBox',[0,30,0,50],'Quads',[30 30]);    
 msh = msh.generate();
 
 %% show generated mesh

@@ -6,14 +6,14 @@ D = 2;   % inter distance
 
 sdf = @(x) PneuNet(x,W,H,D,W);
 
-msh = Mesh(sdf,'BdBox',[0,W,0,H],'NElem',800);
+msh = Mesh(sdf,'BdBox',[0,W,0,H],'NElem',700);
 msh = msh.generate();
 
 %% show generated mesh
-fem = Fem(msh,'VolumeInfill',0.35,'Penal',4,'FilterRadius',H/15,...
+fem = Fem(msh,'VolumeInfill',0.3,'Penal',2,'FilterRadius',H/15,...
               'Nonlinear',false,'TimeStep',1/3,...
-              'OptimizationProblem','Compliant',...
-              'MaxIterationMMA',25,'ChangeMax',0.05,'Movie',0);
+              'OptimizationProblem','Compliant','Linestyle','None',...
+              'MaxIterationMMA',50,'ChangeMax',0.03,'Movie',0);
 
 %% set spatial settings
 fem = fem.set('Periodic',[1/2, 0],'Repeat',ones(7,1));
@@ -25,11 +25,11 @@ fem = fem.AddConstraint('Support',id,[1,1]);
 id  = fem.FindNodes('Right'); 
 fem = fem.AddConstraint('Spring',id,[0,1]);
 fem = fem.AddConstraint('Output',id,[0,-1]);
-id  = fem.FindElements('Location',[W/2,0.625*H],1);
+id  = fem.FindElements('Location',[W/2,0.5*H],1);
 fem = fem.AddConstraint('PressureCell',id,5*kpa);
 
 %% set density
-fem = fem.initialTopology('Hole',[W/2,0.625*H],0.85);
+fem = fem.initialTopology('Hole',[W/2,0.5*H],0.85);
 
 %% material
 fem.Material = Ecoflex0030();
@@ -48,21 +48,21 @@ MaxH = 40;
 mshr = fem.exportMesh(ISO,Simp,[GrowH,MinH,MaxH]); 
 mshr.show(); pause(2);
 
-femr = Fem(mshr,'Nonlinear',true,'TimeStep',1/35,'Linestyle','none');
+femr = Fem(mshr,'Nonlinear',true,'TimeStep',1/50,'Linestyle','none');
 
 %% assign boundary conditions to reduced fem
 id = femr.FindNodes('Left'); 
 femr = femr.AddConstraint('Support',id,[1,1]);
 
 id = femr.FindEdges('TopHole');
-femr = femr.AddConstraint('Pressure',id,10*kpa);
+femr = femr.AddConstraint('Pressure',id,9*kpa);
 
 id = femr.FindNodes('Bottom');
 femr = femr.AddConstraint('Output',id,[0,0]);
 
 %% assign material to reduced fem
-D = 25; % compress. factor (more stable)
-femr.Material = Ecoflex0030(15);
+D = 150; % compress. factor (more stable)
+femr.Material = Ecoflex0030(D);
 
 %% solve final finite-element problem
 femr.solve();

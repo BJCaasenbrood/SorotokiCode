@@ -3,14 +3,14 @@ clr;
 sdf = @(x) PneuGrip(x);
 
 %% generate mesh
-msh = Mesh(sdf,'BdBox',[-5,13,0,5],'NElem',5e3);%'Quads',[50 25]);
+msh = Mesh(sdf,'BdBox',[-5,13,0,5],'NElem',4e3);%'Quads',[50 25]);
 msh = msh.generate();
 
 %% generate fem model
-fem = Fem(msh,'VolumeInfill',0.3,'Penal',4,'FilterRadius',0.5,...
+fem = Fem(msh,'VolumeInfill',0.25,'Penal',1,'FilterRadius',0.5,...
               'Nonlinear',false,'TimeStep',1/3,...
               'OptimizationProblem','Compliant',...
-              'MaxIterationMMA',65,'ChangeMax',0.05,'Movie',false);
+              'MaxIterationMMA',125,'ChangeMax',0.02,'Movie',false);
           
 %% set spatial settings
 fem = fem.set('ReflectionPlane',[0 -1]);
@@ -30,7 +30,7 @@ fem = fem.AddConstraint('PressureCell',id,[1*kpa,0]);
 fem = fem.initialTopology('Hole',[-5,5],2);
 
 %% material
-fem.Material = Ecoflex0050;
+fem.Material = Ecoflex0050(0.75);
 
 %% solving
 fem.optimize();
@@ -47,9 +47,22 @@ femr = Fem(mshr,'Nonlinear',true,'TimeStep',1/25,'FilterRadius',2/15,...
 id = femr.FindNodes('Left'); 
 femr = femr.AddConstraint('Support',id,[1,1]);
 
-id = femr.FindEdges('EdgeSelect',[10,4.3],89);
-femr = femr.AddConstraint('Pressure',id,[2*kpa,0]);
+id = femr.FindEdges('EdgeSelect',[10.7,4.44],60);
+femr = femr.AddConstraint('Pressure',id,[4*kpa,0]);
 
+id = femr.FindNodes('Location',[17.64,3.05],1);
+femr = femr.AddConstraint('Support',id,[1,0]);
+
+id = femr.FindNodes('Location',[17.64,6.762],1);
+femr = femr.AddConstraint('Support',id,[1,0]);
+
+id = femr.FindNodes('Location',[17.64,6.762],1);
+femr = femr.AddConstraint('Support',id,[1,0]);
+
+id = femr.FindNodes('Location',[0.2352,8.705],1);
+femr = femr.AddConstraint('Support',id,[1,1]);
+id = femr.FindNodes('Location',[0.2352,1.11],1);
+femr = femr.AddConstraint('Support',id,[1,1]);
 %% assign material to reduced fem
 D = 25; % compress. factor (more stable)
 femr.Material = Ecoflex0050(D);

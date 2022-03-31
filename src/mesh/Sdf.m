@@ -46,6 +46,30 @@ classdef Sdf
             B = obj1.BdBox;
             r.BdBox = [B(3), B(4), B(1), B(2)];
         end
+%----------------------------------------------------------- rotate X <-> Y              
+        function r = rotate(obj1,varargin)
+            if isempty(varargin), k = pi/2;
+            else, k = varargin{1};
+            end
+            R = TwoDRotation(k);
+            fnc = @(x) obj1.sdf((R*x.').');
+            r = Sdf(fnc);
+            B = obj1.BdBox;
+            BB = [B(1),B(3);B(1),B(4);B(2),B(3);B(2),B(4)];
+            
+            r.BdBox = boxhull((R*BB.').').';
+        end        
+%----------------------------------------------------------- rotate X <-> Y              
+        function r = smoothunion(obj1,obj2,varargin)
+            if isempty(varargin), k = 1;
+            else, k = varargin{1};
+            end
+                
+            fnc = @(x) dSmoothUnion(obj1.sdf(x),obj2.sdf(x),k);
+            r = Sdf(fnc);
+            B = [box2node(obj1.BdBox); box2node(obj2.BdBox)];
+            r.BdBox = boxhull(B);
+        end        
     end
 %--------------------------------------------------------------------------       
 methods (Access = public)
@@ -192,3 +216,6 @@ methods (Access = private)
 end
 end
 
+function [R] = TwoDRotation(x)
+R = [cos(x),sin(x);-sin(x),cos(x)];
+end

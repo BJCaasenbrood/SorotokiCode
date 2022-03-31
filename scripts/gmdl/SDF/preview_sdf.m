@@ -1,7 +1,6 @@
 clr;
 %% model
-Dist = @(x) SDF(x);
-obj = Gmodel(Dist,domain(-0.1,1.1,3),'Quality',75);
+obj = Gmodel(SDF,'Quality',125);
 
 %% set texture
 obj.Texture = base;
@@ -9,9 +8,11 @@ obj.Texture = base;
 %% show
 obj.bake().render().ground(); 
 
-function Dist = SDF(x)
-    C1 = dCube(x,0,1,0,1,0,1);
-    S1 = dSphere(x,0,0,1,.5);
-    S2 = dSphere(x,0,0,0.5,1);
-    Dist = dIntersect(dDiff(C1,S1),S2);
+function y = SDF
+    C1 = sCube(0,1,0,1,0,1);
+    S1 = sSphere(0,0,1,.5);
+    S2 = sSphere(0,0,0.5,1);
+    %Dist = dIntersect(dDiff(C1,S1),S2);
+    
+    y = (C1 - S1)/S2;
 end

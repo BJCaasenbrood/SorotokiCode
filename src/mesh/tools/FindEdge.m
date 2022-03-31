@@ -30,7 +30,7 @@ end
 
 function id = FindHoles(Mesh,List)
 Bnd = Mesh.get('BndMat');
-for ii = 1:length(List)
+for ii = 1:numel(List)
     E = unique(Bnd{List(ii)}(:),'stable');
     E = [E;E(1)];
     id{ii,1} = E;
@@ -105,20 +105,22 @@ else
 end
 
 V = Mesh.Node(Loop,:);
-dsx = diff(V(:,1));
-dsy = diff(V(:,2));
-ds = sqrt(dsx.^2+dsy.^2);
-Tx = dsx./ds;
-Ty = dsy./ds;
-
-% Second derivative & curvature
-ds2 = 0.5*(ds([end,1:end-1])+ds);
-Hx = diff(Tx([end,1:end]))./ds2;
-Hy = diff(Ty([end,1:end]))./ds2;
-x = V(1:end-1,1);
-y = V(1:end-1,2); % remove repeated point
-
-Angles = sqrt(Hx.^2+Hy.^2).*ds*(180/pi);
+% dsx = diff(V(:,1));
+% dsy = diff(V(:,2));
+% ds = sqrt(dsx.^2+dsy.^2);
+% Tx = dsx./ds;
+% Ty = dsy./ds;
+% 
+% % Second derivative & curvature
+% ds2 = 0.5*(ds([end,1:end-1])+ds);
+% Hx = diff(Tx([end,1:end]))./ds2;
+% Hy = diff(Ty([end,1:end]))./ds2;
+% x = V(1:end-1,1);
+% y = V(1:end-1,2); % remove repeated point
+% 
+% Angles = sqrt(Hx.^2+Hy.^2).*ds*(180/pi);
+% 
+Angles = abs(DifferentialGeometry(V));
 
 index0 = find(Loop == id);
 n = 1; m = 1;
@@ -127,20 +129,21 @@ n = 1; m = 1;
 for ii = (index0+1):1:length(Loop)-1
     if Angles(ii) <= AngleMax
         n = n+1;
-    else, 
+    else
         break 
     end
 end
+
 %backwards loop
 for ii = (index0-1):-1:1
     if Angles(ii) <= AngleMax
         m = m+1;
-    else, 
+    else
         break; 
     end
 end
 
-id = {flipud(Loop((index0-m):1:(index0+n)))};
+id = {flipud(Loop((index0-m+1):1:(index0+n)))};
 
 end
 
@@ -200,3 +203,50 @@ for el = 1:length(f);
 end
 end
 
+function Theta = DifferentialGeometry(Node)
+% http://page.math.tu-berlin.de/~bobenko/Lehre/Skripte/DDG_Lectures.pdf
+N = length(Node);
+T = zeros(N,3); 
+Node0 = Node;
+%dgam = zeros(N,3); 
+%phi  = zeros(N,1);
+
+[~, Fy] = gradient(Node);   
+dgam = [Fy(:,1),Fy(:,2)]; 
+
+[~, Fy] = gradient(Node0);   
+dgam0 = [Fy(:,1),Fy(:,2)]; 
+
+dl  = sqrt(sum(dgam.^2,2));
+dl0 = sqrt(sum(dgam0.^2,2));
+ds  = mean(dl0);
+
+Gamma = dl./dl0;
+
+% compute tangents
+for ii = 1:N 
+    T(ii,[1,3]) = dgam(ii,:)/norm(dgam(ii,:));
+end
+
+I = null(round(T(1,:)));
+Normal = I(:,1);
+    
+% compute curvature
+for ii = 2:N-1
+    
+    t1 = T(ii - 1,:);
+    t2 = T(ii,:);
+%     
+    dir = sign(dot(so3(t2)*t1(:),Normal));
+    angle = real(2*dir*acos(dot(t2,t1)));
+    
+    
+    Kappa(ii,1) = angle/(norm(Node(ii+1,:) - Node(ii,:)) + ...
+        norm(Node(ii,:) - Node(ii-1,:)));
+end
+
+Kappa(1,:) = Kappa(2,:) + ds*(Kappa(3,:) - Kappa(2,:));
+Kappa(N,:) = Kappa(end-1,:) + ds*(Kappa(end,:) - Kappa(end-1,:));
+Theta = (Kappa*ds)*(180/pi);
+
+end

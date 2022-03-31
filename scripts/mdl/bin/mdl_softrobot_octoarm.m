@@ -66,39 +66,39 @@ grid on;
 %error(1);
 disp(' - Press enter to play simulation - ');
 %% generate rig
-% [rig, sph] = setupRig(mdl);
-% 
-% %text(0.055,0.00,-0.005,'\textbf{$g_d$}','interpreter','latex','fontsize',16);
-% 
-% h = [];
-% for ii = 1:fps(t,15):length(mdl.q)
-%     rig = rig.computeFK(mdl.q(ii,:));
-%     rig = rig.update();
-%    
-%     sph.reset();
-%     sph = Blender(sph,'SE3x',mdl.gd(ii,:));
-%     sph = Blender(sph,'SE3',rig.g0);
-%     sph.update();
-% 
-%     setupFigure(ii);
-%     view(30,30);
-%     
-%     delete(h);
-%     %h = shadowplot(5);
-%     
-%     background();
-%     
-% %     if mod(ii,15) <= 1
-% %         pause;
-% %         t(ii)
-% %     end
-% %     if ii == 1, gif('srm3_octarm.gif','frame',gcf,'nodither');
-% %         pause; framepause(5);
-% %     else, gif;
-% %     end
-% end
+[rig, sph] = setupRig(mdl);
 
-%framepause(15);
+%text(0.055,0.00,-0.005,'\textbf{$g_d$}','interpreter','latex','fontsize',16);
+
+h = [];
+for ii = 1:fps(t,15):length(mdl.q)
+    rig = rig.computeFK(mdl.q(ii,:));
+    rig = rig.update();
+   
+    sph.reset();
+    sph = Blender(sph,'SE3x',mdl.gd(ii,:));
+    sph = Blender(sph,'SE3',rig.g0);
+    sph.update();
+
+    setupFigure(ii);
+    view(30,30);
+    
+    delete(h);
+    %h = shadowplot(5);
+    
+    background();
+    
+%     if mod(ii,15) <= 1
+%         pause;
+%         t(ii)
+%     end
+%     if ii == 1, gif('srm3_octarm.gif','frame',gcf,'nodither');
+%         pause; framepause(5);
+%     else, gif;
+%     end
+end
+
+framepause(15);
 
 %% BACK-END FUNCTIONS
 % setup model

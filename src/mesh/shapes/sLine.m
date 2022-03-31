@@ -8,7 +8,7 @@ if nargin < 2
     end
 end
 
-sdf = SDF(@(P) sdfLine(P,x1,x2,y1,y2));
+sdf = Sdf(@(P) sdfLine(P,x1,x2,y1,y2));
 sdf.BdBox = [x1,x2,y1,y2];
 end
 
