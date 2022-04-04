@@ -41,7 +41,7 @@ Specs: Lenovo Yoga, AMD Ryzen 7 5800H, 32GB RAM.
 
 <details>
 <summary>Show video</summary>
-<div align="center"> <img src="./docs/documentation/img/mdl_fast_simu.mp4" width="500"> </div>
+<div align="center"> <img src="./docs/documentation/img/mdl_fast_simu.gif" width="500"> </div>
 </details>
 
 <a href="https://github.com/BJCaasenbrood/SorotokiCode/blob/master/scripts/mdl/mdl_swing_motion.m"> Code available here</a>
