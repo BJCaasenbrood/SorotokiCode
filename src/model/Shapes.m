@@ -27,6 +27,7 @@ classdef Shapes
         Ktt; Ktt0;
         Jtt;
         Att;
+        Gvec;
         
     end
     
@@ -71,6 +72,7 @@ function obj = Shapes(Input,NModal,varargin)
         
         obj.Rho  = Fem.Material.Rho;
         obj.Zeta = Fem.Material.Zeta;
+        obj.Gvec = [0;0;9.81e3];
         
     elseif isa(Input,'double')
         obj.NNode = size(Input,1);
@@ -86,6 +88,7 @@ function obj = Shapes(Input,NModal,varargin)
         
         obj.Rho  = 1090e-12;
         obj.Zeta = .15;
+        obj.Gvec = [0;0;9.81e3];
     end
 
     % cross-section SDF
@@ -177,14 +180,14 @@ if strcmp(Request,'POD')
         legend(leg{:},'Fontsize',14,'Orientation','Horizontal');        
         
         A  = axis; Ay = 1.2*max(abs(A(3:4)));
-        axis([0 1 -Ay Ay]);
+        %axis([0 1 -Ay Ay]);
         
         subplot(Shapes.NDof,2,2*jj);
         En = (Shapes.PODEnergy{jj})/sum(Shapes.PODEnergy{jj});
         plot(En,'-o','LineW',3); hold on;
         Enp = cumsum(En);
         plot(Enp,'--','LineW',3); 
-        axis([1 10 0 max(En)*1.2]);
+        %axis([1 10 0 max(En)*1.2]);
 
     end
 

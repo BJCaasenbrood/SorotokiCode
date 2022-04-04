@@ -2,7 +2,7 @@ classdef Model
     
     properties (Access = public)
         Shapes;
-        Inertia;
+        %Inertia;
         Tsim;
         Tstep;
 
@@ -287,7 +287,8 @@ disp('----------------------------------');
                 Model.Shapes.Ba,... 
                 Model.Shapes.Ktt,...
                 Model.Shapes.Mtt,...     
-                Model.Shapes.Zeta);      
+                Model.Shapes.Zeta,...
+                Model.Shapes.Gvec);      
         end
             
         % overwrite dynamics

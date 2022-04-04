@@ -8,7 +8,8 @@ permalink: /
   https://fontawesome.com/how-to-use/on-the-web/styling/sizing-icons
 -->
 
-<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+<!-- <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script> -->
+
 <div align="center"> <img src="./docs/documentation/img/softrobot_.png" width="650"> </div> <br/>
 
 # **SOROTOKI** - An open-source soft robotics toolkit for MATLAB
@@ -28,14 +29,35 @@ git clone --depth 1  https://github.com/BJCaasenbrood/SorotokiCode.git
 
 ## What's new?
 {: .text-purple-000}
-- **Nov 11, 2021**: We recently added the functionality to perform real-time control of
-soft robotic systems using a desktop-sized developement platform, see [Github repo](https://github.com/chukhanhhoang/SoftRoboticSetupFesto). Using `Model.m`{: .text-purple-000}, we developed a model-based controller which we see in action below!
+- **Apr 03, 2022**: We added environmental contact in SOROTOKI! You can now use Signed Distance Functions `Sdf.m`{: .text-purple-000} with `Fem.m`{: .text-purple-000}. Use `fem.AddConstraint('Contact',sdf,Move)`{: .text-purple-000} to add the contact. The vector `Move = [dX, dY]`{: .text-purple-000} or `Move = [dX, dY, dZ]`{: .text-purple-000} can be used to offset the contact. The contact dynamics can be solved Quasi-static or Dynamic.
 
+<details>
+<summary>Show image</summary>
+<div align="center"> <img src="./docs/documentation/img/fem_bouncing_ball.gif" width="500"> </div>
+</details>
+
+- **Mar 10, 2022**: We hugely improved the dynamic simulations performance using a combination of Matrix-Differential Equations (MDEs) and Matlab's mex compiler. To enable the compiled dynamic solver, set `mdl.MexSolver = true`{: .text-purple-000} (default option). As an example, see `mdl_swing_motion`{: .text-purple-000}. It runs a 16-dim Kirchoff beam at 60 Hz easily! (5s simulation = 1s real-time).
+Specs: Lenovo Yoga, AMD Ryzen 7 5800H, 32GB RAM.
+
+<details>
+<summary>Show video</summary>
+<div align="center"> <img src="./docs/documentation/img/mdl_fast_simu.mp4" width="500"> </div>
+</details>
+
+<a href="https://github.com/BJCaasenbrood/SorotokiCode/blob/master/scripts/mdl/mdl_swing_motion.m"> Code available here</a>
+
+- **Nov 11, 2021**: We recently added the functionality to perform real-time control of
+soft robotic systems using a desktop-sized development platform, see [Github repo](https://github.com/chukhanhhoang/SoftRoboticSetupFesto). Using `Model.m`{: .text-purple-000}, we developed a model-based controller which we see in action below!
+
+<details>
+<summary>Show image</summary>
 <div align="center"> <img src="./docs/documentation/img/bdog_closed_loop_control.gif" width="500"> </div>
+</details>
 
 {: .text-purple-000}
-**REMARK**: The controller shown above is not a 'elementary' PID controller, we actively use gravity compensation, and hyper-elastic and visco-elastic material compensation! To envelop these entities in a dynamic model, we used the SOROTOKI toolkit.
+**REMARK**: The controller shown in the video is not a 'elementary' PID controller, we actively use gravity compensation, and hyper-elastic and visco-elastic material compensation! To envelop these entities in a dynamic model, we used the SOROTOKI toolkit.
 {: .fs-2}
+
 
 ## Applications highlights
 {: .text-purple-000}
@@ -92,6 +114,8 @@ soft robotic systems using a desktop-sized developement platform, see [Github re
 <details>
 <summary>Show image</summary>
 <div align="left"> <img src="./docs/documentation/img/fem_tensile.gif" width="500"> </div>
+
+<a href="https://github.com/BJCaasenbrood/SorotokiCode/blob/master/scripts/fem/2D/static/fem_tbone.m">Code available here</a>
 </details>
 
 #### FEM: Topology optimization of PneuNet actuator
@@ -100,6 +124,8 @@ soft robotic systems using a desktop-sized developement platform, see [Github re
 <details>
 <summary>Show image</summary>
 <div align="left"> <img src="./docs/documentation/img/opt_pneunet.gif" width="500"> </div>
+
+<a href="https://github.com/BJCaasenbrood/SorotokiCode/blob/master/scripts/fem/2D/static/fem_tbone.m">Code available here</a>
 </details>
 
 #### FEM: Deforming PneuNet actuator -- Ecoflex 0030
@@ -116,6 +142,22 @@ soft robotic systems using a desktop-sized developement platform, see [Github re
 <details>
 <summary>Show image</summary>
 <div align="left"> <img src="./docs/documentation/img/fem_3D_buckle.gif" width="200"> </div>
+</details>
+
+#### FEM: Hyper-elastic bouncing ball
+{: .text-purple-000}
+
+<details>
+<summary>Show image</summary>
+<div align="left"> <img src="./docs/documentation/img/fem_bouncing_ball.gif" width="400"> </div>
+</details>
+
+#### FEM: PneuNet with dynamic contact
+{: .text-purple-000}
+
+<details>
+<summary>Show image</summary>
+<div align="left"> <img src="./docs/documentation/img/fem_pneunet_dyn_contact.gif" width="300"> </div>
 </details>
 
 
@@ -143,6 +185,22 @@ soft robotic systems using a desktop-sized developement platform, see [Github re
 <details>
 <summary>Show image</summary>
 <div align="left"> <img src="./docs/documentation/img/mdl_femconstruct.png" width="900"> </div>
+</details>
+
+### Real-time Control -- `Control.m`{: .text-purple-000}
+
+#### CONTROL: Closed-loop control of PneuNet actuator
+{: .text-purple-000}
+<details>
+<summary>Show image</summary>
+<div align="left"> <img src="./docs/documentation/img/bdog_closed_loop_control.gif" width="400"> </div>
+</details>
+
+#### CONTROL: Energy-based control two-link system
+{: .text-purple-000}
+<details>
+<summary>Show image</summary>
+<div align="left"> <img src="./docs/documentation/img/bdog_2link.gif" width="300"> </div>
 </details>
 
 ### Graphics Model -- `Gmodel.m`{: .text-purple-000}

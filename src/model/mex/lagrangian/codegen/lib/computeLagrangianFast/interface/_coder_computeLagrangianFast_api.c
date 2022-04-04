@@ -557,7 +557,7 @@ static real_T (*x_emlrt_marshallIn(const emlrtStack *sp, const mxArray *src,
   return ret;
 }
 
-void computeLagrangianFast_api(const mxArray *const prhs[11], int32_T nlhs,
+void computeLagrangianFast_api(const mxArray *const prhs[12], int32_T nlhs,
                                const mxArray *plhs[10])
 {
   emlrtStack st = {
@@ -580,6 +580,7 @@ void computeLagrangianFast_api(const mxArray *const prhs[11], int32_T nlhs,
   real_T(*Mtt)[36];
   real_T(*Phi)[9];
   real_T(*Phi0)[9];
+  real_T(*Gvec)[3];
   real_T(*p)[3];
   real_T(*p0)[3];
   real_T Kin;
@@ -618,9 +619,10 @@ void computeLagrangianFast_api(const mxArray *const prhs[11], int32_T nlhs,
   Ktt = o_emlrt_marshallIn(&st, emlrtAlias(prhs[8]), "Ktt");
   Mtt = o_emlrt_marshallIn(&st, emlrtAlias(prhs[9]), "Mtt");
   Zeta = c_emlrt_marshallIn(&st, emlrtAliasP(prhs[10]), "Zeta");
+  Gvec = e_emlrt_marshallIn(&st, emlrtAlias(prhs[11]), "Gvec");
   /* Invoke the target function */
   computeLagrangianFast(x, dx, ds, *p0, *Phi0, xia0, Th, Ba, *Ktt, *Mtt, Zeta,
-                        M, C, K, R, G, *p, *Phi, J, &Vg, &Kin);
+                        *Gvec, M, C, K, R, G, *p, *Phi, J, &Vg, &Kin);
   /* Marshall function outputs */
   M->canFreeData = false;
   plhs[0] = emlrt_marshallOut(M);

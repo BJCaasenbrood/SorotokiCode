@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.coder" plugin-version="R2021a">
-  <configuration build-checksum="3217059852" file="/home/brandon/Documents/MATLAB/SorotokiCode/src/model/mex/lagrangian/computeLagrangianFast.prj" location="/home/brandon/Documents/MATLAB/SorotokiCode/src/model/mex/lagrangian" name="computeLagrangianFast" target="target.unifiedcoder" target-name="MATLAB Coder">
+  <configuration build-checksum="228630873" file="/home/brandon/Documents/MATLAB/SorotokiCode/src/model/mex/lagrangian/computeLagrangianFast.prj" location="/home/brandon/Documents/MATLAB/SorotokiCode/src/model/mex/lagrangian" name="computeLagrangianFast" target="target.unifiedcoder" target-name="MATLAB Coder">
     <profile key="profile.mex">
       <param.BuiltInstrumentedMex>false</param.BuiltInstrumentedMex>
       <param.RanInstrumentedMex>false</param.RanInstrumentedMex>
@@ -887,7 +887,7 @@
     <param.AutoInferUnboundedSizeThreshold>2048</param.AutoInferUnboundedSizeThreshold>
     <param.EnableFixedPointStep>false</param.EnableFixedPointStep>
     <param.EnableScreener>true</param.EnableScreener>
-    <param.AnnotationChecksum>3546357743</param.AnnotationChecksum>
+    <param.AnnotationChecksum>3175988971</param.AnnotationChecksum>
     <var.LegacyTarget />
     <var.MirrorOnOpen>false</var.MirrorOnOpen>
     <param.FixedPointEnabled>false</param.FixedPointEnabled>
@@ -896,12 +896,12 @@
     <param.unifiedParamStorage />
     <var.gc.lastOutputRoot>codegen/lib/computeLagrangianFast</var.gc.lastOutputRoot>
     <var.gc.lastOutputType>C_CODE</var.gc.lastOutputType>
-    <var.gc.preBuildChecksum>1266961571</var.gc.preBuildChecksum>
+    <var.gc.preBuildChecksum>4192509430</var.gc.preBuildChecksum>
     <var.cfi.lastOutputRoot>codegen/mex/computeLagrangianFast</var.cfi.lastOutputRoot>
-    <var.cfi.preBuildChecksum>1501229816</var.cfi.preBuildChecksum>
+    <var.cfi.preBuildChecksum>3944358829</var.cfi.preBuildChecksum>
     <var.lastCfiTestSnippet>entrypoint_CLF</var.lastCfiTestSnippet>
     <var.outdatedOnRestore>false</var.outdatedOnRestore>
-    <var.lastUserSourceChecksum>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;&lt;checksum&gt;&lt;includedFiles&gt;&lt;file&gt;/home/brandon/Documents/MATLAB/SorotokiCode/src/model/mex/lagrangian/computeLagrangianFast.m&lt;/file&gt;&lt;/includedFiles&gt;&lt;value&gt;2948009652&lt;/value&gt;&lt;/checksum&gt;</var.lastUserSourceChecksum>
+    <var.lastUserSourceChecksum>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;&lt;checksum&gt;&lt;includedFiles&gt;&lt;file&gt;/home/brandon/Documents/MATLAB/SorotokiCode/src/model/mex/lagrangian/computeLagrangianFast.m&lt;/file&gt;&lt;/includedFiles&gt;&lt;value&gt;2488800953&lt;/value&gt;&lt;/checksum&gt;</var.lastUserSourceChecksum>
     <var.sourceSetState>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;&lt;sourceModel&gt;&lt;primarySourceFiles&gt;&lt;file&gt;/home/brandon/Documents/MATLAB/SorotokiCode/src/model/mex/lagrangian/computeLagrangianFast.m&lt;/file&gt;&lt;/primarySourceFiles&gt;&lt;fixedPointSourceFiles/&gt;&lt;fixedPointSourceRegistered&gt;false&lt;/fixedPointSourceRegistered&gt;&lt;fixedPointSourceSelected&gt;false&lt;/fixedPointSourceSelected&gt;&lt;/sourceModel&gt;</var.sourceSetState>
     <param.forceMexBuild>false</param.forceMexBuild>
     <param.NoDefaultJIT>false</param.NoDefaultJIT>
@@ -1122,7 +1122,7 @@
     </unset>
     <fileset.entrypoints>
       <file custom-data-expanded="false" value="${PROJECT_ROOT}/computeLagrangianFast.m">
-        <Marker>1644996912871</Marker>
+        <Marker>1648999688262</Marker>
       </file>
     </fileset.entrypoints>
     <fileset.testbench>
@@ -1142,6 +1142,7 @@
           <Input Name="Ktt" typeId="7" />
           <Input Name="Mtt" typeId="7" />
           <Input Name="Zeta" typeId="1" />
+          <Input Name="Gvec" typeId="2" />
           <idpTable>
             <type typeId="0">
               <Class>double</Class>
@@ -1243,7 +1244,7 @@
       <vista>false</vista>
       <linux>true</linux>
       <solaris>false</solaris>
-      <osver>5.15.15-76051515-generic</osver>
+      <osver>5.16.11-76051611-generic</osver>
       <os32>false</os32>
       <os64>true</os64>
       <arch>glnxa64</arch>

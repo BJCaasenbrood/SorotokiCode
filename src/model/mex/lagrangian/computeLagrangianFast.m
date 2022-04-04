@@ -8,7 +8,8 @@ function [M,C,K,R,G,p,Phi,J,Vg,Kin] = computeLagrangianFast(x,dx,... % states
     Ba,...      % state to strain matrix
     Ktt,...     % geometric stiffness
     Mtt,...     % geometric inertia
-    Zeta)        
+    Zeta,...    % dampings coefficient
+    Gvec)       % gravitional vector  
 
 % compute total length
 n    = numel(x);
@@ -25,11 +26,11 @@ for ii = 1:(size(Th,3)/2)
     
     % first EL-diff eval
     [K1Z1,K1Z2] = LagrangianODEX(x, dx, Z1,...
-        Th(:,:,2*ii-1), xia0(:,1,2*ii-1), Ba, Mtt, Ktt);
+        Th(:,:,2*ii-1), xia0(:,1,2*ii-1), Ba, Mtt, Ktt, Gvec);
     
     % second EL-diff eval
     [K2Z1,K2Z2] = LagrangianODEX(x, dx, Z1 + (2/3)*ds*K1Z1,...
-        Th(:,:,2*ii), xia0(:,1,2*ii), Ba, Mtt, Ktt);
+        Th(:,:,2*ii), xia0(:,1,2*ii), Ba, Mtt, Ktt, Gvec);
     
     % update integrands
     s  = s  + ds;
@@ -58,7 +59,7 @@ R = Zeta*K;
 end
 
 function [dZ1,dZ2] = LagrangianODEX(x,dx,Z1,...
-    Theta,xia0,Ba,Mtt,Ktt)
+    Theta,xia0,Ba,Mtt,Ktt,Gvec)
 
 n     = numel(x);
 p_    = Z1(1:3,4);
@@ -93,14 +94,14 @@ dJt = A*adV*BTh;
 % compute inertia, coriolis, gravity
 dM = (Jg).'*Mtt*Jg;
 dC = (Jg).'*((Mtt*adV - adV.'*Mtt)*Jg  + Mtt*Jgt);
-dG = (Jg).'*(Ai*Mtt*[0;0;0;0;0;9.81e3]);
+dG = (Jg).'*(Ai*Mtt*[0;0;0;Gvec]);
 
 % compute (nonlinear stiffness)
 dK = (BTh).'*Ktt*(BTh);
 
 % compute grav. potential energy
 dKe = 0.5*V.'*Mtt*V;
-dVg = Mtt(4,4)*p_.'*[0;0;9.81e3];
+dVg = Mtt(4,4)*p_.'*Gvec;
 
 dZ1                      = zeros(6,6+2*(n-1));
 dZ1(1:3,1:3)             = dPhi;

@@ -204,9 +204,9 @@ static void main_computeLagrangianFast(void)
   emxArray_real_T *xia0;
   double Ktt_tmp[36];
   double Phi[9];
-  double dv1[9];
-  double dv[3];
+  double dv[9];
   double p[3];
+  double p0_tmp[3];
   double Kin;
   double Vg;
   double ds_tmp;
@@ -223,6 +223,7 @@ static void main_computeLagrangianFast(void)
   dx = argInit_Unboundedx1_real_T();
   ds_tmp = argInit_real_T();
   /* Initialize function input argument 'p0'. */
+  argInit_3x1_real_T(p0_tmp);
   /* Initialize function input argument 'Phi0'. */
   /* Initialize function input argument 'xia0'. */
   xia0 = argInit_6x1xUnbounded_real_T();
@@ -233,11 +234,12 @@ static void main_computeLagrangianFast(void)
   /* Initialize function input argument 'Ktt'. */
   argInit_6x6_real_T(Ktt_tmp);
   /* Initialize function input argument 'Mtt'. */
+  /* Initialize function input argument 'Gvec'. */
   /* Call the entry-point 'computeLagrangianFast'. */
-  argInit_3x1_real_T(dv);
-  argInit_3x3_real_T(dv1);
-  computeLagrangianFast(x, dx, ds_tmp, dv, dv1, xia0, Th, Ba, Ktt_tmp, Ktt_tmp,
-                        ds_tmp, M, C, K, R, G, p, Phi, J, &Vg, &Kin);
+  argInit_3x3_real_T(dv);
+  computeLagrangianFast(x, dx, ds_tmp, p0_tmp, dv, xia0, Th, Ba, Ktt_tmp,
+                        Ktt_tmp, ds_tmp, p0_tmp, M, C, K, R, G, p, Phi, J, &Vg,
+                        &Kin);
   emxDestroyArray_real_T(J);
   emxDestroyArray_real_T(G);
   emxDestroyArray_real_T(R);

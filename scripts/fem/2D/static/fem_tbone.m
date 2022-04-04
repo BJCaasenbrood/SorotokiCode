@@ -17,7 +17,7 @@ fem = fem.AddConstraint('Displace',fem.FindNodes('Top'),[0,6]);
 fem = fem.AddConstraint('Output',fem.FindNodes('Location',[1,4]),[0,1]);
 
 %% assign material
-fem.Material = Dragonskin10(400);
+fem.Material = Dragonskin10(120);
 
 %% solving
 fem.solve();

@@ -21,18 +21,17 @@ static void LagrangianODEX(const emxArray_real_T *x, const emxArray_real_T *dx,
                            const emxArray_real_T *Z1,
                            const emxArray_real_T *Theta, const double xia0[6],
                            const emxArray_real_T *Ba, const double Mtt[36],
-                           const double Ktt[36], emxArray_real_T *dZ1,
-                           emxArray_real_T *dZ2);
+                           const double Ktt[36], const double Gvec[3],
+                           emxArray_real_T *dZ1, emxArray_real_T *dZ2);
 
 /* Function Definitions */
 static void LagrangianODEX(const emxArray_real_T *x, const emxArray_real_T *dx,
                            const emxArray_real_T *Z1,
                            const emxArray_real_T *Theta, const double xia0[6],
                            const emxArray_real_T *Ba, const double Mtt[36],
-                           const double Ktt[36], emxArray_real_T *dZ1,
-                           emxArray_real_T *dZ2)
+                           const double Ktt[36], const double Gvec[3],
+                           emxArray_real_T *dZ1, emxArray_real_T *dZ2)
 {
-  static const short b[6] = {0, 0, 0, 0, 0, 9810};
   emxArray_real_T *C;
   emxArray_real_T *Jg;
   emxArray_real_T *b_C;
@@ -49,6 +48,7 @@ static void LagrangianODEX(const emxArray_real_T *x, const emxArray_real_T *dx,
   double dv[9];
   double V[6];
   double XI[6];
+  double dv1[6];
   double y[6];
   double bkj;
   double d;
@@ -263,15 +263,22 @@ static void LagrangianODEX(const emxArray_real_T *x, const emxArray_real_T *dx,
   adV[11] = V[3];
   adV[17] = 0.0;
   /*  compute inertia, coriolis, gravity */
+  dv1[0] = 0.0;
+  dv1[1] = 0.0;
+  dv1[2] = 0.0;
+  dv1[3] = Gvec[0];
+  dv1[4] = Gvec[1];
+  dv1[5] = Gvec[2];
   for (i = 0; i < 6; i++) {
-    y[i] = 0.0;
+    bkj = 0.0;
     for (i1 = 0; i1 < 6; i1++) {
-      bkj = 0.0;
+      d = 0.0;
       for (n = 0; n < 6; n++) {
-        bkj += Ai[i + 6 * n] * Mtt[n + 6 * i1];
+        d += Ai[i + 6 * n] * Mtt[n + 6 * i1];
       }
-      y[i] += bkj * (double)b[i1];
+      bkj += d * dv1[i1];
     }
+    y[i] = bkj;
   }
   emxInit_real_T(&dG, 1);
   inner = Jg->size[1];
@@ -379,8 +386,8 @@ static void LagrangianODEX(const emxArray_real_T *x, const emxArray_real_T *dx,
     }
   }
   dZ1->data[22] =
-      (Mtt[21] * Z1->data[18] * 0.0 + Mtt[21] * Z1->data[19] * 0.0) +
-      Mtt[21] * Z1->data[20] * 9810.0;
+      (Mtt[21] * Z1->data[18] * Gvec[0] + Mtt[21] * Z1->data[19] * Gvec[1]) +
+      Mtt[21] * Z1->data[20] * Gvec[2];
   bkj = 0.0;
   for (i = 0; i < 6; i++) {
     d = 0.0;
@@ -549,7 +556,8 @@ void computeLagrangianFast(const emxArray_real_T *x, const emxArray_real_T *dx,
                            const emxArray_real_T *xia0,
                            const emxArray_real_T *Th, const emxArray_real_T *Ba,
                            const double Ktt[36], const double Mtt[36],
-                           double Zeta, emxArray_real_T *M, emxArray_real_T *C,
+                           double Zeta, const double Gvec[3],
+                           emxArray_real_T *M, emxArray_real_T *C,
                            emxArray_real_T *K, emxArray_real_T *R,
                            emxArray_real_T *G, double p[3], double Phi[9],
                            emxArray_real_T *J, double *Vg, double *Kin)
@@ -586,6 +594,8 @@ void computeLagrangianFast(const emxArray_real_T *x, const emxArray_real_T *dx,
   /*       % state to strain matrix */
   /*      % geometric stiffness */
   /*      % geometric inertia */
+  /*     % dampings coefficient */
+  /*  gravitional vector   */
   /*  compute total length */
   i = Z1->size[0] * Z1->size[1];
   Z1->size[0] = 6;
@@ -637,7 +647,7 @@ void computeLagrangianFast(const emxArray_real_T *x, const emxArray_real_T *dx,
     LagrangianODEX(x, dx, Z1, b_Th,
                    *(double(*)[6]) &
                        xia0->data[6 * ((int)((unsigned int)(ii + 1) << 1) - 2)],
-                   Ba, Mtt, Ktt, K1Z1, K1Z2);
+                   Ba, Mtt, Ktt, Gvec, K1Z1, K1Z2);
     /*  second EL-diff eval */
     s = 0.66666666666666663 * ds;
     k = b_Z1->size[0] * b_Z1->size[1];
@@ -664,7 +674,7 @@ void computeLagrangianFast(const emxArray_real_T *x, const emxArray_real_T *dx,
     LagrangianODEX(x, dx, b_Z1, b_Th,
                    *(double(*)[6]) &
                        xia0->data[6 * ((int)((unsigned int)(ii + 1) << 1) - 1)],
-                   Ba, Mtt, Ktt, K2Z1, K2Z2);
+                   Ba, Mtt, Ktt, Gvec, K2Z1, K2Z2);
     /*  update integrands */
     s = 0.25 * ds;
     loop_ub = 6 * Z1->size[1];

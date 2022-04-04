@@ -47,16 +47,18 @@ Ba   = shp.Ba;
 Ktt  = shp.Ktt;
 Mtt  = shp.Mtt;
 Zeta = shp.Zeta;
+Gvec = [0;0;9e3];
 
-% [M,C,K,R,G,p,Phi,J,Vg,Kin] = computeLagrangianFast(x,dx,... % states
-%     ds,...      % spatial steps
-%     p0,...      % position zero
-%     Phi0,...    % phi zero
-%     xia0,...    % intrinsic strain vector
-%     Th,...      % evaluated Theta matrix
-%     Ba,...      % state to strain matrix
-%     Ktt,...     % geometric stiffness
-%     Mtt,...     % geometric inertia
-%     Zeta);      
+[M,C,K,R,G,p,Phi,J,Vg,Kin] = computeLagrangianFast(x,dx,... % states
+    ds,...      % spatial steps
+    p0,...      % position zero
+    Phi0,...    % phi zero
+    xia0,...    % intrinsic strain vector
+    Th,...      % evaluated Theta matrix
+    Ba,...      % state to strain matrix
+    Ktt,...     % geometric stiffness
+    Mtt,...     % geometric inertia
+    Zeta,...
+    Gvec);      
 
 %clearvars -except M C K R G p Phi J Vg Kin

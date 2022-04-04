@@ -46,12 +46,13 @@ void computeLagrangianFast(emxArray_real_T *x, emxArray_real_T *dx, real_T ds,
                            real_T p0[3], real_T Phi0[9], emxArray_real_T *xia0,
                            emxArray_real_T *Th, emxArray_real_T *Ba,
                            real_T Ktt[36], real_T Mtt[36], real_T Zeta,
-                           emxArray_real_T *M, emxArray_real_T *C,
-                           emxArray_real_T *K, emxArray_real_T *R,
-                           emxArray_real_T *G, real_T p[3], real_T Phi[9],
-                           emxArray_real_T *J, real_T *Vg, real_T *Kin);
+                           real_T Gvec[3], emxArray_real_T *M,
+                           emxArray_real_T *C, emxArray_real_T *K,
+                           emxArray_real_T *R, emxArray_real_T *G, real_T p[3],
+                           real_T Phi[9], emxArray_real_T *J, real_T *Vg,
+                           real_T *Kin);
 
-void computeLagrangianFast_api(const mxArray *const prhs[11], int32_T nlhs,
+void computeLagrangianFast_api(const mxArray *const prhs[12], int32_T nlhs,
                                const mxArray *plhs[10]);
 
 void computeLagrangianFast_atexit(void);

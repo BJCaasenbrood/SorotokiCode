@@ -158,10 +158,11 @@ Node0 = [mesh.Node, ones(mesh.NNode,1)];
 % R = Quat2Rot(Arg(1:4));
 % r = Arg(5:7);
 % H = zeros(4);
-% H(1:3,1:3) = R.';
-% H(1:3,4) = [r(3),r(2),r(1)].';
+
 % H(4,4) = 1;
 H = Arg;
+H(1:3,1:3) = H(1:3,1:3);
+H(1:3,4) = H([3;2;1],4);
 Node = H*Node0.';
 mesh.Node = Node(1:3,:).';
 end
@@ -226,6 +227,7 @@ for ii = 1:length(Node0)
     V(ii,:) = reshape(H(1:3,4),1,3);
 end
 
+% fixes cosserat frame
 mesh.Node = V;
 
 end

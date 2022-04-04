@@ -1,12 +1,12 @@
-clr; 
+clr; cd;
 %% 
 L = 100;   % length of robot
 M = 4;     % number of modes
 N = M*10;  % number of discrete points on curve
-H = 1/150; % timesteps
+H = 1/75; % timesteps
 FPS = 30;  % animation speed
 
-Modes = [0,M,0,M,0,0];  % pure-XY curvature
+Modes = [0,M,M,0,0,0];  % pure-XY curvature
 %%
 % generate nodal space
 X = linspace(0,L,N)';
@@ -15,23 +15,21 @@ Y = GenerateFunctionSpace(X,N,M,L);
 %%
 shp = Shapes(Y,Modes,'L0',L);
 
-shp.E    = 2.00;     % Young's modulus in Mpa
-shp.Nu   = 0.49;     % Poisson ratio
+shp.E    = 0.05;     % Young's modulus in Mpa
+shp.Nu   = 0.33;     % Poisson ratio
 shp.Rho  = 1000e-12; % Density in kg/mm^3
-shp.Zeta = 0.1;      % Damping coefficient
+shp.Zeta = 0.05;      % Damping coefficient
+
+shp.Gvec = [0; 0; 0];
 
 shp = shp.rebuild();
 
 %%
-mdl = Model(shp,'Tstep',H,'Tsim',5);
-
-%% controller
-mdl.tau = @(M) Controller(M);
+mdl = Model(shp,'Tstep',H,'Tsim',15);
 
 %%
-mdl.q0(1)   = 0;
+mdl.q0(1)    = 1.5;
 mdl = mdl.simulate(); 
-
 %% 
 figure(100);
 plot(mdl.Log.t,mdl.Log.q(:,1:M),'LineW',2);
@@ -58,24 +56,10 @@ Y = zeros(N,M);
 
 for ii = 1:M
    Y(:,ii) = chebyshev(X/L,ii-1); % chebyshev
-   %Y(:,ii) = pcc(X/L,ii,M);       % piece-wise constant
 end
 
 % ensure its orthonormal (gram–schmidt)
 Y = gsogpoly(Y,X);
-end
-
-%% setup controller
-function tau = Controller(mdl)
-n = numel(mdl.Log.q);
-t = mdl.Log.t;
-
-w = 7;
-
-tau        = zeros(n,1);
-tau(end)   = 5*sin(w*t);
-tau(end-1) = 5*sin(w*t);
-% tau(n/2+1) = 9*smoothstep(t)*cos(t);
 end
 
 %% setup rig
@@ -84,6 +68,8 @@ function [rig, gmdl] = setupRig(M,L,Modes)
 gmdl = Gmodel('Arm.stl');
 gmdl = gmdl.set('Emission', [0.9 0.8 0.8],...
      'SSSPower',0.005,'SSSRadius',5,'SSS',true);
+ 
+gmdl = gmdl.bake.render(); 
  
 N = 200;
 X = linspace(0,L,N)';
@@ -97,7 +83,7 @@ rig = rig.add(gmdl);
 rig = rig.parent(1,0,0);
 rig = rig.parent(1,1,1);
 
-rig    = rig.texture(1,mateplastic);
+rig    = rig.texture(1,base);
 rig.g0 = SE3(roty(-pi),zeros(3,1));
 
 rig = rig.render();

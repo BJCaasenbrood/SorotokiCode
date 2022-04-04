@@ -38,7 +38,7 @@ fem = fem.set('TimeStep',1/125,'BdBox',[0,120,0,325],'Linestyle','none',...
 
 %% add boundary constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Box',[0 150 0 2]),[1,1]);
-%fem = fem.AddConstraint('Gravity',[],[0,-9.81e3]);
+fem = fem.AddConstraint('Gravity',[],[0,-1e3]);
 
 fem = fem.AddConstraint('Pressure',fem.FindEdges('BoxHole',pset0), @(x) 5*P0*sigmoid(x.Time));
 fem = fem.AddConstraint('Pressure',fem.FindEdges('BoxHole',pset1), @(x) 2*P1*sigmoid(x.Time));
@@ -46,7 +46,7 @@ fem = fem.AddConstraint('Pressure',fem.FindEdges('BoxHole',pset2), @(x) 0.75*P0*
 fem = fem.AddConstraint('Pressure',fem.FindEdges('BoxHole',pset3), @(x) 0.75*P0*sigmoid(x.Time));
 fem = fem.AddConstraint('Pressure',fem.FindEdges('BoxHole',pset4), @(x) 2*P1*sigmoid(x.Time));
 
-fem = fem.AddConstraint('Contact',@(x) SDF(x),[0,0]);
+%fem = fem.AddConstraint('Contact',@(x) SDF(x),[0,0]);
 % fem = fem.AddConstraint('Pressure',pset1, @(x) P1*sigmoid(x.Time));
 % fem = fem.AddConstraint('Pressure',pset2, @(x) P2*sigmoid(x.Time));
 % fem = fem.AddConstraint('Pressure',pset3, @(x) P3*sigmoid(x.Time));
@@ -54,7 +54,7 @@ fem = fem.AddConstraint('Contact',@(x) SDF(x),[0,0]);
 
 %% assign material
 fem.Material = NeoHookeanMaterial(2,0.33);  
-fem.Material.Zeta = 1.35;
+fem.Material.Zeta = 0.35;
 
 %% solve
 fem.simulate(); 
@@ -66,7 +66,7 @@ figure(101);
 
 t = fem.Log.t;
 
-for ii = 1:fps(t,60):numel(t)
+for ii = 1:fps(t,30):numel(t)
     %subplot(1,3,[1,2]);
         fem.set('Node',fem.Log.Node{ii});
         fem.show('Field',fem.Log.Stress{ii});
