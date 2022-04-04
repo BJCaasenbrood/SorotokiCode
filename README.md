@@ -25,7 +25,7 @@ Please visit [**Sorotoki**](https://bjcaasenbrood.github.io/SorotokiCode/) for t
 If you are planning on using Sorotoki in your (academic) work, please consider citing the toolkit  
 
 ```bibtex
-@misc{Caasenbrood2018,
+@misc{Caasenbrood2020,
   author = {Caasenbrood, Brandon},
   title = {Sorotoki - A Soft Robotics Toolkit for MATLAB},
   year = {2020},
