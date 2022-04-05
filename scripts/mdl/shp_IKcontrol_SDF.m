@@ -32,7 +32,6 @@ EE = [];
 k  = 0;
 
 while norm(e) > 1e-3 && k < 400
-    %clf;
     
     % update iteration
     k = k + 1;
@@ -69,8 +68,7 @@ while norm(e) > 1e-3 && k < 400
         gd = SE3((Rd),pd);
         
         [dr, dE] = EnergyController(...
-            g(:,:,ii),...
-            gd,...
+            g(:,:,ii), gd,...
             J(:,:,ii));                     
         
         dq = dq + dr;
@@ -91,7 +89,8 @@ while norm(e) > 1e-3 && k < 400
     setupFigure(BdBox);
     drawnow;
     
-    if k == 1, gif('shp_ik_sdf.gif','frame',gcf,'nodither');
+    if k == 1, gif('shp_ik_sdf.gif',...
+            'frame',gcf,'nodither');
     else, gif;
     end
      
