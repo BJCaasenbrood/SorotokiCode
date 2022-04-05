@@ -22,19 +22,18 @@ shp.Zeta = 0.1;      % Damping coefficient
 
 shp = shp.rebuild();
 
-%%
+%% build model class
 mdl = Model(shp,'Tstep',H,'Tsim',15);
 
 %% controller
 mdl.tau = @(M) Controller(M);
 
-%%
+%% simulate system
 mdl = mdl.simulate(); 
 
 %% 
 figure(100);
 plot(mdl.Log.t,mdl.Log.q(:,1:M),'LineW',2);
-colororder(col);
 
 %% animation
 [rig,sph] = setupRig(M,L,Modes);
@@ -70,16 +69,17 @@ end
 
 %% setup controller
 function tau = Controller(mdl)
+
 t = mdl.Log.t;
 
 J = mdl.Log.EL.J;
 ge = SE3(mdl.Log.Phi,mdl.Log.p);
 gd = gref(t);
 
-k1   = 0.05;
-k2   = 15;
+k1   = 0.01;
+k2   = 12;
 lam1 = 1;
-lam2 = 1;
+lam2 = 0.1;
 Kp = diag([k1,k1,k1,k2,k2,k2]);
 
 Xi = smoothstep(t)*logmapSE3(ge\gd);
@@ -91,7 +91,7 @@ tau = tau + mdl.Log.EL.G + mdl.Log.EL.K*mdl.Log.q;
 end
 
 function gd = gref(t)
-gd = SE3(eye(3),[50,50*cos(t),50*sin(t)]);
+gd = SE3(eye(3),[60,50*cos(t),50*sin(t)]);
 end
 
 %% setup rig

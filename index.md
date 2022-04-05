@@ -29,6 +29,20 @@ git clone --depth 1  https://github.com/BJCaasenbrood/SorotokiCode.git
 
 ## What's new?
 {: .text-purple-000}
+- **Apr 05, 2022**: We have written a simulation environment of a continuum soft arm grabbing a spherical object described as Signed Distance Function `Sdf.m`{: .text-purple-000}. To make the soft arm envelop the object, we developed an energy-shaping technique that ensures the geometric distance between the robot and the object is minimal. In theory, this technique can be used to grab any arbitrarily shaped object as long as we describe it as a Sdf.
+
+<details>
+<summary>Show image</summary>
+<div align="center"> <img src="./docs/documentation/img/mdl_energycontrol_sdfshape.gif" width="500"> </div>
+</details>
+
+{: .text-purple-000}
+**DISCLAIMER**: The soft arm still penetrates the object, no contact is prescribed in the simulation here. This will be implemented in the future!
+{: .fs-2}
+
+<a href="https://github.com/BJCaasenbrood/SorotokiCode/blob/master/scripts/mdl/mdl_swing_motion.m"> Code available here</a>
+
+
 - **Apr 03, 2022**: We added environmental contact in SOROTOKI! You can now use Signed Distance Functions `Sdf.m`{: .text-purple-000} with `Fem.m`{: .text-purple-000}. Use `fem.AddConstraint('Contact',sdf,Move)`{: .text-purple-000} to add the contact. The vector `Move = [dX, dY]`{: .text-purple-000} or `Move = [dX, dY, dZ]`{: .text-purple-000} can be used to offset the contact. The contact dynamics can be solved Quasi-static or Dynamic.
 
 <details>
