@@ -357,11 +357,13 @@ WriteToFile([Path,'\src\gmodel']);
 WriteToFile([Path,'\src\gmodel\tools\']);
 WriteToFile([Path,'\src\gmodel\matcap\']);
 WriteToFile([Path,'\src\gmodel\matcap\img']);
+WriteToFile([Path,'\src\gmodel\tools\thirdparty']);
 else
 AddPath([Path,'\livescripts\gmdl\']);
 AddPath([Path,'\scripts\gmdl\']);
 AddPath([Path,'\src\gmodel']);
 AddPath([Path,'\src\gmodel\tools\']);
+AddPath([Path,'\src\gmodel\tools\thirdparty']);
 AddPath([Path,'\src\gmodel\matcap\']);
 AddPath([Path,'\src\gmodel\matcap\img\']);
 AddPath([Path,'\src\gmodel\matcap\tools\']);
