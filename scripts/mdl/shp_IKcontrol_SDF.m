@@ -1,7 +1,7 @@
 clr; beep off;
 %% settings
 L = 1;   % manipulator length
-M = 4;   % number of modes
+M = 10;  % number of modes
 N = M*8; % grid on SR
 
 %% build basis
@@ -89,10 +89,10 @@ while norm(e) > 1e-3 && k < 400
     setupFigure(BdBox);
     drawnow;
     
-    if k == 1, gif('shp_ik_sdf.gif',...
-            'frame',gcf,'nodither');
-    else, gif;
-    end
+%     if k == 1, gif('shp_ik_sdf.gif',...
+%             'frame',gcf,'nodither');
+%     else, gif;
+%     end
      
 end
 
@@ -156,6 +156,7 @@ Y = zeros(N,M);
 
 for ii = 1:M
    Y(:,ii) = chebyshev(X/L,ii-1); % chebyshev
+   Y(:,ii) = pcc(X/L,ii,M);%chebyshev(X/L,ii-1); % chebyshev
 end
 
 % ensure its orthonormal (gram–schmidt)

@@ -425,6 +425,8 @@ WriteToFile([Path,'\src\fem\tools\mma']);
 WriteToFile([Path,'\src\fem\mex\']);
 WriteToFile([Path,'\src\fem\materials\']);
 WriteToFile([Path,'\src\fem\materials\samples']);
+mexPath = genpath([Path,'/src/fem/mex']);
+WriteToFile(mexPath);
 else
 AddPath([Path,'\scripts\fem\']);
 AddPath([Path,'\scripts\fem\2D']);
@@ -437,6 +439,8 @@ AddPath([Path,'\src\fem\tools\mma']);
 AddPath([Path,'\src\fem\mex\']);
 AddPath([Path,'\src\fem\materials\']);
 AddPath([Path,'\src\fem\materials\samples']);
+mexPath = genpath([Path,'/src/fem/mex']);
+AddPath(mexPath);
 pause(.3);
 
 x = CheckLibary('fem.lib',@(x) femPathConfirm);
@@ -459,20 +463,27 @@ WriteToFile([Path,'\scripts\mdl']);
 WriteToFile([Path,'\livescripts\mdl']);
 WriteToFile([Path,'\src\model']);
 WriteToFile([Path,'\src\model\tools']);
+WriteToFile([Path,'\src\model\tools\liegroup']);
+WriteToFile([Path,'\src\model\tools\shapefnc']);
 WriteToFile([Path,'\src\model\tools\solver']);
+mexPath = genpath([Path,'\src\model\mex']);
+WriteToFile(mexPath);
 else
 AddPath([Path,'\scripts\mdl']);
 AddPath([Path,'\livescripts\mdl']);
 AddPath([Path,'\src\model']);
 AddPath([Path,'\src\model\tools']);
+AddPath([Path,'\src\model\tools\liegroup']);
+AddPath([Path,'\src\model\tools\shapefnc']);
+AddPath([Path,'\src\model\tools']);
+mexPath = genpath([Path,'/src/model/mex']);
+AddPath(mexPath);
 pause(.3);
 
 x = CheckLibary('model.lib',@(x) modelPathConfirm);
 
-if x
-    fprintf(FIT,'%% model.lib installed succesfully! \n');
-else
-    fprintf(FIT,'%% model.lib missing! \n');
+if x, fprintf(FIT,'%% model.lib installed succesfully! \n');
+else, fprintf(FIT,'%% model.lib missing! \n');
 end
 
 end

@@ -66,13 +66,11 @@ function obj = Shapes(Input,NModal,varargin)
     obj.xia0   = [0,0,0,1,0,0].';
     
     if isa(Input,'Fem')
-        obj.Fem    = Fem;
-        obj.NNode  = 30;
-        %obj.NModal = 2;
-        
-        obj.Rho  = Fem.Material.Rho;
-        obj.Zeta = Fem.Material.Zeta;
-        obj.Gvec = [0;0;9.81e3];
+        obj.Fem    = Input;
+        obj.NNode  = 30;        
+        obj.Rho    = Input.Material.Rho;
+        obj.Zeta   = Input.Material.Zeta;
+        obj.Gvec   = [0;0;9.81e3];
         
     elseif isa(Input,'double')
         obj.NNode = size(Input,1);
@@ -99,10 +97,11 @@ function obj = Shapes(Input,NModal,varargin)
     obj.Nu = 0.33;
     obj.g0 = SE3(eye(3),zeros(3,1));
     
-%     for ii = 1:2:length(varargin)
-%         obj.(varargin{ii}) = varargin{ii+1};
-%     end
+    for ii = 1:2:length(varargin)
+        obj.(varargin{ii}) = varargin{ii+1};
+    end
     
+
     if ~isempty(obj.Fem)
     if ~isempty(obj.Fem.get('Output'))
         out = obj.Fem.get('Output');
@@ -115,11 +114,11 @@ function obj = Shapes(Input,NModal,varargin)
     end
     
     %obj.g0 = [1,0,0,0,0,0,0];
-    obj.g0 = SE3(eye(3),zeros(3,1));
+    %obj.g0 = SE3(eye(3),zeros(3,1));
     
-    for ii = 1:2:length(varargin)
-        obj.(varargin{ii}) = varargin{ii+1};
-    end
+%     for ii = 1:2:length(varargin)
+%         obj.(varargin{ii}) = varargin{ii+1};
+%     end
     
     obj = rebuild(obj);
     
@@ -161,7 +160,7 @@ if strcmp(Request,'POD')
     for jj = 1:2
         
         % pick shape-matrix
-        if jj == 1, theta = Shapes.POD; 
+        if jj == 1, theta = Shapes.PODR; 
         else, theta = Shapes.PODQ;
         end
             
@@ -208,7 +207,7 @@ Shapes.L0 = sqrt((XL(1)-X0(1))^2 + (XL(2)-X0(2))^2);
 
 % build discretization of curve domain
 Shapes.Sigma = linspace(0,Shapes.L0,Shapes.NNode);    
-Shapes.ds = Shapes.L0/(Shapes.NNode);
+Shapes.ds    = Shapes.L0/(Shapes.NNode);
 
 % finds associated nodes from Fem mesh.
 if isempty(Shapes.Fem)
@@ -236,7 +235,7 @@ end
 Shapes.NDim = sum(Shapes.NModal);
 Shapes.Ba   = I6(:,Xa);
 Shapes.Sigma = linspace(0,1,Shapes.NNode);
-Shapes.ds    = Shapes.L0/(Shapes.NNode);
+Shapes.ds   = Shapes.L0/(Shapes.NNode);
 
 Shapes = BuildInertia(Shapes);
 
@@ -267,8 +266,9 @@ if ~isempty(Shapes.PODR) || ~isempty(Shapes.PODR)
     Shapes.Theta = @(x) ShapeFunction(Shapes,x);
 end
 
-Shapes.Xi0 = @(x) IntrinsicFunction(Shapes,x);
-
+if ~isempty(Shapes.Theta)
+Shapes.Xi0 = @(x) IntrinsicFunction(Shapes,x);    
+    
 % precompute Theta matrix
 FncT = @(x) Shapes.Theta(x);
 FncX = @(x) Shapes.Xi0(x);
@@ -282,6 +282,7 @@ Shapes.Xi0Eval   = zeros(6,1,numel(s));
 for ii = 1:numel(s)
     Shapes.ThetaEval(:,:,ii) = FncT(s(ii));
     Shapes.Xi0Eval(:,1,ii)   = FncX(s(ii));
+end
 end
 
 end 
@@ -327,8 +328,8 @@ for ii = 1:numel(t)
 end
 
 % SVD decompostion of snapshot reconstructions
-[Ur,Sr,~] = svd(full(Shapes.Kappa*Shapes.Kappa.'));%/numel(t));
-[Uq,Sq,~] = svd(full(Shapes.Gamma*Shapes.Gamma.'));%/numel(t));
+[Ur,Sr,~] = svd(full(Shapes.Kappa*Shapes.Kappa.'));
+[Uq,Sq,~] = svd(full(Shapes.Gamma*Shapes.Gamma.'));
 
 Er = (diag(Sr).^0.5);
 Eq = (diag(Sq).^0.5);
@@ -597,7 +598,8 @@ for ii = 1:Shapes.NNode
     RRe = 0;
     UUe = 0;
     
-    W   = P(ii,:);
+    W = P(ii,:);
+    
     for jj = lst(abs(P(ii,:))>0)
         UUe = UUe + W(jj)*S{jj};
         RRe = RRe + W(jj)*R{jj};
@@ -606,7 +608,7 @@ for ii = 1:Shapes.NNode
     [Ur,~,Vr] = svd(RRe);
     Re = (Ur*Vr.');
 % 
-%     Re = R{ii};
+%    Re = R{ii};
 %     UUe = R{ii};
     
     Rotation{ii,1} = Re;
@@ -615,7 +617,7 @@ for ii = 1:Shapes.NNode
 end
 
 %Kappa = [];
-
+% 
 for ii = 2:Shapes.NNode-1
     Ni  = Node(ii,:);
     Nii = Node(ii+1,:);
@@ -629,6 +631,8 @@ for ii = 2:Shapes.NNode-1
     
     Kappa(ii,1) = -XI(1,2);
     %Gamma(ii,1) = XI(1,4);
+    
+    %plotSE2(g,'xy'); hold on;
 end
 
 
@@ -656,8 +660,10 @@ Kappa(1,1) = Kappa(2,1);
 Gamma(1,1) = Gamma(2,1);
 Kappa(end,1) = Kappa(end-1,1);
 Gamma(end,1) = Gamma(end-1,1);
-Kappa    = GaussianFilter(Kappa,round(Shapes.NNode/200));
-Gamma    = GaussianFilter(Gamma,round(Shapes.NNode/200));
+
+
+Kappa = GaussianFilter(Kappa,round(Shapes.NNode/200));
+Gamma = GaussianFilter(Gamma,round(Shapes.NNode/200));
 
 % subplot(2,1,1);
 % plot(Gamma); hold on
@@ -687,12 +693,12 @@ Gamma = dl./dl0;
 
 % compute tangents
 for ii = 1:N
-%     if ii < Shapes.NNode
-%         dgam(ii,:) = Node(ii + 1,:) -  Node(ii,:);
-%     else
-%         dgam(ii,:) = Node(ii,:) - Node(ii - 1,:);
-%     end
-%     
+    if ii < Shapes.NNode
+        dgam(ii,:) = Node(ii + 1,:) -  Node(ii,:);
+    else
+        dgam(ii,:) = Node(ii,:) - Node(ii - 1,:);
+    end
+    
     T(ii,:) = dgam(ii,:)/norm(dgam(ii,:));
     
 end
@@ -703,11 +709,11 @@ Normal = I(:,1);
 % compute curvature
 for ii = 2:Shapes.NNode-1
     
-    t1 = T(ii - 1,:);
-    t2 = T(ii,:);
+    %t1 = T(ii - 1,:);
+    %t2 = T(ii,:);
 %     
-    %t1 = (T(ii,:) + T(ii-1,:)); t1 = t1/norm(t1);
-    %t2 = (T(ii,:) + T(ii+1,:)); t2 = t2/norm(t2);
+    t1 = (T(ii,:) + T(ii-1,:)); t1 = t1/norm(t1);
+    t2 = (T(ii,:) + T(ii+1,:)); t2 = t2/norm(t2);
     
     dir = sign(dot(so3(t2)*t1(:),Normal));
     angle = real(2*dir*acos(dot(t2,t1)));
@@ -841,4 +847,30 @@ function Ktt = LinearStiffnessTensor(Shapes)
     QE  = diag([E0,G0,G0]);
     QR  = diag([G0,E0,E0]);    
     Ktt = blkdiag(QR*Shapes.Jtt,QE*Shapes.Att);    
+end
+%------------------------------------------------------- optimal sphere fit
+function [C,R] = SphereFit(X)
+% Author: Alan Jennings, University of Dayton
+X1 = mean(X(:,1));
+X2 = mean(X(:,2));
+X3 = mean(X(:,3));
+
+A=  [mean(X(:,1).*(X(:,1)-X1)), ...
+    2*mean(X(:,1).*(X(:,2)-X2)), ...
+    2*mean(X(:,1).*(X(:,3)-X3)); ...
+    0, ...
+    mean(X(:,2).*(X(:,2)-X2)), ...
+    2*mean(X(:,2).*(X(:,3)-X3)); ...
+    0, ...
+    0, ...
+    mean(X(:,3).*(X(:,3)-X3))];
+
+A = A + A.';
+
+Y = X(:,1).^2 + X(:,2).^2 + X(:,3).^2;
+
+B = [mean(Y.*(X(:,1)-X1)); mean(Y.*(X(:,2)-X2)); mean(Y.*(X(:,3)-X3))];
+
+C = (A\B).';
+R = sqrt(mean(sum([X(:,1)-C(1),X(:,2)-C(2),X(:,3)-C(3)].^2,2)));
 end

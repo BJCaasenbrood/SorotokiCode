@@ -1,7 +1,7 @@
 clr; 
 %% 
 L = 100;   % length of robot
-M = 5;     % number of modes
+M = 8;     % number of modes
 N = 30;    % number of discrete points on curve
 H = 1/60;  % timesteps
 FPS = 30;  % animation speed
