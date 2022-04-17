@@ -2,7 +2,6 @@ classdef Model
     
     properties (Access = public)
         Shapes;
-        %Inertia;
         Tsim;
         Tstep;
 
@@ -11,6 +10,7 @@ classdef Model
         Log;
    
         tau, tau_;
+        update;
     end
     
     properties (Access = private)
@@ -50,10 +50,11 @@ function obj = Model(Shapes,varargin)
     G0 = Shapes.get('g0');
     obj.Phi0 = G0(1:3,1:3); 
     obj.p0   = G0(5:7).';    
-    obj.q0   = zeros(Shapes.NDim,1) + 1e-3*rand(Shapes.NDim,1);
+    obj.q0   = zeros(Shapes.NDim,1) + 1e-6*rand(Shapes.NDim,1);
     obj.dq0  = zeros(Shapes.NDim,1);
 
     obj.tau  = @(mdl) zeros(Shapes.NDim,1);
+    obj.update = @(x) x;
     
     obj.Linewidth  = 4;
     obj.Markersize = 25;
@@ -95,13 +96,12 @@ Model.dq  = [];
 
 Model.Log    = struct;
 Model.Log.q  = Model.q0;
-Model.Log.dq = 0.1*Model.q0;
+Model.Log.dq = 0*Model.q0;
 Model.Log.EL = struct;
 
 % get evals
 Model.Theta = Model.Shapes.get('ThetaEval');
-Model.Xi0 = Model.Shapes.get('Xi0Eval');
-
+Model.Xi0   = Model.Shapes.get('Xi0Eval');
 
 if isempty(Model.dTaudq)
     Model.Log.t = 0;
@@ -124,29 +124,62 @@ Model.Log.Psi = Ue;
 end
 %---------------------------------------------------- simulates dyn. system
 function Model = computeEL(Model,Q,varargin)
+    
+Model.q      = []; 
+Model.dq     = [];
+Model.Log    = struct;
+Model.Log.q  = Q;
+Model.Log.EL = struct;
 
-if isempty(varargin), dQ = Q*0; end    
+if isempty(varargin)
+    dQ = Q*0;
+end
+
+Model.Log.dq = dQ;
+
+% get evals
+Model.Theta = Model.Shapes.get('ThetaEval');
+Model.Xi0   = Model.Shapes.get('Xi0Eval');
     
 % compute Lagrangian entries
-[M_,C_,K_,R_,G_,...
-p_,Phi_,J_,Vg_,Kin_] = computeLagrangian(Model,Q,dQ);
-    
+if ~Model.MexSolver
+    [M_,C_,K_,R_,G_,...
+        p_,Phi_,J_,Vg_,Kin_] = computeLagrangian(Model,Q,dQ);
+else
+    [M_,C_,K_,R_,G_,...
+        p_,Phi_,J_,Vg_,Kin_] = computeLagrangianFast_mex(...
+        Q,dQ,...
+        Model.Shapes.ds,...
+        Model.p0,...
+        Model.Phi0,...
+        Model.Xi0,...
+        Model.Theta,...
+        Model.Shapes.Ba,...
+        Model.Shapes.Ktt,...
+        Model.Shapes.Mtt,...
+        Model.Shapes.Zeta,...
+        Model.Shapes.Gvec);
+end
+
+% hyper-elastic modifier
+[Psi, Khyp] = HyperElasticModifier(Model,K_,Q);
+
 % overwrite dynamics
-%Model.Log.t  = T;
-Model.Log.q  = Q;
-Model.Log.dq = dQ;
+Model.Log.q   = Q;
+Model.Log.dq  = dQ;
 Model.Log.p   = p_;
 Model.Log.Phi = Phi_;
 
 Model.Log.EL.M = M_;
 Model.Log.EL.C = C_;
-Model.Log.EL.R = diag(diag(R_));
-Model.Log.EL.K = diag(diag(K_));
+Model.Log.EL.R = R_;
+Model.Log.EL.K = Khyp;
 Model.Log.EL.G = G_;
 Model.Log.EL.J = J_;
 
-Model.Log.Vg  = Vg_;
-Model.Log.Kin = Kin_;
+Model.Log.Psi  = Psi;
+Model.Log.Vg   = Vg_;
+Model.Log.Kin  = Kin_;
 
 end
 %------------------------------------------------- plot curve configuration
@@ -290,33 +323,42 @@ disp('----------------------------------');
                 Model.Shapes.Zeta,...
                 Model.Shapes.Gvec);      
         end
+        
+        % hyper-elastic modifier
+        [Psi, Khyp] = HyperElasticModifier(Model,K_,Q);
             
         % overwrite dynamics
-        Model.Log.t  = T;
-        Model.Log.q  = Q;
-        Model.Log.dq = dQ;
+        Model.Log.t   = T;
+        Model.Log.q   = Q;
+        Model.Log.dq  = dQ;
         Model.Log.p   = p_;
         Model.Log.Phi = Phi_;
         
         Model.Log.EL.M = M_;
         Model.Log.EL.C = C_;
         Model.Log.EL.R = R_;
-        Model.Log.EL.K = K_;
+        Model.Log.EL.K = Khyp;
         Model.Log.EL.G = G_;
         Model.Log.EL.J = J_;
 
+        Model.Log.Psi = Psi;
         Model.Log.Vg  = Vg_;
         Model.Log.Kin = Kin_;
         
         % evaluate control action
         Model.tau_ = Model.tau(Model);
         
+        % update system
+        Model = Model.update(Model);
+        
         % pre-compute Minverse
         Minv = M_\eye(numel(Q));
         
         % flow field
         f = [dQ; ...
-             Minv*(Model.tau_ - C_*dQ - K_*Q - R_*dQ - G_)];
+             Minv*(Model.tau_ - Model.Log.EL.C*dQ - ...
+             Model.Log.EL.K*Q - Model.Log.EL.R*dQ - ...
+             Model.Log.EL.G)];
     end
     
 end
@@ -421,8 +463,8 @@ end
 function [dp,dPhi,dJ] = ForwardKinematicODE(Model,s,x,Phi_,p_)
 
 % construct geometric vectors
-Theta = Model.Shapes.Theta(s);
-XI    = Model.Shapes.Ba*Theta*x + Model.Shapes.xia0;
+Theta_ = Model.Shapes.Theta(s);
+XI     = Model.Shapes.Ba*Theta_*x + Model.Shapes.xia0;
 
 U     = XI(4:6);
 Gamma = XI(1:3);
@@ -431,9 +473,8 @@ Gamma = XI(1:3);
 dp   = Phi_*U;
 dPhi = Phi_*skew(Gamma);
 A    = adjointSE3(Phi_,p_);
-dJ   = A*Model.Shapes.Ba*Theta;
+dJ   = A*Model.Shapes.Ba*Theta_;
 end
-
 %---------------------------- Lagrangian Matrix-Differential Equation (MDE)
 function [dZ1,dZ2] = LagrangianODEX(Model,Theta_,Xi0_,x,dx,Z1,NLStiff)
 
@@ -557,6 +598,27 @@ Kappa = norm(abs(xi(1:3)));
 Gamma = norm(abs(xi(4:6)));
 
 Ktt = Ktt*(1.0 + 1.35*(tanh(-16200*Kappa)^2));
+
+end
+%------------------------------------------------ hyper-elastic evaluation
+function [Psi, Khyp] = HyperElasticModifier(Model,K0,x)
+Nstp = 50;
+
+a = Model.Shapes.HypA;
+b = Model.Shapes.HypB;
+
+z = linspacen(zeros(Model.Shapes.NDim,1),x,Nstp);
+dz = z(:,2);
+
+Knl = @(x) K0 + a*K0*log(b*(x.')*x + 1);
+
+Psi = 0;
+for ii = 1:Nstp-1
+    K1 = Knl(z(:,ii)); K2 = Knl(z(:,ii+1));
+    Psi = Psi + 0.5*dz.'*(K1*z(:,ii) + K2*z(:,ii+1));
+end
+
+Khyp = K2;
 
 end
 %----------------------------------- (pre)-computes the controller jacobian

@@ -2931,12 +2931,15 @@ if nargin < 2, Request = ''; end
     
 if ~Fem.InformationBoolean
 NodeNum = Fem.NElem;
+NDofs   = numel(GetFreeDofs(Fem));
 MaxNVer = max(cellfun(@numel,Fem.Element));      
 MinNVer = min(cellfun(@numel,Fem.Element));      
 
 switch(Request)
 case('NonlinearFem')
 fprintf('--------------------------------------------------------------\n');  
+if NDofs>1e3, fprintf('* Free DOFs: %1.2fk \n',NDofs/1e3);
+else, fprintf('* Free DOFs: %i \n',NDofs); end
 if Fem.NElem>1e3, fprintf('* Elements: %1.2fk \n',NodeNum/1e3);
 else, fprintf('* Element = %i \n',NodeNum); end
 fprintf('* Element degree = P%1.0f-P%1.0f \n',MinNVer,MaxNVer);

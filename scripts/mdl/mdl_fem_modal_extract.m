@@ -1,28 +1,26 @@
 clr;
 %% pressure settings
-P0  = 50*kpa;
+P0  = 35*kpa;
 
 %% generate mesh
 Simp  = 0.02;
 GrowH = 1;
 
-MinH  = 0.8586*2;
-MaxH  = 1.5*2;
+MinH  = 1.5;
+MaxH  = 3;
 
-msh = Mesh('Pneunet.png','BdBox',[0,120,0,20],'SimplifyTol',Simp,...
-    'Hmesh',[GrowH,MinH,MaxH]);
+msh = Mesh('Pneunet.png','BdBox',[0,120,0,20],...
+    'SimplifyTol',Simp,'Hmesh',[GrowH,MinH,MaxH]);
 
 msh = msh.generate();
 
 %% generate fem model
 fem = Fem(msh);
-fem = fem.set('TimeStep',1/120,'BdBox',[0,120,-80,20],'TimeEnd',2);
+fem = fem.set('TimeStep',1/120,...
+              'BdBox',[0,120,-80,20],'TimeEnd',2);
 
 %% add boundary constraint
-fem = fem.AddConstraint('Support',fem.FindNodes('Box',[0,0,0,20]),[1,1]);
-fem = fem.AddConstraint('Support',fem.FindNodes('Box',[0,5,0,0]),[1,1]);
-fem = fem.AddConstraint('Support',fem.FindNodes('Box',[0,10,20,20]),[1,1]);
-fem = fem.AddConstraint('Support',fem.FindNodes('Box',[10.9,10.9,9,20]),[1,1]);
+fem = fem.AddConstraint('Support',fem.FindNodes('Box',[0,1,0,10]),[1,1]);
 fem = fem.AddConstraint('Gravity',[],[0,-9.81e3]);
 fem = fem.AddConstraint('Pressure',fem.FindEdges('AllHole'),...
    @(x) P0*sigmoid(x.Time));
@@ -39,7 +37,7 @@ fem.Material.Zeta = 0.4;
 fem = fem.simulate(); 
 
 %% shape function reconstruction
-shp = Shapes(fem,[0,5,0,3,0,0],'NNode',300,...
+shp = Shapes(fem,[0,5,0,2,0,0],'NNode',120,...
      'Sdf',CrossSection,'Center',[7.5;0;0]);
 
 %shp = Shapes(fem,[0,5,0,2,0,0],'NNode',200);
@@ -63,23 +61,46 @@ for ii = 1:4
 end
 
 %% model
+shp.E  = 5;
+shp.Nu = 0.1;
+shp.Zeta = 0.5;
+
 shp = shp.rebuild();
 
-mdl = Model(shp,'Tstep',1/60,'Tsim',5);
+mdl = Model(shp,'Tstep',1/60,'Tsim',15);
 
-%% simulate system
+mdl.tau = @(M) Controller(M);
+
+% simulate system
 mdl = mdl.simulate(); 
 
-%% 
-figure(100);
-subplot(2,1,1);
-plot(mdl.Log.t,mdl.Log.q(:,1:M),'LineW',2);
+FPS = 120;
 
-subplot(2,1,2);
-plot(mdl.Log.t,mdl.Log.q(:,M+1:2*M),'LineW',2);
-colororder(col);
+figure(103);
+h = [];
+for ii = 1:fps(mdl.Log.t,FPS):length(mdl.Log.q)
 
+    delete(h);
+    
+    p = shp.FK(mdl.Log.q(ii,:));
+    h = plot(p(:,1),p(:,3),'LineW',3);
+    axis equal;
+    %view(30,30);
+    axis([-40 120 -120 40]);
+    drawnow;
+    
+end
 
+%% setup controller
+function tau = Controller(mdl)
+n = numel(mdl.Log.q);
+t = mdl.Log.t;
+
+tau = zeros(n,1);
+tau(1) = 350*smoothstep(t)*sin(2*t) - 100;
+tau(2) = 0.1*(350*smoothstep(t)*sin(2*t) - 100);
+
+end
 
 function sdf = CrossSection
 H = 20/2;
@@ -87,5 +108,5 @@ W = 15;
 
 R1 = sRectangle(0,W,0,H);
 R2 = sRectangle(2,W-2,5,H-3);
-sdf = R1;
+sdf = R1 - R2;
 end

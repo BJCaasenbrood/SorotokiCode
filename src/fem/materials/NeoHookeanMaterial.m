@@ -2,18 +2,19 @@ classdef NeoHookeanMaterial
 
     properties (Access = public)
         Type = 'NeoHookean';
-        E    = 1;
-        Nu   = 0.49;
+        E  = 1;
+        Nu = 0.49;
         C10;
         D1   = 10;
         Rho  = 1070e-12;
         Zeta = 1.35;
+        Lambda;
+        Mu; 
     end
     
     properties (Access = private)
         Alpha;
-        Lambda;
-        Mu; 
+
     end
 
     

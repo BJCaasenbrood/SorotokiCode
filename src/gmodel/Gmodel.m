@@ -496,7 +496,7 @@ function Gmodel = GenerateObject(Gmodel,varargin)
        v = msh{1}.Node;
        f = msh{1}.Element;
     elseif  isa(msh{1},'Mmesh')
-       myGhostFigure = figure("Visible",false);
+       h = figure("Visible",false);
        [x,y,z] = tubeplot(msh{1}.Node.',msh{1}.get('WireThickness'));
        h = mesh(x,y,z);
        fv = surf2patch(h);
@@ -568,7 +568,7 @@ function Gmodel = BakeCubemap(Gmodel,Cubemap)
     UV = SphereMapping(Normals,alpha);
        
     EnviromentReflect = zeros(N,3);
-    rgbImage = ((Cubemap));
+    rgbImage = rot90((Cubemap));
       
     R = rgbImage(:,:,1);
     G = rgbImage(:,:,2);

@@ -2,3 +2,4 @@
 clc;
 clear;
 close all;
+beep off;

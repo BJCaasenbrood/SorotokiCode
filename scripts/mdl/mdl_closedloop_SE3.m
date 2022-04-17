@@ -91,7 +91,8 @@ tau = tau + mdl.Log.EL.G + mdl.Log.EL.K*mdl.Log.q;
 end
 
 function gd = gref(t)
-gd = SE3(eye(3),[60,50*cos(t),50*sin(t)]);
+w = 0.75;
+gd = SE3(eye(3),[60,50*cos(w*t),50*sin(w*t)]);
 end
 
 %% setup rig

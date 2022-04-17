@@ -8,6 +8,8 @@ classdef Shapes
         Ba;
         ds;
         xia0;
+        Node;
+        Node0;
         
         NModal;
         NDim;
@@ -25,6 +27,7 @@ classdef Shapes
         Mtt;
         Dtt;
         Ktt; Ktt0;
+        HypA; HypB;
         Jtt;
         Att;
         Gvec;
@@ -34,8 +37,6 @@ classdef Shapes
     properties (Access = private)
         Table;
         NDof;
-        Node;
-        Node0;
         Center;
         
         Rotation;
@@ -96,6 +97,8 @@ function obj = Shapes(Input,NModal,varargin)
     obj.E  = 5;
     obj.Nu = 0.33;
     obj.g0 = SE3(eye(3),zeros(3,1));
+    obj.HypA = 0;
+    obj.HypB = 0;
     
     for ii = 1:2:length(varargin)
         obj.(varargin{ii}) = varargin{ii+1};
@@ -247,7 +250,14 @@ if ~isempty(Shapes.Fem)
     Shapes = GenerateRadialFilter(Shapes);
 end
 
-if ~isempty(Shapes.PODR) || ~isempty(Shapes.PODR)
+if ~isempty(Shapes.PODR) || ~isempty(Shapes.PODQ)
+    
+    
+    if length(Shapes.PODQ) ~= Shapes.NNode
+        X = linspace(0,Shapes.L0,length(Shapes.PODQ));
+        Shapes.PODR = interp1(X,Shapes.PODR,Shapes.Sigma*Shapes.L0);
+        Shapes.PODQ = interp1(X,Shapes.PODQ,Shapes.Sigma*Shapes.L0);
+    end
     
     k = 1;
     Shapes.POD = [];
@@ -266,8 +276,9 @@ if ~isempty(Shapes.PODR) || ~isempty(Shapes.PODR)
     Shapes.Theta = @(x) ShapeFunction(Shapes,x);
 end
 
-if ~isempty(Shapes.Theta)
-Shapes.Xi0 = @(x) IntrinsicFunction(Shapes,x);    
+Shapes.Xi0 = @(x) IntrinsicFunction(Shapes,x);   
+
+if ~isempty(Shapes.Theta) 
     
 % precompute Theta matrix
 FncT = @(x) Shapes.Theta(x);
@@ -321,9 +332,9 @@ for ii = 1:numel(t)
    
    %[Kf, Gf] = DifferentialGeometry(Shapes,Np);
    
-   [~, ~, Kf, Gf] = ReconstructField(Shapes,N,R,S);
+   [Kf, Gf] = ReconstructField(Shapes,N,R,S);
 
-   Shapes.Gamma = [Shapes.Gamma - 1, Gf];
+   Shapes.Gamma = [Shapes.Gamma, Gf-1];
    Shapes.Kappa = [Shapes.Kappa, Kf];
 end
 
@@ -334,8 +345,8 @@ end
 Er = (diag(Sr).^0.5);
 Eq = (diag(Sq).^0.5);
 
-Shapes.PODEnergy{2} = Eq;
-Shapes.PODEnergy{1} = Er;
+Shapes.PODEnergy{2} = Eq/sum(Eq);
+Shapes.PODEnergy{1} = Er/sum(Er);
 
 for ii = 1:10
     PODr = Ur(:,ii);
@@ -368,6 +379,7 @@ end
 
 % rebuild shape-function matrix
 Shapes.Theta = @(x) ShapeFunction(Shapes,x);
+Shapes = Shapes.rebuild();
 
 end
 %--------------------------------------------------------- compute jacobian
@@ -421,32 +433,32 @@ function p = FK(Shapes,q)
     p = [p0.';reshape(g(1:3,4,:),3,[]).'];
 end
 %------------------------------------------------- estimate Cosserat string
-function q = estimateJointSpace(Shapes,fem)
+function q = estimateJointSpace(Shapes,fem,varargin)
 
-P = Shapes.Filter;  
-N = fem.Log.Node{end};
-R = fem.Log.Rotation{end};
-S = fem.Log.Stretch{end};
+if isempty(varargin)
+    N = fem.Log.Node{end};
+    R = fem.Log.Rotation{end};
+    S = fem.Log.Stretch{end};
+else
+    N = fem.Log.Node{varargin{1}};
+    R = fem.Log.Rotation{varargin{1}};
+    S = fem.Log.Stretch{varargin{1}};
+end
 
-[~, ~, K, G] = ReconstructField(Shapes,N,R,S);
-%
-% 
-%N_    = P*[N(:,1),N(:,1)*0,N(:,2)];
-%[K,~] = DifferentialGeometry(Shapes,N_);
-% K = 0.5*(K1 + K2);
-  
-Kappa_ = full(-K);
+[K, G, ~, ~] = ReconstructField(Shapes,N,R,S);
+
+Kappa_ = full(K);
 Gamma_ = full(G-1);
 
-ki = Shapes.NModal(1);
-ei = Shapes.NModal(2);
+ki = Shapes.NModal(2);
+ei = Shapes.NModal(4);
 
-PODr = Shapes.POD(:,1:ki);
-PODq = Shapes.POD(:,ki+1:ki+ei);
+PODr = Shapes.PODR(:,1:ki);
+PODq = Shapes.PODQ(:,1:ei);
 
-%XR = trapz(Shapes.Sigma,PODr.*Kappa_);
-%XQ = trapz(Shapes.Sigma,PODq.*(Gamma_));
-%q  = [XR(:); XQ(:)];
+XR = trapz(Shapes.Sigma,PODr.*Kappa_);
+XQ = trapz(Shapes.Sigma,PODq.*Gamma_);
+
 
 % figure(106);
 % subplot(2,1,1);
@@ -454,38 +466,40 @@ PODq = Shapes.POD(:,ki+1:ki+ei);
 % plot(PODr*XR.');
 % 
 % subplot(2,1,2);
-% plot(Gamma_-1); hold on;
+% plot(Gamma_); hold on;
 % plot(PODq*XQ.');
 % 
-
+% q0 = zeros(sum(Shapes.NModal),1);
+% 
 % q = fminunc(@(x) Objective(x,Shapes,N_),q0);
 % 
 %     function J = Objective(Q,shp,P)
 %        
-%         P_ = shp.string(Q);
+%         P_ = shp.FK(Q);
 %         
-%         J = sum((sum((P - P_).^2,2)));
+%         J = sum((sum((P - P_(2:end,:)).^2,2)));
 %         
 %     end
 
-XR = PODr.'*inv(PODr*PODr.' + 1e-4*eye(Shapes.NNode))*Kappa_;
-XQ = PODq.'*inv(PODq*PODq.' + 1e-4*eye(Shapes.NNode))*Gamma_;
-
-q = [XR;XQ];
+% XR = PODr.'*inv(PODr*PODr.' + 10*eye(Shapes.NNode))*Kappa_;
+% XQ = PODq.'*inv(PODq*PODq.' + 10*eye(Shapes.NNode))*Gamma_;
+q  = [XR(:); XQ(:)];
 
 end
 %----------------------------------------------------- tangent point energy
-function E = energy(Shapes,q,varargin)
-% compute string   
-[g,~] = string(Shapes,q);
-pa = reshape(g(1:3,4,:),3,[]).';
-xa = linspace(0,1,Shapes.NNode);
+function [E, R] = tangentPoint(Shapes,q,PS1)
+% compute string  tangent
+[gc,~] = string(Shapes,q);
 
-if isempty(varargin)
-   type = 'tangentpoint';
-   pb = gamA;    
-   xb = xa;
+% compute minimal torus
+R = zeros(length(gc),1);
+
+for ii = 1:length(gc)
+    r = torusSolve(gc(:,:,ii),PS1);
+    R(ii) = min(r);
 end
+
+E = trapz(Shapes.Sigma,R);
 
 end
 end
@@ -582,15 +596,16 @@ Shapes.Filter = P;
 
 end
 %-------------------------------------------------- compute Cosserat string
-function [Node, Rotation, Kappa, Gamma] = ReconstructField(Shapes,N,R,S)
+function [Kappa, Gamma, GSE3, Nod] = ReconstructField(Shapes,N,R,S)
     
 P   = Shapes.Filter;  
 lst = 1:Shapes.Fem.NNode;
 
 Gamma = zeros(Shapes.NNode,1);
 Kappa = zeros(Shapes.NNode,1);
-Rotation = {};
-Node     = P*N;
+Rot = {};
+Nod = P*N;
+GSE3 = zeros(4,4,Shapes.NNode);
 
 % loop over each node in curve to find geometric strains
 for ii = 1:Shapes.NNode
@@ -607,32 +622,27 @@ for ii = 1:Shapes.NNode
     
     [Ur,~,Vr] = svd(RRe);
     Re = (Ur*Vr.');
-% 
-%    Re = R{ii};
-%     UUe = R{ii};
-    
-    Rotation{ii,1} = Re;
+     
+    Rot{ii,1} = Re;
     Tangent(ii,:)  = Re(:,1).';
-    Gamma(ii,1)    = sqrt(UUe(1,1));
+    Gamma(ii,1)    = det(UUe);%trace(UUe)/3;
 end
 
-%Kappa = [];
-% 
 for ii = 2:Shapes.NNode-1
-    Ni  = Node(ii,:);
-    Nii = Node(ii+1,:);
-    Nip = Node(ii-1,:);
+    Ni  = Nod(ii,:);
+    Nii = Nod(ii+1,:);
+    Nip = Nod(ii-1,:);
     
-    g  = [Rotation{ii,1},    [Ni(1);0;Ni(2)];   zeros(1,3), 1];
-    dg = ([Rotation{ii+1,1}, [Nii(1);0;Nii(2)]; zeros(1,3), 1] ...
-        - [Rotation{ii-1,1}, [Nip(1);0;Nip(2)]; zeros(1,3), 1])/(2*Shapes.ds);
+    g  = [Rot{ii,1},    [Ni(1); Ni(2);0];   zeros(1,3), 1];
+    dg = ([Rot{ii+1,1}, [Nii(1);Nii(2);0]; zeros(1,3), 1] ...
+        - [Rot{ii-1,1}, [Nip(1);Nip(2);0]; zeros(1,3), 1])/(2*Shapes.ds);
     
+    GSE3(:,:,ii) = g;
     XI = inv(g)*dg;
     
-    Kappa(ii,1) = -XI(1,2);
-    %Gamma(ii,1) = XI(1,4);
-    
-    %plotSE2(g,'xy'); hold on;
+    Kappa(ii,1) = XI(1,2);
+    Gamma(ii,1) = XI(1,4);
+   
 end
 
 
@@ -649,8 +659,8 @@ end
 %         
 %         % differential geometric on discretized curve 
 %         % recover the approximate curvature
-%         Kappa(ii,1) = angle/(norm(Node(ii+1,:) - Node(ii,:)) + ...
-%             norm(Node(ii,:) - Node(ii-1,:)));
+%         Kappa(ii,1) = angle/(norm(Nod(ii+1,:) - Nod(ii,:)) + ...
+%             norm(Nod(ii,:) - Nod(ii-1,:)));
 %     end   
 % 
 % end
@@ -661,9 +671,8 @@ Gamma(1,1) = Gamma(2,1);
 Kappa(end,1) = Kappa(end-1,1);
 Gamma(end,1) = Gamma(end-1,1);
 
-
-Kappa = GaussianFilter(Kappa,round(Shapes.NNode/200));
-Gamma = GaussianFilter(Gamma,round(Shapes.NNode/200));
+Kappa = GaussianFilter(Kappa,round(Shapes.NNode/100));
+Gamma = GaussianFilter(Gamma,round(Shapes.NNode/100));
 
 % subplot(2,1,1);
 % plot(Gamma); hold on
@@ -830,7 +839,7 @@ Shapes.Jtt = P.'*[Jxx,Jxy,Jxz;Jxy,Jyy,Jyz;Jxz,Jyz,Jzz]*P;
 Shapes.Mtt = Shapes.Rho*blkdiag(Shapes.Jtt,Shapes.Att*eye(3));
 
 end
-
+%--------------------------------------- forwards integration of kinematics
 end
 end
 
@@ -849,28 +858,20 @@ function Ktt = LinearStiffnessTensor(Shapes)
     Ktt = blkdiag(QR*Shapes.Jtt,QE*Shapes.Att);    
 end
 %------------------------------------------------------- optimal sphere fit
-function [C,R] = SphereFit(X)
-% Author: Alan Jennings, University of Dayton
-X1 = mean(X(:,1));
-X2 = mean(X(:,2));
-X3 = mean(X(:,3));
+function r = torusSolve(gp,x)
+% x  := [Nx3] of points
+% gp := [4x4] SE(3) matrix of tang-point orgin 
+R0 = gp(1:3,1:3);
+x0 = gp(1:3,4);
+x = x.' - x0;
 
-A=  [mean(X(:,1).*(X(:,1)-X1)), ...
-    2*mean(X(:,1).*(X(:,2)-X2)), ...
-    2*mean(X(:,1).*(X(:,3)-X3)); ...
-    0, ...
-    mean(X(:,2).*(X(:,2)-X2)), ...
-    2*mean(X(:,2).*(X(:,3)-X3)); ...
-    0, ...
-    0, ...
-    mean(X(:,3).*(X(:,3)-X3))];
+X1 = (R0(1,:)*(x)).^2;
+X2 = (R0(2,:)*(x)).^2;
+X3 = (R0(3,:)*(x)).^2;
 
-A = A + A.';
-
-Y = X(:,1).^2 + X(:,2).^2 + X(:,3).^2;
-
-B = [mean(Y.*(X(:,1)-X1)); mean(Y.*(X(:,2)-X2)); mean(Y.*(X(:,3)-X3))];
-
-C = (A\B).';
-R = sqrt(mean(sum([X(:,1)-C(1),X(:,2)-C(2),X(:,3)-C(3)].^2,2)));
+r = sqrt((((X1 + X2 + X3).^2) ...
+     ./(4*(X1 + X2))));
+ 
+r(isnan(r)) = mean(mink(r,3));
+ 
 end

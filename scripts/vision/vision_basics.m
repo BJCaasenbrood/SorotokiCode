@@ -1,6 +1,6 @@
 clr;
 %% build Vision class
-cam = Vision(1);
+cam = Vision();
 
 %% detect cirlces
 out = cam.detect();
