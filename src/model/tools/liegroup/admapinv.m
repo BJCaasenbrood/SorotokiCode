@@ -1,4 +1,4 @@
-function Y = SE3inv(X,varargin)
+function Y = admapinv(X,varargin)
 
 if size(X,1) == 7
     q = R7(1:4,1);     % quaterions
@@ -9,16 +9,21 @@ elseif numel(X) == 9
     R = X;
     if ~isempty(varargin)
        p = varargin{1};
-       p = p(:);
     else
        p = zeros(3,1); 
     end
 end
 
-Y          = zeros(4);
-Y(4,4)     = 1;
-Y(1:3,1:3) = R.';
-Y(1:3,4)   = -R.'*p;
+Rt = R.';
+S  = skew(p);
+Y = zeros(6);
+Y(1:3,1:3) = Rt;
+Y(4:6,4:6) = Rt;
+Y(4:6,1:3) = Rt*S.';
 
 end
 
+function y = skew(x)
+    x1 = x(1); x2 = x(2); x3 = x(3);
+    y = [0, -x3, x2; x3, 0, -x1; -x2, x1, 0];
+end

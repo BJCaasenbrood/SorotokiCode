@@ -18,7 +18,8 @@ computeLagrangianFast(x,dx,... % states
     Ba,...      % state to strain matrix
     Ktt,...     % geometric stiffness
     Mtt,...     % geometric inertia
-    Zeta);
+    Zeta,...
+    [0;0;0]);
 
 end
 
@@ -39,8 +40,8 @@ computeLagrangianFast_mex(x,dx,... % states
     Ba,...      % state to strain matrix
     Ktt,...     % geometric stiffness
     Mtt,...     % geometric inertia
-    Zeta);
-
+    Zeta,...
+    [0;0;0]);
 end
 
 time1 = cputime - time1;

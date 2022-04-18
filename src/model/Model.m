@@ -367,7 +367,7 @@ function [pp, id, J] = computeForwardKinematics(Model,x)
     
 % compute total length
 ds  = Model.Shapes.ds;
-s    = 0.0;
+%s    = 0.0;
 p_   = Model.p0;
 Phi_ = Model.Phi0;
 J    = zeros(6,numel(x));
@@ -395,7 +395,7 @@ for ii = 1:Model.Shapes.NNode-1
 end
 
 % transform Jacobian to body frame
-J  = adjointSE3inv(Phi_,p_)*J;
+J  = admapinv(Phi_,p_)*J;
 id = round(linspace(1,Model.Shapes.NNode,2));
 
 end
@@ -445,7 +445,7 @@ end
 p   = Z1(1:3,4);
 Phi = Z1(1:3,1:3);
 B1  = Z1(1:6,5:5+n-1);
-J   = Admapinv(Phi,p)*B1;
+J   = admapinv(Phi,p)*B1;
 
 % recover the dynamics entities
 M  = Z2(1:n,1:n);
@@ -471,7 +471,7 @@ Gamma = XI(1:3);
 
 % build forward kin - position
 dp   = Phi_*U;
-dPhi = Phi_*skew(Gamma);
+dPhi = Phi_*hat(Gamma);
 A    = adjointSE3(Phi_,p_);
 dJ   = A*Model.Shapes.Ba*Theta_;
 end
@@ -492,10 +492,10 @@ U     = XI(4:6);
 
 % build forward kin - position
 dp   = Phi_*U;
-dPhi = Phi_*isomSO3(Gamma);
+dPhi = Phi_*hat(Gamma);
 
-A   = Admap(Phi_,p_);
-Ai  = Admapinv(Phi_,p_);
+A   = admap(Phi_,p_);
+Ai  = admapinv(Phi_,p_);
 
 % build jacobian
 Jg  = Ai*J_;
@@ -525,7 +525,6 @@ dC = (Jg).'*((Mtt*adV - adV.'*Mtt)*Jg  + Mtt*Jgt);
 dG = (Jg).'*(Ai*Mtt*[0;0;0;0;0;-9.81e3]);
 
 % compute (nonlinear stiffness)
-%Ktt = nonlinearStiffnessMat(Model,s,x);
 dK = (BTh).'*Ktt*(BTh);
 
 % compute grav. potential energy
@@ -589,8 +588,7 @@ QE = diag([E0,G0,G0]);
 QR = diag([G0,E0,E0]);
 
 Theta1 = Model.Shapes.Phi(s);
-Ba    = Model.Shapes.Ba;
-xi    = Ba*Theta1*x;
+xi    = Model.Shapes.Ba*Theta1*x;
 
 %diag([G0*J11,E0*J22,E0*J33,E0*A,G0*A,G0*A]);
 Ktt = blkdiag(QR*Jt,QE*eye(3));

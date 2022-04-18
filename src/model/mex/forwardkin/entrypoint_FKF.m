@@ -50,4 +50,4 @@ Th   = Theta;
     Th,...      % evaluated Theta matrix
     Ba);
 
-clearvars -except g J
+%clearvars -except g J

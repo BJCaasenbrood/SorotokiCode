@@ -172,7 +172,8 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 S = ver;
 ToolboxesInstalled = {S.Name}';
-Requisites = {'Image Processing Toolbox';'Partial Differential Equation Toolbox'};
+Requisites = {'Image Processing Toolbox';'Partial Differential Equation Toolbox';...
+    'MATLAB Coder'; 'Image Processing Toolbox'};
 HTMLLink = {'<a href="https://nl.mathworks.com/products/image.html">click here to install</a> \n',...
             '<a href="https://nl.mathworks.com/products/pde.html">click here to install</a> \n'};
 memb = ismember(Requisites,ToolboxesInstalled);
@@ -229,15 +230,58 @@ else
 end
 pause(0.75);
 
-cout('Text','* Checking for Cmake...\n'); pause(1);
+% cout('Text','* Checking for Cmake...\n'); pause(1);
+% 
+% [status,~] = system("cmake --version");
+% if  status~= 0
+%     cout('Error', '* Missing Cmake! \n');    
+% else
+%     cout('green','* Cmake compiler founded\n')
+% end
+% pause(0.75);
 
-[status,~] = system("cmake --version");
-if  status~= 0
-    cout('Error', '* Missing Cmake! \n');    
-else
-    cout('green','* Cmake compiler founded\n')
+cout('Text', '\n');
+cout('Text','* Proceeding with MEX libary\n');
+Request = input(['* It is highly recommended to use MEX files,',...
+    ' do you want to build MEX? (y/n)'],'s');
+
+switch(Request)
+    case('y'); buildMexbool = 1;
+    case('n'); buildMexbool = 0;
+    otherwise; buildMexbool = 0;
 end
-pause(0.75);
+
+if buildMexbool
+   cout('Text','* Building MEX executables...\n');
+   cd([Path,'/src/fem/mex/polardecomposition']);
+   cout('Text','* Finding polar decomposition folder...\n');
+   cout('Keyword','* building PolarDecompositionFast.mex...\n');
+   cout('Green','\t ');
+   generateMexPD;
+   
+   cd([Path,'/src/fem/mex/nonlinearstrainmat']);
+   cout('Text','* Finding nonlinear strain mat folder...\n');
+   cout('Keyword','* building NonlinearStrainOperatorFast.mex...\n');
+   cout('Green','\t ');
+   generateMexNSOF;
+   
+   cd([Path,'/src/model/mex/forwardkin']);
+   cout('Text','* Finding forward kinematics folder...\n');
+   cout('Keyword','* building computeForwardKinematicsFast.mex...\n');
+   cout('Green','\t ');
+   generateMexFKF;
+   
+   cd([Path,'/src/model/mex/lagrangian']);
+   cout('Text','* Finding lagrangian computation folder...\n');
+   cout('Keyword','* building computeLagrangianFast.mex...\n');
+   cout('Green','\t ');
+   generateMexCLF;
+   cout('Text','* MEX build completed!\n');
+   cdsoro;
+else
+   cout('Error',['* Not building MEX might result in ,',...
+    ' incompatability in future release of SOROTOKI!']);
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 cout('Text', '\n');
@@ -427,8 +471,9 @@ WriteToFile([Path,'\src\fem\tools\mma']);
 WriteToFile([Path,'\src\fem\mex\']);
 WriteToFile([Path,'\src\fem\materials\']);
 WriteToFile([Path,'\src\fem\materials\samples']);
-mexPath = genpath([Path,'/src/fem/mex']);
-WriteToFile(mexPath);
+WriteToFile([Path,'\src\fem\mex\nonlinearstrainmat']);
+WriteToFile([Path,'\src\fem\mex\polardecomposition']);
+%WriteToFile(mexPath);
 else
 AddPath([Path,'\scripts\fem\']);
 AddPath([Path,'\scripts\fem\2D']);
@@ -441,8 +486,8 @@ AddPath([Path,'\src\fem\tools\mma']);
 AddPath([Path,'\src\fem\mex\']);
 AddPath([Path,'\src\fem\materials\']);
 AddPath([Path,'\src\fem\materials\samples']);
-mexPath = genpath([Path,'/src/fem/mex']);
-AddPath(mexPath);
+AddPath([Path,'\src\fem\mex\nonlinearstrainmat']);
+AddPath([Path,'\src\fem\mex\polardecomposition']);
 pause(.3);
 
 x = CheckLibary('fem.lib',@(x) femPathConfirm);
@@ -467,9 +512,11 @@ WriteToFile([Path,'\src\model']);
 WriteToFile([Path,'\src\model\tools']);
 WriteToFile([Path,'\src\model\tools\liegroup']);
 WriteToFile([Path,'\src\model\tools\shapefnc']);
-WriteToFile([Path,'\src\model\tools\solver']);
-mexPath = genpath([Path,'\src\model\mex']);
-WriteToFile(mexPath);
+WriteToFile([Path,'\src\model\mex\forwardkin']);
+WriteToFile([Path,'\src\model\mex\lagrangian']);
+%WriteToFile([Path,'\src\model\tools\solver']);
+% mexPath = genpath([Path,'\src\model\mex']);
+% WriteToFile(mexPath);
 else
 AddPath([Path,'\scripts\mdl']);
 AddPath([Path,'\livescripts\mdl']);
@@ -478,8 +525,10 @@ AddPath([Path,'\src\model\tools']);
 AddPath([Path,'\src\model\tools\liegroup']);
 AddPath([Path,'\src\model\tools\shapefnc']);
 AddPath([Path,'\src\model\tools']);
-mexPath = genpath([Path,'/src/model/mex']);
-AddPath(mexPath);
+AddPath([Path,'\src\model\mex\forwardkin']);
+AddPath([Path,'\src\model\mex\lagrangian']);
+% mexPath = genpath([Path,'/src/model/mex']);
+% AddPath(mexPath);
 pause(.3);
 
 x = CheckLibary('model.lib',@(x) modelPathConfirm);

@@ -1,8 +1,8 @@
 clr; 
 %% 
 L = 100;   % length of robot
-M = 8;     % number of modes
-N = 30;    % number of discrete points on curve
+M = 5;     % number of modes
+N = 100;    % number of discrete points on curve
 H = 1/60;  % timesteps
 FPS = 30;  % animation speed
 
@@ -83,7 +83,7 @@ lam2 = 0.1;
 Kp = diag([k1,k1,k1,k2,k2,k2]);
 
 Xi = smoothstep(t)*logmapSE3(ge\gd);
-Fu = Kp*tmapSE3(Xi)*isomse3(Xi);
+Fu = Kp*tmapSE3(Xi)*wedge(Xi);
 
 tau = lam1*J.'*((J*J.' + lam2*eye(6))\Fu);
 tau = tau + mdl.Log.EL.G + mdl.Log.EL.K*mdl.Log.q;

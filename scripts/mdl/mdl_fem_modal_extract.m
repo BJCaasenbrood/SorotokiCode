@@ -1,16 +1,13 @@
 clr;
 %% pressure settings
-P0  = 35*kpa;
+P0  = 20*kpa;
 
 %% generate mesh
-Simp  = 0.02;
-GrowH = 1;
+MinH  = 3;
+MaxH  = 4;
 
-MinH  = 1.5;
-MaxH  = 3;
-
-msh = Mesh('Pneunet.png','BdBox',[0,120,0,20],...
-    'SimplifyTol',Simp,'Hmesh',[GrowH,MinH,MaxH]);
+msh = Mesh('Pneunet.png','BdBox',[0,107,0,16],...
+    'SimplifyTol',0.02,'Hmesh',[1,MinH,MaxH]);
 
 msh = msh.generate();
 
@@ -37,41 +34,43 @@ fem.Material.Zeta = 0.4;
 fem = fem.simulate(); 
 
 %% shape function reconstruction
-shp = Shapes(fem,[0,5,0,2,0,0],'NNode',120,...
+shp = Shapes(fem,[0,2,0,1,0,0],'NNode',120,...
      'Sdf',CrossSection,'Center',[7.5;0;0]);
 
-%shp = Shapes(fem,[0,5,0,2,0,0],'NNode',200);
-shp = shp.reference([0,2],[120,2]);
+shp = shp.reference([0,2],[107,2]);
 shp = shp.rebuild();
 shp = shp.reconstruct();
 
-Y = shp.get('PODR');
-Z = shp.get('PODQ');
+X = shp.get('PODR');
+Y = shp.get('PODQ');
 
-figure(101);
-%clf;
-for ii = 1:4
+figure(101); clf;
+
+for ii = 1:2
    subplot(1,2,1);
-   plot(shp.Sigma,Y(:,ii),'LineW',3,'Color',col(ii)); 
+   plot(shp.Sigma,X(:,ii),'LineW',3,'Color',col(ii)); 
    hold on;
    
    subplot(1,2,2);
-   plot(shp.Sigma,Z(:,ii),'LineW',3,'Color',col(ii)); 
+   plot(shp.Sigma,Y(:,ii),'LineW',3,'Color',col(ii)); 
    hold on;
 end
 
+Z = shp.get('POD');
+gm = ones(shp.NNode,1);
+G = trapz(shp.Sigma.',gm.*Z).';
+
 %% model
-shp.E  = 5;
-shp.Nu = 0.1;
-shp.Zeta = 0.5;
+shp.E    = 5;
+shp.Nu   = 0.1;
+shp.Zeta = 0.05;
 
 shp = shp.rebuild();
 
-mdl = Model(shp,'Tstep',1/60,'Tsim',15);
+mdl = Model(shp,'Tstep',1/60,'Tsim',8);
 
-mdl.tau = @(M) Controller(M);
+mdl.tau = @(M) Controller(M,G);
 
-% simulate system
 mdl = mdl.simulate(); 
 
 FPS = 120;
@@ -85,21 +84,18 @@ for ii = 1:fps(mdl.Log.t,FPS):length(mdl.Log.q)
     p = shp.FK(mdl.Log.q(ii,:));
     h = plot(p(:,1),p(:,3),'LineW',3);
     axis equal;
-    %view(30,30);
+
     axis([-40 120 -120 40]);
     drawnow;
-    
 end
 
 %% setup controller
-function tau = Controller(mdl)
+function tau = Controller(mdl,G)
 n = numel(mdl.Log.q);
 t = mdl.Log.t;
 
-tau = zeros(n,1);
-tau(1) = 350*smoothstep(t)*sin(2*t) - 100;
-tau(2) = 0.1*(350*smoothstep(t)*sin(2*t) - 100);
-
+P0 = 1500;
+tau = -G*P0*sigmoid(max(t-3,0));
 end
 
 function sdf = CrossSection

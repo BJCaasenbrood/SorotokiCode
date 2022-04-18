@@ -1,7 +1,7 @@
 clr; beep off;
 %% settings
 L = 1;   % manipulator length
-M = 20;  % number of modes
+M = 8;   % number of modes
 N = 101; % grid on SR
 
 %% build basis
@@ -18,7 +18,6 @@ shp = Shapes(Y,[0,M,0,0,0,0]);      % generate basis
 rig = setupRig(M,L,[0,M,0,0,0,0]);  % rig the soft arm
 
 q = 1e-4*sort(rand(shp.NDim,1));
-%q(2) = -2;
 e = 0.1;
 
 %% solve IK
@@ -114,11 +113,11 @@ function [dq, E] = EnergyController(g,gd,J)
     Kp = diag([k1,k1,k1,k2,k2,k2]);
 
     Xi = logmapSE3(g\gd);
-    Fu = Kp*tmapSE3(W*Xi)*isomse3(W*Xi);
+    Fu = Kp*tmapSE3(W*Xi)*wedge(W*Xi);
 
     dq = lam1*J.'*Fu;
     
-    E = Kp*isomse3(Xi);
+    E = Kp*wedge(Xi);
     
 end
 
