@@ -1,6 +1,6 @@
 function colmap = diffmap(h,n)
 
-HSV = 1.05*rgb2hsv(noir);
+HSV = 1.1*rgb2hsv(noir);
 HSV(:,1) = h;
 
 colmap = hsv2rgb(HSV);

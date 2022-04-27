@@ -16,6 +16,8 @@ classdef Shapes
         NNode;
         
         POD;
+        PODR;
+        PODQ;
         Theta;
         Xi0;
         
@@ -43,8 +45,6 @@ classdef Shapes
         Gamma;
         Kappa;
         
-        PODR;
-        PODQ;
         PODEnergy;
         
         Phi0;
@@ -103,8 +103,7 @@ function obj = Shapes(Input,NModal,varargin)
     for ii = 1:2:length(varargin)
         obj.(varargin{ii}) = varargin{ii+1};
     end
-    
-
+   
     if ~isempty(obj.Fem)
     if ~isempty(obj.Fem.get('Output'))
         out = obj.Fem.get('Output');
@@ -235,10 +234,10 @@ for ii = 1:6
     end
 end
 
-Shapes.NDim = sum(Shapes.NModal);
-Shapes.Ba   = I6(:,Xa);
+Shapes.NDim  = sum(Shapes.NModal);
+Shapes.Ba    = I6(:,Xa);
 Shapes.Sigma = linspace(0,1,Shapes.NNode);
-Shapes.ds   = Shapes.L0/(Shapes.NNode);
+Shapes.ds    = Shapes.L0/(Shapes.NNode);
 
 Shapes = BuildInertia(Shapes);
 
@@ -246,18 +245,21 @@ Shapes.Ktt  = LinearStiffnessTensor(Shapes);
 Shapes.Ktt0 = Shapes.Ktt;
 Shapes.Dtt  = Shapes.Zeta*Shapes.Mtt;
   
-if ~isempty(Shapes.Fem)
+if ~isempty(Shapes.Node0)
     Shapes = GenerateRadialFilter(Shapes);
 end
 
 if ~isempty(Shapes.PODR) || ~isempty(Shapes.PODQ)
-    
     
     if length(Shapes.PODQ) ~= Shapes.NNode
         X = linspace(0,Shapes.L0,length(Shapes.PODQ));
         Shapes.PODR = interp1(X,Shapes.PODR,Shapes.Sigma*Shapes.L0);
         Shapes.PODQ = interp1(X,Shapes.PODQ,Shapes.Sigma*Shapes.L0);
     end
+    
+%     % ensure orthonormality
+    Shapes.PODR = gsogpoly(Shapes.PODR,Shapes.Sigma);
+    Shapes.PODQ = gsogpoly(Shapes.PODQ,Shapes.Sigma);
     
     k = 1;
     Shapes.POD = [];
@@ -298,7 +300,7 @@ end
 
 end 
 %--------------------------------------------------------------------------
-function Shapes = reconstruct(Shapes)
+function Shapes = reconstruct(Shapes,varargin)
     
 fem = Shapes.Fem;
 t   = fem.Log.t;
@@ -321,7 +323,16 @@ Shapes.Ba   = I6(:,Xa);
 Shapes.Gamma = [];
 Shapes.Kappa = [];
 
-for ii = 1:numel(t)
+if isempty(varargin)
+   DATASET = 1:numel(t);
+else 
+   DATASET = unique(round(varargin{1}));
+   if DATASET(1) <= 0 
+      DATASET = numel(t);
+   end
+end
+
+for ii = DATASET
     
    N = Shapes.Fem.Log.Node{ii};
    R = Shapes.Fem.Log.Rotation{ii};
@@ -376,9 +387,11 @@ for jj = 1:Shapes.NModal(ii)
     k = k+1;
 end
 end
-
+    
 % rebuild shape-function matrix
 Shapes.Theta = @(x) ShapeFunction(Shapes,x);
+
+% rebuild shape-function matrix
 Shapes = Shapes.rebuild();
 
 end
@@ -430,25 +443,13 @@ end
 function p = FK(Shapes,q)
     p0 = Shapes.g0(1:3,4);
     g = string(Shapes,q);
-    p = [p0.';reshape(g(1:3,4,:),3,[]).'];
+    p = [p0.';reshape(g(1:3,4,1:end-1),3,[]).'];
 end
 %------------------------------------------------- estimate Cosserat string
-function q = estimateJointSpace(Shapes,fem,varargin)
+function [q,XI] = estimateJointSpace(Shapes,Xi,W)
 
-if isempty(varargin)
-    N = fem.Log.Node{end};
-    R = fem.Log.Rotation{end};
-    S = fem.Log.Stretch{end};
-else
-    N = fem.Log.Node{varargin{1}};
-    R = fem.Log.Rotation{varargin{1}};
-    S = fem.Log.Stretch{varargin{1}};
-end
-
-[K, G, ~, ~] = ReconstructField(Shapes,N,R,S);
-
-Kappa_ = full(K);
-Gamma_ = full(G-1);
+Kappa_ = Xi(:,1);
+Gamma_ = Xi(:,2);
 
 ki = Shapes.NModal(2);
 ei = Shapes.NModal(4);
@@ -456,19 +457,35 @@ ei = Shapes.NModal(4);
 PODr = Shapes.PODR(:,1:ki);
 PODq = Shapes.PODQ(:,1:ei);
 
-XR = trapz(Shapes.Sigma,PODr.*Kappa_);
-XQ = trapz(Shapes.Sigma,PODq.*Gamma_);
+if nargin < 3
+   W = [1,1];
+end
 
+WR = (W(:,1));
+WQ = (W(:,2) );
+% 
+Lam1 = diag(trapz(Shapes.Sigma,PODr.*PODr));
+Lam2 = diag(trapz(Shapes.Sigma,PODq.*PODq));
+% % 
+XR = Lam1\trapz(Shapes.Sigma,PODr.*WR.*Kappa_).';
+XQ = Lam2\trapz(Shapes.Sigma,PODq.*WQ.*Gamma_).';
+% 
+% XI = [PODr*XR,PODq*XQ];
 
-% figure(106);
+% figure(106); clf;
 % subplot(2,1,1);
 % plot(Kappa_); hold on;
-% plot(PODr*XR.');
+% plot(PODr*XR);
 % 
 % subplot(2,1,2);
+
+
+% XR = (diag(WR)*PODr).'*inv(PODr*diag(WR)*(PODr.'))*Kappa_;
+% XQ = (diag(WQ)*PODq).'*inv(PODq*diag(WQ)*(PODq.'))*Gamma_;
+
 % plot(Gamma_); hold on;
-% plot(PODq*XQ.');
-% 
+% plot(PODq*XQ);
+
 % q0 = zeros(sum(Shapes.NModal),1);
 % 
 % q = fminunc(@(x) Objective(x,Shapes,N_),q0);
@@ -481,10 +498,32 @@ XQ = trapz(Shapes.Sigma,PODq.*Gamma_);
 %         
 %     end
 
-% XR = PODr.'*inv(PODr*PODr.' + 10*eye(Shapes.NNode))*Kappa_;
-% XQ = PODq.'*inv(PODq*PODq.' + 10*eye(Shapes.NNode))*Gamma_;
-q  = [XR(:); XQ(:)];
+% XR = PODr.'*inv(PODr*PODr.')*Kappa_;
+% XQ = PODq.'*inv(PODq*PODq.')*Gamma_;
+q  = [XR; XQ];
+XI = [PODr*XR,PODq*XQ];
 
+end
+%------------------------------------------------- estimate Cosserat string
+function Xi = recoverStrain(Shapes,fem,varargin)
+   
+if isempty(varargin)
+    N = fem.Log.Node{end};
+    R = fem.Log.Rotation{end};
+    S = fem.Log.Stretch{end};
+else
+    N = fem.Log.Node{varargin{1}};
+    R = fem.Log.Rotation{varargin{1}};
+    S = fem.Log.Stretch{varargin{1}};
+end
+
+[Curvature, Stretch, ~, ~] = ReconstructField(Shapes,N,R,S);
+
+G = full(Curvature);
+U = full(Stretch-1);
+
+Xi = [G,U];
+    
 end
 %----------------------------------------------------- tangent point energy
 function [E, R] = tangentPoint(Shapes,q,PS1)
@@ -557,7 +596,7 @@ I = knnsearch(PS1,PS2);
 for ii = 1:Shapes.NNode
    el = Shapes.Fem.Element{I(ii)};
    Vsp = PS3(el,:);  % points spanned by element
-   Vin = PS1(ii,:); % point in element
+   Vin = PS1(ii,:);  % point in element
    
    % compute shape function jacobian transformation
    J0 = Vsp.'*ShapeFnc{numel(el)}.dNdxi(:,:,1);
@@ -625,7 +664,7 @@ for ii = 1:Shapes.NNode
      
     Rot{ii,1} = Re;
     Tangent(ii,:)  = Re(:,1).';
-    Gamma(ii,1)    = det(UUe);%trace(UUe)/3;
+    Gamma(ii,1)    = trace(UUe)/3;
 end
 
 for ii = 2:Shapes.NNode-1
@@ -634,11 +673,11 @@ for ii = 2:Shapes.NNode-1
     Nip = Nod(ii-1,:);
     
     g  = [Rot{ii,1},    [Ni(1); Ni(2);0];   zeros(1,3), 1];
-    dg = ([Rot{ii+1,1}, [Nii(1);Nii(2);0]; zeros(1,3), 1] ...
-        - [Rot{ii-1,1}, [Nip(1);Nip(2);0]; zeros(1,3), 1])/(2*Shapes.ds);
+    dg = ([Rot{ii+1,1}, [Nii(1); Nii(2);0]; zeros(1,3), 1] ...
+        - [Rot{ii-1,1}, [Nip(1); Nip(2);0]; zeros(1,3), 1])/(2*Shapes.ds);
     
     GSE3(:,:,ii) = g;
-    XI = inv(g)*dg;
+    XI = g\dg;
     
     Kappa(ii,1) = XI(1,2);
     Gamma(ii,1) = XI(1,4);
@@ -671,8 +710,8 @@ Gamma(1,1) = Gamma(2,1);
 Kappa(end,1) = Kappa(end-1,1);
 Gamma(end,1) = Gamma(end-1,1);
 
-Kappa = GaussianFilter(Kappa,round(Shapes.NNode/100));
-Gamma = GaussianFilter(Gamma,round(Shapes.NNode/100));
+Kappa = GaussianFilter(Kappa,round(Shapes.NNode/150));
+Gamma = GaussianFilter(Gamma,round(Shapes.NNode/150));
 
 % subplot(2,1,1);
 % plot(Gamma); hold on

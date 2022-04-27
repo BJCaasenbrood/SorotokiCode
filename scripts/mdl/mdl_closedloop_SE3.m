@@ -9,16 +9,16 @@ FPS = 30;  % animation speed
 Modes = [0,M,M,0,0,0];  % pure-XY curvature
 %%
 % generate nodal space
-X = linspace(0,L,N)';
+X = linspace(0,1,N)';
 Y = GenerateFunctionSpace(X,N,M,L);
 
 %%
 shp = Shapes(Y,Modes,'L0',L);
 
-shp.E    = 2.00;     % Young's modulus in Mpa
+shp.E    = 1.00;     % Young's modulus in Mpa
 shp.Nu   = 0.49;     % Poisson ratio
 shp.Rho  = 1000e-12; % Density in kg/mm^3
-shp.Zeta = 0.1;      % Damping coefficient
+shp.Zeta = 0.001;     % Damping coefficient
 
 shp = shp.rebuild();
 
@@ -36,7 +36,7 @@ figure(100);
 plot(mdl.Log.t,mdl.Log.q(:,1:M),'LineW',2);
 
 %% animation
-[rig,sph] = setupRig(M,L,Modes);
+[rig, sph] = setupRig(M,L,Modes);
 %[sph] = setupSphere();
 
 for ii = 1:fps(mdl.Log.t,FPS):length(mdl.Log.q)
@@ -54,13 +54,18 @@ for ii = 1:fps(mdl.Log.t,FPS):length(mdl.Log.q)
     drawnow();
 end
 
+function gd = gref(t)
+w = 0.75;
+gd = SE3(eye(3),[60,50*cos(w*t),50*sin(w*t)]);
+end
+
 %%
 function Y = GenerateFunctionSpace(X,N,M,L)
 % loop over functional space
 Y = zeros(N,M);
 
 for ii = 1:M
-   Y(:,ii) = chebyshev(X/L,ii-1); % chebyshev
+   Y(:,ii) = chebyshev(X,ii-1); % chebyshev
 end
 
 % ensure its orthonormal (gram–schmidt)
@@ -69,30 +74,27 @@ end
 
 %% setup controller
 function tau = Controller(mdl)
-
 t = mdl.Log.t;
 
+%tau        = zeros(n,1);
 J = mdl.Log.EL.J;
 ge = SE3(mdl.Log.Phi,mdl.Log.p);
+%gd = SE3(roty(pi/2*t),[50,50*cos(t),50*sin(t)]);
 gd = gref(t);
 
-k1   = 0.01;
-k2   = 12;
+k1 = 0.05;
+k2 = 15;
 lam1 = 1;
-lam2 = 0.1;
+lam2 = 1;
 Kp = diag([k1,k1,k1,k2,k2,k2]);
 
 Xi = smoothstep(t)*logmapSE3(ge\gd);
 Fu = Kp*tmapSE3(Xi)*wedge(Xi);
 
 tau = lam1*J.'*((J*J.' + lam2*eye(6))\Fu);
-tau = tau + mdl.Log.EL.G + mdl.Log.EL.K*mdl.Log.q;
+tau = tau + mdl.Log.EL.G + mdl.Log.EL.K*mdl.Log.q ...
+    + 0.00*mdl.Log.EL.K*mdl.Log.dq;
 
-end
-
-function gd = gref(t)
-w = 0.75;
-gd = SE3(eye(3),[60,50*cos(w*t),50*sin(w*t)]);
 end
 
 %% setup rig
@@ -126,5 +128,6 @@ sph.Texture = diffuse(0.925);
 sph.bake.render();
 
 end
+
 
 

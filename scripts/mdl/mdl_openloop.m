@@ -1,9 +1,9 @@
 clr;
 %% 
 L = 100;   % length of robot
-M = 14;     % number of modes
+M = 5;     % number of modes
 N = M*10;  % number of discrete points on curve
-H = 1/75; % timesteps
+H = 1/175; % timesteps
 FPS = 30;  % animation speed
 
 Modes = [0,M,M,0,0,0];  % pure-XY curvature
@@ -15,7 +15,7 @@ Y = GenerateFunctionSpace(X,N,M,L);
 %%
 shp = Shapes(Y,Modes,'L0',L);
 
-shp.E    = 0.05;     % Young's modulus in Mpa
+shp.E    = 1.00;     % Young's modulus in Mpa
 shp.Nu   = 0.33;     % Poisson ratio
 shp.Rho  = 1000e-12; % Density in kg/mm^3
 shp.Zeta = 0.05;      % Damping coefficient
@@ -28,7 +28,7 @@ shp = shp.rebuild();
 mdl = Model(shp,'Tstep',H,'Tsim',15);
 
 %%
-mdl.q0(1)    = 1.5;
+mdl.q0(1)    = 0.1;
 mdl = mdl.simulate(); 
 %% 
 figure(100);
@@ -59,7 +59,7 @@ for ii = 1:M
 end
 
 % ensure its orthonormal (gram–schmidt)
-Y = gsogpoly(Y,X);
+%Y = gsogpoly(Y,X);
 end
 
 %% setup rig

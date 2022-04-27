@@ -3,10 +3,11 @@ clr;
 Simp  = 0.025;
 GrowH = 2;
 
-MinH  = 3;
-MaxH  = 10;
+MinH  = 2;
+MaxH  = 7;
 
-msh = Mesh('SWR_robot_gripper.png','BdBox',...
+%msh = Mesh('SWR_robot_gripper.png','BdBox',...
+msh = Mesh('SWR_robot.png','BdBox',...
     [0,108,0,325],'SimplifyTol',Simp,...
     'Hmesh',[GrowH,MinH,MaxH]);
 
@@ -40,7 +41,7 @@ fem = fem.set('TimeStep',1/125,'BdBox',[0,120,0,325],'Linestyle','none',...
 fem = fem.AddConstraint('Support',fem.FindNodes('Box',[0 150 0 2]),[1,1]);
 fem = fem.AddConstraint('Gravity',[],[0,-1e3]);
 
-fem = fem.AddConstraint('Pressure',fem.FindEdges('BoxHole',pset0), @(x) 5*P0*sigmoid(x.Time));
+%fem = fem.AddConstraint('Pressure',fem.FindEdges('BoxHole',pset0), @(x) 5*P0*sigmoid(x.Time));
 fem = fem.AddConstraint('Pressure',fem.FindEdges('BoxHole',pset1), @(x) 2*P1*sigmoid(x.Time));
 fem = fem.AddConstraint('Pressure',fem.FindEdges('BoxHole',pset2), @(x) 0.75*P0*sigmoid(x.Time));
 fem = fem.AddConstraint('Pressure',fem.FindEdges('BoxHole',pset3), @(x) 0.75*P0*sigmoid(x.Time));

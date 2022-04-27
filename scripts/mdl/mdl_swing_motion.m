@@ -1,12 +1,12 @@
 clr;
 %% 
 L = 100;   % length of robot
-M = 8;     % number of modes
-N = 60;  % number of discrete points on curve
-H = 1/120; % timesteps
-FPS = 60;  % animation speed
+M = 12;     % number of modes
+N = 160;  % number of discrete points on curve
+H = 1/500; % timesteps
+FPS = 150;  % animation speed
 
-Modes = [0,M,M,0,0,0];  % pure-XY curvature
+Modes = [M,M,M,0,0,0];  % pure-XY curvature
 %%
 % generate nodal space
 X = linspace(0,L,N)';
@@ -18,7 +18,7 @@ shp = Shapes(Y,Modes,'L0',L);
 shp.E    = 2.00;     % Young's modulus in Mpa
 shp.Nu   = 0.49;     % Poisson ratio
 shp.Rho  = 1000e-12; % Density in kg/mm^3
-shp.Zeta = 0.05;      % Damping coefficient
+shp.Zeta = 0.01;      % Damping coefficient
 
 shp.Gvec = [-9.81e3;0;0];
 
@@ -31,7 +31,8 @@ mdl = Model(shp,'Tstep',H,'Tsim',5);
 %mdl.tau = @(M) Controller(M);
 
 %%
-mdl.q0(1)    = 0.5;
+mdl.q0(1)    = 0.05;
+mdl.q0(M+1)  = 0.02;
 mdl = mdl.simulate(); 
 %% 
 figure(100);
@@ -54,7 +55,6 @@ for ii = 1:fps(mdl.Log.t,FPS):length(mdl.Log.q)
     view(30,30);
     drawnow();
 end
-
 
 %%
 function Y = GenerateFunctionSpace(X,N,M,L)

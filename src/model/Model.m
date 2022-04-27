@@ -325,7 +325,7 @@ disp('----------------------------------');
         end
         
         % hyper-elastic modifier
-        [Psi, Khyp] = HyperElasticModifier(Model,K_,Q);
+        [Psi, ~] = HyperElasticModifier(Model,K_,Q);
             
         % overwrite dynamics
         Model.Log.t   = T;
@@ -334,10 +334,10 @@ disp('----------------------------------');
         Model.Log.p   = p_;
         Model.Log.Phi = Phi_;
         
-        Model.Log.EL.M = M_;
+        Model.Log.EL.M = 0.5*(M_ + M_.');
         Model.Log.EL.C = C_;
         Model.Log.EL.R = R_;
-        Model.Log.EL.K = Khyp;
+        Model.Log.EL.K = K_;
         Model.Log.EL.G = G_;
         Model.Log.EL.J = J_;
 
@@ -608,7 +608,7 @@ b = Model.Shapes.HypB;
 z = linspacen(zeros(Model.Shapes.NDim,1),x,Nstp);
 dz = z(:,2);
 
-Knl = @(x) K0 + a*K0*log(b*(x.')*x + 1);
+Knl = @(x) K0 + 0*a*K0*log(b*(x.')*x + 1);
 
 Psi = 0;
 for ii = 1:Nstp-1
