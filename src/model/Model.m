@@ -45,7 +45,7 @@ function obj = Model(Shapes,varargin)
     obj.ShpFnc = Shapes.Theta;
     
     obj.MaxIteration = 10;
-    obj.ResidualNorm = 0.01;
+    obj.ResidualNorm = 1e-3;
 
     G0 = Shapes.get('g0');
     obj.Phi0 = G0(1:3,1:3); 
@@ -347,6 +347,9 @@ disp('----------------------------------');
         
         % evaluate control action
         Model.tau_ = Model.tau(Model);
+        
+        % compute control jacobian
+        %[Model.dTaudq,Model.dTauddq] = computeControlJacobians(Model);
         
         % update system
         Model = Model.update(Model);

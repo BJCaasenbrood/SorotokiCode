@@ -1,12 +1,12 @@
 clr;
 %% 
-L = 100;   % length of robot
-M = 12;     % number of modes
-N = 160;  % number of discrete points on curve
-H = 1/500; % timesteps
+L = 100;    % length of robot
+M = 5;     % number of modes
+N = 100;    % number of discrete points on curve
+H = 1/200;  % timesteps
 FPS = 150;  % animation speed
 
-Modes = [M,M,M,0,0,0];  % pure-XY curvature
+Modes = [0,M,M,0,0,0];  % pure-XY curvature
 %%
 % generate nodal space
 X = linspace(0,L,N)';
@@ -31,8 +31,7 @@ mdl = Model(shp,'Tstep',H,'Tsim',5);
 %mdl.tau = @(M) Controller(M);
 
 %%
-mdl.q0(1)    = 0.05;
-mdl.q0(M+1)  = 0.02;
+mdl.q0(1)     = 0.1;
 mdl = mdl.simulate(); 
 %% 
 figure(100);
