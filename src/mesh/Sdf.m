@@ -41,10 +41,21 @@ classdef Sdf
         end
 %----------------------------------------------------------- rotate X <-> Y              
         function r = transpose(obj1)
-            fnc = @(x) obj1.sdf([x(:,2),x(:,1)]);
-            r = Sdf(fnc);
             B = obj1.BdBox;
-            r.BdBox = [B(3), B(4), B(1), B(2)];
+            if numel(B) == 4
+                fnc = @(x) obj1.sdf([x(:,2),x(:,1)]);
+                r = Sdf(fnc);
+                r.BdBox = [B(3), B(4), B(1), B(2)];
+                r.Node = [obj1.Node(:,2), obj1.Node(:,1)];
+                r.Element = obj1.Element;
+            else
+                fnc = @(x) obj1.sdf([x(:,3),x(:,1),x(:,2)]);
+                r = Sdf(fnc);
+                r.Node = [obj1.Node(:,2), obj1.Node(:,3), obj1.Node(:,1)];
+                r.BdBox = boxhull(r.Node);
+                r.Element = obj1.Element;
+            end
+            
         end
 %----------------------------------------------------------- rotate X <-> Y              
         function r = rotate(obj1,varargin)
@@ -204,9 +215,11 @@ function showcontour(Sdf,Quality)
         
         
         colormap(Sdf.cmap);
-        %view(0,90);
-        %axis off;
         caxis([-1 1]);
+    else
+        hold on;
+        patch('Vertices',Sdf.Node,'Faces',Sdf.Element,...
+            'FaceColor','none','LineW',3);
     end
 end
 end
@@ -218,4 +231,25 @@ end
 
 function [R] = TwoDRotation(x)
 R = [cos(x),sin(x);-sin(x),cos(x)];
+end
+
+function BdBox = boxhull(Node,eps)
+if nargin < 2, eps = 1e-6; end
+
+if size(Node,2) == 2
+    BdBox = zeros(4,1);
+    BdBox(1) = min(Node(:,1));
+    BdBox(2) = max(Node(:,1));
+    BdBox(3) = min(Node(:,2));
+    BdBox(4) = max(Node(:,2));
+else
+    BdBox = zeros(6,1);
+    BdBox(1) = min(Node(:,1))-eps;
+    BdBox(2) = max(Node(:,1))+eps;
+    BdBox(3) = min(Node(:,2))-eps;
+    BdBox(4) = max(Node(:,2))+eps;
+    BdBox(5) = min(Node(:,3))-eps;
+    BdBox(6) = max(Node(:,3))+eps;
+end
+
 end

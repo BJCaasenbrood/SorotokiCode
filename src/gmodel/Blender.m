@@ -161,7 +161,7 @@ Node0 = [mesh.Node, ones(mesh.NNode,1)];
 
 % H(4,4) = 1;
 H = Arg;
-H(1:3,1:3) = H(1:3,1:3);
+H(1:3,1:3) = rot90(H(1:3,1:3),2);
 H(1:3,4) = H([3;2;1],4);
 Node = H*Node0.';
 mesh.Node = Node(1:3,:).';

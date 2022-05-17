@@ -58,10 +58,10 @@ end
 
 Z = shp.get('POD');
 gm = ones(shp.NNode,1);
-G = trapz(shp.Sigma.',gm.*Z).';
+G  = trapz(shp.Sigma.',gm.*Z).';
 
 %% model
-shp.E    = 5;
+shp.E    = 2;
 shp.Nu   = 0.1;
 shp.Zeta = 0.05;
 
@@ -77,6 +77,7 @@ FPS = 120;
 
 figure(103);
 h = [];
+
 for ii = 1:fps(mdl.Log.t,FPS):length(mdl.Log.q)
 
     delete(h);
@@ -94,7 +95,7 @@ function tau = Controller(mdl,G)
 n = numel(mdl.Log.q);
 t = mdl.Log.t;
 
-P0 = 1500;
+P0 = 450;
 tau = -G*P0*sigmoid(max(t-3,0));
 end
 

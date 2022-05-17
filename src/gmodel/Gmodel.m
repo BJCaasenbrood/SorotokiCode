@@ -33,6 +33,7 @@ classdef Gmodel < handle
         NNode;
         NElem;
         Texture;
+        TextureStretch;
         Shading;
         Emission;
         Occlusion;
@@ -52,7 +53,6 @@ classdef Gmodel < handle
         FigHandle;
         FigAxis;
         TextureMap;
-        TextureStretch;
         Colormap;
         LineStyle;
         LineColor;
@@ -175,7 +175,7 @@ function Gmodel = ground(Gmodel,gnd)
 end
 %------------------------------------------------------------- return Bdbox
 function Gmodel = box(Gmodel)
-    BoundingBox(Gmodel);
+    boundingBox(Gmodel);
 end
 %------------------------------------ renders the graphics: MatCap, AO, SSS
 function Gmodel = render(Gmodel,varargin)
@@ -479,7 +479,7 @@ function Gmodel = GenerateObject(Gmodel,varargin)
        D = Gmodel.SDF(single(P));
        D = reshape(D(:,end),size(X));
        
-       [f,v,~] = MarchingCubes(single(X),single(Y),...
+       [f,v] = MarchingCubesFast(single(X),single(Y),...
           single(Z),single(D),1e-6);
 
     elseif isa(msh{1},'double') && isa(msh{2},'double')
@@ -504,7 +504,7 @@ function Gmodel = GenerateObject(Gmodel,varargin)
        f = fv.faces;
     end
     
-    [vn,fn] = TriangleNormal(v,f);
+    [vn,fn] = TriangleNormalFast_mex(v,f);
     
     Gmodel.Node = v;
     Gmodel.Node0 = v;
@@ -522,14 +522,19 @@ function Gmodel = GenerateObject(Gmodel,varargin)
     end
     
     fcell = num2cell(Gmodel.Element,2);
-    [~,Gmodel.V2F,Gmodel.F2V] = ElementAdjecency(fcell);
+    [~,Gmodel.V2F,Gmodel.F2V] = elementAdjecency(fcell);
   
-    Gmodel.TextureMap = Normal2RGB(Gmodel.Normal);
+    Gmodel.TextureMap = normal2rgb(Gmodel.Normal);
     
-    f = num2cell(Gmodel.Element,2);
-    VCell = cellfun(@(E) Gmodel.Node(E,:),f,'UniformOutput',false);
-    c = cellfun(@(V) mean(V,1),VCell,'UniformOutput',false);
-    Gmodel.Center = vertcat(c{:});
+    Nf = size(Gmodel.Element,1);
+    C = zeros(Nf,3);
+    
+    for ii = 1:1
+        el = Gmodel.Element(ii,:);
+        C(ii,:) = mean(Gmodel.Node(el,:),1);
+    end
+    
+    Gmodel.Center = C;
 end
 %------------------------------------------------------------ bake cubemaps
 function Gmodel = BakeCubemap(Gmodel,Cubemap)
@@ -594,7 +599,7 @@ end
 function Gmodel = BakeAmbientOcclusion(Gmodel)
 Bias = Gmodel.AOBias;
 Res = round(2.^Gmodel.AOBit);
-BB = BoundingBox(Gmodel.Node); 
+BB = boundingBox(Gmodel.Node); 
 if Gmodel.AORenderComplete == false
 R = Gmodel.AORadius*mean([abs(BB(2)-BB(1)),abs(BB(4)-BB(3)),...
     abs(BB(6)-BB(5))]);
@@ -605,16 +610,8 @@ end
 
 Gmodel.BdBox = BB;
 
-% if strcmp(Gmodel.Shading,'Face')
-% Centers = zeros(length(Gmodel.Element),3);
-% for el = 1:length(Gmodel.Element)
-%     Centers(el,:) = mean(Gmodel.Node(Gmodel.Element(el,:),:),1);
-% end
-% Normals = Gmodel.Normal;
-% else
 Normals = Gmodel.VNormal;
 Centers = Gmodel.Node;
-% end
 
 AOmap = zeros(length(Centers),1);
         
@@ -625,8 +622,8 @@ pts = zeros(npts,3);
 idx = 0;
 
 for ii = 1:length(Centers)
-    T = GenerateHemiSphereBase(Res,Bias); 
-    Rot = PlanarProjection(dir*Normals(ii,:));
+    T = generateHemiSphereBase(Res,Bias); 
+    Rot = planarProjection(dir*Normals(ii,:));
     pts(1+idx:Res+idx,:) = R*((Rot*T.').') + Centers(ii,:);
     idx = idx + Res;
 end
@@ -651,7 +648,7 @@ idx = 0;
 for ii = 1:length(Centers)
     flag = PolyFlag(1+idx:Res+idx);
     if Gmodel.AOInvert, AOmap(ii) = 1 - sum(flag)/Res;
-    else, AOmap(ii) = 1 - sum(flag)/Res;
+    else, AOmap(ii) = sum(flag)/Res;
     end
     
     idx = idx + Res;
@@ -722,31 +719,6 @@ patch('Faces',f,'Vertices',v,...
     'EdgeColor',[1 1 1]*0.5);
 end
 %---------------------------------------------------- generate bounding box
-function BoundingBox(Gmodel)
-
-tmp = boxhull(Gmodel.Node);
-
-v = [tmp(1),tmp(3), tmp(5);  
-     tmp(2),tmp(3), tmp(5);
-     tmp(2),tmp(4), tmp(5);
-     tmp(1),tmp(4), tmp(5);
-     tmp(1),tmp(3), tmp(6);  
-     tmp(2),tmp(3), tmp(6);
-     tmp(2),tmp(4), tmp(6);
-     tmp(1),tmp(4), tmp(6)];
- 
-f = [1,2,3,4;
-     5,6,7,8;
-     1,5,nan,nan;
-     2,6,nan,nan;
-     3,7,nan,nan;
-     4,8,nan,nan];
-
-patch('Faces',f,'Vertices',v,...
-    'Linewidth',1.5,'linestyle','-','FaceColor','none',...
-    'EdgeColor',col(2));
-
-end
     
 end
 end

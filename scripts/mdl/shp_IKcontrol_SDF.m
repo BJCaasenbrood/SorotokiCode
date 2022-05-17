@@ -9,8 +9,8 @@ x = linspace(0,1,N).';
 Y = GenerateFunctionSpace(x,N,M,L);
 
 %% desired SE3
-Sd = sCircle(0.1,-0.3,0.1);  % desired enveloping SDF
-sp = sSphere(0.1,0,0.3,0.1); % offset due to occupance of soft arm
+Sd = sCircle(0.2,-0.15,0.15);  % desired enveloping SDF
+sp = sSphere(0.2,0,0.15,0.1); % offset due to occupance of soft arm
 
 %% soft sobotics shapes
 figure(101); subplot(1,2,1);
@@ -82,15 +82,6 @@ while norm(e) > 1e-3 && k < 400
     % setup figure
     setupFigure(BdBox);
     
-    hold on;
-    if isempty(h)
-        h = plot3(p(:,1),p(:,2),-p(:,3),'b-','LineW',3);
-    else
-        set(h,'XData',p(:,1));
-        set(h,'YData',p(:,2));
-        set(h,'ZData',-p(:,3));
-    end
-    
     subplot(1,2,2);
     plot(shp.Sigma,R,'LineW',3);
     axis([0 1 0 0.25]);
@@ -104,8 +95,8 @@ end
 
 function [dq, E] = EnergyController(g,gd,J)
     
-    k1   = 0.002;
-    k2   = 0.075;
+    k1   = 0.00;
+    k2   = 0.75;
     lam1 = 1;
     
     % conditioner
@@ -134,7 +125,6 @@ end
 function rig = setupRig(M,L,Modes)
 
 gmdl = Gmodel('Arm.stl');
-gmdl.Alpha = 0.5;
  
 N = 100;
 X = linspace(0,L,N)';

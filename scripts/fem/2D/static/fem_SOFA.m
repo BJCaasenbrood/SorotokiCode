@@ -15,12 +15,12 @@ fem = Fem(msh);
 fem = fem.set('TimeStep',1/40,'Linestyle','none','SolverPlotType','Svm');
 
 %% assign material
-fem.Material = NeoHookeanMaterial;
+fem.Material = Dragonskin30(15);
 
 %% add boundary constraint
 CP1 = [20,48];  % control point 1
 CP2 = [150,48]; % control point 2
-F1  = 5;     % control force 1
+F1  = 2;     % control force 1
 F2  = -1;      % control force 2
 
 fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[1,1]);

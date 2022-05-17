@@ -3,6 +3,7 @@ classdef Shapes
     properties (Access = public)
         Fem;   
         Sdf;
+        Material;
         Sigma;
         L0;
         Ba;
@@ -33,7 +34,6 @@ classdef Shapes
         Jtt;
         Att;
         Gvec;
-        
     end
     
     properties (Access = private)
@@ -93,6 +93,7 @@ function obj = Shapes(Input,NModal,varargin)
     % cross-section SDF
     obj.Sdf    = sCircle(5);
     obj.Center = zeros(3,1);
+    obj.Material = NeoHookeanMaterial(1,0.33);
 
     obj.E  = 5;
     obj.Nu = 0.33;
@@ -241,9 +242,18 @@ Shapes.ds    = Shapes.L0/(Shapes.NNode);
 
 Shapes = BuildInertia(Shapes);
 
-Shapes.Ktt  = LinearStiffnessTensor(Shapes);
-Shapes.Ktt0 = Shapes.Ktt;
-Shapes.Dtt  = Shapes.Zeta*Shapes.Mtt;
+JJ     = Shapes.Mtt/Shapes.Material.Rho;
+[SS,KK] = Shapes.Material.PiollaStress(eye(3));
+KK = 2*diag(voightextraction(KK));
+%KK2 = LinearStiffnessTensor(Shapes);
+% KQR = KK(4:6,4:6); 
+% KQG = KK(1:3,1:3);
+% 
+% KK = blkdiag(KQR,KQG);
+Shapes.Ktt  = JJ*KK;%diag(diag(JJ))*diag(diag(KK));
+%Shapes.Mtt  = diag(diag(Shapes.Mtt));
+%Shapes.Ktt0 = Shapes.Ktt;
+Shapes.Dtt  = Shapes.Material.Zeta*Shapes.Ktt;
   
 if ~isempty(Shapes.Node0)
     Shapes = GenerateRadialFilter(Shapes);
@@ -402,13 +412,9 @@ if numel(q) ~= Shapes.NDim
    error(['Dimension of joint inconstisten with POD matrix. Please ', ...
        'check your input dimensions dim(q).']) 
 end    
-% 
-% Ndim = Shapes.NDim;
-% Ns   = Shapes.NNode;
-q    = q(:) + 1e-6;
-% s    = 0;
-% h    = Shapes.ds;
-% X    = MDE(Shapes.NDim);
+
+% ensures robustness for near-zero singularities in some PCC models
+q = q(:) + 1e-6;
 
 [g,J] = computeForwardKinematicsFast_mex(q,... % states
     Shapes.ds,...         % spatial steps
@@ -887,14 +893,23 @@ function y = isomSO3(x)
 x1 = x(1); x2 = x(2); x3 = x(3);
 y = [0, -x3, x2; x3, 0, -x1; -x2, x1, 0];
 end
+%--------------------------------------------- isomorphism from R3 to so(3)
+function y = voightextraction(X)
+y(1,1) = X(2,3);
+y(2,1) = 2*X(4,4);
+y(3,1) = 2*X(4,4);
+y(4,1) = X(1,1);
+y(5,1) = X(2,1);
+y(6,1) = X(3,1);
+end
 %----------------------------------------------------------- strain mapping
 function Ktt = LinearStiffnessTensor(Shapes)
-    E0 = Shapes.E;
-    G0 = (E0)/(2*(1+Shapes.Nu));
-  
-    QE  = diag([E0,G0,G0]);
-    QR  = diag([G0,E0,E0]);    
-    Ktt = blkdiag(QR*Shapes.Jtt,QE*Shapes.Att);    
+E0 = Shapes.Material.E;
+G0 = (E0)/(2*(1+Shapes.Material.Nu));
+
+QE  = diag([E0,G0,G0]);
+QR  = diag([G0,E0,E0]);
+Ktt = blkdiag(QR,QE);
 end
 %------------------------------------------------------- optimal sphere fit
 function r = torusSolve(gp,x)

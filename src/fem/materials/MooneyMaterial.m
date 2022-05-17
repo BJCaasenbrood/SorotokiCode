@@ -19,7 +19,6 @@ function obj = MooneyMaterial(varargin)
         obj.(varargin{ii}) = varargin{ii+1};
     end
 end
-
 %---------------------------------------------------------------------- get     
 function varargout = get(MooneyMaterial,varargin)
     if nargin > 1
@@ -30,17 +29,19 @@ function varargout = get(MooneyMaterial,varargin)
     else
         varargout = MooneyMaterial.(varargin);
     end
-end
-        
+end       
 %---------------------------------------------------------------------- set
 function MooneyMaterial = set(MooneyMaterial,varargin)
     for ii = 1:2:length(varargin)
         MooneyMaterial.(varargin{ii}) = varargin{ii+1};
     end
 end
-
+%---------------------------------------------------------------------- set
+function y = getModulus(MooneyMaterial)
+    y = MooneyMaterial.C10; 
+end
+%---------------------------------------------------------------------- set
 function C = C1(MooneyMaterial), C = MooneyMaterial.C10; end
-
 %------------------------------ 2ND PIOLLA STRESSAND STIFFNESS FOR YEOH
 function [S, D, P] = PiollaStress(MooneyMaterial,F)
 %Se = 2nd PK stress [S11, S22, S33, S12, S23, S13];
@@ -100,7 +101,6 @@ D = MooneyMaterial.C10*J1EE + MooneyMaterial.C01*J2EE ...
 + MooneyMaterial.K*(J3E*J3E') + MooneyMaterial.K*J3M1*J3EE;
 
 end
-
 %---------------------------------------------------------------------- set
 function E = Emod(MooneyMaterial),  E = MooneyMaterial.C10; end
 

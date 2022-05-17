@@ -1,8 +1,38 @@
 %% ------------------------------------------------------------------------
-% % SOROTOKI - Alpha - 2.28.01 - Jan 28 - 2022
+% % SOROTOKI - Alpha - 2.05.17 - May 17 - 2022
+% + Added MEX compiler for Model, Gmodel, and Fem classes. This signicantly
+%   improves the computation times of the Sorotoki toolkit. When calling
+%   sorotoki.m, the installer askes to compile the mex files. *Note* we do
+%   not support the orginal Matlab functions anymore, simple because of
+%   computational speed. Hence, the Matlab Coder Toolkit is a prerequisite 
+%   for Sorotoki.
+% 
+% + Updated verifySorotoki to include also Model.
+% 
+% **Shapes.m**
+% + Updated the Fem -> Shapes converter that extracts the geometric modes
+%   from dynamic or quasi-static FEM data. This can be done using shp.Fem =
+%   Fem followed by shp.reconstruct, shp.rebuild. Then a dynamic model can
+%   be generated using mdl = Model(shp). We call this new strain basis the
+%   **Geometry-Informed Variable Strain** basis as the geoemtry of the soft
+%   robot is preserved into the functional basis.
+% 
+% + Added Shapes.Material. Now hyper-elastic materials can be loaded into
+%   the stiffness and interia tensor construction. The work is experimental
+%   since more research is required to properly include hyp-elast materials
+%   into the Cosserat beam models.
+% 
+% **Model.m**
+% + Added an auxiliary flow function to the Model class: dx = f(x,t). This
+%   can be used for integrator actions, like PI controllers. or adaptive
+%   controllers where unknown parameters evolutions can be included.
+% 
+% % ------------------------------------------------------------------------
+% % SOROTOKI - Alpha - 2.01.28 - Jan 28 - 2022
 % + Improved stability of Newmark solver.
+% 
 %% ------------------------------------------------------------------------
-% % SOROTOKI - Alpha - 2.24.01 - Jan 24 - 2022
+% % SOROTOKI - Alpha - 2.01.24 - Jan 24 - 2022
 % - Fixed broken installer. `vernum.m` file was missing on Repo. It has been
 %   replaced with `soropatch.m` which also includes the patch notes.
 %
@@ -13,7 +43,7 @@
 % + **Open issue (2.24.01)**:    
 %   - @martijnschouten Missing DOI for citation, and long-term support/access.
 %% ------------------------------------------------------------------------
-% % SOROTOKI - Alpha - 2.13.01 - Jan 13 - 2022
+% % SOROTOKI - Alpha - 2.01.13 - Jan 13 - 2022
 % + Moved SOROTOKI from early alpha to alpha (prepping for official release).
 % 
 % + Signifcant update to the class Shapes. Shapes now requests a Fem class
@@ -78,9 +108,9 @@ if isempty(varargin)
 end
 
 switch(varargin{1})
-    case(1); x = '2.13.01';
-    case(2); x = '13 January 2022';
-    case(3); x = '30 August 2018';
+    case(1); x = '2.05.17';
+    case(2); x = 'May 17, 2022';
+    case(3); x = 'August 30, 2018';
 end
 end
 

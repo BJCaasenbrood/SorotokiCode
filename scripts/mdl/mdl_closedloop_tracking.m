@@ -7,22 +7,17 @@ H = 1/60;  % timesteps
 FPS = 30;  % animation speed
 
 Modes = [0,M,M,0,0,0];  % pure-XY curvature
-%%
-% generate nodal space
+%% shapes
 X = linspace(0,1,N)';
 Y = GenerateFunctionSpace(X,N,M,L);
-
-%%
 shp = Shapes(Y,Modes,'L0',L);
 
-shp.E    = 25;       % Young's modulus in Mpa
-shp.Nu   = 0.49;     % Poisson ratio
-shp.Rho  = 1000e-12; % Density in kg/mm^3
-shp.Zeta = 0.01;    % Damping coefficient
-shp = shp.rebuild();
+%% set material properties
+shp.Material = NeoHookeanMaterial(25,0.4);
+shp = shp.rebuild(); 
 
 %% build model class
-mdl = Model(shp,'Tstep',H,'Tsim',15);
+mdl = Model(shp,'TimeStep',H,'TimeEnd',10);
 mdl = mdl.set('ResidualNorm',1e-5);
 mdl = mdl.set('MaxIteration',100);
 %% controller
@@ -78,10 +73,10 @@ t = mdl.Log.t;
 
 %tau        = zeros(n,1);
 J = mdl.Log.EL.J;
-ge = SE3(mdl.Log.Phi,mdl.Log.p);
+ge = SE3(mdl.Log.Phi,mdl.Log.gam);
 gd = gref(t);
 
-lam1 = 2500;
+lam1 = 2e3;
 lam2 = 1;
 Kp = diag([0.1,0.1,0.1,1,1,1]);
 
@@ -90,7 +85,6 @@ Fu = Kp*tmapSE3(Xi)*wedge(Xi);
 
 tau = lam1*J.'*((J*J.' + lam2*eye(6))\Fu);
 tau = tau + mdl.Log.EL.G + mdl.Log.EL.K*mdl.Log.q;
-
 end
 
 %% setup rig

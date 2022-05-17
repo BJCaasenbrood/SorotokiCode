@@ -3,9 +3,10 @@ clr;
 sdf = SDF;
 
 %% dual contouring
-%[F,V] = DualContour(SDF,20);
+[F,V] = DualContour(SDF,30);
 
-obj = Gmodel(sdf,'Quality',120);
+obj = Gmodel(V,F);
+%obj = Gmodel(sdf,'Quality',120);
 obj.bake.render
 
 function y = SDF

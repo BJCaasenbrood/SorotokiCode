@@ -1,12 +1,12 @@
 clr;
 %% model
-Dist = @(x) SDF(x);
-BdBox =[-50,80,-50,50,0,90];
+Dist  = @(x) SDF(x);
+BdBox = [-50,80,-50,50,0,22*5];
 
-obj = Gmodel(Dist,BdBox,'Quality',70);
+obj = Gmodel(Dist,BdBox,'Quality',80);
 
 %% set texture
-obj.Texture = bump;
+obj.Texture = softmath;
 obj.bake();
 
 %% show
@@ -19,7 +19,7 @@ B1 = Bellow(y,5,4,6,5,7,5,2);
 y  = dTranslate(x,[44,0,0]);
 y  = dRevolve(y);
 B2 = Bellow(y,5,4,6,5,7,5,2);
-Dist = dSmoothUnion(B1,B2,7);
+Dist = dSmoothUnion(B1,B2,10);
 end
 
 function Dist = Bellow(P,r0,r1,r2,r3,r4,x,t)

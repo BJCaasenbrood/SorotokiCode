@@ -1,28 +1,35 @@
 classdef Model
     
     properties (Access = public)
-        Shapes;
-        Tsim;
-        Tstep;
+        Shapes;         % Shape class
+        Environment;    % enviromental interaction
+        Contact;        % (self)-contact interaction
+        TimeEnd;        % time horizon simulation
+        TimeStep;       % time steps 
+        Flow;           % auxilary flow map
+        Log;            % simulation logger
+        
+        t;              % time
+        q, dq, p;       % states
+        q0, dq0, p0;    
+        Phi0;
+        z0;
 
-        q, dq, t;
-        q0, dq0, Phi0, p0;
-        Log;
-   
-        tau, tau_;
+        tau;
         update;
     end
     
     properties (Access = private)
-        N; S;
+
         dTaudq, dTauddq;
         Theta;
         Xi0;
         
-        MexSolver = true;
-        
+        MexSolver;
+        Print
         ResidualNorm;
         MaxIteration;
+        ShowProcess;
         Conv;
         Adaptive;
         
@@ -39,19 +46,23 @@ methods %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function obj = Model(Shapes,varargin) 
     
     obj.Shapes = Shapes;
-    obj.Tstep  = 1/60;
-    obj.Tsim   = 10;
-    obj.Ba     = Shapes.Ba;
-    obj.ShpFnc = Shapes.Theta;
+    obj.TimeStep = 1/60;
+    obj.TimeEnd  = 10;
+    obj.Ba       = Shapes.Ba;
+    obj.ShpFnc   = Shapes.Theta;
     
     obj.MaxIteration = 10;
     obj.ResidualNorm = 1e-3;
+    obj.MexSolver = true;
+    obj.ShowProcess = true;
 
     G0 = Shapes.get('g0');
     obj.Phi0 = G0(1:3,1:3); 
     obj.p0   = G0(5:7).';    
     obj.q0   = zeros(Shapes.NDim,1) + 1e-6*rand(Shapes.NDim,1);
     obj.dq0  = zeros(Shapes.NDim,1);
+    obj.Flow = [];
+    obj.z0   = 0;
 
     obj.tau  = @(mdl) zeros(Shapes.NDim,1);
     obj.update = @(x) x;
@@ -90,36 +101,52 @@ end
 %---------------------------------------------------- simulates dyn. system
 function Model = simulate(Model)
     
-Model.t   = 0:Model.Tstep:Model.Tsim;
+Model.t   = 0:Model.TimeStep:Model.TimeEnd;
 Model.q   = []; 
 Model.dq  = [];
+Model.p   = [];
 
 Model.Log    = struct;
 Model.Log.q  = Model.q0;
 Model.Log.dq = 0*Model.q0;
+Model.Log.p  = 0*Model.q0;
 Model.Log.EL = struct;
+Model.Log.PH = struct;
 
 % get evals
 Model.Theta = Model.Shapes.get('ThetaEval');
 Model.Xi0   = Model.Shapes.get('Xi0Eval');
 
-if isempty(Model.dTaudq)
-    Model.Log.t = 0;
-    [Model.dTaudq,Model.dTauddq] = computeControlJacobians(Model);
+% prebuild EL 
+Model = computeEL(Model,Model.q0);
+
+if ~isempty(Model.Flow)
+    Model.Log.AUX   = struct;
+    Model.Log.AUX.z = Model.z0;
 end
 
-[T, X, U, Km, Ue, Ug] = simulateSoftRobot(Model,...
+if isempty(Model.dTaudq)
+    Model.Log.t = 0;
+    [Model.Log.EL.dTaudq,Model.Log.EL.dTauddq] = ...
+        computeControlJacobians(Model);
+end
+
+[T, X, Z, U, Km, Ue, Ug] = simulateSoftRobot(Model,...
     [Model.q0(:); Model.dq0(:)]);
 
 % extracting data
 Model.Log.t   = T(:);
-Model.Log.q   = X(:,1:Model.Shapes.NDim,:);
-Model.Log.dq  = X(:,2*Model.Shapes.NDim+1:Model.Shapes.NDim);  
+Model.Log.q   = X(:,1:Model.Shapes.NDim);
+Model.Log.dq  = X(:,Model.Shapes.NDim+(1:Model.Shapes.NDim));  
 Model.Log.tau = U;
 
 Model.Log.Kin = Km;
 Model.Log.Vg  = Ug;
 Model.Log.Psi = Ue;
+
+if ~isempty(Model.Flow)
+   Model.Log.z = Z; 
+end
 
 end
 %---------------------------------------------------- simulates dyn. system
@@ -167,7 +194,8 @@ end
 % overwrite dynamics
 Model.Log.q   = Q;
 Model.Log.dq  = dQ;
-Model.Log.p   = p_;
+Model.Log.p   = M_\dQ;
+Model.Log.gam = p_;
 Model.Log.Phi = Phi_;
 
 Model.Log.EL.M = M_;
@@ -186,8 +214,6 @@ end
 function [P] = show(Model,Q,col,varargin)
     
     % solve forward kinematics on [0,L0]
-    %[P, Np] = computeForwardKinematics(Model,Q(:));
-    
     P = Model.Shapes.string(Q(:));
     
     if nargin < 2
@@ -195,14 +221,15 @@ function [P] = show(Model,Q,col,varargin)
     end
     
     if ~isempty(varargin)
-       st = '--'; 
+        st = '--';
     else
         st = '-';
     end
-       
+    
     % plot spatial curve
     plot(P(:,1),P(:,3),'-','linewidth',...
          Model.Linewidth,'Color',col,'LineStyle',st); hold on;
+     
     % plot interconnection links 
     plot(P([1,end],1),P([1,end],3),'.',...
          'markersize',Model.Markersize,'Color',col);
@@ -218,10 +245,10 @@ end
 %--------------------------------------------------------------------------
 methods (Access = private) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %----------------------------------------- implicit time-integration solver
-function [Ts, X, U, Kin, Ue, Ug] = simulateSoftRobot(Model,z0)
+function [Ts, X, Z, U, Kin, Ue, Ug] = simulateSoftRobot(Model,z0)
 
 Ts  = Model.t(:);
-h   = mean(diff(Ts));
+h   = Model.TimeStep;
 nd  = Model.Shapes.NDim;
 
 z   = z0(:); 
@@ -234,10 +261,19 @@ Ug  = zeros(length(Ts),1);
 X(1,:)  = z0(:).';
 U(1,:)  = zeros(1,nd);
 
-tic;
-disp('----------------------------------');
-fprintf('* Computing SR dynamics... ');
-progress('start')
+if ~isempty(Model.Flow)
+    Z = zeros(length(Ts),numel(Model.z0));
+    Z(1,:) = Model.z0(:).';
+else
+    Z = [];
+end
+
+if Model.ShowProcess
+    tic;
+    disp('----------------------------------');
+    fprintf('* Computing SR dynamics... ');
+    progress('start')
+end
 
 for ii = 1:length(Ts)-1
     
@@ -245,6 +281,10 @@ for ii = 1:length(Ts)-1
     dW  = 1e3;
     w_  = z;
     itr = 1;
+    
+    if ~isempty(Model.Flow)
+        Model.Log.AUX.z = UpdateAuxiliaryFlow(Model);
+    end
     
     while (dW > Model.ResidualNorm && itr <= Model.MaxIteration)
         
@@ -276,27 +316,37 @@ for ii = 1:length(Ts)-1
        
     % write output data
     X(ii+1,:) = z(:).';
-    U(ii+1,:) = Model.tau_(:).';
+    U(ii+1,:) = Model.Log.tau(:).';
     Kin(ii+1) = 0.5*z(nd+1:2*nd).'*Model.Log.EL.M*z(nd+1:2*nd);
     Ue(ii+1)  = 0.5*z(1:nd).'*Model.Log.EL.K*z(1:nd);
     Ug(ii+1)  = Model.Log.Vg;
+    
+    if ~isempty(Model.Flow)
+        Z(ii+1,:) = Model.Log.AUX.z(:).';
+    end
 
     % update progress bar
-    inc = round(100*(ii/(length(Ts)))-1);
-    progress(inc,100);
+    if Model.ShowProcess
+        inc = round(100*(ii/(length(Ts)))-1);
+        progress(inc,100);
+    end
 end
 
-progress(100,100);
-progress('end');
-disp('----------------------------------');
+if Model.ShowProcess
+    progress(100,100);
+    progress('end');
+    disp('----------------------------------');
+    
+    
+    tt = toc;
+    disp(['* Number of elem.  = ', num2str(Model.Shapes.NNode,3)]);
+    disp(['* Computation time = ', num2str(tt,3), ' s']);
+    disp(['* Computation freq = ', num2str(round(1/h)), ' Hz']);
+    disp(['* Real-time ratio  = ', num2str((Ts(end))/(tt),4), '']);
+    
+    disp('----------------------------------');
 
-tt = toc;
-disp(['* Number of elem.  = ', num2str(Model.Shapes.NNode,3)]);
-disp(['* Computation time = ', num2str(tt,3), ' s']);
-disp(['* Computation freq = ', num2str(round(1/h)), ' Hz']);
-disp(['* Real-time ratio  = ', num2str((Ts(end))/(tt),4), '']);
-
-disp('----------------------------------');
+end
 
     function [f, Model, Minv] = flow(Model,Z,T)
         
@@ -307,10 +357,10 @@ disp('----------------------------------');
         % compute Lagrangian entries
         if ~Model.MexSolver
             [M_,C_,K_,R_,G_,...
-                p_,Phi_,J_,Vg_,Kin_] = computeLagrangian(Model,Q,dQ);
+                gam_,Phi_,J_,Vg_,Kin_] = computeLagrangian(Model,Q,dQ);
         else
             [M_,C_,K_,R_,G_,...
-                p_,Phi_,J_,Vg_,Kin_] = computeLagrangianFast_mex(...
+                gam_,Phi_,J_,Vg_,Kin_] = computeLagrangianFast_mex(...
                 Q,dQ,... 
                 Model.Shapes.ds,...   
                 Model.p0,... 
@@ -320,7 +370,7 @@ disp('----------------------------------');
                 Model.Shapes.Ba,... 
                 Model.Shapes.Ktt,...
                 Model.Shapes.Mtt,...     
-                Model.Shapes.Zeta,...
+                Model.Shapes.Material.Zeta,...
                 Model.Shapes.Gvec);      
         end
         
@@ -331,7 +381,7 @@ disp('----------------------------------');
         Model.Log.t   = T;
         Model.Log.q   = Q;
         Model.Log.dq  = dQ;
-        Model.Log.p   = p_;
+        Model.Log.gam = gam_;
         Model.Log.Phi = Phi_;
         
         Model.Log.EL.M = 0.5*(M_ + M_.');
@@ -346,7 +396,7 @@ disp('----------------------------------');
         Model.Log.Kin = Kin_;
         
         % evaluate control action
-        Model.tau_ = Model.tau(Model);
+        Model.Log.tau = Model.tau(Model);
         
         % compute control jacobian
         %[Model.dTaudq,Model.dTauddq] = computeControlJacobians(Model);
@@ -359,7 +409,7 @@ disp('----------------------------------');
         
         % flow field
         f = [dQ; ...
-             Minv*(Model.tau_ - Model.Log.EL.C*dQ - ...
+             Minv*(Model.Log.tau - Model.Log.EL.C*dQ - ...
              Model.Log.EL.K*Q - Model.Log.EL.R*dQ - ...
              Model.Log.EL.G)];
     end
@@ -369,8 +419,7 @@ end
 function [pp, id, J] = computeForwardKinematics(Model,x)
     
 % compute total length
-ds  = Model.Shapes.ds;
-%s    = 0.0;
+ds   = Model.Shapes.ds;
 p_   = Model.p0;
 Phi_ = Model.Phi0;
 J    = zeros(6,numel(x));
@@ -459,7 +508,7 @@ G  = Z2(1:n,3*n+1);
 Vg  = Z1(5,4);
 Kin = Z1(6,4);
 
-R = Model.Shapes.Zeta*K;
+R = Model.Shapes.Material.Zeta*K;
 
 end
 %-------------------------------------------------- forwards kinematics ODE
@@ -553,7 +602,7 @@ dZ2(1:n,3*n+1)     = dG;
 end
 %--------------------------------------- updated Hessian with dyn. residual
 function dr = stateUpdate(Model, H, dR)
-dr = -(-(1/2)*Model.Tstep*H + eye(size(H,1),size(H,1)))\dR;
+dr = -(-(1/2)*Model.TimeStep*H + eye(size(H,1),size(H,1)))\dR;
 end
 %---------------------------------------------- compute Hessian approximate
 function DF = buildHessian(Model,varargin)
@@ -563,9 +612,23 @@ n    = size(Model.Log.q,1);
 
 DF                      = zeros(2*n,2*n);
 DF(1:n,n+1:2*n)         = eye(n);
-DF(n+1:2*n,1:n)         = -Minv*(Model.Log.EL.K - Model.dTaudq);
-DF(n+1:2*n,n+1:2*n)     = -Minv*(Model.Log.EL.R + Model.Log.EL.C - Model.dTauddq);
+DF(n+1:2*n,1:n)         = -Minv*(Model.Log.EL.K - Model.Log.EL.dTaudq);
+DF(n+1:2*n,n+1:2*n)     = -Minv*(Model.Log.EL.R + Model.Log.EL.C - ...
+    Model.Log.EL.dTauddq);
 
+end
+%---------------------------------------------- compute Hessian approximate
+function z = UpdateAuxiliaryFlow(Model)
+z = Model.Log.AUX.z;
+
+% first EL-diff eval
+f1 = Model.Flow(Model); 
+
+Model.Log.AUX.z = z + (2/3)*Model.TimeStep*f1;
+f2 = Model.Flow(Model);
+
+% update integrands
+z = z + 0.25*Model.TimeStep*(f1 + 3*f2);
 end
 %--------------------------------------------------------- show solver info
 function showInformation(Model)   

@@ -1,4 +1,4 @@
 function mcap = metal
-mcap = imread('metal.jpg');
+mcap = flipud(rot90(imread('metal.jpg'),2));
 end
 

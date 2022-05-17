@@ -1,6 +1,7 @@
 close all; clc; clear;
 %% set signed distance function
-sdf = @(x) Square(x,10,20);
+sdf = sRectangle(0,10,0,20);
+
 %% generate mesh
 msh = Mesh(sdf,'BdBox',[0,10,0,20],'NElem',500);
 msh = msh.generate();
@@ -18,18 +19,15 @@ fem = fem.set('TimeStep',1/25,...
 fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[1,1]);
 fem = fem.AddConstraint('Support',fem.FindNodes('Top'),[0,1]);
 fem = fem.AddConstraint('PressureCell',fem.FindElements(...
-                        'Location',[5,5],1),[4e-3,0]);
+                        'Location',[5,5],1),[2*kpa,0]);
 
-fem.Material = Ecoflex0030();
+fem.Material = Ecoflex0050(30);
 
 %% generate void region
 f = @(x) dRectangle(x,2,8,3.75,20);
-d = f(fem.Center); id = find(d(:,end) < 0);
-fem.Density(id) = 1e-1;
+d = f(fem.Center); 
+id = find(d(:,end) < 0);
+fem.Density(id) = 0.25;
 
 %% solving
 fem.solve();
-
-function D = Square(P,W,H)
-D = dRectangle(P,0,W,0,H);
-end

@@ -2,12 +2,12 @@ classdef YeohMaterial
 
     properties (Access = public)
         Type = 'Yeoh';
-        C1   = 10;
-        C2   = 0;
-        C3   = 0;
-        D1   = 10;
-        D2   = 10;
-        D3   = 10;
+        C1   = 1.0;
+        C2   = -0.1;
+        C3   = 0.01;
+        D1   = 1;
+        D2   = 1;
+        D3   = 1;
         Rho  = 1e-9;
         Zeta = 0.1;
     end
@@ -47,8 +47,12 @@ function YeohMaterial = set(YeohMaterial,varargin)
         YeohMaterial.(varargin{ii}) = varargin{ii+1};
     end
 end  
+%---------------------------------------------------------------------- set
+function y = getModulus(YeohMaterial)
+   y = 6*YeohMaterial.C1;
+end
 %------------------------------ 2ND PIOLLA STRESSAND STIFFNESS FOR YEOH
-function [S, D, P] = PiollaStress(YeohMaterial,F,R)
+function [S, D, P] = PiollaStress(YeohMaterial,F,~)
 %Se = 2nd PK stress [S11, S22, S33, S12, S23, S13];
 P = 0;
 S = zeros(3,3);
@@ -101,12 +105,6 @@ D = (4*J^(-4/3)*alpha)*TOa - ((4/3)*J^(-2/3)*beta)*(TOb1 + TOb2 - ...
     (I1/3)*TOb3 - I1*TOb4) + (J^2)*gamma*TOc + delta*J*(TOd1 -2*TOd2);
 
 end
-
-%---------------------------------------------------------------------- set
-function E = Emod(YeohMaterial)
-   E = 6*YeohMaterial.C1;
-end
-
 %------------------------------ 2ND PIOLLA STRESSAND STIFFNESS FOR YEOH
 function y = dWdI(YeohMaterial,I1)
 c1 = YeohMaterial.C1; 
@@ -118,9 +116,7 @@ end
 end
 
 methods (Access = private)
-
-
-    
+ 
 end
 end
 

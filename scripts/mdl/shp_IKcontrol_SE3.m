@@ -18,9 +18,8 @@ gd = SE3(roty(pi/2),[0.5,0,-0.2]);
 pd = gd(1:3,4);
 %% soft sobotics shapes
 shp = Shapes(Y,[0,M,0,0,0,0]);
-
-q  = 0.1*sort(rand(shp.NDim,1));
-e  = 0.1;
+q   = 0.01*ones(shp.NDim,1);
+e   = 0.1;
 
 %% solve IK
 figure(103); BdBox = [0,1.2,-.75,.75];
@@ -42,16 +41,10 @@ while norm(e) > 1e-3
     [T,N,B] = Sd.normal(XY);
     
     % plotting
-    subplot(1,2,1)
     cplane(X,Y,Z); hold on;
-    plot(p(:,1),p(:,3),'w-','LineW',2); 
-    plot(pd(1),pd(3),'wo','LineW',2,'MarkerS',20);
-    
-    %plotSE2(g);
-    plot(XY(:,1),XY(:,2),'w.','MarkerS',10);
-    quiver(XY(:,1),XY(:,2),T(:,1),T(:,2));
-    quiver(XY(:,1),XY(:,2),N(:,1),N(:,2));
-    
+    plot(p(:,1),p(:,3),'w-','LineW',4); 
+    plot(pd(1),pd(3),'wo','LineW',2,'MarkerS',10);
+   
     % setup figure
     setupFigure(BdBox);
     
@@ -61,23 +54,22 @@ while norm(e) > 1e-3
     
     % compute error
     e = abs(0.1*e - norm(abs(E)));
-    
-    
+
 end
 
 function [dq,E] = EnergyController(g,gd,J)
-    k1 = 1e-4;
+    k1 = 1;
     k2 = 0.1;
     lam1 = 1;
-    lam2 = 1e-5;
+    lam2 = 1e-3;
     Kp = diag([k1,k1,k1,k2,k2,k2]);
 
     Xi = logmapSE3(g\gd);
-    Fu = Kp*tmapSE3(Xi)*isomse3(Xi);
+    Fu = Kp*tmapSE3(Xi)*wedge(Xi);
 
     dq = lam1*J.'*((J*J.' + lam2*eye(6))\Fu);
     
-    E = Kp*isomse3(Xi);
+    E = Kp*wedge(Xi);
 end
 
 function [X,Y,T] = TangentMap(p,BdBox)
@@ -96,13 +88,13 @@ function [X,Y,T] = TangentMap(p,BdBox)
 end
 
 function [XY,D] = ClosestPointOnSDF(sdf,P)
-[XY,D,I] = distance2curve(sdf.Node,P);
+[XY,D,~] = distance2curve(sdf.Node,P);
 end
 
 function setupFigure(B)
     axis equal;
     axis(B);
     drawnow;
-    colormap(viridis(0));
+    colormap(turbo(0));
     pause(0.1);
 end

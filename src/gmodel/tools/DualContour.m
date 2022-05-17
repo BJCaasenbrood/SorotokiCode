@@ -107,7 +107,7 @@ for ii = Clist
             Ni = Gi./vecnorm(Gi.').';  % normalize vectors
             Ni = mean(Ni,1);
             Ni = Ni/norm(Ni);
-            R = PlanarProjection(Ni);
+            R = planarProjection(Ni);
             P2 = (R.'*P.').';
 %             
             b = sign(poly_area(P2(:,1),P2(:,2)));

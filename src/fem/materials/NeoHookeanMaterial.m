@@ -6,15 +6,14 @@ classdef NeoHookeanMaterial
         Nu;
         C10;
         D1;
-        Rho = 1070e-12;
-        Zeta;
+        Rho  = 1070e-12;
+        Zeta = 0.01;
         Lambda;
         Mu; 
     end
     
     properties (Access = private)
         Alpha;
-
     end
 
     
@@ -22,10 +21,6 @@ classdef NeoHookeanMaterial
 methods  
 %--------------------------------------------------------------- Mesh Class
 function obj = NeoHookeanMaterial(varargin) 
-    
-%     for ii = 1:2:length(varargin)
-%         obj.(varargin{ii}) = varargin{ii+1};
-%     end
     
     if isempty(varargin)
         E0   = 1;
@@ -42,8 +37,8 @@ function obj = NeoHookeanMaterial(varargin)
 
     obj.C10 = obj.Mu/2;
     obj.D1  = obj.Lambda/2;
-    
 end
+
 %---------------------------------------------------------------------- get     
 function varargout = get(NeoHookeanMaterial,varargin)
     if nargin > 1
@@ -54,7 +49,11 @@ function varargout = get(NeoHookeanMaterial,varargin)
     else
         varargout = NeoHookeanMaterial.(varargin);
     end
-end      
+end   
+%---------------------------------------------------------------------- get     
+function y = getModulus(NeoHookeanMaterial)
+y = NeoHookeanMaterial.E;
+end
 %---------------------------------------------------------------------- set
 function NeoHookeanMaterial = set(NeoHookeanMaterial,varargin)
     for ii = 1:2:length(varargin)
@@ -121,12 +120,10 @@ J3EE = -W8*(J3E*J3E') + W9*I3EE;
 D = C100*J1EE + K*(J3E*J3E') + K*J3M1*J3EE;
 
 end
-
 %---------------------------------------------------------------------- set
 function E = Emod(NeoHookeanMaterial)
    E = NeoHookeanMaterial.E;
 end
-
 
 end
 end

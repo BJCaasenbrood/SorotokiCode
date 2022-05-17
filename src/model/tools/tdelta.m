@@ -1,4 +1,4 @@
 function y = tdelta(x,h)
-y = h*max(1-abs(x*h),0);
+y = max(1-abs((2*x)/(h) - (0.5)/(h)),0);
 end
 

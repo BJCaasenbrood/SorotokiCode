@@ -52,15 +52,17 @@ clc; clear; close all; warning off; beep off;
 
 addpath('src');
 addpath('src/__base__');
-addpath('src/__base__/fnc');
-addpath('src/__base__/fnc/thirdparty');
+addpath('src/__base__/auxiliary');
+addpath('src/__base__/thirdparty');
 addpath('src/__base__/colormap');
 addpath('src/__base__/color');
+addpath('src/__base__/userinput');
+addpath('src/__base__/plot');
 
 skipUpdate = false;
 Path = cd;
-DisplayLogo;
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+displayLogoSorotoki;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 cout(['* Thank you for installing SOROTOKI, we will',...
     ' start the installation shortly \n']); pause(1.0);
@@ -76,7 +78,7 @@ cout(['* Directory ',verFolder, ' added to path \n']);
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-AddPath([Path,verFolder]);
+addPath([Path,verFolder]);
 global FIT FID
 InstallerFile = [Path,'/src/__version__/install.log'];
 
@@ -90,7 +92,7 @@ fprintf(FIT,[datestr(datetime('today')),'\n']);
 fprintf(FIT,'%% install directory = ');
 fprintf(FIT,[Path,'\n']);
 
-if ~pingserver
+if ~pingServer()
     cout('err','No internet connection! '); 
     str = action({'(y)es, continue without connection',...
             '(n)o, stop installation'},'s');
@@ -104,16 +106,15 @@ url = ['https://raw.githubusercontent.com/BJCaasenbrood/',...
     'SorotokiCode/master/src/'];
 filename = [verFolder,'/soropatch.m'];
 %websave(filename,url);
-
 cout(['* Succesfully downloaded latest patchnotes -- ', filename, '\n']);
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-libs(1) = IncludeBase(Path,0);
-libs(2) = IncludeGraphicsModel(Path,0);
-libs(3) = IncludeMesh(Path,0);
-libs(4) = IncludeFiniteElement(Path,0);
-libs(5) = IncludeDynamicModel(Path,0);
-libs(6) = IncludeControl(Path,0);
+libs(1) = includeBase(Path,0);
+libs(2) = includeGraphicsModel(Path,0);
+libs(3) = includeMesh(Path,0);
+libs(4) = includeFiniteElement(Path,0);
+libs(5) = includeDynamicModel(Path,0);
+libs(6) = includeControl(Path,0);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if min(libs) == 1
@@ -152,12 +153,12 @@ if bool == 1
     
     fprintf('* Assigning fixed search paths to MATLAB: \n');
     
-    if libs(1), IncludeBase(Path,1); end
-    if libs(2), IncludeGraphicsModel(Path,1); end
-    if libs(3), IncludeMesh(Path,1); end
-    if libs(4), IncludeFiniteElement(Path,1); end
-    if libs(5), IncludeDynamicModel(Path,1); end
-    if libs(6), IncludeControl(Path,1); end
+    if libs(1), includeBase(Path,1); end
+    if libs(2), includeGraphicsModel(Path,1); end
+    if libs(3), includeMesh(Path,1); end
+    if libs(4), includeFiniteElement(Path,1); end
+    if libs(5), includeDynamicModel(Path,1); end
+    if libs(6), includeControl(Path,1); end
     
     Request = input(['\n* Do you want to setup the SorotokiCode folder',...
         ' as your main directory (y/n)'],'s');
@@ -177,8 +178,11 @@ Requisites = {'Image Processing Toolbox';'Partial Differential Equation Toolbox'
 HTMLLink = {'<a href="https://nl.mathworks.com/products/image.html">click here to install</a> \n',...
             '<a href="https://nl.mathworks.com/products/pde.html">click here to install</a> \n'};
 memb = ismember(Requisites,ToolboxesInstalled);
-cout('Text','* Checking for prerequisit toolboxes...\n'); pause(1);
+
+cout('Text','* Checking for prerequisit toolboxes...\n'); 
+pause(1);
 reqCheckList = find(memb == false);
+
 if ~isempty(reqCheckList)
 cout('Error', '* Missing some required toolboxes! \n');    
 
@@ -276,6 +280,19 @@ if buildMexbool
    cout('Keyword','* building computeLagrangianFast.mex...\n');
    cout('Green','\t ');
    generateMexCLF;
+
+%    cd([Path,'/src/gmodel/mex/marchingcube']);
+%    cout('Text','* Finding marching cube folder...\n');
+%    cout('Keyword','* building MarchingCubesFast.mex...\n');
+%    cout('Green','\t ');
+%    generateMexMCF;
+%    cout('Text','* MEX build completed!\n');
+   
+   cd([Path,'/src/gmodel/mex/trinormal']);
+   cout('Text','* Finding trinormal folder...\n');
+   cout('Keyword','* building TriangleNormalFast.mex...\n');
+   cout('Green','\t ');
+   generateMexTNF;
    cout('Text','* MEX build completed!\n');
    cdsoro;
 else
@@ -300,7 +317,7 @@ switch(Request)
 end
 
 if bool
-   arg = verify_sorotoki; 
+   arg = verifySorotoki(); 
    cout('Text', '* Finalizing the verification check-up \n');
    cout('Text', '\n');
    if isempty(vertcat(arg{:,2}))
@@ -316,7 +333,6 @@ if bool
     end
    end
    cout('Text', '\n');
-   
 end
 
 pause(.01);
@@ -338,7 +354,7 @@ Path = cd;
 if print, disp(['* cd: ',Path]); end
 end
 % ------------------------------------------------------------------ BASICS
-function x = IncludeBase(Path,Request)
+function x = includeBase(Path,Request)
 global FID FIT
 cout(['* Adding SOROTOKI libraries to path, ',...
     'this might take a minute...\n\n']);
@@ -346,40 +362,46 @@ cout(['* Adding SOROTOKI libraries to path, ',...
 if Request == 1
 fprintf(FID,['%%!INSTALDIR:',strrep(Path,'\','/'),' \n']);
 fprintf(FID,'%% base.lib \n');
-WriteToFile([Path,'\src\__base__']);
-WriteToFile([Path,'\src\__version__']);
-WriteToFile([Path,'\src\__base__\fnc']);
-WriteToFile([Path,'\src\__base__\color']);
-WriteToFile([Path,'\src\__base__\colormap']);
-WriteToFile([Path,'\data\']);
-WriteToFile([Path,'\data\color']);
-WriteToFile([Path,'\data\colormap']);
-WriteToFile([Path,'\data\matcap']);
-WriteToFile([Path,'\data\matcap\img']);
-WriteToFile([Path,'\data\stl']);
-WriteToFile([Path,'\data\contours']);
-WriteToFile([Path,'\scripts\']);
-WriteToFile([Path,'\livescripts\']);
+write2file([Path,'\src\__base__']);
+write2file([Path,'\src\__version__']);
+write2file([Path,'\src\__base__\auxiliary']);
+write2file([Path,'\src\__base__\thirdparty']);
+write2file([Path,'\src\__base__\color']);
+write2file([Path,'\src\__base__\colormap']);
+write2file([Path,'\src\__base__\userinput']);
+write2file([Path,'\src\__base__\plot']);
+write2file([Path,'\data\']);
+write2file([Path,'\data\color']);
+write2file([Path,'\data\colormap']);
+write2file([Path,'\data\matcap']);
+write2file([Path,'\data\matcap\img']);
+write2file([Path,'\data\stl']);
+write2file([Path,'\data\contours']);
+write2file([Path,'\scripts\']);
+write2file([Path,'\livescripts\']);
 else
-AddPath(Path);
-AddPath([Path,'\src\']);
-AddPath([Path,'\src\__version__']);
-AddPath([Path,'\src\__base__']);
-AddPath([Path,'\src\__base__\fnc']);
-AddPath([Path,'\src\__base__\color']);
-AddPath([Path,'\src\__base__\colormap']);
-AddPath([Path,'\data\']);
-AddPath([Path,'\data\color']);
-AddPath([Path,'\data\colormap']);
-AddPath([Path,'\data\matcap']);
-AddPath([Path,'\data\matcap\img']);
-AddPath([Path,'\data\stl']);
-AddPath([Path,'\data\contours']);
-AddPath([Path,'\scripts\']);
-AddPath([Path,'\livescripts\']);
+addPath(Path);
+addPath([Path,'\src\']);
+addPath([Path,'\src\__version__']);
+addPath([Path,'\src\__base__']);
+addPath([Path,'\src\__base__\auxiliary']);
+addPath([Path,'\src\__base__\thirdparty']);
+addPath([Path,'\src\__base__\color']);
+addPath([Path,'\src\__base__\colormap']);
+addPath([Path,'\src\__base__\userinput']);
+addPath([Path,'\src\__base__\plot']);
+addPath([Path,'\data\']);
+addPath([Path,'\data\color']);
+addPath([Path,'\data\colormap']);
+addPath([Path,'\data\matcap']);
+addPath([Path,'\data\matcap\img']);
+addPath([Path,'\data\stl']);
+addPath([Path,'\data\contours']);
+addPath([Path,'\scripts\']);
+addPath([Path,'\livescripts\']);
 pause(.3);
 
-x = CheckLibary('base.lib',@(x) basePathConfirm);
+x = checkLibary('base.lib',@(x) basePathConfirm);
 
 if x
     fprintf(FIT,'%% base.lib installed succesfully! \n');
@@ -390,30 +412,36 @@ end
 end
 end
 % ---------------------------------------------------------------- GRAPHICS
-function x = IncludeGraphicsModel(Path,Request)
+function x = includeGraphicsModel(Path,Request)
 global FID FIT
 
 if Request == 1
 fprintf(FID,'%% gmodel.lib \n');
-WriteToFile([Path,'\scripts\gmdl\']);
-WriteToFile([Path,'\livescripts\gmdl\']);
-WriteToFile([Path,'\src\gmodel']);
-WriteToFile([Path,'\src\gmodel\tools\']);
-WriteToFile([Path,'\src\gmodel\matcap\']);
-WriteToFile([Path,'\src\gmodel\matcap\img']);
-WriteToFile([Path,'\src\gmodel\tools\thirdparty']);
+write2file([Path,'\scripts\gmdl\']);
+write2file([Path,'\livescripts\gmdl\']);
+write2file([Path,'\src\gmodel']);
+write2file([Path,'\src\gmodel\tools\']);
+write2file([Path,'\src\gmodel\matcap\']);
+write2file([Path,'\src\gmodel\mex\']);
+write2file([Path,'\src\gmodel\mex\marchingcube']);
+write2file([Path,'\src\gmodel\mex\trinormal']);
+write2file([Path,'\src\gmodel\matcap\img']);
+write2file([Path,'\src\gmodel\tools\thirdparty']);
 else
-AddPath([Path,'\livescripts\gmdl\']);
-AddPath([Path,'\scripts\gmdl\']);
-AddPath([Path,'\src\gmodel']);
-AddPath([Path,'\src\gmodel\tools\']);
-AddPath([Path,'\src\gmodel\tools\thirdparty']);
-AddPath([Path,'\src\gmodel\matcap\']);
-AddPath([Path,'\src\gmodel\matcap\img\']);
-AddPath([Path,'\src\gmodel\matcap\tools\']);
+addPath([Path,'\livescripts\gmdl\']);
+addPath([Path,'\scripts\gmdl\']);
+addPath([Path,'\src\gmodel']);
+addPath([Path,'\src\gmodel\tools\']);
+addPath([Path,'\src\gmodel\tools\thirdparty']);
+addPath([Path,'\src\gmodel\matcap\']);
+addPath([Path,'\src\gmodel\mex\']);
+addPath([Path,'\src\gmodel\mex\marchingcube']);
+addPath([Path,'\src\gmodel\mex\trinormal']);
+addPath([Path,'\src\gmodel\matcap\img\']);
+addPath([Path,'\src\gmodel\matcap\tools\']);
 pause(.3);
 
-x = CheckLibary('gmodel.lib',@(x) graphicsmodelPathConfirm);
+x = checkLibary('gmodel.lib',@(x) graphicsmodelPathConfirm);
 
 if x
     fprintf(FIT,'%% gmodel.lib installed succesfully! \n');
@@ -424,27 +452,27 @@ end
 end
 end
 % -------------------------------------------------------------------- MESH
-function x = IncludeMesh(Path,Request)
+function x = includeMesh(Path,Request)
 global FID FIT
 
 if Request == 1
 fprintf(FID,'%% mesh.lib \n');
-WriteToFile([Path,'\src\mesh']);
-WriteToFile([Path,'\scripts\mesh\']);
-WriteToFile([Path,'\scripts\mesh\SDF']);
-WriteToFile([Path,'\src\mesh\tools\']);
-WriteToFile([Path,'\src\mesh\shapes\']);
-WriteToFile([Path,'\src\mesh\operators\']);
+write2file([Path,'\src\mesh']);
+write2file([Path,'\scripts\mesh\']);
+write2file([Path,'\scripts\mesh\SDF']);
+write2file([Path,'\src\mesh\tools\']);
+write2file([Path,'\src\mesh\shapes\']);
+write2file([Path,'\src\mesh\operators\']);
 else
-AddPath([Path,'\scripts\mesh\']);
-AddPath([Path,'\scripts\mesh\SDF']);
-AddPath([Path,'\src\mesh']);
-AddPath([Path,'\src\mesh\tools\']);
-AddPath([Path,'\src\mesh\shapes\']);
-AddPath([Path,'\src\mesh\operators\']);
+addPath([Path,'\scripts\mesh\']);
+addPath([Path,'\scripts\mesh\SDF']);
+addPath([Path,'\src\mesh']);
+addPath([Path,'\src\mesh\tools\']);
+addPath([Path,'\src\mesh\shapes\']);
+addPath([Path,'\src\mesh\operators\']);
 pause(.3);
 
-x = CheckLibary('mesh.lib',@(x) meshPathConfirm);
+x = checkLibary('mesh.lib',@(x) meshPathConfirm);
 
 if x
     fprintf(FIT,'%% mesh.lib installed succesfully! \n');
@@ -455,42 +483,42 @@ end
 end
 end
 % --------------------------------------------------------------------- FEM
-function x = IncludeFiniteElement(Path,Request)
+function x = includeFiniteElement(Path,Request)
 global FID FIT
 
 if Request == 1
 fprintf(FID,'%% fem.lib \n');
-WriteToFile([Path,'\scripts\fem\']);
-WriteToFile([Path,'\scripts\fem\2D']);
-WriteToFile([Path,'\scripts\fem\3D']);
-WriteToFile([Path,'\scripts\opt']);
-WriteToFile([Path,'\src\fem']);
-WriteToFile([Path,'\src\fem\tools\']);
-WriteToFile([Path,'\src\fem\tools\tpswarp']);
-WriteToFile([Path,'\src\fem\tools\mma']);
-WriteToFile([Path,'\src\fem\mex\']);
-WriteToFile([Path,'\src\fem\materials\']);
-WriteToFile([Path,'\src\fem\materials\samples']);
-WriteToFile([Path,'\src\fem\mex\nonlinearstrainmat']);
-WriteToFile([Path,'\src\fem\mex\polardecomposition']);
-%WriteToFile(mexPath);
+write2file([Path,'\scripts\fem\']);
+write2file([Path,'\scripts\fem\2D']);
+write2file([Path,'\scripts\fem\3D']);
+write2file([Path,'\scripts\opt']);
+write2file([Path,'\src\fem']);
+write2file([Path,'\src\fem\tools\']);
+write2file([Path,'\src\fem\tools\tpswarp']);
+write2file([Path,'\src\fem\tools\mma']);
+write2file([Path,'\src\fem\mex\']);
+write2file([Path,'\src\fem\materials\']);
+write2file([Path,'\src\fem\materials\samples']);
+write2file([Path,'\src\fem\mex\nonlinearstrainmat']);
+write2file([Path,'\src\fem\mex\polardecomposition']);
+%write2file(mexPath);
 else
-AddPath([Path,'\scripts\fem\']);
-AddPath([Path,'\scripts\fem\2D']);
-AddPath([Path,'\scripts\fem\3D']);
-AddPath([Path,'\scripts\opt']);
-AddPath([Path,'\src\fem']);
-AddPath([Path,'\src\fem\tools\']);
-AddPath([Path,'\src\fem\tools\tpswarp']);
-AddPath([Path,'\src\fem\tools\mma']);
-AddPath([Path,'\src\fem\mex\']);
-AddPath([Path,'\src\fem\materials\']);
-AddPath([Path,'\src\fem\materials\samples']);
-AddPath([Path,'\src\fem\mex\nonlinearstrainmat']);
-AddPath([Path,'\src\fem\mex\polardecomposition']);
+addPath([Path,'\scripts\fem\']);
+addPath([Path,'\scripts\fem\2D']);
+addPath([Path,'\scripts\fem\3D']);
+addPath([Path,'\scripts\opt']);
+addPath([Path,'\src\fem']);
+addPath([Path,'\src\fem\tools\']);
+addPath([Path,'\src\fem\tools\tpswarp']);
+addPath([Path,'\src\fem\tools\mma']);
+addPath([Path,'\src\fem\mex\']);
+addPath([Path,'\src\fem\materials\']);
+addPath([Path,'\src\fem\materials\samples']);
+addPath([Path,'\src\fem\mex\nonlinearstrainmat']);
+addPath([Path,'\src\fem\mex\polardecomposition']);
 pause(.3);
 
-x = CheckLibary('fem.lib',@(x) femPathConfirm);
+x = checkLibary('fem.lib',@(x) femPathConfirm);
 
 if x
     fprintf(FIT,'%% fem.lib installed succesfully! \n');
@@ -501,37 +529,37 @@ end
 end
 end
 % ---------------------------------------------------------------- DYNAMICS
-function x = IncludeDynamicModel(Path,Request)
+function x = includeDynamicModel(Path,Request)
 global FID FIT
 
 if Request == 1
 fprintf(FID,'%% mdl.lib \n');
-WriteToFile([Path,'\scripts\mdl']);
-WriteToFile([Path,'\livescripts\mdl']);
-WriteToFile([Path,'\src\model']);
-WriteToFile([Path,'\src\model\tools']);
-WriteToFile([Path,'\src\model\tools\liegroup']);
-WriteToFile([Path,'\src\model\tools\shapefnc']);
-WriteToFile([Path,'\src\model\mex\forwardkin']);
-WriteToFile([Path,'\src\model\mex\lagrangian']);
-%WriteToFile([Path,'\src\model\tools\solver']);
+write2file([Path,'\scripts\mdl']);
+write2file([Path,'\livescripts\mdl']);
+write2file([Path,'\src\model']);
+write2file([Path,'\src\model\tools']);
+write2file([Path,'\src\model\tools\liegroup']);
+write2file([Path,'\src\model\tools\shapefnc']);
+write2file([Path,'\src\model\mex\forwardkin']);
+write2file([Path,'\src\model\mex\lagrangian']);
+%write2file([Path,'\src\model\tools\solver']);
 % mexPath = genpath([Path,'\src\model\mex']);
-% WriteToFile(mexPath);
+% write2file(mexPath);
 else
-AddPath([Path,'\scripts\mdl']);
-AddPath([Path,'\livescripts\mdl']);
-AddPath([Path,'\src\model']);
-AddPath([Path,'\src\model\tools']);
-AddPath([Path,'\src\model\tools\liegroup']);
-AddPath([Path,'\src\model\tools\shapefnc']);
-AddPath([Path,'\src\model\tools']);
-AddPath([Path,'\src\model\mex\forwardkin']);
-AddPath([Path,'\src\model\mex\lagrangian']);
+addPath([Path,'\scripts\mdl']);
+addPath([Path,'\livescripts\mdl']);
+addPath([Path,'\src\model']);
+addPath([Path,'\src\model\tools']);
+addPath([Path,'\src\model\tools\liegroup']);
+addPath([Path,'\src\model\tools\shapefnc']);
+addPath([Path,'\src\model\tools']);
+addPath([Path,'\src\model\mex\forwardkin']);
+addPath([Path,'\src\model\mex\lagrangian']);
 % mexPath = genpath([Path,'/src/model/mex']);
-% AddPath(mexPath);
+% addPath(mexPath);
 pause(.3);
 
-x = CheckLibary('model.lib',@(x) modelPathConfirm);
+x = checkLibary('model.lib',@(x) modelPathConfirm);
 
 if x, fprintf(FIT,'%% model.lib installed succesfully! \n');
 else, fprintf(FIT,'%% model.lib missing! \n');
@@ -540,25 +568,25 @@ end
 end
 end
 % ----------------------------------------------------------------- CONTROL
-function x = IncludeControl(Path,Request)
+function x = includeControl(Path,Request)
 global FID FIT
 
 if Request == 1
 fprintf(FID,'%% bdog.lib \n');
-WriteToFile([Path,'\scripts\bdog']);
-WriteToFile([Path,'\src\bdog']);
-WriteToFile([Path,'\src\bdog\tools']);
-WriteToFile([Path,'\src\vision']);
-WriteToFile([Path,'\src\vision\tools']);
+write2file([Path,'\scripts\bdog']);
+write2file([Path,'\src\bdog']);
+write2file([Path,'\src\bdog\tools']);
+write2file([Path,'\src\vision']);
+write2file([Path,'\src\vision\tools']);
 else
-AddPath([Path,'\scripts\bdog']);
-AddPath([Path,'\src\bdog']);
-AddPath([Path,'\src\bdog\tools']);
-AddPath([Path,'\src\vision']);
-AddPath([Path,'\src\vision\tools']);
+addPath([Path,'\scripts\bdog']);
+addPath([Path,'\src\bdog']);
+addPath([Path,'\src\bdog\tools']);
+addPath([Path,'\src\vision']);
+addPath([Path,'\src\vision\tools']);
 pause(.3);
 
-x = CheckLibary('control.lib',@(x) bdogPathConfirm);
+x = checkLibary('control.lib',@(x) bdogPathConfirm);
 
 if x
     fprintf(FIT,'%% control.lib installed succesfully! \n');

@@ -1,4 +1,5 @@
 function GenerateMatcap(name,cmap)
+close all;
 path = cdsoro;
 pathmcap = [path,'\data\matcap\'];
 pathimg = [path,'\data\matcap\'];
@@ -6,26 +7,30 @@ pathimg = [path,'\data\matcap\'];
 [x,y,z] = sphere(100);
 z = (z);
 
-figure('Position', [100 100 500 500]);
-surf(x,y,z.^2,'linestyle','none');
+Dx = 512;
+Dy = 512;
+b = 0.5715;
+a = 512;
+figure('Position', [a,a,b*Dx,b*Dy]);
+cplane(x,y,z.^2);
 %image(unique(x(:)),flipud(unique(y(:))),z*255);
-axis square;
+axis equal;
 axis([-1 1 -1 1]);
 ax = gca;
+%AxesH = axes;
 ax.Clipping = 'off';
-AxesH = axes;
-drawnow;
-% InSet = get(AxesH, 'TightInset');
+%InSet = get(AxesH, 'TightInset');
 %set(gca, 'Position', [InSet(1:2), 1-InSet(1)-InSet(3), 1-InSet(2)-InSet(4)]);
- set(gcf, 'Position', [InSet(1:2), 1-InSet(1)-InSet(3), 1-InSet(2)-InSet(4)]);
-%axis image
+%set(gcf, 'Position', [InSet(1:2), 1-InSet(1)-InSet(3), 1-InSet(2)-InSet(4)]);
+axis image
 view(0,90);
 caxis([0 1]);
-axis off;
 shading interp;
 colormap(cmap);
-background(cmap(1,:));
+background(0.85*cmap(1,:));
 axis off;
-print(gcf,name,'-dpng','-r300');
+drawnow;
+F = getframe;
+imwrite(F.cdata,name);
 end
 

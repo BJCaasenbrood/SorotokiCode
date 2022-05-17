@@ -110,11 +110,11 @@ function [dq, E] = EnergyController(g,gd,J,k)
     Kp = diag([k1,k1,k1,k2,k2,k2]);
 
     Xi = logmapSE3(g\gd);
-    Fu = Kp*tmapSE3(W*Xi)*isomse3(W*Xi);
+    Fu = Kp*tmapSE3(W*Xi)*wedge(W*Xi);
 
     dq = lam1*J.'*Fu;
     
-    E = Kp*isomse3(Xi);
+    E = Kp*wedge(Xi);
     
 end
 

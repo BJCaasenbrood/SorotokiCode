@@ -108,16 +108,7 @@ end
 %----------------------------------------------------------- compute ik rig
 function Rig = computeFK(Rig,q,varargin)
     
-    Rig = Rig.reset();
-
-%     G = Rig.FK(q);
-%     Rig.g = zeros(size(G,3),7);
-    
-%     for ii = 1:size(G,3)
-%         Rig.g(ii,1:4) = rot2quat(G(1:3,1:3,ii));
-%         Rig.g(ii,5:7) = G(1:3,4,ii).';
-%     end
-%      
+    Rig = Rig.reset();    
     Rig.g = Rig.FK(q);
 
     s = Rig.Domain;
@@ -127,11 +118,16 @@ function Rig = computeFK(Rig,q,varargin)
     
     for ii = 1:N
         [I,~] = find(Rig.IKlist(:,1) == ii);
-        if numel(I) == 1, 
+        if numel(I) == 1
             Instr{ii,1} = 'SE3';
 
             [~,id] = min(abs(X - s*Rig.IKlist(I,3)));
             Instr{ii,2} = id;
+            
+            if Rig.AutoScale
+               Rig.List{ii} = Blender(Rig.List{ii},...
+                   'Scale',Rig.IKlist(end,3)/(Rig.IKlist(end,1)-1)); 
+            end
 
         else
             Instr{ii,1} = 'Sweep';

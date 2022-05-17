@@ -1,5 +1,4 @@
 function y = smoothstep(X)
-
 for ii = 1:length(X)
     x = X(ii);
     if x<=0, y(ii,1) = 0;
@@ -7,5 +6,4 @@ for ii = 1:length(X)
     else, y(ii,1) = 1;
     end
 end
-
 end

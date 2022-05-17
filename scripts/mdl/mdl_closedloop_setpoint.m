@@ -7,33 +7,28 @@ H = 1/60;  % timesteps
 FPS = 30;  % animation speed
 
 Modes = [0,M,0,0,0,0];  % pure-XY curvature
-%%
+
+%% shapes
 % generate nodal space
 X = linspace(0,1,N)';
-Y = GenerateFunctionSpace(X,N,M,L);
-
-%%
+Y = GenerateFunctionSpace(X,N,M);
 shp = Shapes(Y,Modes,'L0',L);
 
-shp.E    = 25;       % Young's modulus in Mpa
-shp.Nu   = 0.49;     % Poisson ratio
-shp.Rho  = 1000e-12; % Density in kg/mm^3
-shp.Zeta = 0.01;    % Damping coefficient
-shp = shp.rebuild();
+%% set material properties
+shp.Material = Ecoflex0050();
+shp = shp.rebuild(); 
 
 %% build model class
-mdl = Model(shp,'Tstep',H,'Tsim',15);
+mdl = Model(shp,'TimeStep',H,'TimeEnd',5);
 
 %% controller
-mdl.q0 = ones(M,1)*1e-3;
-mdl.tau = @(M) Controller(M);
+mdl.tau  = @(M) Controller(M);
+mdl.Flow = @(M) IntegrateError(M);
+mdl.z0   = 0;
 
 %% simulate system
+mdl.q0 = 1e-3*ones(shp.NDim,1);
 mdl = mdl.simulate(); 
-
-%% 
-figure(100);
-plot(mdl.Log.t,mdl.Log.q(:,1:M),'LineW',2);
 
 %% animation
 [rig, sph] = setupRig(M,L,Modes);
@@ -54,12 +49,11 @@ for ii = 1:fps(mdl.Log.t,FPS):length(mdl.Log.q)
 end
 
 function gd = gref(~)
-w = 0.75;
-gd = SE3(eye(3),[40,0,-10]);
+gd = SE3(eye(3),[40,0,0]);
 end
 
 %%
-function Y = GenerateFunctionSpace(X,N,M,L)
+function Y = GenerateFunctionSpace(X,N,M)
 % loop over functional space
 Y = zeros(N,M);
 
@@ -74,34 +68,37 @@ end
 %% setup controller
 function tau = Controller(mdl)
 t = mdl.Log.t;
-
-%tau        = zeros(n,1);
 J = mdl.Log.EL.J;
-ge = SE3(mdl.Log.Phi,mdl.Log.p);
+ge = SE3(mdl.Log.Phi,mdl.Log.gam);
 gd = gref(t);
 
-lam1 = 500;
-lam2 = 1e5;
-Kp = diag([0,0,0,1,1,1]);
+KI = 0.01;
+lam1 = 25 + KI*mdl.Log.AUX.z;
+lam2 = 1e4;
+Kp = diag([1e-2,1e-2,1e-2,1,1,1]);
 
 Xi = smoothstep(2*t)*logmapSE3(ge\gd);
 Fu = Kp*tmapSE3(Xi)*wedge(Xi);
 
 tau = lam1*J.'*((J*J.' + lam2*eye(6))\Fu);
 tau = tau + mdl.Log.EL.G + mdl.Log.EL.K*mdl.Log.q;
+end
 
+function de = IntegrateError(mdl)
+t = mdl.Log.t;
+ge = SE3(mdl.Log.Phi,mdl.Log.gam);
+gd = gref(t);
+Xi = wedge(logmapSE3(ge\gd));
+de = (Xi.')*Xi;
 end
 
 %% setup rig
 function [rig, sph] = setupRig(M,L,Modes)
+gmdl = Gmodel('Arm.stl','ShowProcess',0);
 
-gmdl = Gmodel('Arm.stl');
-% gmdl = gmdl.set('Emission', [0.9 0.8 0.8],...
-%      'SSSPower',0.005,'SSSRadius',5,'SSS',true);
- 
 N = 200;
 X = linspace(0,L,N)';
-Y = GenerateFunctionSpace(X,N,M,L);
+Y = GenerateFunctionSpace(X,N,M);
 
 shp = Shapes(Y,Modes,'L0',L);
  
@@ -117,9 +114,7 @@ rig.g0 = SE3(roty(pi/2),zeros(3,1));
 rig = rig.render();
 
 sph = Gmodel(sSphere(5));
-
 sph.Texture = diffuse(0.925);
-
 sph.bake.render();
 
 end

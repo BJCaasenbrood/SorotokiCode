@@ -1764,7 +1764,7 @@ if ~isempty(Fem.Contact) && Fem.PrescribedDisplacement == false
     F_ = F*0;
     SDF  = Fem.Contact{1};
     Move = Fem.Contact{2};
-    Emod = Fem.Material.Emod();
+    Emod = Fem.Material.getModulus();
     
     Y0 = Fem.Node0;
     
@@ -1852,7 +1852,7 @@ if Fem.PrescribedDisplacement
         end
     end
     
-    EMod = Fem.Material.Emod();
+    EMod = Fem.Material.getModulus();
    
     if Fem.Nonlinear
         KTtmp = full(Ktr);
@@ -2334,7 +2334,7 @@ if (Criteria && (Fem.Iteration <= Fem.MaxIteration) && ~SingularKt && ...
     flag = 0;
 else
     if (Fem.Iteration > Fem.MaxIteration) || SingularKt || ...
-            Fem.SolverResidual(end) > (25*Fem.Material.Emod)
+            Fem.SolverResidual(end) > (25*Fem.Material.getModulus)
         flag = 2; 
         Fem.Convergence = false;
         Fem.Utmp = Fem.U;
