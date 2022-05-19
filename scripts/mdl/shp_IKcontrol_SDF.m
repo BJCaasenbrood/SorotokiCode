@@ -9,8 +9,8 @@ x = linspace(0,1,N).';
 Y = GenerateFunctionSpace(x,N,M,L);
 
 %% desired SE3
-Sd = sCircle(0.2,-0.15,0.15);  % desired enveloping SDF
-sp = sSphere(0.2,0,0.15,0.1); % offset due to occupance of soft arm
+Sd = sCircle(0.2,-0.15,0.175);  % desired enveloping SDF
+sp = sSphere(0.2,0,0.15,0.125); % offset due to occupance of soft arm
 
 %% soft sobotics shapes
 figure(101); subplot(1,2,1);
@@ -85,6 +85,7 @@ while norm(e) > 1e-3 && k < 400
     subplot(1,2,2);
     plot(shp.Sigma,R,'LineW',3);
     axis([0 1 0 0.25]);
+    axis square;
     drawnow;
     
     % compute update state and compute error
@@ -124,7 +125,7 @@ end
 
 function rig = setupRig(M,L,Modes)
 
-gmdl = Gmodel('Arm.stl');
+gmdl = Gmodel('Arm.stl','ShowProcess',0);
  
 N = 100;
 X = linspace(0,L,N)';

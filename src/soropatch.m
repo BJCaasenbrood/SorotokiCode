@@ -1,4 +1,13 @@
 %% ------------------------------------------------------------------------
+% % SOROTOKI - Alpha - 2.05.19 - May 19 - 2022
+% **Fem.m**
+%
+% - @muyi-max: Fixed issue with Fem.Log. If a nonlinear residual increment takes less
+%   than 2 iterations, data was not properly stored. To solve this, any
+%   nonlinear time increment must take atleast two steps, as to ensure a
+%   new displacement field is introduced to the stress-strain calculations.
+%
+%% ------------------------------------------------------------------------
 % % SOROTOKI - Alpha - 2.05.17 - May 17 - 2022
 % + Added MEX compiler for Model, Gmodel, and Fem classes. This signicantly
 %   improves the computation times of the Sorotoki toolkit. When calling
@@ -108,8 +117,8 @@ if isempty(varargin)
 end
 
 switch(varargin{1})
-    case(1); x = '2.05.17';
-    case(2); x = 'May 17, 2022';
+    case(1); x = '2.05.19';
+    case(2); x = 'May 19, 2022';
     case(3); x = 'August 30, 2018';
 end
 end

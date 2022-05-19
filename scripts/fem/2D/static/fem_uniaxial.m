@@ -12,18 +12,17 @@ msh = Mesh(sdf,'Quads',[2,2]);
 msh = msh.generate();
 
 %% generate fem model from mesh
-fem = Fem(msh,'TimeStep',1/20,'PrescribedDisplacement',true,...
-              'Linestyle','none','ColorAxis',[0 1],'SolverPlot',true);
+fem = Fem(msh,'TimeStep',1/20,'Linestyle','none',...
+    'ColorAxis',[0 1],'SolverPlot',true);
 
 %% add boundary conditions
 fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[0,1]);
 fem = fem.AddConstraint('Support',fem.FindNodes('SW'),[1,1]);
-fem = fem.AddConstraint('Load',fem.FindNodes('Top'),[0,dL]);
+fem = fem.AddConstraint('Displace',fem.FindNodes('Top'),[0,dL]);
 
 fem = fem.AddConstraint('Output',fem.FindNodes('Location',[0,H]),[0,0]);
 %% assign material
-%fem.Material = Ecoflex0050;
-fem.Material = Ecoflex0030_Ogden;
+fem.Material = Ecoflex0050;
 
 %% solving extension
 fem.solve();

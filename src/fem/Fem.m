@@ -613,7 +613,7 @@ while true
         drawnow;
     end
     
-    if ~Fem.Nonlinear || Fem.Time >= 1, 
+    if ~Fem.Nonlinear || Fem.Time >= 1
         break; 
     end
 end
@@ -2328,9 +2328,9 @@ Criteria = CriteriaResidual && CriteriaStress; %&& CriteriaDisplace;
 if Fem.SolverResidual(end,1) > Fem.SolverResidual(end-1,1)
    Fem.Divergence = Fem.Divergence + 1;
 end
-
+ 
 if (Criteria && (Fem.Iteration <= Fem.MaxIteration) && ~SingularKt && ...
-         Fem.Divergence < Fem.BisectLimit)
+         Fem.Divergence < Fem.BisectLimit && Fem.Iteration <= 1)
     flag = 0;
 else
     if (Fem.Iteration > Fem.MaxIteration) || SingularKt || ...
@@ -2468,8 +2468,8 @@ if isempty(Fem.Log)
    
    Fem.Log.Node{1} = Fem.Node0;
    Fem.Log.Node{2} = Fem.Node;
-   Fem.Log.U{1} = Fem.Utmp;
-   Fem.Log.U{2} = Fem.Utmp;
+   Fem.Log.U{1}    = Fem.Utmp;
+   Fem.Log.U{2}    = Fem.Utmp;
    
    Fem.Log.Rotation{1} = R(:);
    Fem.Log.Rotation{2} = R(:);
@@ -2513,7 +2513,7 @@ else
    Fem.Log.Rotation{end + 1} = R(:);
    Fem.Log.Stretch{end + 1}  = Q(:);
    Fem.Log.Stress{end + 1}   = Fem.VonMisesNodal;
-   Fem.Log.U{end + 1}   = Fem.Utmp;
+   Fem.Log.U{end + 1}        = Fem.Utmp;
 
    if ~isempty(Fem.Output)
        idNodes = Fem.Output(:,1);

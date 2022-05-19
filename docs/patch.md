@@ -6,14 +6,21 @@ nav_order: 7
 
 # Patch notes
 
+% SOROTOKI - Alpha - 2.05.19 - May 19 - 2022
+- **Fem.m**:
+    - @muyi-max: Fixed issue with Fem.Log. If a nonlinear residual increment takes less
+      than 2 iterations, data was not properly stored. To solve this, any
+      nonlinear time increment must take atleast two steps, as to ensure a
+      new displacement field is introduced to the stress-strain calculations.
+
 ## SOROTOKI - Alpha - 2.05.17 - May 17 - 2022
 - Added MEX compiler for Model, Gmodel, and Fem classes. This significantly improves the computation times of the Sorotoki toolkit. When calling *sorotoki.m*, the installer asks to compile the mex files. *Note* we do not support the original Matlab functions anymore, simple because of computational speed. Hence, the Matlab Coder Toolkit is a prerequisite for Sorotoki.
 - Updated `verifySorotoki.m` to include also Model.
 - **Shapes.m**
-- Updated the Fem -> Shapes converter that extracts the geometric modes from dynamic or quasi-static FEM data. This can be done using `shp.Fem = Fem` followed by `shp.reconstruct`, `shp.rebuild`. Then a dynamic model can be generated using `mdl = Model(shp)`. We call this new strain basis the **Geometry-Informed Variable Strain** basis as the geometry of the soft  robot is preserved into the functional basis.
-- Added Shapes.Material. Now hyper-elastic materials can be loaded into the stiffness and inertia tensor construction. The work is experimental since more research is required to properly include hyper-elastic materials  into the Cosserat beam models.
+    - Updated the Fem -> Shapes converter that extracts the geometric modes from dynamic or quasi-static FEM data. This can be done using `shp.Fem = Fem` followed by `shp.reconstruct`, `shp.rebuild`. Then a dynamic model can be generated using `mdl = Model(shp)`. We call this new strain basis the **Geometry-Informed Variable Strain** basis as the geometry of the soft  robot is preserved into the functional basis.
+    - Added Shapes.Material. Now hyper-elastic materials can be loaded into the stiffness and inertia tensor construction. The work is experimental since more research is required to properly include hyper-elastic materials  into the Cosserat beam models.
 - **Model.m**
-- Added an auxiliary flow function to the Model class: `dx = f(x,t)`. This can be used for integrator actions, like PI controllers. or adaptive  controllers where unknown parameters evolutions can be included.
+    - Added an auxiliary flow function to the Model class: `dx = f(x,t)`. This can be used for integrator actions, like PI controllers. or adaptive  controllers where unknown parameters evolutions can be included.
 
 ## SOROTOKI - Alpha - 2.01.28 - Jan 28 - 2022
 - Improved stability of Newmark solver.

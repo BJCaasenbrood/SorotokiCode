@@ -2,7 +2,7 @@
 X = 1;
 %% preview
 %obj = Gmodel(sSphere(1));
-obj = Gmodel('Bunny.stl');
+%obj = Gmodel('Bunny.stl');
 
 mat = {aniso, bluered, bump, chroma, chromium, ...
        clean, copper, egg, grey, hotmetal, jade, ...

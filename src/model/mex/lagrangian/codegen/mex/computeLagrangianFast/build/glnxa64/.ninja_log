@@ -1,13 +1,13 @@
 # ninja log v5
-0	25	1652779801045233892	build/glnxa64/rt_nonfinite.o	4405ccab66393835
-1	43	1652779801065233363	build/glnxa64/c_mexapi_version.o	3a82f18649b287fd
-0	60	1652779801081232940	build/glnxa64/computeLagrangianFast_terminate.o	1553215bea021187
-1	67	1652779801089232729	build/glnxa64/_coder_computeLagrangianFast_info.o	3a8c23657e6f3ee8
-0	75	1652779801097232516	build/glnxa64/_coder_computeLagrangianFast_mex.o	4e7bb669d62e429d
-0	77	1652779801097232516	build/glnxa64/computeLagrangianFast_data.o	e836b8223b018243
-0	82	1652779801101232412	build/glnxa64/computeLagrangianFast_initialize.o	a0306692af301fb0
-1	100	1652779801121231883	build/glnxa64/computeLagrangianFast_emxutil.o	7df7229cb8e05705
-1	112	1652779801133231566	build/glnxa64/mtimes.o	3ab089afe9f3be9
-1	117	1652779801137231459	build/glnxa64/_coder_computeLagrangianFast_api.o	fc9153e7d0b3bc65
-1	364	1652779801385224905	build/glnxa64/computeLagrangianFast.o	c4580f83e118faca
-364	405	1652779801425223848	computeLagrangianFast_mex.mexa64	30be98e256fb1089
+1	21	1652949272081129880	build/glnxa64/rt_nonfinite.o	4405ccab66393835
+2	33	1652949272097125010	build/glnxa64/c_mexapi_version.o	3a82f18649b287fd
+1	45	1652949272109121356	build/glnxa64/computeLagrangianFast_initialize.o	a0306692af301fb0
+2	46	1652949272109121356	build/glnxa64/_coder_computeLagrangianFast_info.o	3a8c23657e6f3ee8
+0	50	1652949272113120138	build/glnxa64/computeLagrangianFast_data.o	e836b8223b018243
+1	58	1652949272121117703	build/glnxa64/computeLagrangianFast_emxutil.o	7df7229cb8e05705
+1	67	1652949272129115267	build/glnxa64/computeLagrangianFast_terminate.o	1553215bea021187
+1	68	1652949272129115267	build/glnxa64/_coder_computeLagrangianFast_mex.o	4e7bb669d62e429d
+1	98	1652949272161105526	build/glnxa64/mtimes.o	3ab089afe9f3be9
+1	101	1652949272161105526	build/glnxa64/_coder_computeLagrangianFast_api.o	fc9153e7d0b3bc65
+1	295	1652949272357045854	build/glnxa64/computeLagrangianFast.o	c4580f83e118faca
+295	328	1652949272389036112	computeLagrangianFast_mex.mexa64	30be98e256fb1089
