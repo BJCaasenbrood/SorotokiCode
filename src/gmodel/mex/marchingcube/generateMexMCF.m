@@ -1,0 +1,1 @@
+codegen MarchingCubesFast -args {coder.newtype('single',[inf,inf,inf],[1,1,1]),coder.newtype('single',[inf,inf,inf],[1,1,1]),coder.newtype('single',[inf,inf,inf],[1,1,1]),coder.newtype('single',[inf,inf,inf],[1,1,1]),1e-6}
