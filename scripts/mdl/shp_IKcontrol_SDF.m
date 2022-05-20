@@ -9,8 +9,10 @@ x = linspace(0,1,N).';
 Y = GenerateFunctionSpace(x,N,M,L);
 
 %% desired SE3
-Sd = sCircle(0.2,-0.15,0.175);  % desired enveloping SDF
-sp = sSphere(0.2,0,0.15,0.125); % offset due to occupance of soft arm
+R = 0.15;
+D = 0.055;
+Sd = sCircle(0.2,-0.15,R+D); % desired enveloping SDF
+sp = sSphere(0.2,0,0.15,R);  % offset due to occupance of soft arm
 
 %% soft sobotics shapes
 figure(101); subplot(1,2,1);
@@ -18,18 +20,17 @@ shp = Shapes(Y,[0,M,0,0,0,0]);      % generate basis
 rig = setupRig(M,L,[0,M,0,0,0,0]);  % rig the soft arm
 
 q = 1e-4*sort(rand(shp.NDim,1));
-e = 0.1;
 
 %% solve IK
-obj = Gmodel(sp);
-obj.Texture = diffuse(0.925);
+obj = Gmodel(sp,'Texture',diffuse(0.925));
 obj.bake.render();
 
 BdBox = [-0.1,0.4,-0.2,0.2,0,0.6];
 
-h = [];
+h  = [];
 EE = [];
 k  = 0;
+e  = 0.1;
 
 while norm(e) > 1e-3 && k < 400
     
@@ -44,11 +45,11 @@ while norm(e) > 1e-3 && k < 400
     
     % compute closest points
     V = Sd.Node;
-    [XY,D]  = ClosestPointOnSDF(Sd,p(:,[1 3]));
+    
+    [XY,~]  = ClosestPointOnSDF(Sd,p(:,[1 3]));
     [T,N,B] = Sd.normal(XY);
     
     % update IK control law
-    E(k) = 0;
     dq   = 0;
     
     A = [];
@@ -68,8 +69,6 @@ while norm(e) > 1e-3 && k < 400
             J(:,:,ii));                     
         
         dq = dq + dr;
-        
-        E(k) = E(k) + (dE.'*dE);
     end
     
     [Et,R] = shp.tangentPoint(q,...
@@ -79,24 +78,36 @@ while norm(e) > 1e-3 && k < 400
     rig = rig.computeFK(q);
     rig = rig.update();
     
+    V = rig.List{1}.Node;
+    V = V(sp.intersect(V),:);
+    
+    [~,N] = sp.normal(V);
+    
+    delete(h); hold on;
+    h = quiver3(V(:,1),V(:,2),V(:,3),...
+                N(:,1),N(:,2),N(:,3),'b-');
+    
     % setup figure
     setupFigure(BdBox);
     
     subplot(1,2,2);
     plot(shp.Sigma,R,'LineW',3);
     axis([0 1 0 0.25]);
-    axis square;
+    axis square; ax = gca;
+    grid on;
+    set(ax,'LineW',1.5);
+    ax.YAxis.Exponent = -2;
+    ax.XTickLabel = {'0',[],'L'};
+    ax.FontSize = 12;
     drawnow;
     
     % compute update state and compute error
-    q = q + dq;
-    e = norm(abs(dq));
-     
+    q = q + dq;     
 end
 
 function [dq, E] = EnergyController(g,gd,J)
     
-    k1   = 0.00;
+    k1   =0;
     k2   = 0.75;
     lam1 = 1;
     
@@ -125,7 +136,7 @@ end
 
 function rig = setupRig(M,L,Modes)
 
-gmdl = Gmodel('Arm.stl','ShowProcess',0);
+gmdl = Gmodel('Arm.stl','ShowProcess',0,'Alpha',0.3);
  
 N = 100;
 X = linspace(0,L,N)';

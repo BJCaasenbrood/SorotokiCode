@@ -6,12 +6,12 @@ P = -2*kpa;
 sdf = @(x) Bellow(x,5,4,6,5,7,5,2);
 
 %% generate mesh
-msh = Mesh(sdf,'BdBox',[0,25,0,25],'NElem',150);
+msh = Mesh(sdf,'BdBox',[0,25,0,25],'NElem',350);
 msh = msh.generate();
 msh.showSDF();
 
 %% generate fem model from mesh
-fem = Fem(msh,'TimeStep',1/5,'SigmoidFactor',0.5,'Linestyle','none');
+fem = Fem(msh,'TimeStep',1/10,'SigmoidFactor',0.5,'SelfCollision',true);
 
 %% add constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[1,1]);

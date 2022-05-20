@@ -76,6 +76,7 @@ classdef Fem < handle
         PrescribedDisplacement = false;
         VolumetricPressure     = false;
         TendonForces           = false;
+        SelfCollision          = true;
         
         VonMisesNodal; 
         sxxNodal; syyNodal; sxyNodal;
@@ -159,7 +160,7 @@ classdef Fem < handle
         AssembledSystem  = false;
         PressureLoad     = 0;
         
-        Linestyle = '-';
+        Linestyle = 'none';
         Linestyle0 = '-';
         Colormap    = turbo;
         ColormapOpt = barney(-1);
@@ -1813,6 +1814,16 @@ if ~isempty(Fem.Contact) && Fem.PrescribedDisplacement == false
         
         F = F + F_;
     end
+end
+
+if ~isempty(Fem.SelfCollision) 
+    bnd = Fem.Mesh.get('BndMat');
+    bnd = bnd{1}; 
+    bnd(end+1,:) = bnd(1,:);
+    
+    nds = Fem.Node(bnd(:),:);
+    sdf = sPolyline(nds);
+    
 end
 
 if Fem.PrescribedDisplacement

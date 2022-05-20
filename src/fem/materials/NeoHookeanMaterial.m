@@ -38,7 +38,6 @@ function obj = NeoHookeanMaterial(varargin)
     obj.C10 = obj.Mu/2;
     obj.D1  = obj.Lambda/2;
 end
-
 %---------------------------------------------------------------------- get     
 function varargout = get(NeoHookeanMaterial,varargin)
     if nargin > 1

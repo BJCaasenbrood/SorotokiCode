@@ -1,0 +1,9 @@
+cff-version: 1.0.0
+message: "If you are using SOROTOKI for your academic research, please consider citing us."
+authors:
+  - family-names: Caasenbrood
+    given-names: Brandon
+    orcid:  https://orcid.org/0000-0002-6299-1730
+title: "Sorotoki - A Soft Robotics Toolkit for MATLAB"
+version: 1.0.0
+url: https://github.com/BJCaasenbrood/SorotokiCode

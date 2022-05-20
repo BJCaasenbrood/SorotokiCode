@@ -88,6 +88,11 @@ methods (Access = public)
 function d = eval(Sdf,x)
 d = Sdf.sdf(x);
 end
+%--------------------------------------------------------- evalution of SDF
+function y = intersect(Sdf,x)
+d = Sdf.sdf(x);
+y = d(:,end)<0;
+end
 %------------------------------------------------- evalution of tangent SDF
 function [T,N,B,Z] = normal(Sdf,x)
 d = Sdf.sdf(x);
@@ -101,10 +106,13 @@ if size(x,2) == 2
     N(:,1) = n1(:,end);
     N(:,2) = n2(:,end);
 else
-    n1 = (Mesh.SDF(x+repmat([Sdf.eps,0,0],size(x,1),1))-d)/Sdf.eps;
-    n2 = (Mesh.SDF(x+repmat([0,Sdf.eps,0],size(x,1),1))-d)/Sdf.eps;
-    n3 = (Mesh.SDF(x+repmat([0,0,Sdf.eps],size(x,1),1))-d)/Sdf.eps;
-    N = [n1(:,end),n2(:,end),n3(:,end)];
+    n1 = (Sdf.sdf(x+repmat([Sdf.eps,0,0],size(x,1),1))-d)/Sdf.eps;
+    n2 = (Sdf.sdf(x+repmat([0,Sdf.eps,0],size(x,1),1))-d)/Sdf.eps;
+    n3 = (Sdf.sdf(x+repmat([0,0,Sdf.eps],size(x,1),1))-d)/Sdf.eps;
+    N(:,1) = n1(:,end);
+    N(:,2) = n2(:,end);
+    N(:,3) = n3(:,end);
+    %N = [n1(:,end),n2(:,end),n3(:,end)];
 end
 
 N = N./sqrt((sum((N.^2),2)));
