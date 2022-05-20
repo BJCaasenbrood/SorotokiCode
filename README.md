@@ -1,6 +1,6 @@
-<div align="center"> <img src="./docs/documentation/img/softrobot_.png" width="700"> </div> <br/>
+<div align="center"> <img src="https://bjcaasenbrood.github.io/SorotokiPage/docs/documentation/img/softrobot_.png" width="700"> </div> <br/>
 
-[**Sorotoki**](https://bjcaasenbrood.github.io/SorotokiCode/) is an open-source MATLAB toolkit for soft robotics that includes an array of tools for design, modeling, and control. Due to its scientific diversity, it can be challenging for new researchers to quickly familiarize themselves with multiple scientific areas. With the aim to lower this threshold, Sorotoki aims to incorporate multiple layers of soft robotics research into one compact toolkit. Examples include: continuum mechanics, dynamic systems and control theory, topology optimization, computer graphics, and much more to come! The combination provides a highly flexible programming environment and will hopefully aid the development of novel soft robotic research.
+[**Sorotoki**](https://bjcaasenbrood.github.io/SorotokiPage/) is an open-source MATLAB toolkit for soft robotics that includes an array of tools for design, modeling, and control. Due to its scientific diversity, it can be challenging for new researchers to quickly familiarize themselves with multiple scientific areas. With the aim to lower this threshold, Sorotoki aims to incorporate multiple layers of soft robotics research into one compact toolkit. Examples include: continuum mechanics, dynamic systems and control theory, topology optimization, computer graphics, and much more to come! The combination provides a highly flexible programming environment and will hopefully aid the development of novel soft robotic research.
 
 #### Download the latest stable version:
 
@@ -9,7 +9,7 @@ git clone --depth 1  https://github.com/BJCaasenbrood/SorotokiCode.git
 ```
 
 ## Installation
-Please visit [**Sorotoki**](https://bjcaasenbrood.github.io/SorotokiCode/) for the installation intruction. If any future updates may occur, just simply run *sorotoki.m*, and the toolkit will automatically tell you which files are out-of-date.
+Please visit [**Sorotoki**](https://bjcaasenbrood.github.io/SorotokiPage/) for the installation intruction. If any future updates may occur, just simply run *sorotoki.m*, and the toolkit will automatically tell you which files are out-of-date.
 
 ## Applications highlights
 
