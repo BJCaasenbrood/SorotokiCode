@@ -31,7 +31,9 @@ set = {'Meshing a 2D-circle',...
        'Rendering stanford bunny',...
        'Nonlinear finite element',...
        '3D nonlinear finite element',...
-       'Topology optimization of Pneu-net'};
+       'Topology optimization of Pneu-net',...
+       'Modeling a Cosserat beam',...
+       'Closed-loop control soft arm'};
 
 request = action(set);
 
@@ -41,6 +43,8 @@ switch(request)
     case(3); open fem_bellow;
     case(4); open fem_twisting_beam;
     case(5); open opt_pneunet;
+    case(6); open mdl_free_motion;
+    case(7); open mdl_closedloop_setpoint
     otherwise; warning('Please select a demo from the list above.');
 end
 
@@ -362,6 +366,7 @@ cout(['* Adding SOROTOKI libraries to path, ',...
 if Request == 1
 fprintf(FID,['%%!INSTALDIR:',strrep(Path,'\','/'),' \n']);
 fprintf(FID,'%% base.lib \n');
+write2file([Path,'src']);
 write2file([Path,'\src\__base__']);
 write2file([Path,'\src\__version__']);
 write2file([Path,'\src\__base__\auxiliary']);
@@ -381,7 +386,7 @@ write2file([Path,'\scripts\']);
 write2file([Path,'\livescripts\']);
 else
 addPath(Path);
-addPath([Path,'\src\']);
+addPath([Path,'src']);
 addPath([Path,'\src\__version__']);
 addPath([Path,'\src\__base__']);
 addPath([Path,'\src\__base__\auxiliary']);

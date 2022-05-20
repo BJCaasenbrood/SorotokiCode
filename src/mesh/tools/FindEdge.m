@@ -21,7 +21,7 @@ Request = varargin{1};
 switch(Request)
     case('Hole');       x = FindHoles(Mesh,varargin{end});
     case('TopHole');    x = FindTopHoles(Mesh,tol);
-    case('AllHole');    x = FindAllHoles(Mesh,tol);
+    case('AllHole');    x = FindAllHoles(Mesh);
     case('BoxHole');    x = BoxHoles(Mesh,tol,varargin{2:end});
     case('EdgeSelect'); x = FindEdgeSelect(Mesh,BdBox,varargin{2:end});
 end
@@ -29,6 +29,11 @@ end
 end
 
 function id = FindHoles(Mesh,List)
+if ischar(List)
+    id = FindAllHoles(Mesh);
+    return
+end
+
 Bnd = Mesh.get('BndMat');
 for ii = 1:numel(List)
     E = unique(Bnd{List(ii)}(:),'stable');
@@ -67,7 +72,7 @@ id = S(d(:,end)<tol);
 end
 
 
-function id = FindAllHoles(Mesh,tol)
+function id = FindAllHoles(Mesh)
 Bnd = Mesh.get('BndMat');
 Nds = Mesh.Node;
 

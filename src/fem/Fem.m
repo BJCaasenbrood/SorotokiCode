@@ -537,24 +537,24 @@ while true
 
         %if rcond(full(A)) >= 1e-10
             if Fem.SolverStartMMA
-                [L,D,P] = ldl(A,'vector');
-                %DeltaU = A\b; % topology optimization needs exact mid-solution
-                DeltaU = sparse(P,1,(L'\(D\(L\b(P))))); % thanks Ondrej ;)
+                %[L,D,P] = ldl(A,'vector');
+                DeltaU = A\b; % topology optimization needs exact mid-solution
+                %DeltaU = sparse(P,1,(L'\(D\(L\b(P))))); % thanks Ondrej ;)
             else
                 
-               [L,D,P] = ldl(A,'vector');
+              % [L,D,P] = ldl(A,'vector');
                %minDiag = full(min(diag(D)));
                
-               if Fem.SolverId == 1
-                    DeltaU = A\b;
+%                if Fem.SolverId == 1
+%                     DeltaU = A\b;
+%                     %DeltaU = sparse(P,1,(L'\(D\(L\b(P))))); % thanks Ondrej ;)
+%                elseif Fem.SolverId == 2
                     %DeltaU = sparse(P,1,(L'\(D\(L\b(P))))); % thanks Ondrej ;)
-               elseif Fem.SolverId == 2
-                    DeltaU = sparse(P,1,(L'\(D\(L\b(P))))); % thanks Ondrej ;)
-               elseif Fem.SolverId == 3
-                   [DeltaU,~] = gmres(A,b,[],Fem.ResidualNorm,100);
-               else
-                   DeltaU = A\b;
-               end
+%                elseif Fem.SolverId == 3
+%                    [DeltaU,~] = gmres(A,b,[],Fem.ResidualNorm,100);
+%                else
+                    DeltaU = A\b;
+%                end
 
             end     
             
@@ -1728,7 +1728,7 @@ end
 
 if ~isempty(Fem.Contact) && Fem.PrescribedDisplacement == true 
     
-    SDF = Fem.Contact{1};
+    SDF  = Fem.Contact{1};
     Move = Fem.Contact{2};
     Y = Fem.Node;
     
@@ -1785,7 +1785,6 @@ if ~isempty(Fem.Contact) && Fem.PrescribedDisplacement == false
         n1 = (SDF(Y(I,:)+repmat([eps,0],size(Y(I,:),1),1))-d(I,end))/eps;
         n2 = (SDF(Y(I,:)+repmat([0,eps],size(Y(I,:),1),1))-d(I,end))/eps;
         
-        
         Ux = (d(I,end)).*n1(:,end);
         Uy = (d(I,end)).*n2(:,end);
         vUx = (dUx(I,end)).*n1(:,end);
@@ -1805,21 +1804,12 @@ if ~isempty(Fem.Contact) && Fem.PrescribedDisplacement == false
         
         F_(2*I(1:size(Y(I,:),1),1),1)   = -0.1*Emod*(Uy).^3 - 1e-12*Emod*Uy.*abs(vUy).^2 ...
             + 1e-5*Emod*abs(d(I,end)).*Ffric(:,2);
-        
-        
-%         Ktr(2*I(1:size(Y(I,:),1),1)-1,2*I(1:size(Y(I,:),1),1)-1) = ...
-%             Ktr(2*I(1:size(Y(I,:),1),1)-1,2*I(1:size(Y(I,:),1),1)-1) - 0.05*Emod;
-%         
-%         Ktr(2*I(1:size(Y(I,:),1),1),2*I(1:size(Y(I,:),1),1)) = ...
-%             Ktr(2*I(1:size(Y(I,:),1),1),2*I(1:size(Y(I,:),1),1)) - 0.05*Emod;
-%         
+
         C(2*I(1:size(Y(I,:),1),1)-1,2*I(1:size(Y(I,:),1),1)-1) = ...
             C(2*I(1:size(Y(I,:),1),1)-1,2*I(1:size(Y(I,:),1),1)-1) + 1e-12*Emod;
         
         C(2*I(1:size(Y(I,:),1),1),2*I(1:size(Y(I,:),1),1)) = ...
             C(2*I(1:size(Y(I,:),1),1),2*I(1:size(Y(I,:),1),1)) + 1e-12*Emod;
-        
-        %C = 0.5*(C + C.');
         
         F = F + F_;
     end

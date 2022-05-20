@@ -6,7 +6,7 @@ classdef NeoHookeanMaterial
         Nu;
         C10;
         D1;
-        Rho  = 1070e-12;
+        Rho  = 970e-12;
         Zeta = 0.01;
         Lambda;
         Mu; 

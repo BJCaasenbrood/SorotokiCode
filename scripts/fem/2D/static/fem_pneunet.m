@@ -1,16 +1,18 @@
-
 clr;
-%% pressure settings
-P0  = 30*kpa;
+%% simulation settings
+P = 25*kpa;
+W = 120;
+H = 20;
 
-%% generate mesh
+%% finite element settings
 Simp  = 0.02;
 GrowH = 1;
-MinH  = 3;
-MaxH  = 4;
+MinH  = 2;
+MaxH  = 3;
 
-msh = Mesh('Pneunet.png','BdBox',[0,120,0,20],'SimplifyTol',Simp,...
-    'Hmesh',[GrowH,MinH,MaxH]);
+%% generate mesh
+msh = Mesh('Pneunet.png','BdBox',[0,W,0,H],...
+    'SimplifyTol',Simp,'Hmesh',[GrowH,MinH,MaxH]);
 
 msh = msh.generate();
 
@@ -20,15 +22,15 @@ subplot(2,1,2); msh.show();
 
 %% generate fem model
 fem = Fem(msh);
-fem = fem.set('TimeStep',1/50,'BdBox',[0,120,-80,20],'Linestyle','none',...
-    'MovieAxis',[-25 120 -60 130],'Movie',0,'TimeEnd',2,'SolverPlot',1);
+fem = fem.set('TimeStep',1/120,'Linestyle','none','TimeEnd',2);
 
 %% add boundary constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Box',[0,0,0,10]),[1,1]);
-fem = fem.AddConstraint('Pressure',fem.FindEdges('AllHole'),P0);
+fem = fem.AddConstraint('Pressure',fem.FindEdges('Hole'),P);
+%fem = fem.AddConstraint('Gravity',[],[0,-9810]);
 
 %% assign material
-fem.Material = Dragonskin30(25);
+fem.Material = NeoHookeanMaterial(0.5,0.4);
 
 %% solve
 close all;

@@ -1,12 +1,12 @@
 clr;
 %% 
-L = 50;   % length of robot
-M = 10;     % number of modes
-N = 100;   % number of discrete points on curve
-H = 1/250; % timesteps
+L = 50;     % length of robot
+M = 6;      % number of modes
+N = 50;     % number of discrete points on curve
+H = 1/150;  % timesteps
 FPS = 150;  % animation speed
 
-Modes = [0,M,0,0,0,0];  % pure-XY curvature
+Modes = [0,M,M,0,0,0];  % pure-XY curvature
 %%
 % generate nodal space
 X = linspace(0,L,N)';
@@ -15,7 +15,7 @@ Y = GenerateFunctionSpace(X,N,M,L);
 %%
 shp = Shapes(Y,Modes,'L0',L);
 
-shp.Material = NeoHookeanMaterial(0.5,0.3);
+shp.Material = NeoHookeanMaterial(0.25,0.3);
 shp.Gvec = [-9.81e3;0;0];
 
 shp = shp.rebuild();
@@ -24,22 +24,31 @@ shp = shp.rebuild();
 mdl = Model(shp,'TimeStep',H,'TimeEnd',5);
 
 %%
-mdl.q0(1) = 0.2;
+mdl.q0(1)    = 0.1;
+mdl.dq0(1+M) = 2;
+
 mdl = mdl.simulate(); 
 %% 
 figure(100);
+subplot(1,2,1);
 plot(mdl.Log.t,mdl.Log.q(:,1:Modes(2)),'LineW',2);
+
+subplot(1,2,1);
+plot(mdl.Log.t,mdl.Log.Psi + mdl.Log.Kin + mdl.Log.Vg,'LineW',2);
 
 %% animation
 [rig] = setupRig(M,L,Modes);
 
+h = [];
 for ii = 1:fps(mdl.Log.t,FPS):length(mdl.Log.q)
 
     rig = rig.computeFK(mdl.Log.q(ii,:));
     rig = rig.update();
     
-    axis([-.5*L .5*L -.5*L .5*L -L 0.1*L]);
+    axis([-.5*L .5*L -.5*L .5*L -1.2*L 0.1*L]);
     view(30,30);
+    delete(h);
+    h = shadowplot(5);
     drawnow();
 end
 

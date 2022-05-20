@@ -3,11 +3,11 @@ classdef YeohMaterial
     properties (Access = public)
         Type = 'Yeoh';
         C1   = 1.0;
-        C2   = -0.1;
-        C3   = 0.01;
+        C2   = 0.0;
+        C3   = 0.0;
         D1   = 1;
-        D2   = 1;
-        D3   = 1;
+        D2   = 10;
+        D3   = 10;
         Rho  = 1e-9;
         Zeta = 0.1;
     end

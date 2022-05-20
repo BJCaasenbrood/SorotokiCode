@@ -108,7 +108,7 @@ Model.p   = [];
 
 Model.Log    = struct;
 Model.Log.q  = Model.q0;
-Model.Log.dq = 0*Model.q0;
+Model.Log.dq = Model.dq0;
 Model.Log.p  = 0*Model.q0;
 Model.Log.EL = struct;
 Model.Log.PH = struct;
@@ -140,9 +140,9 @@ Model.Log.q   = X(:,1:Model.Shapes.NDim);
 Model.Log.dq  = X(:,Model.Shapes.NDim+(1:Model.Shapes.NDim));  
 Model.Log.tau = U;
 
-Model.Log.Kin = Km;
-Model.Log.Vg  = Ug;
-Model.Log.Psi = Ue;
+Model.Log.Kin = GaussianFilter(Km,5);
+Model.Log.Vg  = GaussianFilter(Ug,5);
+Model.Log.Psi = GaussianFilter(Ue,5);
 
 if ~isempty(Model.Flow)
    Model.Log.z = Z; 
@@ -320,6 +320,12 @@ for ii = 1:length(Ts)-1
     Kin(ii+1) = 0.5*z(nd+1:2*nd).'*Model.Log.EL.M*z(nd+1:2*nd);
     Ue(ii+1)  = 0.5*z(1:nd).'*Model.Log.EL.K*z(1:nd);
     Ug(ii+1)  = Model.Log.Vg;
+    
+    if ii == 1
+        Kin(1) = Kin(ii+1);
+        Ug(1)  = Ug(ii+1);
+        Ue(1)  = Ue(ii+1);
+    end
     
     if ~isempty(Model.Flow)
         Z(ii+1,:) = Model.Log.AUX.z(:).';
