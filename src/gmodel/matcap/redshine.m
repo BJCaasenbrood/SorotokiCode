@@ -1,4 +1,4 @@
 function mcap = redshine
-mcap = imread('redshine.jpg');
+mcap = rot90(imread('redshine.jpg'),1);
 end
 

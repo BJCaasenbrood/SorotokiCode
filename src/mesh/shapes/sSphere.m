@@ -26,9 +26,10 @@ end
 function [V,F] = generateNodeSet(xc,yc,zc,r,N)
 th = linspace(-pi,pi,N).';
 
-x1 = r*cos(th) + xc;
-y1 = r*sin(th) + yc;
-z1 = x1*0;
+sx = sqrt(3)*0.5;
+x1 = sx*r*cos(th) + xc;
+y1 = sx*r*sin(th) + yc;
+z1 = x1*0 + 0.5*r;
 
 x2 = r*sin(th) + xc;
 y2 = x1*0;
@@ -38,8 +39,21 @@ x3 = x1*0;
 y3 = r*sin(th) + xc;
 z3 = r*cos(th) + zc;
 
-V = [x1,y1,z1;x2,y2,z2;x3,y3,z3];
+x4 = sx*r*cos(th) + xc;
+y4 = sx*r*sin(th) + yc;
+z4 = x1*0 - 0.5*r;
+
+x5 = sx*r*cos(th) + xc;
+y5 = sx*r*sin(th) + yc;
+z5 = x1*0 - 0.5*r;
+
+V = [x1,y1,z1;
+     x2,y2,z2;
+     x3,y3,z3;
+     x4,y4,z4;];
+ 
 S = [(1:N-1).',(2:N).'];
-F = [S;S+N;S+2*N];
+
+F = [S;S+N;S+2*N;S+3*N;S + 4*N];
 %F = [1:N;N+1:2*N;2*N+1:3*N];
 end

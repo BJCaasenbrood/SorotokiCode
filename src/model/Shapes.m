@@ -122,7 +122,7 @@ function obj = Shapes(Input,NModal,varargin)
 %     for ii = 1:2:length(varargin)
 %         obj.(varargin{ii}) = varargin{ii+1};
 %     end
-    
+%     
     obj = rebuild(obj);
     
 end
@@ -446,10 +446,24 @@ q = q(:) + 1e-6;
     
 end
 %--------------------------------------------------------- compute jacobian
-function p = FK(Shapes,q)
+function varargout = FK(Shapes,q,dq)
+    
+    if nargin < 2
+        dq = q*0;
+    end
+    
     p0 = Shapes.g0(1:3,4);
-    g = string(Shapes,q);
-    p = [p0.';reshape(g(1:3,4,1:end-1),3,[]).'];
+    [g, J] = string(Shapes,q);
+    varargout{1} = [p0.';reshape(g(1:3,4,1:end-1),3,[]).'];
+    
+    if nargout > 1
+        V = zeros(Shapes.NNode,6);
+        for ii = 1:Shapes.NNode
+            V(ii,:) = (J(:,:,ii)*dq).';
+        end
+        varargout{2} = V;
+    end
+    
 end
 %------------------------------------------------- estimate Cosserat string
 function [q,XI] = estimateJointSpace(Shapes,Xi,W)

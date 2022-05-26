@@ -3,18 +3,23 @@ clr;
 %% loop over colormaps
 figure(102);
 
-map = {blackwhite, bluesea, heatmap, inferno, metro, ...
-    noir,turbo,viridis,bounce,barney};
-
 name = {'blackwhite', 'bluesea', 'heatmap', 'inferno', 'metro', ...
-    'noir','turbo','viridis','bounce','barney'};
+    'noir','turbo','viridis','bounce','barney','evolution','rainbow',...
+    'polarmap','redgreen','soapbubble'};
 
-for ii = 1:length(map)
-   subplot(length(map),3,3*ii-2:3*ii-1) 
-   showColormap(map{ii});
-   subplot(length(map),3,3*ii) 
-   text(0,0.33,name{ii},'interpreter','tex');
+N  = numel(name);
+Nx = ceil(sqrt(N));
+Ny = ceil(sqrt(N));
+
+for ii = 1:N
+   ax = subplot(Nx,Ny,ii) ;
+   %showColormap(map{ii});
+   colorwheel();
+   map = str2func(['@(x) ',name{ii}]);
+   colormap(ax,map(1));
    axis off;
    axis tight;
+   title(name{ii});
 end
-background(gitpage*0.75)
+
+background(gitpage)

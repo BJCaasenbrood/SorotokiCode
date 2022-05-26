@@ -10,12 +10,13 @@ sdf = Sdf(@(P) dCircle(P,xc,yc,r));
 sdf.BdBox = [xc-r-eps,xc+r+eps,yc-r-eps,yc+r+eps];
 
 % generat sample points
-x   = linspace(-pi,pi,20).';
+N   = 50;
+x   = linspace(-pi,pi,N).';
 S   = [(r-0.5*eps)*cos(x)+xc,...
        (r-0.5*eps)*sin(x)+yc]; % sample set
    
 sdf.Node    = S;
-sdf.Element = [(1:99).',(2:100).'];
+sdf.Element = [(1:N-1).',(2:N).'];
 
 end
 

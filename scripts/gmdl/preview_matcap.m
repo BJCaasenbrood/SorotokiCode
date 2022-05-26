@@ -1,15 +1,13 @@
-%clr; 
-X = 1;
+clr; 
 %% preview
-%obj = Gmodel(sSphere(1));
-%obj = Gmodel('Bunny.stl');
+obj = Gmodel(sSphere(1),'Quality',50);
 
 mat = {aniso, bluered, bump, chroma, chromium, ...
        clean, copper, egg, grey, hotmetal, jade, ...
        matcap, mateplastic, metal, metalclean, ...
        oldwax, prusa, planet, plastic, ...
        redshine, redwax, retro, rim, soft, ...
-       skin, studioclay};
+       skin, studioclay,bubble};
    
 f = figure(101);
 obj.bake().render();
@@ -20,19 +18,6 @@ for ii = 1:numel(mat)
    view(10,20); drawnow;
    pause(0.2);
 end
-
-% b = uicontrol('Parent',f,'Style','slider','Position',[81,24,419,23],...
-%               'value',X,'min',1, 'max',length(mat));
-%           
-% bl1 = uicontrol('Parent',f,'Style','text','Position',[50,24,23,23],...
-%                 'String','0','BackgroundColor',gitpage);
-%             
-% bl2 = uicontrol('Parent',f,'Style','text','Position',[500,24,23,23],...
-%                 'String',num2str(length(mat)),'BackgroundColor',gitpage);
-%           
-% b.Callback = @(s,e) updateSphere(s,e,mat);
-% 
-% title(['Material capture number: ', num2str(X,3)]);
 
 function updateSphere(src,~,mat)
     class = whoClasses('Gmodel');

@@ -2,22 +2,18 @@ clr;
 %% loop over colors
 figure(101);
 
+colorlist = redgreen(10);
+%%
 x = linspace(0,2*pi,1e3);
-y = @(x,a) sin(x + (a-1)/(pi));
+y = @(x,a) sin(x + (a-1)/(.444*pi));
+Leg = {};
 
-for ii = 1:12
-   plot(x,y(x,ii),'LineW',3); hold on;
+for ii = 1:size(colorlist,1)
+   plot(x,y(x,ii),'LineW',5,...
+       'Color',colorlist(ii,:)); hold on;
    axis off;
    axis tight;
+   Leg{ii} = num2str(ii);
 end
 
-figure(102);
-
-for ii = 1:12
-   subplot(12,3,3*ii-2:3*ii-1) 
-   showColormap(col(ii));
-   subplot(12,3,3*ii) 
-   text(0,0.33,['col(',num2str(ii),')'],'Fontsize',12);
-   axis off;
-   axis tight;
-end
+legend(Leg,'Orientation','Vertical','Location','west');

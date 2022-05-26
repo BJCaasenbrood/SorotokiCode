@@ -1,7 +1,6 @@
 %------------------------------------------ PLANAR PROJECTION OF 3D-POLYGON
 function R = planarProjection(n)
 b = n(:)/norm(n); a = [0;0;1];
-
 v = cross(a,b); 
 s = norm(v);
 c = dot(a,b);

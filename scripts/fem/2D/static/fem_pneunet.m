@@ -22,7 +22,7 @@ subplot(2,1,2); msh.show();
 
 %% generate fem model
 fem = Fem(msh);
-fem = fem.set('TimeStep',1/120,'SelfCollision',1,'TimeEnd',2);
+fem = fem.set('TimeStep',1/120,'TimeEnd',2);
 
 %% add boundary constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Box',[0,0,0,10]),[1,1]);

@@ -1,4 +1,4 @@
 function mcap = base
-mcap = 1.0*fliplr(imread('img/base.png'));
+mcap = 1.0*flipud(imread('img/base.png'));
 end
 

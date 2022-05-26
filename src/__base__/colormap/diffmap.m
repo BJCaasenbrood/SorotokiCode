@@ -1,5 +1,12 @@
 function colmap = diffmap(h,n)
 
+if nargin < 1
+    h = 0.5;
+    n = 1e3;
+elseif nargin < 2
+    n = 1e3;
+end
+
 HSV = 1.1*rgb2hsv(noir);
 HSV(:,1) = h;
 

@@ -344,7 +344,7 @@ h{2} = patch('Faces',FaceMatrix,'Vertices',V,...
     'Linewidth',1.5,'FaceAlpha',1,'EdgeColor','k');
 
 h{3} = patch('Faces',BoundMatrix,'Vertices',V,...
-    'LineStyle','-','Linewidth',2,'EdgeColor','k');
+    'LineStyle','-','Linewidth',1.5,'EdgeColor','k');
 
 if Fem.Dim == 3, view(30,10); end
 
@@ -357,21 +357,22 @@ if Fem.Dim == 3, view(30,10); end
 %     %h{5} = plot(Pc(id,1),Pc(id,2),'.','Color','k');
 % end
 
-if ~isempty(Fem.Contact)
-    sdfFNC = Fem.Contact{1};
-    Move = Fem.Contact{2};
-    BD = Fem.BdBox;
-    %BD = [-BD,BD,-BD,BD];
-    [px,py] = meshgrid(linspace(BD(1),BD(2),50),linspace(BD(3),BD(4),50));
-    Y = [px(:),py(:)];
-    beta = 0.975*Fem.Time;
-    Y(:,1) = Y(:,1) - beta*Move(1);
-    Y(:,2) = Y(:,2) - beta*Move(2);
-    d = sdfFNC(Y);
-    D = reshape(d(:,end),[50,50]);
-    h{5} = contourf(px,py,-D,[1e-3 1e-3],'linewidth',1.5,...
-        'FaceColor',0.85*gitpage);
-end
+% if ~isempty(Fem.Contact)
+%     sdfFNC = Fem.Contact{1};
+%     Move = Fem.Contact{2};
+%     BD = Fem.BdBox;
+%     %BD = [-BD,BD,-BD,BD];
+%     [px,py] = meshgrid(linspace(BD(1),BD(2),50),linspace(BD(3),BD(4),50));
+%     Y = [px(:),py(:)];
+%     beta = 0.975*Fem.Time;
+%     Y(:,1) = Y(:,1) - beta*Move(1);
+%     Y(:,2) = Y(:,2) - beta*Move(2);
+%     d = sdfFNC(Y);
+%     D = reshape(d(:,end),[50,50]);
+%     h{5} = contourf(px,py,-D,[1e-3 1e-3],'linewidth',1.5,...
+%         'FaceColor',0.85*gitpage);
+% end
+
 end
 
 if flag == 1
@@ -1821,9 +1822,18 @@ if ~isempty(Fem.SelfCollision)
     bnd = bnd{1}; 
     bnd(end+1,:) = bnd(1,:);
     
-    nds = Fem.Node(bnd(:),:);
-    sdf = sPolyline(nds);
+    1;
     
+     V = Fem.Node(bnd(:),:);
+     
+%     inpolyhedron()
+     
+%     dsx = gradient(V(:,1));
+%     dsy = gradient(V(:,2));
+%     dl  = sqrt(dsx.^2+dsy.^2);
+%     Nx  = -dsy./dl;
+%     Ny  =  dsx./dl;
+    %sdf = sPolyline(nds);
 end
 
 if Fem.PrescribedDisplacement
@@ -1920,8 +1930,8 @@ if ~isempty(Fem.Pressure)
         NodeID = EdgeList{ii};
         V = Nds(NodeID,:);
 
-        dsx = diff(V(:,1));
-        dsy = diff(V(:,2));
+        [dsx] = diff(V(:,1));
+        [dsy] = diff(V(:,2));
         dl  = sqrt(dsx.^2+dsy.^2);
         Nx  = -dsy./dl;
         Ny  = dsx./dl;

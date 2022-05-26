@@ -1,4 +1,4 @@
 function mcap = bubble
-mcap = imread('bubble.jpg');
+mcap = imread('soapbubble.png');
 end
 

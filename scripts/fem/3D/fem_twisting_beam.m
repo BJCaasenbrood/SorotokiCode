@@ -1,7 +1,7 @@
 clr;
 %% generate mesh from sdf
 sdf = @(x) dCube(x,-3,3,-3,3,0,20);
-msh = Mesh(sdf,'BdBox',[-3,3,-3,3,0,20],'Hexahedron',7*[1,1,2]);
+msh = Mesh(sdf,'BdBox',[-3,3,-3,3,0,20],'Hexahedron',2*[1,1,2]);
 
 msh = msh.generate();
 msh = msh.show();

@@ -14,7 +14,7 @@ elseif arg == 0
     A = flipud(colmap(1:50,:));
     B = flipud(colmap(51:end,:));
     colmap = [A;flipud(A);flipud(B);B];
-    
+    %colmap = [flipud(A);flipud(B)];
 end
 
 end

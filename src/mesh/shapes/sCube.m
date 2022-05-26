@@ -23,6 +23,18 @@ sdf = Sdf(@(P) sdfCube(P,x1,x2,y1,y2,z1,z2));
 sdf.BdBox = [x1-1e-6,x2+1e-6,....
              y1-1e-6,y2+1e-6,...
              z1-1e-6,z2+1e-6];
+         
+sdf.Node = [x1 x2 x2 x1 x1 x2 x2 x1;
+            y1 y1 y2 y2 y1 y1 y2 y2;
+            z1 z1 z1 z1 z2 z2 z2 z2].';
+   
+sdf.Element = [1,2;2,3;3,4;4,1;
+               5,6;6,7;7,8;8,5;
+               2,3;3,7;7,6;6,2;
+               1,4;4,8;8,5;5,1;
+               1,2;2,6;6,5;5,1;
+               3,4;4,8;8,7;7,3];
+         
 end
 
 function d = sdfCube(P,x1,x2,y1,y2,z1,z2)

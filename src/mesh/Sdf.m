@@ -3,18 +3,19 @@ classdef Sdf
     properties
         sdf;
         BdBox;
-        cmap = turbo;
+        cmap;
         eps  = 1e-5;
         
         Node;      
         Element;
+        Sample;
     end
 %--------------------------------------------------------------------------    
     methods        
 %---------------------------------------------------- Signed Distance Class     
         function obj = Sdf(fnc,varargin)
             obj.sdf = @(x) [fnc(x),fnc(x)];
-            obj.cmap = turbo;
+            obj.cmap = redgreen;
             for ii = 1:2:length(varargin)
                 obj.(varargin{ii}) = varargin{ii+1};
             end
@@ -93,6 +94,20 @@ function y = intersect(Sdf,x)
 d = Sdf.sdf(x);
 y = d(:,end)<0;
 end
+%--------------------------------------------------------- evalution of SDF
+function [Nds,X,Y] = sampleSet(Sdf,Quality)
+if nargin < 2
+    if numel(Sdf.BdBox) < 6, Quality = 250;
+    else, Quality = 50;
+    end
+end
+
+x = linspace(Sdf.BdBox(1),Sdf.BdBox(2),Quality);
+y = linspace(Sdf.BdBox(3),Sdf.BdBox(4),Quality);
+[X,Y] = meshgrid(x,y);
+Nds = [X(:), Y(:)];
+
+end
 %------------------------------------------------- evalution of tangent SDF
 function [T,N,B,Z] = normal(Sdf,x)
 d = Sdf.sdf(x);
@@ -121,30 +136,6 @@ B = cross(T,N);
 Z = atan2(N(:,2).*sign(-d(:,end)),N(:,1).*sign(-d(:,end)));
     
 end
-% %--------------------------------------------------------------------- show
-% function [T, Z] = tangent(Sdf,x)
-%  d = Sdf.sdf(x);
-% N = zeros(size(x,1),3);
-% 
-% if size(x,2) == 2
-%     n1 = (Sdf.sdf(x+repmat([Sdf.eps,0],size(x,1),1))-d)/Sdf.eps;
-%     n2 = (Sdf.sdf(x+repmat([0,Sdf.eps],size(x,1),1))-d)/Sdf.eps;
-%     %[Fy] = gradient(d(:,end));   
-%     %T = [Fy(:,1),Fy(:,2)];
-%     N(:,1) = n1(:,end);
-%     N(:,2) = n2(:,end);
-% else
-%     n1 = (Mesh.SDF(x+repmat([Sdf.eps,0,0],size(x,1),1))-d)/Sdf.eps;
-%     n2 = (Mesh.SDF(x+repmat([0,Sdf.eps,0],size(x,1),1))-d)/Sdf.eps;
-%     n3 = (Mesh.SDF(x+repmat([0,0,Sdf.eps],size(x,1),1))-d)/Sdf.eps;
-%     N = [n1(:,end),n2(:,end),n3(:,end)];
-% end
-% 
-% N = N./sqrt((sum((N.^2),2)));
-% T = ([0,1,0;-1,0,0;0,0,1]*N.').';
-% Z = atan2(N(:,2).*sign(-d(:,end)),N(:,1).*sign(-d(:,end)));
-%    
-% end
 %--------------------------------------------------------------------- show
 function show(Sdf,Quality)
     
@@ -161,10 +152,10 @@ function show(Sdf,Quality)
         [X,Y] = meshgrid(x,y);
 
         D = Sdf.eval([X(:),Y(:)]);
-        D = D(:,end);
+        D = abs(D(:,end)).^(0.5).*sign(D(:,end));
         
         figure(101);
-        surf(X,Y,reshape(D,[Quality Quality]),'linestyle','none');
+        cplane(X,Y,reshape(D,[Quality Quality])-1e-6);
         axis equal; hold on;
         
         if isempty(Sdf.Element)
@@ -175,8 +166,12 @@ function show(Sdf,Quality)
                 'LineW',2.5,'EdgeColor','w');
         end
         
+        cmax = max(abs(D));
+        caxis([-cmax,1.25*cmax]);
+        axis(Sdf.BdBox);
         colormap(Sdf.cmap);
         view(0,90);
+        
     else
         z = linspace(Sdf.BdBox(5),Sdf.BdBox(6),Quality);
         [X,Y,Z] = meshgrid(x,y,z);
@@ -192,6 +187,12 @@ function show(Sdf,Quality)
         colormap(Sdf.cmap);
     end
 end
+
+function skeleton(Sdf)
+    patch('Vertices',Sdf.Node,'Faces',Sdf.Element,...
+                'LineW',2.5,'EdgeColor',col(1),'FaceColor','none');
+end
+
 %------------------------------------------------------------- show contour
 function showcontour(Sdf,Quality)
     if nargin < 2 

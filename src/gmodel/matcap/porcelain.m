@@ -1,4 +1,4 @@
 function mcap = porcelain
-mcap = imread('porcelain.jpg');
+mcap = rot90(imread('porcelain.jpg'),1);
 end
 

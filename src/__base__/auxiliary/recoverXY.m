@@ -1,7 +1,7 @@
-function [x,y] = recoverXY()
+function [dataObjs] = recoverXY()
 fig = gcf;
 axObjs = fig.Children;
 dataObjs = axObjs.Children;
-x = dataObjs(1).XData;
-y = dataObjs(1).YData;
+% x = dataObjs(1).XData;
+% y = dataObjs(1).YData;
 end
