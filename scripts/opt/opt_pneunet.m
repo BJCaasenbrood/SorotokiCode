@@ -10,7 +10,7 @@ msh = Mesh(sdf,'BdBox',[0,W,0,H],'NElem',700);
 msh = msh.generate();
 
 %% show generated mesh
-fem = Fem(msh,'VolumeInfill',0.33,'Penal',2,'FilterRadius',H/10,...
+fem = Fem(msh,'VolumeInfill',0.33,'Penal',4,'FilterRadius',H/20,...
               'Nonlinear',false,'TimeStep',1/3,'ReflectionPlane',[0,0],...
               'OptimizationProblem','Compliant','Linestyle','None',...
               'MaxIterationMMA',70,'ChangeMax',0.03,'Movie',0);
@@ -32,7 +32,7 @@ fem = fem.AddConstraint('PressureCell',id,5*kpa);
 fem = fem.initialTopology('Hole',[W/2,0.5*H],0.85);
 
 %% material
-fem.Material = Ecoflex0030();
+fem.Material = Dragonskin30();
 
 %% solving
 fem.optimize();

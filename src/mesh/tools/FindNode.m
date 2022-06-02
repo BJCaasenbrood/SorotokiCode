@@ -63,7 +63,7 @@ end
 
 function id = SignedFunction(Node,SDF,tol)
 d = SDF(Node); d = d(:,end);
-id = find( (d) < 0.01*tol );
+id = find( abs(d) < tol );
 end
 
 function id = SouthEast(Node,BdBox,tol)

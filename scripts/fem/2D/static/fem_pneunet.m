@@ -1,6 +1,6 @@
 clr;
 %% simulation settings
-P = 25*kpa;
+P = 15*kpa;
 W = 120;
 H = 20;
 
@@ -22,7 +22,7 @@ subplot(2,1,2); msh.show();
 
 %% generate fem model
 fem = Fem(msh);
-fem = fem.set('TimeStep',1/120,'TimeEnd',2);
+fem = fem.set('TimeStep',1/120,'TimeEnd',2,'SelfCollision',1);
 
 %% add boundary constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Box',[0,0,0,10]),[1,1]);
@@ -30,7 +30,8 @@ fem = fem.AddConstraint('Pressure',fem.FindEdges('Hole'),P);
 %fem = fem.AddConstraint('Gravity',[],[0,-9810]);
 
 %% assign material
-fem.Material = NeoHookeanMaterial(0.5,0.4);
+fem.Material = Ecoflex0030(300);
+%fem.Material = NeoHookeanMaterial(0.5,0.4);
 
 %% solve
 close all;

@@ -155,43 +155,41 @@ figure(101);
 switch(Request)
     case('Base'),  Request = 'POD';
     case('POD'),   Request = 'POD';
-    otherwise,     Request = 'POD';
+    otherwise,     Request = 'Curve';
 end
-    
+
 if strcmp(Request,'POD') 
     
-    for jj = 1:2
-        
-        % pick shape-matrix
-        if jj == 1, theta = Shapes.PODR; 
-        else, theta = Shapes.PODQ;
-        end
-            
-        k   = 1;
-        leg = cell(1);
-        % loop through selected modes
-        for ii = 1:Shapes.NModal(jj)
-            subplot(Shapes.NDof,2,2*jj - 1)
-            plot(Shapes.Sigma/Shapes.L0,theta(:,ii),...
-                'Color',col(k),'linewidth',3); 
-            hold on; grid on;
-            k = k +1;
-            leg{ii} = ['\theta_',num2str(ii)];
-        end
-        
-        legend(leg{:},'Fontsize',14,'Orientation','Horizontal');        
-        
-        A  = axis; Ay = 1.2*max(abs(A(3:4)));
-        %axis([0 1 -Ay Ay]);
-        
-        subplot(Shapes.NDof,2,2*jj);
-        En = (Shapes.PODEnergy{jj})/sum(Shapes.PODEnergy{jj});
-        plot(En,'-o','LineW',3); hold on;
-        Enp = cumsum(En);
-        plot(Enp,'--','LineW',3); 
-        %axis([1 10 0 max(En)*1.2]);
-
-    end
+%     for jj = 1:2
+%         
+%         % pick shape-matrix
+%         if jj == 1, theta = Shapes.PODR; 
+%         else, theta = Shapes.PODQ;
+%         end
+%             
+%         k   = 1;
+%         leg = cell(1);
+%         % loop through selected modes
+%         for ii = 1:Shapes.NModal(jj)
+%             subplot(Shapes.NDof,2,2*jj - 1)
+%             plot(Shapes.Sigma/Shapes.L0,theta(:,ii),...
+%                 'Color',col(k),'linewidth',3); 
+%             hold on; grid on;
+%             k = k +1;
+%             leg{ii} = ['\theta_',num2str(ii)];
+%         end
+%         
+%         legend(leg{:},'Fontsize',14,'Orientation','Horizontal');        
+%         
+%         A  = axis; Ay = 1.2*max(abs(A(3:4)));
+%         
+%         subplot(Shapes.NDof,2,2*jj);
+%         En = (Shapes.PODEnergy{jj})/sum(Shapes.PODEnergy{jj});
+%         plot(En,'-o','LineW',3); hold on;
+%         Enp = cumsum(En);
+%         plot(Enp,'--','LineW',3); 
+% 
+%     end
 
 end
 
@@ -288,7 +286,9 @@ if ~isempty(Shapes.PODR) || ~isempty(Shapes.PODQ)
     Shapes.Theta = @(x) ShapeFunction(Shapes,x);
 end
 
-Shapes.Xi0 = @(x) IntrinsicFunction(Shapes,x);   
+if ~isa(Shapes.Xi0,'function_handle')
+    Shapes.Xi0 = @(x) IntrinsicFunction(Shapes,x);   
+end
 
 if ~isempty(Shapes.Theta) 
     
@@ -465,6 +465,19 @@ function varargout = FK(Shapes,q,dq)
     end
     
 end
+%--------------------------------------------------------- compute jacobian
+function xi = strain(Shapes,q)
+    
+    q  = q(:);
+    xi = zeros(Shapes.NNode,6);
+    jj = 1;
+    for ii = 1:2:Shapes.NNode*2
+        xi(jj,:) = (Shapes.Ba*Shapes.ThetaEval(:,:,ii)*q + ...
+            Shapes.Xi0Eval(:,:,ii)).';
+        jj = jj + 1;
+    end
+    
+end
 %------------------------------------------------- estimate Cosserat string
 function [q,XI] = estimateJointSpace(Shapes,Xi,W)
 
@@ -546,21 +559,45 @@ Xi = [G,U];
     
 end
 %----------------------------------------------------- tangent point energy
-function [E, R] = tangentPoint(Shapes,q,PS1)
+function [E, R] = tangentPoint(Shapes,q,varargin) 
+        
 % compute string  tangent
 [gc,~] = string(Shapes,q);
+
+if nargin < 3
+    PS1 = reshape(gc(1:3,4,1:end),3,[]).';
+else
+    PS1 = varargin{1};
+end
 
 % compute minimal torus
 R = zeros(length(gc),1);
 
 for ii = 1:length(gc)
-    r = torusSolve(gc(:,:,ii),PS1);
-    R(ii) = min(r);
+
+    g = gc(:,:,ii);
+    T = g(1:3,1);
+    x = g(1:3,4);
+    
+    %for jj = 1:length(PS1)
+        N = (PS1 - x.');
+        R2 = diag(N*N.'); 
+        R2(abs(R2) <= 1e-6) = max(R2);
+        N = N./sqrt(sum(N.^2,2));
+        TangX = cross(repmat(T.',length(R2),1),N);
+        TangX(isnan(TangX(:,1)),:) = 0;
+        T2 = diag(TangX*TangX.');        
+        r = T2./R2;
+    %end
+%     
+    R(ii) = sum(r);
 end
 
+R = GaussianFilter(R,round(numel(R)*0.01));
 E = trapz(Shapes.Sigma,R);
 
 end
+%----------------------------------------------------- tangent point energy
 end
 
 methods (Access = private)
@@ -928,18 +965,20 @@ end
 %------------------------------------------------------- optimal sphere fit
 function r = torusSolve(gp,x)
 % x  := [Nx3] of points
-% gp := [4x4] SE(3) matrix of tang-point orgin 
-R0 = gp(1:3,1:3);
+% gp := [4x4] SE(3) matrix of tangent-point orgin 
+R0 = fliplr(gp(1:3,1:3));
 x0 = gp(1:3,4);
-x = x.' - x0;
+%x = 
+x = x + rand(length(x),3)*1e-5;
+dx = x.' - x0;
 
-X1 = (R0(1,:)*(x)).^2;
-X2 = (R0(2,:)*(x)).^2;
-X3 = (R0(3,:)*(x)).^2;
+X1 = (R0(1,:)*(dx)).^2;
+X2 = (R0(2,:)*(dx)).^2;
+X3 = (R0(3,:)*(dx)).^2;
 
 r = sqrt((((X1 + X2 + X3).^2) ...
      ./(4*(X1 + X2))));
  
-r(isnan(r)) = mean(mink(r,3));
+r(isnan(r)) = 0;
  
 end

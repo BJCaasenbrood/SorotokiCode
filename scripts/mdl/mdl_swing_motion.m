@@ -1,6 +1,6 @@
 clr;
 %%
-Omega = 4*pi; % rad/s
+Omega = 5*pi; % rad/s
 Ampli = 70;   % Nmm (N-millimeter)
 
 %% 
@@ -29,7 +29,7 @@ shp.Gvec = [-9.81e3;0;0];
 shp = shp.rebuild();
 
 %%
-mdl = Model(shp,'Tstep',H,'Tsim',5);
+mdl = Model(shp,'TimeStep',H,'TimeEnd',15);
 
 %% controller
 mdl.tau = @(M) Controller(M,Omega,Ampli);
@@ -41,8 +41,8 @@ mdl = mdl.simulate();
 figure(100);
 for ii = 1:M
     subplot(2,2,ii);
-    cplot(mdl.Log.q(:,ii),mdl.Log.dq(:,ii),mdl.Log.t,...
-        barney(-1),'LineW',3);
+    cplot(mdl.Log.q(:,ii),mdl.Log.dq(:,ii),mdl.Log.t.^3,...
+        barney(-1),'LineW',1.5);
     box on; grid on; axis square; 
     set(gca,'LineW',1.5);
 end
@@ -67,8 +67,8 @@ function Y = GenerateFunctionSpace(X,N,M,L)
 Y = zeros(N,M);
 
 for ii = 1:M
-   %Y(:,ii) = chebyshev(X/L,ii-1); 
-   Y(:,ii) = pcc(X/L,ii,M); 
+   Y(:,ii) = chebyshev(X/L,ii-1); 
+   %Y(:,ii) = pcc(X/L,ii,M); 
 end
 
 % ensure its orthonormal (gram–schmidt)

@@ -159,6 +159,7 @@ classdef Fem < handle
         BisectCounter    = 1;
         AssembledSystem  = false;
         PressureLoad     = 0;
+        IntrinsicTangEnergy = [];
         
         Linestyle = 'none';
         Linestyle0 = '-';
@@ -235,6 +236,7 @@ function obj = Fem(Mesh,varargin)
     
     obj.SigmoidFactor  = 0;
     obj.ShowProcess    = true;
+    obj.SelfCollision  = false;
     
     for ii = 1:2:length(varargin)
         obj.(varargin{ii}) = varargin{ii+1};
@@ -539,9 +541,9 @@ while true
 
         %if rcond(full(A)) >= 1e-10
             if Fem.SolverStartMMA
-                %[L,D,P] = ldl(A,'vector');
-                DeltaU = A\b; % topology optimization needs exact mid-solution
-                %DeltaU = sparse(P,1,(L'\(D\(L\b(P))))); % thanks Ondrej ;)
+                [L,D,P] = ldl(A,'vector');
+                %DeltaU = A\b; % topology optimization needs exact mid-solution
+                DeltaU = sparse(P,1,(L'\(D\(L\b(P))))); % thanks Ondrej ;)
             else
                 
               % [L,D,P] = ldl(A,'vector');
@@ -1817,24 +1819,81 @@ if ~isempty(Fem.Contact) && Fem.PrescribedDisplacement == false
     end
 end
 
-if ~isempty(Fem.SelfCollision) 
-    bnd = Fem.Mesh.get('BndMat');
-    bnd = bnd{1}; 
-    bnd(end+1,:) = bnd(1,:);
-    
-    1;
-    
-     V = Fem.Node(bnd(:),:);
-     
-%     inpolyhedron()
-     
-%     dsx = gradient(V(:,1));
-%     dsy = gradient(V(:,2));
+% if ~isempty(Fem.SelfCollision)
+%     
+%     F_ = F*0; 
+%     Emod = Fem.Material.getModulus();
+%     
+%     Nds = Fem.Node;       
+% %     Nds(:,1) = Nds(:,1) + Fem.Utmp(1:2:end-1,1);
+% %     Nds(:,2) = Nds(:,2) + Fem.Utmp(2:2:end,1);
+% %     
+%     bnd = Fem.Mesh.get('BndMat');
+%     bnd = bnd{1};
+%     I = bnd([1:end,1],:);    
+%     V = Nds(I,:);
+%     
+%     %P = (fintersect(V.')).';
+%     
+%     [~,Grad] = gradient(V);
+%     dsx = Grad(:,1);
+%     dsy = Grad(:,2);
 %     dl  = sqrt(dsx.^2+dsy.^2);
 %     Nx  = -dsy./dl;
-%     Ny  =  dsx./dl;
-    %sdf = sPolyline(nds);
-end
+%     Ny  = dsx./dl;
+% 
+%     DE = 1e-3*sum(abs(Fem.BdBox));
+%     Vn = V + DE*[Nx,Ny];
+% 
+%     F = F + F_;
+%     
+    
+%     [XY,D,T] = distance2curve(Vnn,Vn);
+%     fplot(XY,'ro');
+%     1;
+%     sdf = sPolyline(Vnn);
+% %     
+%     D = sdf.eval(Vn);
+%     E = abs(D(:,end)).*(D(:,end) <= 3e-3);
+%     
+%     eps = 1e-5;
+%     
+%     n1 = (sdf.eval(Vn+repmat([eps,0],size(Vn,1),1))-D(:,end))/eps;
+%     n2 = (sdf.eval(Vn+repmat([0,eps],size(Vn,1),1))-D(:,end))/eps;
+%         
+% %     
+%     Ux = E.*n1(:,end);
+%     Uy = E.*n2(:,end);
+%     
+%     F_(2*I-1,1) = -0.1*Emod*(Ux).^3;    
+%     F_(2*I,1)   = -0.1*Emod*(Uy).^3;
+%     
+%     F = F + F_;
+    
+%end
+    
+    %1;
+    
+%     if ~isempty(P)
+%         
+%         de = zeros(length(Vn),1);
+%         
+%         for ii = 1:length(P)
+%             d = sqrt((P(ii,1) - Vn(:,1)).^2 + (P(ii,2) - Vn(:,2)).^2);
+%             de = de + (d<=2*D).*d(:);
+%         end
+%         %[xy,distance,t] = distance2curve(V,P);
+% %         Nds  = Fem.Node;
+% %         pDof = [];
+% %         for ii = 1:length(P)
+% %            id = knnsearch(P(ii,:),Nds);
+% %            pDof = [pDof; id];c
+% %            Nds(ii,:) = 1e6;
+% %         end
+%          1;
+%     end
+     
+%sdf = sPolyline(nds);
 
 if Fem.PrescribedDisplacement
     NLoad = size(Fem.Load,1);
@@ -2624,7 +2683,7 @@ fDof = GetFreeDofs(Fem);
 E = MaterialField(Fem);
 
 if strcmp(Fem.OptimizationProblem,'Compliance') &&  ~Fem.Nonlinear
-    f = (Fem.fInput).'*u;
+    f = (Fem.fExternal + Fem.fInput).'*u;
     temp = cumsum(-u(Fem.i).*Fem.k.*u(Fem.j));
     temp = temp(cumsum(Fem.ElemNDof.^2));
     dfdE = [temp(1);temp(2:end)-temp(1:end-1)];

@@ -21,23 +21,23 @@ for k = 1:N
     Z = z; Z(indices(ii)) = NaN;
     h(k) = plot3(X,Y,Z,'Color',map(k,:),varargin{:});
     hold on;
-    if mod(k,6) == 0 
-        X_ = X(~isnan(X)); nX = diff(X_);
-        Y_ = Y(~isnan(Y)); nY = diff(Y_);
-        Z_ = Z(~isnan(Z)); nZ = diff(Z_);
-        nrm = [nX(end),nY(end),nZ(end)];
-        nrm = nrm./norm(nrm);
-        %NRM = [NRM;nrm];
-        V   = [X_(end),Y_(end),Z_(end)];
-        
-        R = vrrotvec2mat(vrrotvec([0,1,0].',nrm(:)));
-        
-        [V,F] = arrowhead(V,R);
-        
-        patch('Vertices',V,'Faces',F,'EdgeColor','None',...
-            'FaceColor',map(k,:));
-    end
-    hold on;
+%     if mod(k,6) == 0 
+%         X_ = X(~isnan(X)); nX = diff(X_);
+%         Y_ = Y(~isnan(Y)); nY = diff(Y_);
+%         Z_ = Z(~isnan(Z)); nZ = diff(Z_);
+%         nrm = [nX(end),nY(end),nZ(end)];
+%         nrm = nrm./norm(nrm);
+%         %NRM = [NRM;nrm];
+%         V   = [X_(end),Y_(end),Z_(end)];
+%         
+%         R = vrrotvec2mat(vrrotvec([0,1,0].',nrm(:)));
+%         
+%         [V,F] = arrowhead(V,R);
+%         
+%         patch('Vertices',V,'Faces',F,'EdgeColor','None',...
+%             'FaceColor',map(k,:));
+%     end
+%     hold on;
 end
 if status == 0, hold off; end   % reset hold status
 end

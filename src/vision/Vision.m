@@ -2,6 +2,8 @@ classdef Vision
      
     properties (Access = public)
        Cam;
+       Pipe;    %real sense pipeline
+       Colorize;
        AR;
        Center;   
        P2X;
@@ -24,16 +26,22 @@ function obj = Vision(varargin)
     
     if isempty(varargin)
        Id = action(list);
-    else
+    elseif isfloat(varargin{1})
        Id = varargin{1};
        varargin{1} = [];
+       obj.Cam = webcam(list{Id});
+    elseif strcmp('realsense',varargin{1})
+       obj.Cam = webcam(1);
+       obj.Pipe = realsense.pipeline();
+       obj.Colorize = realsense.colorizer();
+       %obj.Pipe.start();
     end
     
 %     for ii = 1:2:length(varargin)
 %         obj.(varargin{ii}) = varargin{ii+1};
 %     end
     
-    obj.Cam = webcam(list{Id});
+    
     obj.NMarker = 1;
     obj.RMarker = 17;
     

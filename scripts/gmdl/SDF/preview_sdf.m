@@ -3,7 +3,7 @@ clr;
 obj = Gmodel(SDF,'Quality',100);
 
 %% set texture
-obj.set('Texture',softmath);
+obj.set('Texture',bubble);
 obj.bake().render(); 
    
 view(-30,30);

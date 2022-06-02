@@ -6,17 +6,17 @@ P = -2*kpa;
 sdf = @(x) Bellow(x,5,4,6,5,7,5,2);
 
 %% generate mesh
-msh = Mesh(sdf,'BdBox',[0,25,0,25],'NElem',350);
+msh = Mesh(sdf,'BdBox',[0,25,0,25],'NElem',120);
 msh = msh.generate();
 msh.showSDF();
 
 %% generate fem model from mesh
-fem = Fem(msh,'TimeStep',1/20,'SigmoidFactor',0.5,'SelfCollision',true);
+fem = Fem(msh,'TimeStep',1/100,'SelfCollision',1);
 
 %% add constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[1,1]);
 fem = fem.AddConstraint('Support',fem.FindNodes('Top'),[1,0]);
-fem = fem.AddConstraint('Load',fem.FindNodes('Top'),[0,-1e-3]);
+fem = fem.AddConstraint('Load',fem.FindNodes('Top'),[0,-3e-3]);
 
 %% add logger nodes
 trackerNodeid = fem.FindNodes('Location',[6,22]);

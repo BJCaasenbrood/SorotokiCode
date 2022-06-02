@@ -2,7 +2,7 @@ clr; beep off;
 %% settings
 L = 1;   % manipulator length
 M = 8;   % number of modes
-N = 101; % grid on SR
+N = 301; % grid on SR
 
 %% build basis
 x = linspace(0,1,N).';
@@ -92,12 +92,12 @@ while norm(e) > 1e-3 && k < 400
     
     subplot(1,2,2);
     plot(shp.Sigma,R,'LineW',3);
-    axis([0 1 0 0.25]);
+    axis([0 1 0 5e6]);
     axis square; ax = gca;
     grid on;
     set(ax,'LineW',1.5);
-    ax.YAxis.Exponent = -2;
-    ax.XTickLabel = {'0',[],'L'};
+    %ax.YAxis.Exponent = -2;
+    %ax.XTickLabel = {'0',[],'L'};
     ax.FontSize = 12;
     drawnow;
     
