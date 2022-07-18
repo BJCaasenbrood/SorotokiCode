@@ -26,9 +26,17 @@ function obj = YeohMaterial(varargin)
     
     [obj.ID, obj.SET, obj.WGT] = Tensor4IdSymmetric;
     
+    if ~isempty(varargin)
+    if numel(varargin{1}) == 3
+        C = varargin{1};
+        obj.C1 = C(1); obj.C2 = C(2); obj.C3 = C(3);
+    else
     for ii = 1:2:length(varargin)
         obj.(varargin{ii}) = varargin{ii+1};
     end
+    end
+    end
+    
 end
 %---------------------------------------------------------------------- get     
 function varargout = get(YeohMaterial,varargin)

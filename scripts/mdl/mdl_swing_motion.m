@@ -1,16 +1,16 @@
 clr;
 %%
-Omega = 5*pi; % rad/s
-Ampli = 70;   % Nmm (N-millimeter)
+Omega = 3*pi; % rad/s
+Ampli = 120;   % Nmm (N-millimeter)
 
 %% 
 L = 100;    % length of robot
 M = 4;      % number of modes
-N = 25;     % number of discrete points on curve
-H = 1/300;  % timesteps
-FPS = 120;   % animation speed
+N = 65;     % number of discrete points on curve
+H = 1/250;  % timesteps
+FPS = 30;   % animation speed
 
-Modes = [0,M,0,0,0,0];  % pure-XY curvature
+Modes = [0,M,M,0,0,0];  % pure-XY curvature
 %%
 % generate nodal space
 X = linspace(0,L,N)';
@@ -18,23 +18,15 @@ Y = GenerateFunctionSpace(X,N,M,L);
 
 %%
 shp = Shapes(Y,Modes,'L0',L);
-
-shp.E    = 5.00;     % Young's modulus in Mpa
-shp.Nu   = 0.49;     % Poisson ratio
-shp.Rho  = 1000e-12; % Density in kg/mm^3
-shp.Zeta = 0.01;      % Damping coefficient
-
+shp.Material = NeoHookeanMaterial(2,0.33);
 shp.Gvec = [-9.81e3;0;0];
 
 shp = shp.rebuild();
 
-%%
+%% simulate model
 mdl = Model(shp,'TimeStep',H,'TimeEnd',15);
 
-%% controller
 mdl.tau = @(M) Controller(M,Omega,Ampli);
-
-%%
 mdl = mdl.simulate(); 
 
 %% 
@@ -67,8 +59,8 @@ function Y = GenerateFunctionSpace(X,N,M,L)
 Y = zeros(N,M);
 
 for ii = 1:M
-   Y(:,ii) = chebyshev(X/L,ii-1); 
-   %Y(:,ii) = pcc(X/L,ii,M); 
+   %Y(:,ii) = chebyshev(X/L,ii-1); 
+   Y(:,ii) = pcc(X/L,ii,M); 
 end
 
 % ensure its orthonormal (gram–schmidt)

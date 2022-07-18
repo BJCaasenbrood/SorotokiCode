@@ -8,10 +8,14 @@ classdef Shapes
         L0;
         Ba;
         ds;
+        
+        g0;
+        gL;
         xia0;
         Node;
         Node0;
         
+        NDof;
         NModal;
         NDim;
         NNode;
@@ -22,15 +26,15 @@ classdef Shapes
         Theta;
         Xi0;
         
-        Rho;
-        Zeta;
-        E;
-        Nu;
+%         Rho;
+%         Zeta;
+%         E;
+%         Nu;
         
         Mtt;
         Dtt;
-        Ktt; Ktt0;
-        HypA; HypB;
+        Ktt;  
+        Ktt0;
         Jtt;
         Att;
         Gvec;
@@ -38,18 +42,16 @@ classdef Shapes
     
     properties (Access = private)
         Table;
-        NDof;
+
         Center;
-        
         Rotation;
         Gamma;
         Kappa;
         
         PODEnergy;
         
-        Phi0;
-        g0;
         Filter;
+        FilterRadius;
         Quality;
         
         ThetaEval;
@@ -66,12 +68,13 @@ function obj = Shapes(Input,NModal,varargin)
     obj.NDof   = sum(obj.Table);
     obj.xia0   = [0,0,0,1,0,0].';
     
+    
     if isa(Input,'Fem')
         obj.Fem    = Input;
         obj.NNode  = 30;        
-        obj.Rho    = Input.Material.Rho;
-        obj.Zeta   = Input.Material.Zeta;
-        obj.Gvec   = [0;0;9.81e3];
+        %obj.Rho    = Input.Material.Rho;
+        %obj.Zeta   = Input.Material.Zeta;
+        obj.Gvec   = [0; 0; 9.81e3];
         
     elseif isa(Input,'double')
         obj.NNode = size(Input,1);
@@ -84,23 +87,19 @@ function obj = Shapes(Input,NModal,varargin)
 
         obj.PODEnergy{2} = ones(size(Input,2),1);
         obj.PODEnergy{1} = ones(size(Input,2),1);
-        
-        obj.Rho  = 1090e-12;
-        obj.Zeta = .15;
-        obj.Gvec = [0;0;9.81e3];
+       
+        obj.Gvec = [0; 0 ;9.81e3];
     end
 
     % cross-section SDF
-    obj.Sdf    = sCircle(5);
+    obj.Sdf = sCircle(10);
     obj.Center = zeros(3,1);
     obj.Material = NeoHookeanMaterial(1,0.33);
+    obj.FilterRadius = 10;
 
-    obj.E  = 5;
-    obj.Nu = 0.33;
     obj.g0 = SE3(eye(3),zeros(3,1));
-    obj.HypA = 0;
-    obj.HypB = 0;
-    
+    obj.gL = [];
+       
     for ii = 1:2:length(varargin)
         obj.(varargin{ii}) = varargin{ii+1};
     end
@@ -115,14 +114,7 @@ function obj = Shapes(Input,NModal,varargin)
             [BdBox(2),BdBox(2)]);
     end
     end
-    
-    %obj.g0 = [1,0,0,0,0,0,0];
-    %obj.g0 = SE3(eye(3),zeros(3,1));
-    
-%     for ii = 1:2:length(varargin)
-%         obj.(varargin{ii}) = varargin{ii+1};
-%     end
-%     
+
     obj = rebuild(obj);
     
 end
@@ -155,42 +147,55 @@ figure(101);
 switch(Request)
     case('Base'),  Request = 'POD';
     case('POD'),   Request = 'POD';
-    otherwise,     Request = 'Curve';
+    otherwise,     Request = 'POD';
 end
 
 if strcmp(Request,'POD') 
     
-%     for jj = 1:2
-%         
-%         % pick shape-matrix
-%         if jj == 1, theta = Shapes.PODR; 
-%         else, theta = Shapes.PODQ;
-%         end
-%             
-%         k   = 1;
-%         leg = cell(1);
-%         % loop through selected modes
-%         for ii = 1:Shapes.NModal(jj)
-%             subplot(Shapes.NDof,2,2*jj - 1)
-%             plot(Shapes.Sigma/Shapes.L0,theta(:,ii),...
-%                 'Color',col(k),'linewidth',3); 
-%             hold on; grid on;
-%             k = k +1;
-%             leg{ii} = ['\theta_',num2str(ii)];
-%         end
-%         
-%         legend(leg{:},'Fontsize',14,'Orientation','Horizontal');        
-%         
-%         A  = axis; Ay = 1.2*max(abs(A(3:4)));
-%         
-%         subplot(Shapes.NDof,2,2*jj);
-%         En = (Shapes.PODEnergy{jj})/sum(Shapes.PODEnergy{jj});
-%         plot(En,'-o','LineW',3); hold on;
-%         Enp = cumsum(En);
-%         plot(Enp,'--','LineW',3); 
-% 
-%     end
+    X = Shapes.Sigma*Shapes.L0;
+    Y = [];
+    
+    for ii = 1:numel(X)
+       S = diag(Shapes.Theta(X(ii)));
+       Y = [Y; S(:).'];
+    end
+    
+    figure(101); clf;
+    
+    M = Shapes.NModal; 
+    Modes = M(M~=0);
+    List  = 1:6;
+    List  = List(M~=0);
+    
+    kk = 1;
+    for ii = 1:numel(Modes)
+       
+        subplot(1,Shapes.NDof,ii);
 
+        for jj = 1:Modes(ii)
+            shade(X,Y(:,kk),'LineW',2,...
+                'Color',col(jj)); hold on;
+            kk = kk + 1;
+        end
+        
+        xlim([min(X) max(X)]);
+        ax = gca;
+        ax.LineWidth  = 1.5;
+        ax.XTick      = [min(X) max(X)];
+        ax.XTickLabel = {'0','L'};
+        axis square; grid on; box on;
+        
+        switch(List(ii))
+            case 1, title(['$\kappa_{xx}$'],'interp','latex','Fontsize',24);
+            case 2, title(['$\kappa_{xz}$'],'interp','latex','Fontsize',24);
+            case 3, title(['$\kappa_{yz}$'],'interp','latex','Fontsize',24);
+            case 4, title(['$\epsilon_{xx}$'],'interp','latex','Fontsize',24);
+            case 5, title(['$\epsilon_{xz}$'],'interp','latex','Fontsize',24);
+            case 6, title(['$\epsilon_{yz}$'],'interp','latex','Fontsize',24);
+        end
+
+    end
+    
 end
 
 end
@@ -240,7 +245,7 @@ Shapes.ds    = Shapes.L0/(Shapes.NNode);
 
 Shapes = BuildInertia(Shapes);
 
-JJ     = Shapes.Mtt/Shapes.Material.Rho;
+JJ      = Shapes.Mtt/Shapes.Material.Rho;
 [SS,KK] = Shapes.Material.PiollaStress(eye(3));
 KK = 2*diag(voightextraction(KK));
 %KK2 = LinearStiffnessTensor(Shapes);
@@ -452,16 +457,25 @@ function varargout = FK(Shapes,q,dq)
         dq = q*0;
     end
     
-    p0 = Shapes.g0(1:3,4);
-    [g, J] = string(Shapes,q);
-    varargout{1} = [p0.';reshape(g(1:3,4,1:end-1),3,[]).'];
+    p0           = Shapes.g0(1:3,4);
+    [g, J]       = string(Shapes,q);
+    varargout{1} = [p0.'; reshape(g(1:3,4,1:end-1),3,[]).'];
     
     if nargout > 1
         V = zeros(Shapes.NNode,6);
+        
         for ii = 1:Shapes.NNode
             V(ii,:) = (J(:,:,ii)*dq).';
         end
+        
         varargout{2} = V;
+    end
+    
+    if ~isempty(Shapes.gL)
+        gg = g(:,:,end)*Shapes.gL;
+        p = varargout{1};
+        p(end+1,:)   = gg(1:3,4).';
+        varargout{1} = p;
     end
     
 end
@@ -495,8 +509,8 @@ if nargin < 3
 end
 
 WR = (W(:,1));
-WQ = (W(:,2) );
-% 
+WQ = (W(:,2));
+
 Lam1 = diag(trapz(Shapes.Sigma,PODr.*PODr));
 Lam2 = diag(trapz(Shapes.Sigma,PODq.*PODq));
 % % 
@@ -679,7 +693,11 @@ for ii = 1:Shapes.NNode
    end
    
    % assemble distance filter matrix based on ShpFnc N(s)
-   d{ii} = [repmat(ii,numel(el),1),[el(2);el(1);el(3)],(N)];
+   if numel(el) == 3
+    d{ii} = [repmat(ii,numel(el),1),[el(2);el(1);el(3)],(N)];
+   else
+    d{ii} = [repmat(ii,numel(el),1),[el(:)],(N)];   
+   end
    
 end
 
@@ -767,8 +785,16 @@ Gamma(1,1) = Gamma(2,1);
 Kappa(end,1) = Kappa(end-1,1);
 Gamma(end,1) = Gamma(end-1,1);
 
-Kappa = GaussianFilter(Kappa,round(Shapes.NNode/150));
-Gamma = GaussianFilter(Gamma,round(Shapes.NNode/150));
+if ~isempty(Shapes.FilterRadius)
+    Rf = Shapes.FilterRadius;
+    if numel(Rf) == 1
+        Kappa = GaussianFilter(Kappa,round(Rf));
+        Gamma = GaussianFilter(Gamma,round(Rf));
+    else 
+        Kappa = smoothdata(Kappa,'gaussian',round(Rf(1)));%sgolayfilt(Kappa,3,round(Rf(1)));
+        Gamma = smoothdata(Gamma,'gaussian',round(Rf(2)));%sgolayfilt(Gamma,3,round(Rf(2)));
+    end
+end
 
 % subplot(2,1,1);
 % plot(Gamma); hold on
@@ -932,7 +958,7 @@ P = eye(3);
 P = [P(:,3),P(:,1),P(:,2)];
 
 Shapes.Jtt = P.'*[Jxx,Jxy,Jxz;Jxy,Jyy,Jyz;Jxz,Jyz,Jzz]*P;
-Shapes.Mtt = Shapes.Rho*blkdiag(Shapes.Jtt,Shapes.Att*eye(3));
+Shapes.Mtt = Shapes.Material.Rho*blkdiag(Shapes.Jtt,Shapes.Att*eye(3));
 
 end
 %--------------------------------------- forwards integration of kinematics
@@ -953,15 +979,16 @@ y(4,1) = X(1,1);
 y(5,1) = X(2,1);
 y(6,1) = X(3,1);
 end
-%----------------------------------------------------------- strain mapping
-function Ktt = LinearStiffnessTensor(Shapes)
-E0 = Shapes.Material.E;
-G0 = (E0)/(2*(1+Shapes.Material.Nu));
+% %----------------------------------------------------------- strain mapping
+% function Ktt = LinearStiffnessTensor(Shapes)
+% E0 = Shapes.Material.E;
+% G0 = (E0)/(2*(1+Shapes.Material.Nu));
+% 
+% QE  = diag([E0,G0,G0]);
+% QR  = diag([G0,E0,E0]);
+% Ktt = blkdiag(QR,QE);
+% end
 
-QE  = diag([E0,G0,G0]);
-QR  = diag([G0,E0,E0]);
-Ktt = blkdiag(QR,QE);
-end
 %------------------------------------------------------- optimal sphere fit
 function r = torusSolve(gp,x)
 % x  := [Nx3] of points

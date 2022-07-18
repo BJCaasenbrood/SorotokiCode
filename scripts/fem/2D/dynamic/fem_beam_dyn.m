@@ -6,19 +6,19 @@ msh = Mesh(sdf,'NElem',10);
 msh = msh.generate();
 
 %% generate fem model from mesh
-fem = Fem(msh,'TimeStep',1/100,'TimeEnd',2,'SolverPlot',false);
+fem = Fem(msh,'TimeStep',1/500,'TimeEnd',5,'SolverPlot',false);
 
 %% add constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,1]);
 fem = fem.AddConstraint('Gravity',[],[0,-9.81e3]);
 
 %% select material
-fem.Material = NeoHookeanMaterial(1/6,1/3); 
+fem.Material = NeoHookeanMaterial(0.01,0.3); 
+
 %% solving
 fem.simulate();
 
 %% plot energies
-
 t = fem.Log.t;
 K  = fem.Log.Kin;
 U0 = fem.Log.Vg(end) + fem.Log.Psi(end);
@@ -27,8 +27,7 @@ figure(103);
 cla;
 plot(t,K); hold on;
 plot(t,U);
-plot(t,U+K);
-axis([0 3 0 0.02])
+ylim([0 0.01]);
 
 %% movie
 close all;
@@ -36,7 +35,7 @@ figure(101);
 
 t = fem.Log.t;
 
-for ii = 1:fps(t,20):numel(t)
+for ii = 1:fps(t,300):numel(t)
     subplot(1,3,[1,2]);
         fem.set('Node',fem.Log.Node{ii});
         fem.show();
@@ -50,7 +49,7 @@ for ii = 1:fps(t,20):numel(t)
         U0 = fem.Log.Vg(end) + fem.Log.Psi(end);
         U = fem.Log.Psi(1:ii) + fem.Log.Vg(1:ii) - U0;
         plot(t(1:ii),U,'LineW',2); 
-        axis([0 t(end) -1e-3 1e-2]);     
+        ylim([0 0.01]); 
 
         plot(t(1:ii),K+U,'LineW',2); 
     

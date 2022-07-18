@@ -1,9 +1,6 @@
 clr;
 %%
 sdf0 = sCube(1);
-% obj = Gmodel(,'Quality',60,...
-%     'Texture',grey,'ShowProcess',0);
-% obj.bake.render();
 
 %% render equivalent 
 sdf = sRectangle(1);

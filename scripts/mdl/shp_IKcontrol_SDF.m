@@ -96,8 +96,6 @@ while norm(e) > 1e-3 && k < 400
     axis square; ax = gca;
     grid on;
     set(ax,'LineW',1.5);
-    %ax.YAxis.Exponent = -2;
-    %ax.XTickLabel = {'0',[],'L'};
     ax.FontSize = 12;
     drawnow;
     
@@ -107,16 +105,15 @@ end
 
 function [dq, E] = EnergyController(g,gd,J)
     
-    k1   =0;
+    k1   = 0;
     k2   = 0.75;
-    lam1 = 1;
+    lam1 = 0.25;
     
     % conditioner
-    W  = 1;
     Kp = diag([k1,k1,k1,k2,k2,k2]);
 
     Xi = logmapSE3(g\gd);
-    Fu = Kp*tmapSE3(W*Xi)*wedge(W*Xi);
+    Fu = Kp*tmapSE3(Xi)*wedge(Xi);
 
     dq = lam1*J.'*Fu;
     

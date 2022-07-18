@@ -117,7 +117,7 @@ if isempty(varargin)
 end
 
 switch(varargin{1})
-    case(1); x = '2.05.19';
+    case(1); x = '2.06.02';
     case(2); x = 'May 19, 2022';
     case(3); x = 'August 30, 2018';
 end

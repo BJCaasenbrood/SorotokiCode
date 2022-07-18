@@ -71,7 +71,7 @@ id = find(abs(Node(:,1)-BdBox(2)) < tol & abs(Node(:,2)-BdBox(3)) < tol );
 end
 
 function id = SouthWest(Node,BdBox,tol)
-id = find(abs(Node(:,1)-BdBox(1)) < tol & abs(Node(:,2)) < tol );
+id = find(abs(Node(:,1)-BdBox(1)) < tol & abs(Node(:,2)-BdBox(3)) < tol );
 end
 
 function id = NorthWest(Node,BdBox,tol)

@@ -1,4 +1,5 @@
-function folderFound = CheckLibary(lib,fnc)
+function folderFound = checkLibary(lib,fnc)
+%CHECKLIBRARY if SOROTOKI folder can be found during installation
 folderFound = true;
 cout('Keyword',['* \t -',lib,spc,'version: ',soropatch(1),spc]);
 

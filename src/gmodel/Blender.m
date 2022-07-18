@@ -1,4 +1,4 @@
-function x = Blender(x,Request,Arg)
+function [x,varargout] = Blender(x,Request,Arg)
 
 switch(Request)
     case('LoadMesh');     x = LoadMesh(Arg);
@@ -8,8 +8,9 @@ switch(Request)
     case('Fix');          x = FixMesh(x);
     case('Transform');    x = Transformation(x,Arg);
     case('Scale');        x = ScaleMesh(x,Arg);
-    case('Curve');        x = CurveMesh(x,Arg);
+    case('Curve');        [x, varargout{1}] = CurveMesh(x,Arg);
     case('Sweep');        x = SweepMesh(x,Arg);
+    case('Loft');         x = LoftMesh(x,Arg);
     case('SE3');          x = SE3Mesh(x,Arg);
     case('SO3');          x = SO3Mesh(x,Arg);
     case('SE3x');         x = SE3MeshXTangent(x,Arg);
@@ -202,7 +203,7 @@ mesh.Node = Node;
 
 end
 %--------------------------------------------------------------- SCALE MESH
-function mesh = SweepMesh(mesh,Arg)
+function [mesh, H0] = SweepMesh(mesh,Arg)
 
 Node0 = mesh.Node;
 List  = Arg{1};
@@ -231,8 +232,50 @@ end
 mesh.Node = V;
 
 end
+
+%--------------------------------------------------------------- SCALE MESH
+function [mesh, H0] = LoftMesh(mesh,Scale)
+
+Node0 = mesh.Node;
+% List  = Arg{1};
+% Swp   = Arg{2};
+V     = 0*Node0;
+
+if numel(Scale) == 1
+    Scale(2) = Scale;
+    Scale(1) = 1;
+end
+
+vmax = max(Node0(:,3));
+vmin = min(Node0(:,3));
+
+for ii = 1:length(Node0)
+    v = Node0(ii,:);
+    vx = v(1);
+    vy = v(2);
+    vz = v(3);
+    %id = List(ii);
+    
+    p1 = [vx; vy; 0];
+    %p0 = (Swp([3,2,1].',4,id));    %[Swp(id,7);Swp(id,6);Swp(id,5)];
+    %R  = rot90(Swp(1:3,1:3,id),2); %Quat2Rot(Swp(id,1:4)).';
+    %R = [R(:,3),R(:,2),R(:,1)];
+    
+%     S = eye(3)*;
+%     H0 = [S,[0;0;0];0,0,0,1];
+%     H1 = [eye(3),p1;0,0,0,1];
+    
+    alpha = lerp(Scale(1),Scale(2),(vz-vmin)/(vmax-vmin));
+    V(ii,:) = alpha*p1 + [0;0;vz];%reshape(H(1:3,4),1,3);
+end
+
+% fixes cosserat frame
+mesh.Node = V;
+
+end
+
 %---------------------------------------------------------------- CURL MESH
-function mesh = CurveMesh(mesh,Arg)
+function [mesh, H] = CurveMesh(mesh,Arg)
 
 Node0 = mesh.Node;
 sigma = max(Node0(:,3));
@@ -261,6 +304,9 @@ elseif strcmp(Ax,'PCC+')
     CellDelta = cellfun(@(V) CurveCellOperation(V,dk1,dk2),...
     Celltmp,'UniformOutput',false);
 end
+
+[~,zmax] = max(Node0(:,3));
+[~, H] = CurveCellOperation(Node0(zmax,:),dk1,dk2);
 
 Node = vertcat(CellDelta{:});
 mesh.Node = Node;
@@ -309,10 +355,10 @@ mesh.Node = Node;
 
 end
 %------------------------------------------------------- CURVATURE OPERATOR 
-function V = CurveCellOperation(Node,kx,ky)
+function [V, H0] = CurveCellOperation(Node,kx,ky)
 
-vx = Node(1);
-vy = Node(2);
+vx    = Node(1);
+vy    = Node(2);
 sigma = Node(3);
 
 kappa = sqrt(kx^2 + ky^2);
@@ -351,6 +397,7 @@ R = [(kx^2)*va + ca, kx*ky*va, ky*sa;
      -ky*sa, kx*sa,  ca];
 
 end
+
 function V = TwistCellOperation(Node,NodeC,theta,sigmalow,sigmaupp)
 
 vx = Node(1);
@@ -375,6 +422,7 @@ H = H0*H1;
 V = reshape(H(1:3,4),1,3);
 
 end
+
 function R = TwistRotationMatrix(sigma, theta)
 gamma = theta*sigma;
 

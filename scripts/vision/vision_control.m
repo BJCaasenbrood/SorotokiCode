@@ -125,8 +125,8 @@ t = brd.t;
 % 
 gd = SE3(roty(pi/2),[-20,0,-90].');
 % 
-P   = g(1:3,4,end)
-Pd  = gd(1:3,4,end)
+P   = g(1:3,4,end);
+Pd  = gd(1:3,4,end);
 % gg = g(:,:,end);
 JJ = J(4:6,:,end);
 % 

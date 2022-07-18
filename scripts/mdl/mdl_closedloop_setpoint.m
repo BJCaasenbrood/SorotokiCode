@@ -1,8 +1,8 @@
 clr; 
 %% 
-L = 100;   % length of robot
-M = 5;     % number of modes
-N = 100;    % number of discrete points on curve
+L = 120;   % length of robot
+M = 8;     % number of modes
+N = 100;   % number of discrete points on curve
 H = 1/60;  % timesteps
 FPS = 30;  % animation speed
 
@@ -15,7 +15,7 @@ Y = GenerateFunctionSpace(X,N,M);
 shp = Shapes(Y,Modes,'L0',L);
 
 %% set material properties
-shp.Material = Ecoflex0050();
+shp.Material = NeoHookeanMaterial(2,0.4);
 shp = shp.rebuild(); 
 
 %% build model class
@@ -49,7 +49,7 @@ for ii = 1:fps(mdl.Log.t,FPS):length(mdl.Log.q)
 end
 
 function gd = gref(~)
-gd = SE3(eye(3),[40,0,0]);
+gd = SE3(eye(3),[30,0,-10]);
 end
 
 %%
@@ -69,19 +69,23 @@ end
 function tau = Controller(mdl)
 t = mdl.Log.t;
 J = mdl.Log.EL.J;
-ge = SE3(mdl.Log.Phi,mdl.Log.gam);
+
+[gg,JJ] = mdl.Shapes.string(mdl.Log.q);
+% 
+J = JJ(:,:,end);
+ge = gg(:,:,end); %SE3(mdl.Log.Phi,mdl.Log.gam);
 gd = gref(t);
 
-KI = 0.01;
-lam1 = 25 + KI*mdl.Log.AUX.z;
-lam2 = 1e4;
-Kp = diag([1e-2,1e-2,1e-2,1,1,1]);
+KI = 0.03;
+lam1 = 15 + KI*mdl.Log.AUX.z;
+lam2 = 1e1;
+Kp = diag([1e-5,1e-5,1e-5,1,1,1]);
 
 Xi = smoothstep(2*t)*logmapSE3(ge\gd);
 Fu = Kp*tmapSE3(Xi)*wedge(Xi);
 
 tau = lam1*J.'*((J*J.' + lam2*eye(6))\Fu);
-tau = tau + mdl.Log.EL.G + mdl.Log.EL.K*mdl.Log.q;
+tau = tau + mdl.Log.EL.fg + mdl.Log.EL.K*mdl.Log.q;
 end
 
 function de = IntegrateError(mdl)
@@ -95,7 +99,9 @@ end
 %% setup rig
 function [rig, sph] = setupRig(M,L,Modes)
 gmdl = Gmodel('Arm.stl','ShowProcess',0);
-
+gmdl = gmdl.set('Emission', [0.9 0.8 0.8],...
+      'SSSPower',0.2,'SSSRadius',0.25,'SSS',true);
+ 
 N = 200;
 X = linspace(0,L,N)';
 Y = GenerateFunctionSpace(X,N,M);
@@ -108,15 +114,14 @@ rig = rig.add(gmdl);
 rig = rig.parent(1,0,0);
 rig = rig.parent(1,1,1);
 
-rig    = rig.texture(1,base);
+rig    = rig.texture(1,grey);
 rig.g0 = SE3(roty(pi/2),zeros(3,1));
-
-rig = rig.render();
 
 sph = Gmodel(sSphere(5));
 sph.Texture = diffuse(0.925);
 sph.bake.render();
 
+rig = rig.render();
 end
 
 

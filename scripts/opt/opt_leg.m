@@ -35,7 +35,7 @@ fem = fem.AddConstraint('PressureCell',id,[-1e-3,0]);
 fem = fem.initialTopology('Hole',[10,30],2);
 
 %% material
-fem.Material = Dragonskin10;
+fem.Material = Dragonskin10(10);
 
 %% linear solving
 fem.optimize();

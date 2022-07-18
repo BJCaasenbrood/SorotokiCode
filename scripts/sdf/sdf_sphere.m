@@ -1,6 +1,6 @@
 clr;
 %%
-S = sSphere(1)
+S = sSphere(1);
 obj = Gmodel(S,...
     'Texture',grey,'ShowProcess',0);
 obj.bake.render();

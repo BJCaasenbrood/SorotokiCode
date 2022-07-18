@@ -1,12 +1,14 @@
 function x = pingserver
-%PINGSERVER True for active internet connection
+%PINGSERVER returns true for active internet connection. It will simply
+%   if www.google.com can be reached. Usage:
 %
-%   See also: REPO, CDSORO.
+%   if pingserver
+%       disp('Hello internet!');
+%   else
+%       disp('404')
+%   end
 %
-%   For more information: 
-%       https://github.com/BJCaasenbrood/SorotokiCode
-
-%   Copyright 2018-2023 B.J.Caasenbrood 
+%   Last edit: Jul 15, 2022.
 if ismac
     % Code to run on Mac platform
 elseif isunix

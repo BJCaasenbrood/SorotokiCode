@@ -3,28 +3,33 @@ clr;
 L = 360;   % length of robot
 M = 2;     % number of modes
 N = 100;   % number of discrete points on curve
-H = 1/120; % timesteps
+H = 1/60; % timesteps
 FPS = 30;  % animation speed
 
-Modes = [0,M,M,M,0,0];  % pure-XY curvature
+Modes = [0,M,M,0,0,0];  % pure-XY curvature
+
 %% generate shapes
 X = linspace(0,L,N)';
 Y = GenerateFunctionSpace(X,N,M,L);
 
 shp = Shapes(Y,Modes,'L0',L);
-shp.Material = TPU90();
-shp.Material.Zeta = 0.05;
+shp.Material = NeoHookeanMaterial(25,0.4);
+shp.Material.Rho  = 500e-12;
+shp.Material.Zeta = 0.1;
 shp.Gvec = [-9.81e3; 0; 0];
 
 shp = shp.rebuild();
 
 %% model class
 mdl = Model(shp,'TimeStep',H,'TimeEnd',10);
+mdl = mdl.set('ResidualNorm',1e-5);
+mdl = mdl.set('MaxIteration',100);
 
 %% control law
 mdl.tau  = @(M) Controller(M);
 
 %%
+mdl.q0 = 1e-2*ones(shp.NDim,1);
 mdl = mdl.simulate(); 
 
 %% 
@@ -63,25 +68,32 @@ end
 Y = gsogpoly(Y,X);
 end
 
+%% setup controller
 function tau = Controller(mdl)
+
 t = mdl.Log.t;
-J = mdl.Log.EL.J;
-ge = SE3(mdl.Log.Phi,mdl.Log.gam);
+
+%[gg, JJ] = mdl.Shapes.string(mdl.Log.q);
+% 
+J  = mdl.Log.EL.J;
+ge = SE3(mdl.Log.Phi,mdl.Log.gam);%gg(:,:,end);
 gd = gref(t);
 
-lam1 = 2500;
-lam2 = 1e6;
+lam1 = 1e-6;
+lam2 = 1e-3;
 Kp = diag([0,0,0,1,1,1]);
 
 Xi = smoothstep(t)*logmapSE3(ge\gd);
 Fu = Kp*tmapSE3(Xi)*wedge(Xi);
 
 tau = lam1*J.'*((J*J.' + lam2*eye(6))\Fu);
+%tau = lam1*J.'*Fu;
 tau = tau + mdl.Log.EL.G + mdl.Log.EL.K*mdl.Log.q;
+tau = tau*0;
 end
 
-function gd = gref(t)
- gd = SE3(eye(3),[125,100,175]);
+function gd = gref(~)
+ gd = SE3(eye(3),[125,0,-175]);
 end
 
 %% setup rig
@@ -119,7 +131,7 @@ rig = rig.texture(3,egg);
 rig.g0 = SE3(roty(-pi),zeros(3,1));
 rig = rig.render();
 
-sph = Gmodel(sSphere(5));
+sph = Gmodel(sSphere(15));
 sph.Texture = diffuse(0.925);
 sph.bake.render();
 

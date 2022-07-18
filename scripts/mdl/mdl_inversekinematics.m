@@ -9,7 +9,6 @@ Y = zeros(N,M);
 
 for ii = 1:M
     Y(:,ii) = chebyshev(x,ii-1); % legendre 
-    %Y(:,ii) = pcc(x,ii,M);       % piece-wise constant
 end
 
 Y = gsogpoly(Y);
@@ -48,9 +47,6 @@ while norm(e) > 1e-3 && k < 100
     
     % plotting
     subplot(1,2,1); hold on;
-    %cplane(X,Y,Z);  hold on;
-    %plot(p(:,1),p(:,3),'k-','LineW',2);
-    %plot(p(Pts,1),p(Pts,3),'k.','MarkerS',15);
     plotSE2(g);
     plot(V(:,1),V(:,2),'k--','MarkerS',10);
     
@@ -92,6 +88,7 @@ while norm(e) > 1e-3 && k < 100
     
     subplot(1,2,2);
     plot(E,'LineW',3);
+    
     %axis equal;
     axis([0 100 0 0.05]);
     title('Energy difference');

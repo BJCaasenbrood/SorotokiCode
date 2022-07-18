@@ -7,10 +7,9 @@ msh = msh.generate();
 
 %%
 fem = Fem(msh,'TimeStep',1/800,'TimeEnd',1.5,'BdBox',[-35,35,-15,30],...
-    'Linestyle','none');
+    'Linestyle','-');
 
 fem.Material = NeoHookeanMaterial(0.1,0.4);
-fem.Material.Zeta = 0.3;
 fem.Material.Rho  = 5*fem.Material.Rho;
 
 fem = fem.AddConstraint('Gravity',[],[0,-9.81e3]);
@@ -24,7 +23,7 @@ figure(101); clf;
 
 for ii = 1:fps(t,200):numel(t)
     fem.set('Node',fem.Log.Node{ii});
-    %fem.show('Field',fem.Log.Stress{ii});
+    
     fem.show();
     caxis([-1e-6 1e-6])
     drawnow();

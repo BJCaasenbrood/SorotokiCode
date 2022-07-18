@@ -1,10 +1,10 @@
 clr;
 %% 
 L = 50;     % length of robot
-M = 6;      % number of modes
+M = 12;      % number of modes
 N = 50;     % number of discrete points on curve
-H = 1/150;  % timesteps
-FPS = 150;  % animation speed
+H = 1/60;  % timesteps
+FPS = 30;  % animation speed
 
 Modes = [0,M,M,0,0,0];  % pure-XY curvature
 %%
@@ -15,7 +15,7 @@ Y = GenerateFunctionSpace(X,N,M,L);
 %%
 shp = Shapes(Y,Modes,'L0',L);
 
-shp.Material = NeoHookeanMaterial(0.25,0.3);
+shp.Material = NeoHookeanMaterial(0.15,0.3);
 shp.Gvec = [-9.81e3;0;0];
 
 shp = shp.rebuild();

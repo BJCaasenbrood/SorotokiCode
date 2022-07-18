@@ -1,9 +1,10 @@
 clr;
 %% loading .stl file
-obj = Gmodel('Bunny.stl','Alpha',0.2);
-obj.Texture = bubble;
+obj = Gmodel('Bunny.stl');
+obj.Texture = base;
 
 %% rendering    
 obj = obj.bake().render(); view(10,20);
 obj.update();
+obj.ground();
 axis tight;

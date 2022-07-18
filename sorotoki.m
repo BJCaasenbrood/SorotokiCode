@@ -1,25 +1,51 @@
-% SOROTOKI is the installation manager, can also be used for demonstra-
-% tion, uninstalling, and general update notifications.  
-%
-% arg - `(empty)`, 'check', 'update', 'demo', 'update'.
-%
-% Usage:
-%   sorotoki();	          % calls the installer
-%   sorotoki('check');	  % performs complete check of toolkit
-%   sorotoki('update');	  % updates toolkit to newest version
-%   sorotoki('unload');	  % removes toolkit from search path
-%   sorotoki('demo');	  % provides a list of demos
-% -------------------------------------------------------------------------
-% Also see: FEM
-%
 function sorotoki(arg)
+%SOROTOKI is the installer function of SOROTOKI.
+%   SOROTOKI() can be executed in the command window and it will start the
+%   installation aumatically. Make sure you have an active internet
+%   connection to start the installation, which will be compared to the
+%   most current (stable) version of the toolkit. Some embedded functions
+%   for the SOROTOKI installer are:
+%
+%   sorotoki install       % installer
+%   sorotoki -i            % ...
+%   sorotoki check         % check installation/toolkit
+%   sorotoki -c            % check installation/toolkit
+%   sorotoki demo          % lists demos
+%   sorotoki -d            % lists demos
+%   sorotoki help          % help
+%   sorotoki -h            % help
+%   sorotoki version       % version
+%   sorotoki -v            % version
+%
+%   Also, some additional toolboxes are required:
+%
+%   - Image Processing Toolbox
+%   - Partial Differential Equation Toolbox
+%   - MATLAB Coder
+%   - Image Processing Toolbox
+%
+%   The installer will automaticall check for these. Furthermore, it will
+%   also prompt for configurating a startup file. This will ensure that
+%   sorotoki is also loaded when opening MATLAB, and can be found under
+%   .../MATLAB/startup.m in the MATLAB's main folder on your desktop.
+%
+%   Last edit: Jul 15, 2022.
 
 if nargin < 1, clc; clear; arg = 'install'; end
 % ------------------------------------------------------------------------
 switch(arg)
-    case('install');  setupToolkit;
-    case('demo');     showDemo;
-    case('cd');       getPath;
+    case('install');   setupToolkit;
+    case('uninstall'); unloadSorotoki;
+    case('remove');    unloadSorotoki;
+    case('demo');      showDemo;
+    case('cd');        getPath;
+    case('check');     verifySorotoki;
+    case('version');   disp(soropatch(1));
+    case('--version'); disp(soropatch(1));
+    case('-v');        disp(soropatch(1));
+    case('-c');        verifySorotoki;
+    case('-i');        setupToolkit;
+    case('-h');        help sorotoki;
 end
 
 end
@@ -96,7 +122,7 @@ fprintf(FIT,[datestr(datetime('today')),'\n']);
 fprintf(FIT,'%% install directory = ');
 fprintf(FIT,[Path,'\n']);
 
-if ~pingServer()
+if ~pingserver
     cout('err','No internet connection! '); 
     str = action({'(y)es, continue without connection',...
             '(n)o, stop installation'},'s');
@@ -375,6 +401,7 @@ write2file([Path,'\src\__base__\color']);
 write2file([Path,'\src\__base__\colormap']);
 write2file([Path,'\src\__base__\userinput']);
 write2file([Path,'\src\__base__\plot']);
+write2file([Path,'\src\__base__\units']);
 write2file([Path,'\data\']);
 write2file([Path,'\data\color']);
 write2file([Path,'\data\colormap']);
@@ -383,7 +410,6 @@ write2file([Path,'\data\matcap\img']);
 write2file([Path,'\data\stl']);
 write2file([Path,'\data\contours']);
 write2file([Path,'\scripts\']);
-write2file([Path,'\livescripts\']);
 else
 addPath(Path);
 addPath([Path,'src']);
@@ -395,6 +421,7 @@ addPath([Path,'\src\__base__\color']);
 addPath([Path,'\src\__base__\colormap']);
 addPath([Path,'\src\__base__\userinput']);
 addPath([Path,'\src\__base__\plot']);
+addPath([Path,'\src\__base__\units']);
 addPath([Path,'\data\']);
 addPath([Path,'\data\color']);
 addPath([Path,'\data\colormap']);
@@ -403,7 +430,6 @@ addPath([Path,'\data\matcap\img']);
 addPath([Path,'\data\stl']);
 addPath([Path,'\data\contours']);
 addPath([Path,'\scripts\']);
-addPath([Path,'\livescripts\']);
 pause(.3);
 
 x = checkLibary('base.lib',@(x) basePathConfirm);
@@ -448,10 +474,8 @@ pause(.3);
 
 x = checkLibary('gmodel.lib',@(x) graphicsmodelPathConfirm);
 
-if x
-    fprintf(FIT,'%% gmodel.lib installed succesfully! \n');
-else
-    fprintf(FIT,'%% gmodel.lib missing! \n');
+if x, fprintf(FIT,'%% gmodel.lib installed succesfully! \n');
+else, fprintf(FIT,'%% gmodel.lib missing! \n');
 end
 
 end

@@ -20,7 +20,7 @@ fem.Material = Ecoflex0030(50);
 fem.solve();
 
 function D = SquareHole(P,H,R)
-R1 = dRectangle(P,0,H/2,0,H/2);
-C1 = dCircle(P,0,0,R);
-D = dDiff(R1,C1);
+    R1 = dRectangle(P,0,H/2,0,H/2);
+    C1 = dCircle(P,0,0,R);
+    D = dDiff(R1,C1);
 end

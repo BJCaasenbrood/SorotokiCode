@@ -3,7 +3,7 @@ clr;
 figure(102);
 
 wheel();
-colormap(viridis(0));
+colormap(viridis);
 
 % for ii = 1:12
 %    subplot(12,1,ii) 

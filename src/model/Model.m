@@ -8,15 +8,16 @@ classdef Model
         TimeStep;       % time steps 
         Flow;           % auxilary flow map
         Log;            % simulation logger
+        InputMap;       % input map (Id = default)
         
         t;              % time
         q, dq, p;       % states
-        q0, dq0, p0;    
-        Phi0;
-        z0;
+        q0, dq0, p0;    % initial conditions
+        Phi0;           % initial orientation
+        z0;             % initial auxilary state
 
-        tau;
-        update;
+        tau;            % controller
+        update;         % update states
     end
     
     properties (Access = private)
@@ -64,8 +65,9 @@ function obj = Model(Shapes,varargin)
     obj.Flow = [];
     obj.z0   = 0;
 
-    obj.tau  = @(mdl) zeros(Shapes.NDim,1);
-    obj.update = @(x) x;
+    obj.tau      = @(mdl) zeros(Shapes.NDim,1);
+    obj.update   = @(x) x;
+    obj.InputMap = @(mdl) eye(Shapes.NDim);
     
     obj.Linewidth  = 4;
     obj.Markersize = 25;
@@ -131,12 +133,13 @@ if isempty(Model.dTaudq)
         computeControlJacobians(Model);
 end
 
-[T, X, Z, U, Km, Ue, Ug] = simulateSoftRobot(Model,...
+[T, X, P, Z, U, Km, Ue, Ug] = simulateSoftRobot(Model,...
     [Model.q0(:); Model.dq0(:)]);
 
 % extracting data
 Model.Log.t   = T(:);
 Model.Log.q   = X(:,1:Model.Shapes.NDim);
+Model.Log.p   = P(:,1:Model.Shapes.NDim);
 Model.Log.dq  = X(:,Model.Shapes.NDim+(1:Model.Shapes.NDim));  
 Model.Log.tau = U;
 
@@ -170,10 +173,10 @@ Model.Xi0   = Model.Shapes.get('Xi0Eval');
     
 % compute Lagrangian entries
 if ~Model.MexSolver
-    [M_,C_,K_,R_,G_,...
+    [M_,C_,K_,R_,fg_,...
         p_,Phi_,J_,Vg_,Kin_] = computeLagrangian(Model,Q,dQ);
 else
-    [M_,C_,K_,R_,G_,...
+    [M_,C_,K_,R_,fg_,...
         p_,Phi_,J_,Vg_,Kin_] = computeLagrangianFast_mex(...
         Q,dQ,...
         Model.Shapes.ds,...
@@ -184,7 +187,7 @@ else
         Model.Shapes.Ba,...
         Model.Shapes.Ktt,...
         Model.Shapes.Mtt,...
-        Model.Shapes.Zeta,...
+        Model.Shapes.Material.Zeta,...
         Model.Shapes.Gvec);
 end
 
@@ -198,16 +201,20 @@ Model.Log.p   = M_\dQ;
 Model.Log.gam = p_;
 Model.Log.Phi = Phi_;
 
-Model.Log.EL.M = M_;
-Model.Log.EL.C = C_;
-Model.Log.EL.R = R_;
-Model.Log.EL.K = Khyp;
-Model.Log.EL.G = G_;
-Model.Log.EL.J = J_;
+% evaluate control map
+Model.Log.EL.G = Model.InputMap(Model);
+
+Model.Log.EL.M  = M_;
+Model.Log.EL.C  = C_;
+Model.Log.EL.R  = R_;
+Model.Log.EL.K  = Khyp;
+Model.Log.EL.fg = fg_;
+Model.Log.EL.J  = J_;
 
 Model.Log.Psi  = Psi;
 Model.Log.Vg   = Vg_;
 Model.Log.Kin  = Kin_;
+Model.Log.dUdq = Khyp*Q + fg_;
 
 end
 %------------------------------------------------- plot curve configuration
@@ -236,16 +243,16 @@ function [P] = show(Model,Q,col,varargin)
 end
 %--------------------------------------------- compute end-effector pos/vel 
 function [p, eta] = endeffector(Model,Q,dQ)
-[p, ~, Jacob] = computeForwardKinematics(Model,Q(:));
-p   = p(end,:).';
-eta = Jacob*dQ(:);
+    [p, ~, Jacob] = computeForwardKinematics(Model,Q(:));
+    p   = p(end,:).';
+    eta = Jacob*dQ(:);
+end
 end
 
-end
 %--------------------------------------------------------------------------
 methods (Access = private) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %----------------------------------------- implicit time-integration solver
-function [Ts, X, Z, U, Kin, Ue, Ug] = simulateSoftRobot(Model,z0)
+function [Ts, X, P, Z, U, Kin, Ue, Ug] = simulateSoftRobot(Model,z0)
 
 Ts  = Model.t(:);
 h   = Model.TimeStep;
@@ -253,13 +260,14 @@ nd  = Model.Shapes.NDim;
 
 z   = z0(:); 
 X   = zeros(length(Ts),nd*2);
-U   = zeros(length(Ts),nd);
+U   = zeros(length(Ts),size(Model.Log.EL.G,2));
+P   = zeros(length(Ts),nd);
 Kin = zeros(length(Ts),1);
 Ue  = zeros(length(Ts),1);
 Ug  = zeros(length(Ts),1);
 
 X(1,:)  = z0(:).';
-U(1,:)  = zeros(1,nd);
+%U(1,:)  = zeros(1,nd);
 
 if ~isempty(Model.Flow)
     Z = zeros(length(Ts),numel(Model.z0));
@@ -316,7 +324,8 @@ for ii = 1:length(Ts)-1
        
     % write output data
     X(ii+1,:) = z(:).';
-    U(ii+1,:) = Model.Log.tau(:).';
+    P(ii+1,:) = Model.Log.EL.M*z(nd+1:2*nd);
+    U(ii+1,:) = (Model.Log.tau(:)).';
     Kin(ii+1) = 0.5*z(nd+1:2*nd).'*Model.Log.EL.M*z(nd+1:2*nd);
     Ue(ii+1)  = 0.5*z(1:nd).'*Model.Log.EL.K*z(1:nd);
     Ug(ii+1)  = Model.Log.Vg;
@@ -362,10 +371,10 @@ end
        
         % compute Lagrangian entries
         if ~Model.MexSolver
-            [M_,C_,K_,R_,G_,...
+            [M_,C_,K_,R_,fg_,...
                 gam_,Phi_,J_,Vg_,Kin_] = computeLagrangian(Model,Q,dQ);
         else
-            [M_,C_,K_,R_,G_,...
+            [M_,C_,K_,R_,fg_,...
                 gam_,Phi_,J_,Vg_,Kin_] = computeLagrangianFast_mex(...
                 Q,dQ,... 
                 Model.Shapes.ds,...   
@@ -384,22 +393,28 @@ end
         [Psi, ~] = HyperElasticModifier(Model,K_,Q);
             
         % overwrite dynamics
-        Model.Log.t   = T;
-        Model.Log.q   = Q;
-        Model.Log.dq  = dQ;
-        Model.Log.gam = gam_;
-        Model.Log.Phi = Phi_;
+        Model.Log.EL.M  = M_;
+        Model.Log.EL.C  = C_;
+        Model.Log.EL.R  = R_;
+        Model.Log.EL.K  = K_;
+        Model.Log.EL.fg = fg_;
+        Model.Log.EL.J  = J_;
         
-        Model.Log.EL.M = 0.5*(M_ + M_.');
-        Model.Log.EL.C = C_;
-        Model.Log.EL.R = R_;
-        Model.Log.EL.K = K_;
-        Model.Log.EL.G = G_;
-        Model.Log.EL.J = J_;
+        Model.Log.t    = T;
+        Model.Log.q    = Q;
+        Model.Log.dq   = dQ;
+        Model.Log.p    = M_*dQ;
+        Model.Log.gam  = gam_;
+        Model.Log.Phi  = Phi_;
+        Model.Log.dUdq = K_*Q + fg_;
+        Model.Log.dKdq = M_*dQ;
 
-        Model.Log.Psi = Psi;
-        Model.Log.Vg  = Vg_;
-        Model.Log.Kin = Kin_;
+        Model.Log.Psi   = Psi;
+        Model.Log.Vg    = Vg_;
+        Model.Log.Kin   = Kin_;
+        
+        % evaluate control map
+        Model.Log.EL.G = Model.InputMap(Model);
         
         % evaluate control action
         Model.Log.tau = Model.tau(Model);
@@ -415,9 +430,9 @@ end
         
         % flow field
         f = [dQ; ...
-             Minv*(Model.Log.tau - Model.Log.EL.C*dQ - ...
-             Model.Log.EL.K*Q - Model.Log.EL.R*dQ - ...
-             Model.Log.EL.G)];
+             Minv*(Model.Log.EL.G*Model.Log.tau - Model.Log.EL.C*dQ - ...
+                   Model.Log.EL.K*Q - Model.Log.EL.R*dQ - ...
+                   Model.Log.EL.fg)];
     end
     
 end
@@ -496,7 +511,6 @@ for ii = 1:Model.Shapes.NNode
     s  = s  + ds;
     Z1 = Z1 + 0.25*ds*(K1Z1 + 3*K2Z1);
     Z2 = Z2 + 0.25*ds*(K1Z2 + 3*K2Z2);
-
 end
 
 % recover the kinematics entities
@@ -674,13 +688,11 @@ end
 function [Psi, Khyp] = HyperElasticModifier(Model,K0,x)
 Nstp = 50;
 
-a = Model.Shapes.HypA;
-b = Model.Shapes.HypB;
 
 z = linspacen(zeros(Model.Shapes.NDim,1),x,Nstp);
 dz = z(:,2);
 
-Knl = @(x) K0 + 0*a*K0*log(b*(x.')*x + 1);
+Knl = @(x) K0 ;
 
 Psi = 0;
 for ii = 1:Nstp-1
@@ -698,7 +710,7 @@ Q0  = Model.q0(:);
 dQ0 = Model.dq0(:);    
     
 % compute Lagrangian entries
-[M_,C_,K_,R_,G_,p_,Phi_,J_] = computeLagrangian(Model,Q0,dQ0);
+[M_,C_,K_,R_,fg_,p_,Phi_,J_] = computeLagrangian(Model,Q0,dQ0);
 
 % overwrite dynamics
 Model.q  = Q0; 
@@ -706,11 +718,12 @@ Model.dq = dQ0;
 Model.Log.EL.M  = M_; 
 Model.Log.EL.C  = C_; 
 Model.Log.EL.R  = R_; 
-Model.Log.EL.G  = G_; 
+Model.Log.EL.fg = fg_; 
 Model.Log.EL.K  = K_; 
 Model.Log.EL.J  = J_;
+Model.Log.p     = M_*Model.dq;
 
-Model.Log.p   = p_; 
+Model.Log.gam = p_; 
 Model.Log.Phi = Phi_; 
 
 Model.t  = 0;
@@ -719,15 +732,16 @@ epsilon = 1e-3;
 delta   = epsilon*eye(n);
 
 Tau0 = Model.tau(Model);
+G0   = Model.InputMap(Model);
 
 Kt = zeros(n);
 Dt = zeros(n);
 
 % finite difference for tau(q(t),.)
 for ii = 1:n
-    Model.q = Q0 + delta(:,ii);
-    Tau_ = Model.tau(Model);
-    Kt(:,ii) = (Tau_ - Tau0)/epsilon;
+    Model.q  = Q0 + delta(:,ii);
+    Tau_     = Model.tau(Model);
+    Kt(:,ii) = (G0*Tau_ - G0*Tau0)/epsilon;
 end
 
 Model.q  = Q0; 
@@ -736,7 +750,7 @@ Model.q  = Q0;
 for ii = 1:n
     Model.dq = dQ0 + delta(:,ii);
     Tau_ = Model.tau(Model);
-    Dt(:,ii) = (Tau_ - Tau0)/epsilon;
+    Dt(:,ii) = (G0*Tau_ - G0*Tau0)/epsilon;
 end
 
 end

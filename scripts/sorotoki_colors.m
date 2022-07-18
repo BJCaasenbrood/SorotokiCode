@@ -2,7 +2,8 @@ clr;
 %% loop over colors
 figure(101);
 
-colorlist = redgreen(10);
+%colorlist = redgreen(10);
+colorlist = col;
 %%
 x = linspace(0,2*pi,1e3);
 y = @(x,a) sin(x + (a-1)/(.444*pi));

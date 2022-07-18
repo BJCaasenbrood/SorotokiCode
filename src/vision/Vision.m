@@ -14,7 +14,7 @@ classdef Vision
        NMarker;
        RMarker;
        HoodXY = 5;
-       HoodR  = 11;
+       HoodR  = 9;
     end
 %--------------------------------------------------------------------------    
 %--------------------------------------------------------------------------       
@@ -26,6 +26,7 @@ function obj = Vision(varargin)
     
     if isempty(varargin)
        Id = action(list);
+       obj.Cam = webcam(list{Id});
     elseif isfloat(varargin{1})
        Id = varargin{1};
        varargin{1} = [];
@@ -34,16 +35,14 @@ function obj = Vision(varargin)
        obj.Cam = webcam(1);
        obj.Pipe = realsense.pipeline();
        obj.Colorize = realsense.colorizer();
-       %obj.Pipe.start();
     end
     
-%     for ii = 1:2:length(varargin)
-%         obj.(varargin{ii}) = varargin{ii+1};
-%     end
-    
-    
+%         for ii = 1:2:length(varargin)
+%             obj.(varargin{ii}) = varargin{ii+1};
+%         end
+%     
     obj.NMarker = 1;
-    obj.RMarker = 17;
+    obj.RMarker = 22;
     
 end
 %---------------------------------------------------------------------- get     
@@ -80,12 +79,24 @@ function preview(Vision)
    preview(Vision.Cam); 
 end
 %--------------------------------------------------------- evalution of SDF
-function out = detect(Vision)
-   
-    
-R   = Vision.RMarker;
+function [out,im,im0] = detect(Vision,varargin)
+CUT = [];    
+if isempty(varargin)
+    R = Vision.RMarker;
+else
+    R = varargin{1};
+    CUT = varargin{2};
+end
+
+
+
 Num = Vision.NMarker;
+%tic
 im0 = snapshot(Vision.Cam);
+if ~isempty(CUT)
+   im0 = im0(CUT(1):CUT(2),CUT(3):CUT(4),:); 
+end
+%toc
 
 % imshow(im0, 'Border', 'tight'); 
 % drawnow;
@@ -102,17 +113,26 @@ h = circle_hough(e, R, 'same', 'normalise');
 
 % get peaks
 out = circle_houghpeaks(h, R, ...
-                          'nhoodxy', Vision.HoodXY,...
-                          'nhoodr', Vision.HoodR,...
-                          'npeaks', Num);
+                           'nhoodxy', Vision.HoodXY,...
+                           'nhoodr', Vision.HoodR,...
+                           'npeaks', Num);
+                       
+%[centers, radii, ~] = imfindcircles(im0,R);
+% out(1) = centers(1);
+% out(2) = centers(2);
+% out(3) = radii;
+%out = circle_houghpeaks(h,R,'npeaks', Num);
+%out = houghcircles(h, R, R);
 
-
-% figure(101);
-% for peak = out
-%     [x, y] = circlepoints(peak(3)); hold on;
-%     plot(x+peak(1), y+peak(2),...
-%         'g-','LineWidth',3);
-% end
+figure(101);
+imshow(im0);
+Color = barney(4);
+for peak = out
+     [x, y] = circlepoints(peak(3)); hold on;
+     [x2, y2] = circlepoints(peak(3)*0.2); hold on;
+     plot(x+peak(1), y+peak(2),'Color',Color(2,:),'LineWidth',3);
+     plot(x2+peak(1), y2+peak(2),'Color',Color(2,:),'LineWidth',3);
+end
                       
     
 end

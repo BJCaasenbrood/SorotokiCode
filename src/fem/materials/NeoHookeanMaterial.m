@@ -4,10 +4,8 @@ classdef NeoHookeanMaterial
         Type = 'NeoHookean';
         E;
         Nu;
-        C10;
-        D1;
         Rho  = 970e-12;
-        Zeta = 0.01;
+        Zeta = 0.1;
         Lambda;
         Mu; 
     end
@@ -30,13 +28,10 @@ function obj = NeoHookeanMaterial(varargin)
         Nu0 = varargin{2};
     end
     
-    obj.E  = E0;
-    obj.Nu = Nu0;
+    obj.E      = E0;
+    obj.Nu     = Nu0;
     obj.Lambda = (Nu0*E0)/((1+Nu0)*(1-2*Nu0));
-    obj.Mu  = E0/(2*(1+Nu0));
-
-    obj.C10 = obj.Mu/2;
-    obj.D1  = obj.Lambda/2;
+    obj.Mu     = E0/(2*(1+Nu0));
 end
 %---------------------------------------------------------------------- get     
 function varargout = get(NeoHookeanMaterial,varargin)
@@ -67,8 +62,8 @@ function [S, D, P] = PiollaStress(NeoHookeanMaterial,F,~)
 % %Nu0 = Nu0*0.75;
 % end
 
-C100 = NeoHookeanMaterial.C10; 
-K    = NeoHookeanMaterial.D1;
+C100 = NeoHookeanMaterial.Mu/2; 
+K    = NeoHookeanMaterial.Lambda/2;
 
 X12 = 1/2; 
 X13 = 1/3; 

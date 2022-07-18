@@ -1,4 +1,5 @@
-function DisplayLogo
+function displayLogoSorotoki
+%DISPLAYLOGOSOROTOKI, as the name implies. It will also show the versions.
 clc;
 fprintf('\t\t\t\n');
 fprintf(' -------------------------------------------------------------------------- \n');

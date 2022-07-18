@@ -34,7 +34,7 @@ fem = fem.AddConstraint('PressureCell',id,[-1e-3,0]);
 fem = fem.initialTopology('Hole',[0,0],1.5);
 
 %% material
-fem.Material = Ecoflex0050;
+fem.Material = Ecoflex0050();
 
 %% solving
 fem.optimize();
@@ -47,18 +47,17 @@ femr = Fem(mshr,'Nonlinear',true,'TimeStep',1/15,'FilterRadius',H/15,...
     'MovieAxis',[-75 170 -140 40],'Movie',0,'Linestyle','none');
 
 %% assign boundary conditions to reduced fem
-id = femr.FindNodes('Top'); 
+id = femr.FindNodes('Bottom'); 
 femr = femr.AddConstraint('Support',id,[1,1]);
 
-id = femr.FindNodes('Bottom'); 
+id = femr.FindNodes('Top'); 
 femr = femr.AddConstraint('Support',id,[1,0]);
 
 id = femr.FindEdges('AllHole');
-femr = femr.AddConstraint('Pressure',id,[-0.1*kpa,0]);
+femr = femr.AddConstraint('Pressure',id,[-0.2*kpa,0]);
 
 %% assign material to reduced fem
-D = 25; % compress. factor (more stable)
-femr.Material = Ecoflex0050(D);
+femr.Material = Ecoflex0050();
 
 %% solve final finite-element problem
 femr.solve();

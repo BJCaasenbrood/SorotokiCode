@@ -97,7 +97,7 @@ dC = (Jg).'*((Mtt*adV - adV.'*Mtt)*Jg  + Mtt*Jgt);
 dG = (Jg).'*(Ai*Mtt*[0;0;0;Gvec]);
 
 % compute (nonlinear stiffness)
-dK = (BTh).'*Ktt*(BTh);
+dK = diag(diag((BTh).'*Ktt*(BTh)));
 
 % compute grav. potential energy
 dKe = 0.5*V.'*Mtt*V;

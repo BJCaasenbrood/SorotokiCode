@@ -14,6 +14,5 @@ end
     
 beta = -1/(2*sigma^2);
 y = (1/(sigma*2*pi))*exp(beta*(x-mu).^2);
-
 end
 

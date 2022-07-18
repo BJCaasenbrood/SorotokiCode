@@ -156,13 +156,12 @@ function Gmodel = set(Gmodel,varargin)
     end
 end
 %--------------------------------------------------------------------- copy
-function obj = copy(Gmodel,varargin)
+function obj = copy(obj0,varargin)
     if nargin > 2
-       obj = Blender(Gmodel,varargin{:});
+       obj = Blender(obj0,varargin{:});
     else
-       obj = Gmodel;
+       obj = Gmodel(obj0.Node,obj0.Element);
     end
-    
 end
 %-------------------------------- store current nodes as base configuration
 function Gmodel = fix(Gmodel)
@@ -190,8 +189,11 @@ function Gmodel = render(Gmodel,varargin)
         Gmodel.LineStyle,'edgecolor',Gmodel.LineColor,'FaceVertexCData',...
         Gmodel.TextureMap,'FaceColor','flat','FaceAlpha',Gmodel.Alpha);
     
-    set(gcf,'color',gitpage); material dull;
+    material dull;
     axis equal; axis(Gmodel.BdBox); axis off; 
+    
+    % please MATLAB, get rid of that ugly grey background...
+    background(); 
     %view(30,15);
     daspect([1,1,1]);
     
@@ -199,10 +201,10 @@ function Gmodel = render(Gmodel,varargin)
     ax.Clipping = 'off';    
    
     Gmodel.FigHandle = hp;
-    Gmodel.FigAxis = ax;
-    Gmodel.Figure = H;
+    Gmodel.FigAxis   = ax;
+    Gmodel.Figure    = H;
     
-    h.ActionPostCallback  = @myprecallback;
+    h.ActionPostCallback   = @myprecallback;
     Gmodel.Figure.UserData = Gmodel;
     
     update(Gmodel);
@@ -214,7 +216,7 @@ function Gmodel = render(Gmodel,varargin)
         for i = 1:length(class)
         	r = update(class{i},'tex');
         end
-          class = whoClasses('Rig');
+        class = whoClasses('Rig');
         for i = 1:length(class)
         	r = class{i}.update();
         end

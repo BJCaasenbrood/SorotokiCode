@@ -13,6 +13,7 @@ classdef Bdog < handle
     end
     
     properties (Access = private)
+        out;
         Ndev;
         pyFile;
         outFile;
@@ -34,14 +35,10 @@ methods
 %-------------------------------------------------------- ballong-dog class 
 function obj = Bdog(usr,ip,pwd,varargin)
     
-    obj.Port = 8888;
+    obj.Port = 8889;
     obj.Ip  = ip;
     obj.Usr = usr;
     obj.Pwd = pwd;
-    
-    for ii = 1:2:length(varargin)
-        obj.(varargin{ii}) = varargin{ii+1};
-    end
     
     obj.t       = 0;
     obj.Ndev    = 0;
@@ -56,7 +53,11 @@ function obj = Bdog(usr,ip,pwd,varargin)
     obj.LoopCounter = 0;
     obj.LoopIndex = uint8(1e6);
     obj.Frequency = 400;
-    obj.Log = struct('Data',[],'Time',[]);
+    obj.Log = struct('y',[],'t',[]);
+    
+    for ii = 1:2:length(varargin)
+        obj.(varargin{ii}) = varargin{ii+1};
+    end
     
     % setup TCP client
     client = tcpip(obj.Ip,obj.Port,'NetworkRole', 'client');
@@ -200,19 +201,14 @@ function data = tcpRecvData(Bdog,data_length)
     data2 = fread(Bdog.TCPclient,data_length,"double");
     
     data = [data1,data2];
-    Bdog.Log.Data = vappend(Bdog.Log.Data,[data1, data2]);
+    Bdog.Log.y = vappend(Bdog.Log.y,[data1, data2]);
     
     Bdog.t = (1/Bdog.Frequency)*Bdog.LoopCounter;
-    Bdog.Log.Time = vappend(Bdog.Log.Time,Bdog.t);
-end
-%----------------------------------------------------------- run executable   
-function Bdog = run(Bdog)
-    %Bdog.command('python3 runme.py')
-    %cout('Press any key to start the realtime control!');
-    %pause;
+    Bdog.Log.t = vappend(Bdog.Log.t,Bdog.t);
 end
 %----------------------------------------------------------- run executable 
 function flag = loop(Bdog,Ts)
+    
     if Bdog.LoopCounter == 0
         fopen(Bdog.TCPclient);
         tic;
@@ -224,6 +220,10 @@ function flag = loop(Bdog,Ts)
         end
         tic;
         Bdog.LoopCounter = Bdog.LoopCounter + 1;
+        
+        % write data
+        %Bdog.Log.y = vappend(Bdog.Log.y,tcpRecvData(4));
+        %Bdog.Log.t = vappend(Bdog.Log.t,Bdog.t);
     end
     
     if Bdog.LoopCounter <= Bdog.LoopIndex
@@ -231,10 +231,7 @@ function flag = loop(Bdog,Ts)
     else
         flag = false;
     end
-end
-%------------------------------------------- generate c++/python executable 
-function Bdog = generate(Bdog)
-    generatePython(Bdog);
+    
 end
 %--------------------------------------------- reads log file, return array
 function A = read(Bdog,filename)
@@ -255,22 +252,6 @@ end
 end
 
 methods (Access = private)
-
-%---------------------------------------------------------------------- get   
-function generatePython(Bdog)
-   
-if exist(Bdog.pyFile,'file')
-    delete(Bdog.pyFile);
-end
-
-cout('* generating Python executable... \n')
-
-FID = fopen(Bdog.pyFile,'w');
-FID = generatePythonScript(Bdog,FID);
-fclose(FID);
-pause(2);
-
-end
 
 end
 end

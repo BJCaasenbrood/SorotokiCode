@@ -964,9 +964,9 @@ function [Node,Element] = GenerateMeshSTL(Mesh,name)
     
     model = createpde(3);
     importGeometry(model,name);
-%     msh = generateMesh(model,'GeometricOrder','linear',...
-%         'Hgrad', Mesh.Hmesh(1), 'Hmin', Mesh.Hmesh(2), 'Hmax', Mesh.Hmesh(3));
-    msh = generateMesh(model,'GeometricOrder','linear');
+   msh = generateMesh(model,'GeometricOrder','linear',...
+         'Hgrad', Mesh.Hmesh(1), 'Hmin', Mesh.Hmesh(2), 'Hmax', Mesh.Hmesh(3));
+    %msh = generateMesh(model,'GeometricOrder','linear');
     Node = msh.Nodes';
     Element = msh.Elements';
     

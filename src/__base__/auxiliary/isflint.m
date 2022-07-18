@@ -1,4 +1,4 @@
-function    isf = isflint( m )
+function isf = isflint(m)
 %   floating double only
 %   
 %   http://www.mathworks.com/company/newsletters/news_notes/pdf/Fall96Cleve.pdf

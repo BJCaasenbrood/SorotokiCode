@@ -1,37 +1,30 @@
 clr;
 %% 
-L = 100;   % length of robot
+L = 250;   % length of robot
 M = 3;     % number of modes
-N = 1000;  % number of discrete points on curve
-H = 1/60;  % timesteps
-FPS = 30;  % animation speed
+N = 50;   % number of discrete points on curve
+H = 1/150;  % timesteps
+FPS = 150;  % animation speed
 
-Modes = [0,M,0,M,0,0];  % pure-XY curvature
+Modes = [0,M,0,0,0,0];  % pure-XY curvature
 %%
 % generate nodal space
 X = linspace(0,L,N)';
 Y = GenerateFunctionSpace(X,N,M,L);
 
-%%
+%% 
 shp = Shapes(Y,Modes,'L0',L);
-
-shp.E    = 1.00;     % Young's modulus in Mpa
-shp.Nu   = 0.33;     % Poisson ratio
-shp.Rho  = 1000e-12; % Density in kg/mm^3
-shp.Zeta = 0.05;      % Damping coefficient
-
 shp.Gvec = [0; 0; 0];
 
 shp = shp.rebuild();
 
 %%
-mdl = Model(shp,'Tstep',H,'Tsim',2);
+mdl = Model(shp,'TimeEnd',30);
 
 %%
-mdl.q0(1)    = 0.1;
+mdl.q0(1) = 0.05;
 mdl = mdl.simulate(); 
 
-error
 %% 
 figure(100);
 plot(mdl.Log.t,mdl.Log.q(:,1:M),'LineW',2);
@@ -61,15 +54,17 @@ for ii = 1:M
 end
 
 % ensure its orthonormal (gram–schmidt)
-%Y = gsogpoly(Y,X);
+Y = gsogpoly(Y,X);
 end
 
 %% setup rig
 function [rig, gmdl] = setupRig(M,L,Modes)
 
-gmdl = Gmodel('Arm.stl');
-gmdl = gmdl.set('Emission', [0.9 0.8 0.8],...
-     'SSSPower',0.005,'SSSRadius',5,'SSS',true);
+T = 50;
+gmdl = Gmodel('Cylinder.stl','Texture',metal);
+gmdl = Blender(gmdl,'Scale',{'z',T});
+gmdl = Blender(gmdl,'Scale',1/T);
+%gmdl = Blender(gmdl,'Fix');
  
 gmdl = gmdl.bake.render(); 
  
@@ -85,7 +80,6 @@ rig = rig.add(gmdl);
 rig = rig.parent(1,0,0);
 rig = rig.parent(1,1,1);
 
-rig    = rig.texture(1,base);
 rig.g0 = SE3(roty(-pi),zeros(3,1));
 
 rig = rig.render();
