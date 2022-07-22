@@ -11,19 +11,19 @@ msh = msh.generate();
 
 msh.show();
 
-fem = Fem(msh,'TimeStep',1/1250,'TimeEnd',1,...
+fem = Fem(msh,'TimeStep',1/250,'TimeEnd',1,...
     'BdBox',[-5*W,5*W,-15,H],'Linestyle','none');
 
-fem.Material = Dragonskin10(10);
+fem.Material = Dragonskin30(10);
 
 fem = fem.AddConstraint('Gravity',[],[0,-9.81e3]);
 fem = fem.AddConstraint('Contact',@(x) SDF(x,W),[0,0]);
-id = fem.FindNodes('NE');
+id  = fem.FindNodes('NE');
 
 %fem = fem.AddConstraint('Spring',id,[0,-1e3]);
 %fem = fem.AddConstraint('Pressure',{[9,12]},@(x) -2e-3*sin(30*x.Time));
 %fem = fem.AddConstraint('Pressure',{[2,3]},@(x)  -2e-3*sin(40*x.Time));
-fem = fem.AddConstraint('Load',fem.FindNodes('Top'),[2e-5,0]);
+%fem = fem.AddConstraint('Load',fem.FindNodes('Top'),[2e-5,0]);
 
 fem = fem.simulate();
 
@@ -68,6 +68,6 @@ end
 
 function D = SDF(x,W)
     %S = sRectangle(-W,2*W,-150,-5);
-    S = sLine(2*W,-W,-2,-5.5);
+    S = sLine(2*W,-W,-.3,-.3);
     D = S.eval(x);
 end

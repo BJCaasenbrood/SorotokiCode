@@ -299,6 +299,24 @@ if buildMexbool
    cout('Green','\t ');
    generateMexNSOF;
    
+   cd([Path,'/src/fem/mex/localsNH']);
+   cout('Text','* Finding locals NeoHookean folder...\n');
+   cout('Keyword','* building LocalsNHFast.mex...\n');
+   cout('Green','\t ');
+   generateMexLNH;
+   
+   cd([Path,'/src/fem/mex/localsYH']);
+   cout('Text','* Finding locals Yeoh folder...\n');
+   cout('Keyword','* building LocalsYHFast.mex...\n');
+   cout('Green','\t ');
+   generateMexLYH;
+   
+   cd([Path,'/src/fem/mex/localsMN']);
+   cout('Text','* Finding locals Mooney folder...\n');
+   cout('Keyword','* building LocalsMNFast.mex...\n');
+   cout('Green','\t ');
+   generateMexLMN;
+   
    cd([Path,'/src/model/mex/forwardkin']);
    cout('Text','* Finding forward kinematics folder...\n');
    cout('Keyword','* building computeForwardKinematicsFast.mex...\n');
@@ -310,6 +328,7 @@ if buildMexbool
    cout('Keyword','* building computeLagrangianFast.mex...\n');
    cout('Green','\t ');
    generateMexCLF;
+   
 
 %    cd([Path,'/src/gmodel/mex/marchingcube']);
 %    cout('Text','* Finding marching cube folder...\n');
@@ -530,6 +549,9 @@ write2file([Path,'\src\fem\materials\']);
 write2file([Path,'\src\fem\materials\samples']);
 write2file([Path,'\src\fem\mex\nonlinearstrainmat']);
 write2file([Path,'\src\fem\mex\polardecomposition']);
+write2file([Path,'\src\fem\mex\localsYH']);
+write2file([Path,'\src\fem\mex\localsMN']);
+write2file([Path,'\src\fem\mex\localsNH']);
 %write2file(mexPath);
 else
 addPath([Path,'\scripts\fem\']);
@@ -545,6 +567,9 @@ addPath([Path,'\src\fem\materials\']);
 addPath([Path,'\src\fem\materials\samples']);
 addPath([Path,'\src\fem\mex\nonlinearstrainmat']);
 addPath([Path,'\src\fem\mex\polardecomposition']);
+addPath([Path,'\src\fem\mex\localsYH']);
+addPath([Path,'\src\fem\mex\localsMN']);
+addPath([Path,'\src\fem\mex\localsNH']);
 pause(.3);
 
 x = checkLibary('fem.lib',@(x) femPathConfirm);
