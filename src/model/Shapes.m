@@ -65,7 +65,16 @@ function obj = Shapes(Input,NModal,varargin)
     if isa(Input,'Fem')
         obj.Fem    = Input;
         obj.NNode  = 30;        
-        obj.Gvec   = [0; 0; 9.81e3];
+        gvec = Input.get('Gravity');
+        if ~isempty(gvec)
+            if numel(gvec) == 2
+                obj.Gvec = [0; gvec(:)];
+            else
+                obj.Gvec = gvec(:);
+            end
+        else
+            obj.Gvec = zeros(3,1);
+        end
         
     elseif isa(Input,'double')
         obj.NNode = size(Input,1);

@@ -1,10 +1,10 @@
 clr;
 %% pressure settings
-P0  = 25*kpa;
+P0  = 30*kpa;
 
 %% generate mesh
 msh = Mesh('PneunetFine.png','BdBox',[0,120,0,20],...
-           'SimplifyTol',0.03,'Hmesh',[1,2,3]);
+           'SimplifyTol',0.03,'Hmesh',[1,1,2]);
 
 msh = msh.generate();
 
@@ -14,7 +14,8 @@ fem = fem.set('TimeStep',1/50,'BdBox',[-20,120,-80,20],...
               'Linestyle','none','TimeEnd',2);
 
 %% add boundary constraint
-fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,1]);
+fem = fem.AddConstraint('Support',fem.FindNodes('Box',[0,0,0,15]),[1,1]);
+fem = fem.AddConstraint('Spring',fem.FindNodes('SE'),[0,0.075]);
 fem = fem.AddConstraint('Gravity',[],[0,-9.81e3]);
 %fem = fem.AddConstraint('Contact',@(x) SDF(x,15), [0, 0]);
 
@@ -26,7 +27,7 @@ fem.Material = NeoHookeanMaterial(0.65,0.3);
 fem.Material.Zeta = 1.45;
 
 %% solve
-fem.simulate(); 
+fem.solve(); 
 
 %% movie
 close all;

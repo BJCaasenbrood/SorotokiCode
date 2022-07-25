@@ -19,7 +19,7 @@ Y = GenerateFunctionSpace(X,N,M,L);
 %%
 shp = Shapes(Y,Modes,'L0',L);
 shp.Material = NeoHookeanMaterial(1,0.33);
-shp.Gvec = [-9.81e3;0;0];
+shp.Gvec = [9.81e3;0;0];
 
 shp = shp.rebuild();
 

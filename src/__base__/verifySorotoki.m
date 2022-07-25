@@ -189,33 +189,32 @@ fem = Fem(msh,'ShowProcess',false);
 boc;
 
 cout('\t Fem.show()'); bic; 
-%fem.show();
 boc;
 
 cout('\t Fem.AddConstraint()'); bic(1); 
 fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,1]);
 fem = fem.AddConstraint('Support',fem.FindNodes('Right'),[0,1]);
-%fem = fem.AddConstraint('Gravity',[],[0,-9.81e3]);
 fem = fem.AddConstraint('Displace',fem.FindNodes('Right'),[1,0]);
 boc;
 
-%cout('\t Fem.Material'); bic; 
 fem.Material = Ecoflex0050(10);
-%boc;
 
 cout('\t Fem.solve()'); bic; 
 fem.solve();
 boc;
 
 cout('\t NeoHookean()'); bic; 
+fem = fem.reset();
 fem.Material = NeoHookeanMaterial(); fem.solve();
 boc();
 
 cout('\t MooneyMaterial()'); bic; 
+fem = fem.reset();
 fem.Material = MooneyMaterial(); fem.solve();
 boc();
 
 cout('\t Yeoh() '); bic; 
+fem = fem.reset();
 fem.Material = YeohMaterial(); fem.solve();
 boc();
 
@@ -335,15 +334,11 @@ p = shp.FK(Q(:,ii));
 plot(p(:,1),p(:,3),'LineW',3);
 boc();
 
-
 E    = 3.00;     % Young's modulus in Mpa
 Nu   = 0.42;     % Poisson ratio
-
-% shp.Rho  = 1000e-12; % Density in kg/mm^3
-% shp.Zeta = 0.01;      % Damping coefficient
 shp.Material = NeoHookeanMaterial(E,Nu);
 shp.Material.Zeta = 0.03;
-shp.Gvec = [-9.81e3;0;0];
+shp.Gvec = [9.81e3; 0; 0];
 
 cout('\t Shapes.rebuild()'); bic(1); 
 shp = shp.rebuild(); boc();
@@ -387,7 +382,6 @@ boc();
 
 end
 %--------------------------------------------------------------------------
-%--------------------------------------------------------------------------
 function list = verifySorotokiSoftware(list,exec,label)
 list = verifyFunction(list,label,0);
 try
@@ -399,7 +393,6 @@ catch e
 end
 
 end
-
 function List = verifyFunction(List,input,index)
 if index == 0
     cout('text','* ');
@@ -421,7 +414,6 @@ else
 end
 
 end
-%--------------------------------------------------------------------------
 function bic(n)
 if nargin < 1
        cout('\t\t ');

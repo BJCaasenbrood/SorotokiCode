@@ -424,10 +424,10 @@ switch(Request)
         Fem.Iteration = 1;
         Fem.Increment = 1;
         %Fem.Node      = Fem.Node0;
-        Fem.Support   = [];
-        Fem.Load      = [];
-        Fem.Spring    = [];
-        Fem.Log       = [];
+%         Fem.Support   = [];
+%         Fem.Load      = [];
+%         Fem.Spring    = [];
+%         Fem.Log       = [];
         Fem.Residual  = zeros(Fem.Dim*Fem.NNode,1);
         Fem.Utmp      = zeros(Fem.Dim*Fem.NNode,1);
         Fem.dUtmp     = zeros(Fem.Dim*Fem.NNode,1);
@@ -838,7 +838,8 @@ while flag
     [~,dEdy,~,dVdy] = MaterialField(Fem);
      
     % set load factor
-    Fem.OptFactor = Fem.IterationMMA/Fem.MaxIterationMMA;
+    Fem.OptFactor = sigmoid(Fem.IterationMMA/Fem.MaxIterationMMA,...
+        Fem.SigmoidFactor);
    
     % solve nonlinear finite elements
     Fem = Fem.solve();
@@ -866,7 +867,7 @@ while flag
     [flag,Fem] = CheckConvergenceOpt(Fem);
     
     % draw visual
-    if mod(Fem.IterationMMA,10) == 0
+    if (mod(Fem.IterationMMA,10) == 0) || Fem.Nonlinear
         Fem.show(Visual); drawnow;
         colormap(turbo);
     end

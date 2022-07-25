@@ -15,7 +15,8 @@
 %   example is fem_bouncingball.m which initally started spinning due to
 %   improper implementation of the friction forces during contact. The
 %   interaction friction can be modified under Material.Cfr (default =
-%   1e-6 for most sample materials).
+%   1e-6 for most sample materials). Added example to show the friction
+%   effects is: ./scripts/fem/2D/dynamics/fem_crawler.m
 %
 % ? High interaction friction forces lead to instabilities, implement with
 %   caution. A fix will be issued later.
