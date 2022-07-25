@@ -7,6 +7,7 @@ Material = YeohMaterial('C1',36e-3,'C2',0.25e-3,'C3',0.023e-3,...
 
 Material.Rho  = 1.07e-9;
 Material.Zeta = 1;
+Material.Cfr  = 1e-5;
 
 end
 

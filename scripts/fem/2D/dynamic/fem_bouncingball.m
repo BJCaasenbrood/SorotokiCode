@@ -11,6 +11,7 @@ fem = Fem(msh,'TimeStep',1/800,'TimeEnd',1.5,'BdBox',[-35,35,-15,30],...
 
 fem.Material = NeoHookeanMaterial(0.1,0.4);
 fem.Material.Rho  = 5*fem.Material.Rho;
+fem.Material.Cfr  = 1e-4;
 
 fem = fem.AddConstraint('Gravity',[],[0,-9.81e3]);
 fem = fem.AddConstraint('Contact',@(x) SDF(x,15),[0,0]);
@@ -28,10 +29,10 @@ for ii = 1:fps(t,200):numel(t)
     caxis([-1e-6 1e-6])
     drawnow();
     background(gitpage);
-    if ii == 1, gif('fem_bouncingball.gif',...
-            'frame',gcf,'nodither','DelayTime',1/30);
-    else, gif; 
-    end
+%     if ii == 1, gif('fem_bouncingball.gif',...
+%             'frame',gcf,'nodither','DelayTime',1/30);
+%     else, gif; 
+%     end
 end
 
 %% Signed distance environment

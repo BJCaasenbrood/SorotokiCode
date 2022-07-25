@@ -1,19 +1,19 @@
-%clr;
+clr;
 %% generate mesh from sdf
 sdf = sRectangle(0,40,0,3);
 
-msh = Mesh(sdf,'NElem',10);
+msh = Mesh(sdf,'Quads',[30,2]);
 msh = msh.generate();
 
 %% generate fem model from mesh
-fem = Fem(msh,'TimeStep',1/500,'TimeEnd',5,'SolverPlot',false);
+fem = Fem(msh,'TimeStep',1/300,'TimeEnd',3,'SolverPlot',false);
 
 %% add constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,1]);
 fem = fem.AddConstraint('Gravity',[],[0,-9.81e3]);
 
 %% select material
-fem.Material = NeoHookeanMaterial(0.01,0.3); 
+fem.Material = NeoHookeanMaterial(0.25,0.3);
 
 %% solving
 fem.simulate();

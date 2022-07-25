@@ -6,14 +6,14 @@ D = 2;   % inter distance
 
 sdf = @(x) PneuNet(x,W,H,D,W);
 
-msh = Mesh(sdf,'BdBox',[0,W,0,H],'NElem',700);
+msh = Mesh(sdf,'BdBox',[0,W,0,H],'NElem',500);
 msh = msh.generate();
 
 %% show generated mesh
-fem = Fem(msh,'VolumeInfill',0.33,'Penal',4,'FilterRadius',H/20,...
-              'Nonlinear',false,'TimeStep',1/3,'ReflectionPlane',[0,0],...
+fem = Fem(msh,'VolumeInfill',0.4,'Penal',4,'FilterRadius',H/20,...
+              'Nonlinear',1,'TimeStep',1/30,'ReflectionPlane',[0,0],...
               'OptimizationProblem','Compliant','Linestyle','None',...
-              'MaxIterationMMA',70,'ChangeMax',0.03,'Movie',0);
+              'MaxIterationMMA',70,'ChangeMax',0.1,'Movie',0);
 
 %% set spatial settings
 fem = fem.set('Periodic',[1/2, 0],'Repeat',[ones(9,1)]);
@@ -26,13 +26,13 @@ id  = fem.FindNodes('Right');
 fem = fem.AddConstraint('Spring',id,[0,1]);
 fem = fem.AddConstraint('Output',id,[0,-1]);
 id  = fem.FindElements('Location',[W/2,0.5*H],1);
-fem = fem.AddConstraint('PressureCell',id,5*kpa);
+fem = fem.AddConstraint('PressureCell',id,10*kpa);
 
 %% set density
 fem = fem.initialTopology('Hole',[W/2,0.5*H],0.85);
 
 %% material
-fem.Material = Dragonskin30();
+fem.Material = Ecoflex0030(2);
 
 %% solving
 fem.optimize();

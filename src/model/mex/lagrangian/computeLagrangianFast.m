@@ -94,7 +94,7 @@ dJt = A*adV*BTh;
 % compute inertia, coriolis, gravity
 dM = (Jg).'*Mtt*Jg;
 dC = (Jg).'*((Mtt*adV - adV.'*Mtt)*Jg  + Mtt*Jgt);
-dG = (Jg).'*(Ai*Mtt*[0;0;0;Gvec]);
+dG = -(Jg).'*(Ai*Mtt*[0;0;0;Gvec]);
 
 % compute (nonlinear stiffness)
 dK = diag(diag((BTh).'*Ktt*(BTh)));

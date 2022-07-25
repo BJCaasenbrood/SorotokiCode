@@ -5,12 +5,8 @@ classdef Shapes
         Sdf;
         Material;
         Sigma;
-        L0;
-        Ba;
-        ds;
-        
-        g0;
-        gL;
+
+        g0; gL;
         xia0;
         Node;
         Node0;
@@ -19,25 +15,18 @@ classdef Shapes
         NModal;
         NDim;
         NNode;
-        
-        POD;
-        PODR;
-        PODQ;
+
         Theta;
         Xi0;
         
-%         Rho;
-%         Zeta;
-%         E;
-%         Nu;
-        
-        Mtt;
-        Dtt;
-        Ktt;  
-        Ktt0;
-        Jtt;
-        Att;
+        Ba; ds; L0;
+        Mtt; Dtt;
+        Ktt; Ktt0;
+        Jtt; Att;
         Gvec;
+        
+        Kp;     %IK proportional gain
+        Kd;     %IK differential gain
     end
     
     properties (Access = private)
@@ -47,6 +36,10 @@ classdef Shapes
         Rotation;
         Gamma;
         Kappa;
+                
+        POD;
+        PODR;
+        PODQ;
         
         PODEnergy;
         
@@ -72,9 +65,16 @@ function obj = Shapes(Input,NModal,varargin)
     if isa(Input,'Fem')
         obj.Fem    = Input;
         obj.NNode  = 30;        
-        %obj.Rho    = Input.Material.Rho;
-        %obj.Zeta   = Input.Material.Zeta;
-        obj.Gvec   = [0; 0; 9.81e3];
+        gvec = Input.get('Gravity');
+        if ~isempty(gvec)
+            if numel(gvec) == 2
+                obj.Gvec = [0; gvec(:)];
+            else
+                obj.Gvec = gvec(:);
+            end
+        else
+            obj.Gvec = zeros(3,1);
+        end
         
     elseif isa(Input,'double')
         obj.NNode = size(Input,1);
@@ -92,13 +92,15 @@ function obj = Shapes(Input,NModal,varargin)
     end
 
     % cross-section SDF
-    obj.Sdf = sCircle(10);
-    obj.Center = zeros(3,1);
-    obj.Material = NeoHookeanMaterial(1,0.33);
+    obj.Sdf          = sCircle(10);
+    obj.Center       = zeros(3,1);
+    obj.Material     = NeoHookeanMaterial(1,0.33);
     obj.FilterRadius = 10;
 
     obj.g0 = SE3(eye(3),zeros(3,1));
     obj.gL = [];
+    obj.Kp = 1e-4;
+    obj.Kd = 1e3;
        
     for ii = 1:2:length(varargin)
         obj.(varargin{ii}) = varargin{ii+1};
@@ -219,6 +221,8 @@ Shapes.ds    = Shapes.L0/(Shapes.NNode);
 if isempty(Shapes.Fem)
     Shapes = GenerateRadialFilter(Shapes);
 end
+
+Shapes = rebuild(Shapes);
 
 end   
 %------------------------------------------------------------ set reference
@@ -459,7 +463,7 @@ function varargout = FK(Shapes,q,dq)
     
     p0           = Shapes.g0(1:3,4);
     [g, J]       = string(Shapes,q);
-    varargout{1} = [p0.'; reshape(g(1:3,4,1:end-1),3,[]).'];
+    varargout{1} = [p0.'; reshape(g(1:3,4,1:end),3,[]).'];
     
     if nargout > 1
         V = zeros(Shapes.NNode,6);
@@ -493,7 +497,7 @@ function xi = strain(Shapes,q)
     
 end
 %------------------------------------------------- estimate Cosserat string
-function [q,XI] = estimateJointSpace(Shapes,Xi,W)
+function [q, XI] = estimateJointSpace(Shapes,Xi,Nds)
 
 Kappa_ = Xi(:,1);
 Gamma_ = Xi(:,2);
@@ -508,46 +512,70 @@ if nargin < 3
    W = [1,1];
 end
 
-WR = (W(:,1));
-WQ = (W(:,2));
+WR = 1;
+WQ = 1;
 
 Lam1 = diag(trapz(Shapes.Sigma,PODr.*PODr));
 Lam2 = diag(trapz(Shapes.Sigma,PODq.*PODq));
-% % 
+
 XR = Lam1\trapz(Shapes.Sigma,PODr.*WR.*Kappa_).';
 XQ = Lam2\trapz(Shapes.Sigma,PODq.*WQ.*Gamma_).';
-% 
-% XI = [PODr*XR,PODq*XQ];
 
-% figure(106); clf;
-% subplot(2,1,1);
-% plot(Kappa_); hold on;
-% plot(PODr*XR);
-% 
-% subplot(2,1,2);
+q0 = [XR; XQ];
+Nc = Shapes.Filter*Nds;  
 
+k1 = 0.000;
+k2 = 0.25;
 
-% XR = (diag(WR)*PODr).'*inv(PODr*diag(WR)*(PODr.'))*Kappa_;
-% XQ = (diag(WQ)*PODq).'*inv(PODq*diag(WQ)*(PODq.'))*Gamma_;
+E = 1;
+q = q0;
 
-% plot(Gamma_); hold on;
-% plot(PODq*XQ);
+Itr = 1;
+Ids = [round(1:(Shapes.NNode/4):Shapes.NNode),(Shapes.NNode)];
 
-% q0 = zeros(sum(Shapes.NModal),1);
-% 
-% q = fminunc(@(x) Objective(x,Shapes,N_),q0);
-% 
+while (E > 1e-3) && (Itr < 150)
+    
+    [gg, JJ] = Shapes.string(q);
+    
+    dq = q*0;
+    
+    for ii = 1:numel(Ids)
+        
+        g  = gg(:,:,Ids(ii));
+        J  = JJ(:,:,Ids(ii));
+        gd = SE3(g(1:3,1:3),[Nc(Ids(ii),1);0;Nc(Ids(ii),2)]);
+        
+        lam1 = Shapes.Kp;
+        lam2 = Shapes.Kd;
+        
+        % conditioner
+        Ke = diag([k1,k1,k1,k2,k2,k2])*(ii/numel(Ids)).^2;
+        
+        Xi = logmapSE3(g\gd);
+        Fu = Ke*tmapSE3(Xi)*wedge(Xi);
+        
+        E = norm(wedge(Xi));
+        
+        dq = dq + lam1*J.'*((J*J.' + lam2*eye(6))\Fu);
+    end
+    
+    q   = q + dq;
+    Itr = Itr + 1;
+end
+
+% opts = optimoptions('fminunc','FiniteDifferenceStepSize',1e-6);
+% q    = fminunc(@(x) Objective(x,Shapes,Nc(end,:)),q0,opts);
+% % 
 %     function J = Objective(Q,shp,P)
-%        
-%         P_ = shp.FK(Q);
-%         
-%         J = sum((sum((P - P_(2:end,:)).^2,2)));
-%         
+%         P_ = shp.FK(Q);      
+%         J = sum((sum((P - P_(end,[1,3])).^2,2)));  
+%         %[~, D] = distance2curve(P,P_(end,[1,3]));
+%         %J = sum(D);
 %     end
 
 % XR = PODr.'*inv(PODr*PODr.')*Kappa_;
 % XQ = PODq.'*inv(PODq*PODq.')*Gamma_;
-q  = [XR; XQ];
+%q  = q0;
 XI = [PODr*XR,PODq*XQ];
 
 end
@@ -696,7 +724,7 @@ for ii = 1:Shapes.NNode
    if numel(el) == 3
     d{ii} = [repmat(ii,numel(el),1),[el(2);el(1);el(3)],(N)];
    else
-    d{ii} = [repmat(ii,numel(el),1),[el(:)],(N)];   
+    d{ii} = [repmat(ii,numel(el),1),[el(end-1:-1:1).';el(end)],(N)];   
    end
    
 end
@@ -737,7 +765,7 @@ for ii = 1:Shapes.NNode
     [Ur,~,Vr] = svd(RRe);
     Re = (Ur*Vr.');
      
-    Rot{ii,1} = Re;
+    Rot{ii,1}      = Re;
     Tangent(ii,:)  = Re(:,1).';
     Gamma(ii,1)    = trace(UUe)/3;
 end
@@ -747,16 +775,15 @@ for ii = 2:Shapes.NNode-1
     Nii = Nod(ii+1,:);
     Nip = Nod(ii-1,:);
     
-    g  = [Rot{ii,1},    [Ni(1); Ni(2);0];   zeros(1,3), 1];
-    dg = ([Rot{ii+1,1}, [Nii(1); Nii(2);0]; zeros(1,3), 1] ...
-        - [Rot{ii-1,1}, [Nip(1); Nip(2);0]; zeros(1,3), 1])/(2*Shapes.ds);
+    g  = [Rot{ii,1},    [Ni(1);  Ni(2);  0];   zeros(1,3), 1];
+    dg = ([Rot{ii+1,1}, [Nii(1); Nii(2); 0]; zeros(1,3), 1] ...
+        - [Rot{ii-1,1}, [Nip(1); Nip(2); 0]; zeros(1,3), 1])/(2*Shapes.ds);
     
     GSE3(:,:,ii) = g;
     XI = g\dg;
     
     Kappa(ii,1) = XI(1,2);
     Gamma(ii,1) = XI(1,4);
-   
 end
 
 

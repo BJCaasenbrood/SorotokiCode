@@ -18,3 +18,4 @@ bin
 */bin/
 */codegen/
 codegen/
+*.mexa64

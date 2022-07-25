@@ -957,6 +957,8 @@ function [Node,Element] = GenerateMeshImage(Mesh,Image)
     
     Node    = Tesselation.Nodes.';    
     Element = Tesselation.Elements.';
+    Node(:,1) = Node(:,1) + B(1);
+    Node(:,2) = Node(:,2) + B(3);
     
 end
 %----------------------------------------------- generate elemental adjency

@@ -88,13 +88,12 @@ qmod  = T.'*[qa; qud];
 MD0   = mdl.computeEL(q);
 MDD   = mdl.computeEL(qmod);
 
-Kp    = 1e4;
-dVddq = -MDD.Log.dVdq + Kp*(qmod - qdmod) ;
+Kp    = 1e3;
+dVddq = -MDD.Log.dUdq + Kp*(qmod - qdmod) ;
 tau   = -A.'*(dVddq);
 
-pdec = annihil(G)*(MD0.Log.dVdq - dVddq);
-c = pdec.'*pdec
-
+pdec = annihil(G)*(MD0.Log.dUdq - dVddq);
+c = pdec.'*pdec;
 end
 
 function [T] = CoordinateTransform(mdl)

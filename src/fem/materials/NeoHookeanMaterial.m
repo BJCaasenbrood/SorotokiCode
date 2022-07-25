@@ -6,6 +6,7 @@ classdef NeoHookeanMaterial
         Nu;
         Rho  = 970e-12;
         Zeta = 0.1;
+        Cfr  = 1e-6;
         Lambda;
         Mu; 
     end
@@ -48,6 +49,10 @@ end
 function y = getModulus(NeoHookeanMaterial)
 y = NeoHookeanMaterial.E;
 end
+%---------------------------------------------------------------------- get     
+function y = getContactFriction(NeoHookeanMaterial)
+y = NeoHookeanMaterial.Cfr*getModulus(NeoHookeanMaterial);
+end
 %---------------------------------------------------------------------- set
 function NeoHookeanMaterial = set(NeoHookeanMaterial,varargin)
     for ii = 1:2:length(varargin)
@@ -57,11 +62,6 @@ end
 %------------------------------ 2nd Piolla stress tensor for Neo-Hookean
 function [S, D, P] = PiollaStress(NeoHookeanMaterial,F,~)
 %Se = 2nd PK stress [S11, S22, S33, S12, S23, S13];
-
-% if (nargin > 2) && Robustness
-% %Nu0 = Nu0*0.75;
-% end
-
 C100 = NeoHookeanMaterial.Mu/2; 
 K    = NeoHookeanMaterial.Lambda/2;
 

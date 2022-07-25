@@ -7,6 +7,7 @@ classdef MooneyMaterial
         K    = 5;
         Rho  = 1e-9;
         Zeta = 0.1;
+        Cfr  = 1e-6;
     end
 
     
@@ -39,6 +40,10 @@ end
 %---------------------------------------------------------------------- set
 function y = getModulus(MooneyMaterial)
     y = MooneyMaterial.C10; 
+end
+%---------------------------------------------------------------------- set
+function y = getContactFriction(MooneyMaterial)
+    y = MooneyMaterial.C10*MooneyMaterial.Cfr; 
 end
 %---------------------------------------------------------------------- set
 function C = C1(MooneyMaterial), C = MooneyMaterial.C10; end

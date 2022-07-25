@@ -115,7 +115,7 @@ for ii = 1:2
     tau = tau + Fu;
 end
 
-tau = tau + mdl.Log.EL.G + mdl.Log.EL.K*mdl.Log.q;
+tau = tau + mdl.Log.EL.fg + mdl.Log.EL.K*mdl.Log.q;
 
 end
 
