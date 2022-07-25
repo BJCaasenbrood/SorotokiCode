@@ -1,4 +1,57 @@
 %% ------------------------------------------------------------------------
+% % SOROTOKI - Alpha - 2.07.22 - July 22 - 2022
+%
+% + Documentation update to the examples Modeling.
+% + Added minor description in auxilary functions in /src/__base__
+%
+% **Fem.m**
+%
+% + Generated new mex files for the Local element computation. Now each
+%   matrix computation in during the fem simulation calls a .mex64 file.
+%   This significantly improves performance ~40% compare to .m files.
+%   During install, Sorotoki will ask to install the new mex files.
+%
+% + Added (proper) friction effects to the contact simulations. A good
+%   example is fem_bouncingball.m which initally started spinning due to
+%   improper implementation of the friction forces during contact. The
+%   interaction friction can be modified under Material.Cfr (default =
+%   1e-6 for most sample materials). Added example to show the friction
+%   effects is: ./scripts/fem/2D/dynamics/fem_crawler.m
+%
+% ? High interaction friction forces lead to instabilities, implement with
+%   caution. A fix will be issued later.
+%
+% + Added initial conditions to the dynamic Fem simulations. Now Fem.Utmp
+%   can be overwritten before calling fem.simulate. This can be extremely
+%   handy if we like to simulate from a quasi-static equilbrium, e.g.,
+%   gravity deflection. One can first call fem.solve(), get the
+%   displacement through U0 = fem.Log.U(end,:), then a new simulation:
+%
+%   fem.reset();
+%   fem.set('Utmp',U0);
+%   fem.simulate();
+%
+%   We can also ensure there is no ramping of the gravity force by setting
+%   the following fem.set('GravityRamp',false);
+%
+% **Shapes.m**
+% + Major update to the class. Now, Shapes.reconstruct() will produce better 
+%   POD bases from the finite element simulations. As example:
+%
+%   shp = Shapes(fem,Modal,'NNode',100,'L0',120,'FilterRadius',[15,15]);
+%   shp = shp.reference([0,0],[119,0]);
+%   shp = shp.reconstruct();
+%
+%   This code will generate a basis from the data in Fem, and project its
+%   dynamics onto a curve spanned by the points: (0,0) -> (119,0). During
+%   the reconstruction, all system tensors are build accordingly.
+%
+% + Shapes.show() is implemented and will show the strain basis.
+%
+% **Model.m**
+% - Fixed a minus error in the gravitional force compuation that lead to
+%   incorrect orientation of the gravity vector.
+%% ------------------------------------------------------------------------
 % % SOROTOKI - Alpha - 2.05.19 - May 19 - 2022
 % **Fem.m**
 %
@@ -6,7 +59,6 @@
 %   than 2 iterations, data was not properly stored. To solve this, any
 %   nonlinear time increment must take atleast two steps, as to ensure a
 %   new displacement field is introduced to the stress-strain calculations.
-%
 %% ------------------------------------------------------------------------
 % % SOROTOKI - Alpha - 2.05.17 - May 17 - 2022
 % + Added MEX compiler for Model, Gmodel, and Fem classes. This signicantly

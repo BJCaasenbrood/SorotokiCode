@@ -13,7 +13,6 @@ Modes = [0,M,0,0,0,0];  % pure-XY curvature
 X   = linspace(0,1,N)';
 Y   = GenerateFunctionSpace(X,N,M);
 shp = Shapes(Y,Modes,'L0',L);
-shp.Gvec = [0,0,-9810].';
 
 % set material properties
 shp.Material = NeoHookeanMaterial(5,0.4);
@@ -23,13 +22,13 @@ shp = shp.rebuild();
 mdl = Model(shp,'TimeStep',H,'TimeEnd',15,'ShowProcess',0);
 
 I = eye(M);
-mdl.InputMap = @(x) I(:,[1,2]);
+mdl.InputMap = @(x) I(:,[1,2,3]);
 
 %% controller
 mdl.tau = @(M) Controller(M);
 
 %% simulate system
-mdl.q0(1) = -0.002;
+mdl.q0(1) = 0.002;
 mdl = mdl.simulate(); 
 
 %% animation
@@ -92,7 +91,7 @@ ge = gg(:,:,end);
 [Fu] = ControllerWrench(t,ge);
 
 % controller
-lam1 = 450.0;
+lam1 = 1e3;
 lam2 = 1e6;
 
 dVedq = mdlmod.Log.EL.K*q + mdlmod.Log.EL.fg;
@@ -100,7 +99,7 @@ dFedq = lam1*J.'*((J*J.' + lam2*eye(6))\Fu);
 tau   = pinv(G)*(dFedq + dVedq);
 
 PDEcon = (annihil(G)*(dVedq));
-c = PDEcon.'*PDEcon
+c = PDEcon.'*PDEcon;
 end
 
 function [T] = CoordinateTransform(mdl)

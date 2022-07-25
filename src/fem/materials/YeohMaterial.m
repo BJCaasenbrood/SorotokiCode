@@ -10,6 +10,7 @@ classdef YeohMaterial
         D3   = 1;
         Rho  = 1e-9;
         Zeta = 0.1;
+        Cfr  = 1e-6;
     end
     
     properties (Access = private)
@@ -57,7 +58,11 @@ function YeohMaterial = set(YeohMaterial,varargin)
 end  
 %---------------------------------------------------------------------- set
 function y = getModulus(YeohMaterial)
-   y = 6*YeohMaterial.C1;
+    y = 6*YeohMaterial.C1; 
+end
+%---------------------------------------------------------------------- set
+function y = getContactFriction(YeohMaterial)
+    y = 6*YeohMaterial.Cfr*YeohMaterial.C1; 
 end
 %------------------------------ 2ND PIOLLA STRESSAND STIFFNESS FOR YEOH
 function [S, D, P] = PiollaStress(YeohMaterial,F,~)

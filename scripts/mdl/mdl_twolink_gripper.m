@@ -16,7 +16,7 @@ shp = Shapes(Y,Modes,'L0',L);
 shp.Material = NeoHookeanMaterial(25,0.4);
 shp.Material.Rho  = 500e-12;
 shp.Material.Zeta = 0.1;
-shp.Gvec = [-9.81e3; 0; 0];
+shp.Gvec = [9.81e3; 0; 0];
 
 shp = shp.rebuild();
 
@@ -88,7 +88,7 @@ Fu = Kp*tmapSE3(Xi)*wedge(Xi);
 
 tau = lam1*J.'*((J*J.' + lam2*eye(6))\Fu);
 %tau = lam1*J.'*Fu;
-tau = tau + mdl.Log.EL.G + mdl.Log.EL.K*mdl.Log.q;
+tau = tau + mdl.Log.EL.fg + mdl.Log.EL.K*mdl.Log.q;
 tau = tau*0;
 end
 

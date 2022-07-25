@@ -1,29 +1,32 @@
 clr;
-%% mesh
-%sdf = SDF(10,10);
-H = 20;
-W = 15;
+W = 150;
+H = 15;
 
-[V,F] = VertexSet(W,H);
+%% generate mesh
+msh = Mesh('Crawler.png','BdBox',[0,W,0,H],...
+           'SimplifyTol',0.02,'Hmesh',[1,3,5]);
 
-msh = Mesh(V,F);
 msh = msh.generate();
-
 msh.show();
 
-fem = Fem(msh,'TimeStep',1/1250,'TimeEnd',1,...
-    'BdBox',[-5*W,5*W,-15,H],'Linestyle','none');
+%% FEM
+fem = Fem(msh,'TimeStep',1/800,'TimeEnd',2,...
+    'BdBox',[-1.2*W,1.2*W,-15,H],'Linestyle','none');
 
-fem.Material = Dragonskin10(10);
+fem.Material = NeoHookeanMaterial(0.15,0.4);
+fem.Material.Rho  = fem.Material.Rho;
+fem.Material.Cfr  = 5e-6;
 
 fem = fem.AddConstraint('Gravity',[],[0,-9.81e3]);
 fem = fem.AddConstraint('Contact',@(x) SDF(x,W),[0,0]);
-id = fem.FindNodes('NE');
 
-%fem = fem.AddConstraint('Spring',id,[0,-1e3]);
-%fem = fem.AddConstraint('Pressure',{[9,12]},@(x) -2e-3*sin(30*x.Time));
-%fem = fem.AddConstraint('Pressure',{[2,3]},@(x)  -2e-3*sin(40*x.Time));
-fem = fem.AddConstraint('Load',fem.FindNodes('Top'),[2e-5,0]);
+%%
+fem = fem.AddConstraint('Pressure',fem.FindEdges('BoxHole',[0 50 0 15]),...
+   @(x) pset(x.Time,1));
+fem = fem.AddConstraint('Pressure',fem.FindEdges('BoxHole',[50 100 0 15]),...
+   @(x) pset(x.Time,2));
+fem = fem.AddConstraint('Pressure',fem.FindEdges('BoxHole',[100 150 0 15]),...
+   @(x) pset(x.Time,3));
 
 fem = fem.simulate();
 
@@ -31,43 +34,31 @@ fem = fem.simulate();
 t = fem.Log.t; close all;
 figure(101);
 
-
-for ii = 1:fps(t,60):numel(t)
+for ii = 1:fps(t,120):numel(t)
+    subplot(2,1,1);
     fem.set('Node',fem.Log.Node{ii});
-    fem.show();
-    %caxis([0 1e-5]);
-    axis([-60 130 -120 30]);
+    fem.show('Field',0*fem.Log.Stress{ii});
+    plot([150,150],[0,25],'k','LineW',1.5);
+    caxis([-1 1]);
+    axis([-1.2*W,1.2*W,-15,5*H]);
+    
+    subplot(2,1,2);
+    P = [pset(t(1:ii).',1).',pset(t(1:ii).',2).',pset(t(1:ii).',3).'];
+    plot(t(1:ii).',P/kpa,'LineW',1.5);
+    xlim([0, fem.get('TimeEnd')]); xlabel('time (s)','interpreter','latex')
+    ylim([0, 5]); ylabel('$p_1$, $p_2$, $p_3$ (kPa)','interpreter','latex')
+    
     drawnow();
 end
 
-
-function [V,F] = VertexSet(W,H)
-
-V = [0,0;
-     W/3,0;
-     W/3,H/3;
-     0,H/3;
-     W/3,H
-     0,H;
-     2*W/3,H/3;
-     2*W/3,H;
-     2*W/3,0;
-     W,0;
-     W,H/3;
-     W,H];
- 
-V(:,1) = V(:,1) -  W/2; 
- 
-F = [1,2,3,4;
-     4,3,5,6
-     3,7,8,5
-     9,10,11,7;
-     11,7,12,8];
-
+function y = pset(t,id)
+w  = 5*pi*2;
+P0 = 4*kpa;
+y  = P0*tsin(w*t - (id-1)*pi/2.75).*sigmoid(w*t);
 end
 
 function D = SDF(x,W)
     %S = sRectangle(-W,2*W,-150,-5);
-    S = sLine(2*W,-W,-2,-5.5);
+    S = sLine(3*W,-W,-.1,-.10);
     D = S.eval(x);
 end

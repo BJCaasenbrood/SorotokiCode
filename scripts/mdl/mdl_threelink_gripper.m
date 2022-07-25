@@ -21,7 +21,7 @@ shp = Shapes(Y,Modes,'L0',L);
 %% setting materials
 shp.Material     = NeoHookeanMaterial(25,0.4);
 shp.Material.Rho = 250e-12;
-shp.Gvec = [-9.81e3; 0; 0];
+shp.Gvec = [9.81e3; 0; 0];
 
 shp = shp.rebuild();
 

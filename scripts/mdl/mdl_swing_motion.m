@@ -1,7 +1,7 @@
 clr;
 %%
 Omega = 3*pi; % rad/s
-Ampli = 120;   % Nmm (N-millimeter)
+Ampli = 320;  % Nmm (N-millimeter)
 
 %% 
 L = 100;    % length of robot
@@ -18,8 +18,8 @@ Y = GenerateFunctionSpace(X,N,M,L);
 
 %%
 shp = Shapes(Y,Modes,'L0',L);
-shp.Material = NeoHookeanMaterial(2,0.33);
-shp.Gvec = [-9.81e3;0;0];
+shp.Material = NeoHookeanMaterial(1,0.33);
+shp.Gvec = [9.81e3;0;0];
 
 shp = shp.rebuild();
 
@@ -59,8 +59,8 @@ function Y = GenerateFunctionSpace(X,N,M,L)
 Y = zeros(N,M);
 
 for ii = 1:M
-   %Y(:,ii) = chebyshev(X/L,ii-1); 
-   Y(:,ii) = pcc(X/L,ii,M); 
+   Y(:,ii) = chebyshev(X/L,ii-1); 
+   %Y(:,ii) = pcc(X/L,ii,M); 
 end
 
 % ensure its orthonormal (gram–schmidt)
