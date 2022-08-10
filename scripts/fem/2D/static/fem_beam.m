@@ -9,15 +9,11 @@ msh = msh.generate();
 fem = Fem(msh,'TimeStep',1/120,'SolverPlot',true);
 
 %% add constraint
-fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,1]);
-%fem = fem.AddConstraint('Support',fem.FindNodes('Right'),[1,1]);
-fem = fem.AddConstraint('Gravity',[],[0,-9.81e3]);
+fem = fem.addSupport(fem.FindNodes('Left'),[1,1]);
+fem = fem.addGravity([0,-9.81e3]);
 
 %% select material
-fem.Material = NeoHookeanMaterial(0.1,0.4);%Ecoflex0030(50);
+fem.Material = NeoHookeanMaterial(0.1,0.4);
 
 %% solving
 fem.simulate();
-
-%% plotting
-%fem.show();

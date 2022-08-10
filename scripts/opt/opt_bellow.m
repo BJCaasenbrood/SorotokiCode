@@ -1,7 +1,9 @@
 clear; close all; clc;
 
+P0 = -1*kpa;
+
 %% set signed distance function
-W = 10;
+W = 15;
 H = 5;
 sdf = @(x) Bellow(x,W,H);
 
@@ -12,35 +14,35 @@ msh.show(); pause(2);
 
 %% show generated mesh
 fem = Fem(msh,'VolumeInfill',0.225,'Penal',4,'FilterRadius',0.75,...
-              'Nonlinear',false,'TimeStep',1/3,'ReflectionPlane',[1,1],...
+              'Nonlinear',0,'TimeStep',1/5,'ReflectionPlane',[1,1],...
               'OptimizationProblem','Compliant','Repeat',[],...
-              'MaxIterationMMA',40,'Movie',0);
+              'MaxIterationMMA',100,'Movie',0);
 
 %% add constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[0,1]);
 fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,0]);
 
 id = fem.FindNodes('Location',[0.1*W,H]);
-fem = fem.AddConstraint('Output',id,[0,-1]);
+fem = fem.AddConstraint('Output',id,[0,sign(P0)]);
 fem = fem.AddConstraint('Spring',id,[0,1]);
 
 id = fem.FindNodes('Line',[0.02*W,W,H,H]);
 fem = fem.AddConstraint('Spring',id,[0,.1]*1e-1);
 
 id = fem.FindElements('Location',[0,0],1);
-fem = fem.AddConstraint('PressureCell',id,[-1e-3,0]);
+fem = fem.AddConstraint('PressureCell',id,[P0,0]);
 
 %% set density
 fem = fem.initialTopology('Hole',[0,0],1.5);
 
 %% material
-fem.Material = Ecoflex0050();
+fem.Material = Ecoflex0030(5);
 
 %% solving
 fem.optimize();
 
 %% convert topology result to mesh
-mshr = fem.exportMesh(0.25,0.07,[1.1,0.25,5]); 
+mshr = fem.exportMesh(0.25,0.07,[1,1,2]); 
 mshr.show(); pause(2);
 
 femr = Fem(mshr,'Nonlinear',true,'TimeStep',1/15,'FilterRadius',H/15,...
@@ -54,10 +56,11 @@ id = femr.FindNodes('Top');
 femr = femr.AddConstraint('Support',id,[1,0]);
 
 id = femr.FindEdges('AllHole');
-femr = femr.AddConstraint('Pressure',id,[-0.2*kpa,0]);
+femr = femr.AddConstraint('Pressure',id,[P0,0]);
 
 %% assign material to reduced fem
-femr.Material = Ecoflex0050();
+D = 5;
+femr.Material = Ecoflex0030(D);
 
 %% solve final finite-element problem
 femr.solve();

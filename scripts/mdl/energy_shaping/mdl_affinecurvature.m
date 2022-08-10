@@ -1,14 +1,14 @@
 clr; 
 %% 
 L = 120;   % length of robot
-T = 15;    % simulation time
+T = 5;    % simulation time
 M = 2;     % number of modes
 N = 40;    % number of discrete points on curve
 H = 1/60;  % timesteps
 FPS = 30;  % animation speed
 
 %% actuated states
-aa = [1];
+aa = [1,2];
 qd = [0.0379   -0.0019].';
 
 %% building model
@@ -88,7 +88,7 @@ qmod  = T.'*[qa; qud];
 MD0   = mdl.computeEL(q);
 MDD   = mdl.computeEL(qmod);
 
-Kp    = 1e3;
+Kp    = 5e3;
 dVddq = -MDD.Log.dUdq + Kp*(qmod - qdmod) ;
 tau   = -A.'*(dVddq);
 

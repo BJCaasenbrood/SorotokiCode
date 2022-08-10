@@ -1,24 +1,24 @@
 clr;
 %% pressure settings
-P0  = 25*kpa;
+P0  = 5*kpa;
 
 %% generate mesh
 msh = Mesh('PneunetFine.png','BdBox',[0,120,0,20],...
-           'SimplifyTol',0.02,'Hmesh',[1,2,3]);
+           'SimplifyTol',0.02,'Hmesh',[1,2,3],...
+           'MatlabMeshType','quadratic');
 
 msh = msh.generate();
 
 %% generate fem model
 fem = Fem(msh);
-fem = fem.set('TimeStep',1/500,'BdBox',[0,120,-80,20],...
+fem = fem.set('TimeStep',1/120,'BdBox',[0,120,-80,20],...
               'Linestyle','none','TimeEnd',2);
 
 %% add boundary constraint
-fem = fem.AddConstraint('Support',fem.FindNodes('Box',[0,0,0,10]),[1,1]);
-fem = fem.AddConstraint('Gravity',[],[0,-9.81e3]);
-fem = fem.AddConstraint('Contact',@(x) SDF(x,22),[0,0]);
+fem = fem.addSupport(fem.FindNodes('Box',[0,0,0,10]),[1,1]);
+fem = fem.addGravity([0,-9.81e3]);
 
-fem = fem.AddConstraint('Pressure',fem.FindEdges('AllHole'),...
+fem = fem.addPressure(fem.FindEdges('AllHole'),...
    @(x) P0*sigmoid(x.Time));
 
 %% assign material

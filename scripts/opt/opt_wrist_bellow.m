@@ -24,9 +24,6 @@ id = fem.FindNodes('Location',[0.1*W,H]);
 fem = fem.AddConstraint('Output',id,[0,-1]);
 fem = fem.AddConstraint('Spring',id,[0,1]);
 
-% id = fem.FindNodes('Line',[0.02*W,W,H,H]);
-% fem = fem.AddConstraint('Spring',id,[0,.1]*1e-1);
-
 id = fem.FindElements('Location',[0,0],1);
 fem = fem.AddConstraint('PressureCell',id,[-1e-3,0]);
 
@@ -52,7 +49,6 @@ femr = femr.AddConstraint('Support',id,[1,1]);
 
 id = femr.FindNodes('Bottom'); 
 femr = femr.AddConstraint('Support',id,[1,0]);
-%femr = femr.AddConstraint('Load',id,[0,-0.1]);
 
 id = [femr.FindNodes('Left'); femr.FindNodes('Right')];
 femr = femr.AddConstraint('Support',id,[1,0]);

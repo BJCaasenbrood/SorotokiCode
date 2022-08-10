@@ -55,6 +55,7 @@ classdef Mesh
         SimplifyTol;
         Hmesh;
         STLFile;
+        MatlabMeshType = 'linear';
     end
     
 %--------------------------------------------------------------------------
@@ -158,7 +159,14 @@ function obj = Mesh(Input,varargin)
        if ~isempty(Input.BdBox)
           obj.BdBox = Input.BdBox;
        end
-       
+    elseif isa(Input,'uint8')
+        obj.Dim   = 2;
+        obj.Type  = 'C2T3';
+        if size(Input,3) == 3
+            obj.Image = rgb2gray(Input);
+        else
+            obj.Image = Input;
+        end
     end
     
     for ii = 1:2:length(varargin)
@@ -178,6 +186,7 @@ function obj = Mesh(Input,varargin)
             obj.(varargin{ii}) = varargin{ii+1};
         end
     end
+    
     
     if obj.Triangulate,  obj.Type = 'C2T3'; end
     if isempty(obj.SDF), obj.Type = 'C3T3'; end
@@ -205,21 +214,6 @@ function obj = Mesh(Input,varargin)
     end
     
 end
-%---------------------------------------------------------------------- get     
-function varargout = get(Mesh,varargin)
-% gets any variable(s) in Class hierarchy.
-% example usage: 
-%  
-%   [n,m] = msh.get('NNode','NElem')
-    if nargin > 1
-        varargout{nargin-1,1} = [];
-        for ii = 1:length(varargin)
-            varargout{ii,1} = Mesh.(varargin{ii});
-        end
-    else
-        varargout = Mesh.(varargin);
-    end
-end
 %---------------------------------------------------------------------- set
 function Mesh = set(Mesh,varargin)
 % sets any variable(s) in Class hierarchy.
@@ -235,6 +229,29 @@ function Mesh = set(Mesh,varargin)
             Mesh.(varargin{ii}) = varargin{ii+1};
         end
     end
+end
+%---------------------------------------------------------------------- get     
+function varargout = get(Mesh,varargin)
+% gets any variable(s) in Class hierarchy.
+% example usage: 
+%  
+%   [n,m] = msh.get('NNode','NElem')
+    if nargin > 1
+        varargout{nargin-1,1} = [];
+        for ii = 1:length(varargin)
+            varargout{ii,1} = Mesh.(varargin{ii});
+        end
+    else
+        varargout = Mesh.(varargin);
+    end
+end
+%------------------------------------------------------------- get boundary
+function varargout = getBoundary(Mesh)
+varargout{1} = Mesh.Boundary;
+end
+%-------------------------------------------------------------- get normal
+function varargout = getNormal(Mesh)
+varargout{1} = Mesh.Normal;
 end
 %---------------------------------------------------------------------- set
 function Mesh = generate(Mesh)
@@ -953,7 +970,8 @@ function [Node,Element] = GenerateMeshImage(Mesh,Image)
     H = Mesh.Hmesh;
     %axis equal; drawnow;    
     %pause();
-    Tesselation = triangulationCreate(c_cell, H(1), H(2), H(3),'linear');
+    Tesselation = triangulationCreate(c_cell, H(1), H(2), H(3),...
+        Mesh.MatlabMeshType);
     
     Node    = Tesselation.Nodes.';    
     Element = Tesselation.Elements.';

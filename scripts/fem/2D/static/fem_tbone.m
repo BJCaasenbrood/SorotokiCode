@@ -10,14 +10,15 @@ msh = msh.generate();
 fem = Fem(msh,'TimeStep',1/125,'Linestyle','none');
 
 %% add boundary conditions
-fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,0]);
-fem = fem.AddConstraint('Support',fem.FindNodes('Right'),[1,0]);
-fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[0,1]);
-fem = fem.AddConstraint('Displace',fem.FindNodes('Top'),[0,6]);
-fem = fem.AddConstraint('Output',fem.FindNodes('Location',[1,4]),[0,1]);
+fem = fem.addSupport(fem.FindNodes('Left'),[1,0]);
+fem = fem.addSupport(fem.FindNodes('Right'),[1,0]);
+fem = fem.addSupport(fem.FindNodes('Bottom'),[0,1]);
+fem = fem.addDisplace(fem.FindNodes('Top'),[0,6]);
+fem = fem.addOutput(fem.FindNodes('Location',[1,4]),[0,1]);
 
 %% assign material
-fem.Material = Dragonskin10(120);
+fem.Material = Dragonskin10(3);
+%fem.Material = MooneyMaterial;%('C01',0.0944,'C10',-0.1494,'K',1e4);
 
 %% solving
 fem.solve();

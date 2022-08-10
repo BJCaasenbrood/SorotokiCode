@@ -9,12 +9,12 @@ msh = msh.generate();
 fem = Fem(msh,'TimeStep',1/25);
 
 %% add constraint
-fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,1]);
-fem = fem.AddConstraint('Support',fem.FindNodes('Right'),[1,1]);
-fem = fem.AddConstraint('Load',fem.FindNodes('Bottom'),[0,-1e-3]);
+fem = fem.addSupport(fem.FindNodes('Left'),[1,1]);
+fem = fem.addSupport(fem.FindNodes('Right'),[1,1]);
+fem = fem.addLoad(fem.FindNodes('Bottom'),[0,-2e-3]);
 
 %% select material
-fem.Material =  Dragonskin10;
+fem.Material = Dragonskin10;
 
 %% solving
 fem.solve();

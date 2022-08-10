@@ -14,10 +14,11 @@ fem = Fem(msh,'TimeStep',1/50,'PrescribedDisplacement',true,...
               'Linestyle','none','ColorAxis',[0 1]);
 
 %% add boundary conditions
-fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,0]);
-fem = fem.AddConstraint('Support',fem.FindNodes('SW'),[1,1]);
-fem = fem.AddConstraint('Load',fem.FindNodes('Right'),[msh.BdBox(2)*Stretch(2),0]);
-fem = fem.AddConstraint('Output',fem.FindNodes('Location',[5,0]),[0,0]);
+fem = fem.addSupport(fem.FindNodes('Left'),[1,0]);
+fem = fem.addSupport(fem.FindNodes('SW'),[1,1]);
+fem = fem.addLoad(fem.FindNodes('Right'),[msh.BdBox(2)*Stretch(2),0]);
+%fem = fem.addOutput(fem.FindNodes('Location',[5,0]),[0,0]);
+
 %% assign material
 fem.Material = Ecoflex0050();
 

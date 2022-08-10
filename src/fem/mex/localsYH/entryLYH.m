@@ -9,11 +9,11 @@ dUtmp = zeros(44,1);
 Rho = 9.7000e-10;
 Zeta = 0.1;
 Grav = [0;-9810];
-YeohC = [36e-3,0.25e-3,0.023e-3];
-YeohD = [5,10,10];
+YeohC = [36e-3;0.25e-3;0.023e-3];
+YeohD = [5;10;10];
 
 [Fe,Fb,Qe,Me,Ce,Ke,Kte,Svme,SS,EE,Te,Ve,Vge,Tke,Re,Ue] = ...
-        LocalsNYFast(eNode,eDof,dV,Rb,...
+        LocalsYHFast(eNode,eDof,dV,Rb,...
         Dim,...   % Fem.Dim
         Node0,... % Node0
         N,...     % shpfnc for Fem.ShapeFnc{nn}

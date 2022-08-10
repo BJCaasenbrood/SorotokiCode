@@ -3,8 +3,8 @@ clr;
 P0  = 20*kpa;
 
 %% generate mesh
-MinH  = 3;
-MaxH  = 4;
+MinH  = 2;
+MaxH  = 3;
 
 msh = Mesh('Pneunet.png','BdBox',[0,107,0,16],...
     'SimplifyTol',0.02,'Hmesh',[1,MinH,MaxH]);

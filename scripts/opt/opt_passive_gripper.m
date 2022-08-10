@@ -8,7 +8,7 @@ msh = msh.generate();
 msh.show(); pause(2);
 
 %% show generated mesh
-fem = Fem(msh,'VolumeInfill',0.3,'Penal',3,'FilterRadius',3,...
+fem = Fem(msh,'VolumeInfill',0.4,'Penal',4,'FilterRadius',3,...
               'Nonlinear',false,'TimeStep',1/3,'ChangeMax',0.1,...
               'OptimizationProblem','Compliant',...
               'MaxIterationMMA',75);
@@ -24,9 +24,9 @@ id = fem.FindNodes('Box',[0 0 0 10]);
 fem = fem.AddConstraint('Load',id,[-10,0]);
 fem = fem.AddConstraint('Spring',id,[1,0]);
 
-alpha = atan(40/80);
+alpha = atan(50/80);
 Fn = -[-sin(alpha),cos(alpha)];
-id = fem.FindNodes('Line',[0 80 0 40]); 
+id = fem.FindNodes('Line',[0 80 0 50]); 
 fem = fem.AddConstraint('Output',id,Fn);
 fem = fem.AddConstraint('Spring',id,abs(Fn));
 
@@ -34,14 +34,14 @@ fem = fem.AddConstraint('Spring',id,abs(Fn));
 fem = fem.initialTopology('Hole',[10,30;30,35;50,40],5);
 
 %% material
-fem.Material = Ecoflex0050;
+fem.Material = NeoHookeanMaterial(0.1,0.4);
 
 %% solving
 fem.optimize();
-fem.show('ISO');
+fem.show('ISO',0.1);
 
 %% convert topology result to mesh
-ISO  = 0.2;
+ISO  = 0.125;
 Simp = 0.1;
 GrowH = 1.1;
 MinH = 1.5;
@@ -54,13 +54,11 @@ femr = Fem(mshr,'Nonlinear',true,'TimeStep',1/25,'FilterRadius',1/15,...
     'Linestyle','none');
 
 %% assign boundary conditions to reduced fem
-id = femr.FindNodes('Box',[0 1 0 30]); 
+id = femr.FindNodes('Box',[0 1 0 10]); 
 femr = femr.AddConstraint('Support',id,[1,1]);
 
-id = femr.FindNodes('Box',[0 1 70 100]); 
+id = femr.FindNodes('Box',[0 1 90 100]); 
 femr = femr.AddConstraint('Support',id,[1,1]);
-
-fem = femr.AddConstraint('Contact',@(x) SDF(x,20),[0,0]);
 
 id = femr.FindNodes('Box',[0 2 40 60]); 
 femr = femr.AddConstraint('Displace',id,[-15,0]);

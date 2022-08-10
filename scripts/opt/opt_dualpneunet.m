@@ -10,29 +10,27 @@ msh = Mesh(sdf,'BdBox',[0,W,0,H],'NElem',3e3);
 msh = msh.generate();
 
 %% show generated mesh
-fem = Fem(msh,'VolumeInfill',0.33,'Penal',2,'FilterRadius',H/20,...
+fem = Fem(msh,'VolumeInfill',0.4,'Penal',2,'FilterRadius',H/20,...
               'Nonlinear',0,'TimeStep',1/10,'ReflectionPlane',[0,1],...
               'OptimizationProblem','Compliant',...
-              'MaxIterationMMA',50,'ChangeMax',0.05);
+              'MaxIterationMMA',150,'ChangeMax',0.1);
 
 %% set spatial settings
 fem = fem.set('Periodic',[1/2, 0],'Repeat',[ones(10,1)]);
 
 %% add boundary condition
-id = fem.FindNodes('Left'); 
-fem = fem.AddConstraint('Support',id,[1,1]);
+fem = fem.addSupport(fem.FindNodes('Left'),[1,1]);
+fem = fem.addSpring(fem.FindNodes('Right'),[0,1]);
+fem = fem.addOutput(fem.FindNodes('Right'),[0,-1]);
 
-id  = fem.FindNodes('Right'); 
-fem = fem.AddConstraint('Spring',id,[0,1]);
-fem = fem.AddConstraint('Output',id,[0,-1]);
 id  = fem.FindElements('Location',[W/2,0.3*H],1);
-fem = fem.AddConstraint('PressureCell',id,0.1*kpa);
+fem = fem.addMyocyte(id,5*kpa);
 
 %% set density
 fem = fem.initialTopology('Hole',[W/2,0.3*H],.5);
 
 %% material
-fem.Material = Dragonskin10();
+fem.Material = Ecoflex0030();
 
 %% solving
 fem.optimize();
@@ -48,14 +46,14 @@ MaxH = 30;
 mshr = fem.exportMesh(ISO,Simp,[GrowH,MinH,MaxH]); 
 mshr.show(); pause(2);
 
-femr = Fem(mshr,'Nonlinear',true,'TimeStep',1/50,'Linestyle','none');
+femr = Fem(mshr,'Nonlinear',true,'TimeStep',1/10,'Linestyle','none');
 
 %% assign boundary conditions to reduced fem
 id = femr.FindNodes('Left'); 
 femr = femr.AddConstraint('Support',id,[1,1]);
 
 id = femr.FindEdges('TopHole');
-femr = femr.AddConstraint('Pressure',id,20*kpa);
+femr = femr.AddConstraint('Pressure',id,5*kpa);
 
 %% assign material to reduced fem
 femr.Material = fem.Material;

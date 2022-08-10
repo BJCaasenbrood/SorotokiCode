@@ -19,7 +19,7 @@ shp.Material = NeoHookeanMaterial(5,0.4);
 shp = shp.rebuild(); 
 
 % build model class
-mdl = Model(shp,'TimeStep',H,'TimeEnd',15,'ShowProcess',0);
+mdl = Model(shp,'TimeStep',H,'TimeEnd',10);
 
 I = eye(M);
 mdl.InputMap = @(x) I(:,[1,2,3]);
@@ -69,9 +69,7 @@ p = mdl.Log.p;
 A = T*G;
 
 qu = annihil(A)*q;
-pu = annihil(A)*p;
 qa = A.'*q;
-pa = A.'*p;
 
 %qud = annihil(A)*qd;
 %qad = A.'*qd;
@@ -91,8 +89,8 @@ ge = gg(:,:,end);
 [Fu] = ControllerWrench(t,ge);
 
 % controller
-lam1 = 1e3;
-lam2 = 1e6;
+lam1 = 1e4;
+lam2 = 1e3;
 
 dVedq = mdlmod.Log.EL.K*q + mdlmod.Log.EL.fg;
 dFedq = lam1*J.'*((J*J.' + lam2*eye(6))\Fu);

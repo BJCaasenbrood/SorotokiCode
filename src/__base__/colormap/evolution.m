@@ -1,6 +1,6 @@
 function colmap = evolution(varargin)
 if isempty(varargin)
-    C = col(1);
+    C = color_orange;
     n = 100;
 else
     if numel(varargin) == 1 && numel(varargin{1}) == 1
@@ -22,6 +22,7 @@ else
         end
     end
 end
+
 WW = [0.8929    0.8929    0.8929];
 colmap = linspacen(WW.',C.',n).';
 

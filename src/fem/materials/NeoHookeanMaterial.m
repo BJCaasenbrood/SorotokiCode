@@ -6,7 +6,8 @@ classdef NeoHookeanMaterial
         Nu;
         Rho  = 970e-12;
         Zeta = 0.1;
-        Cfr  = 1e-6;
+        Rr   = 0.1;      
+        Cfr  = 4e-6;
         Lambda;
         Mu; 
     end
@@ -48,6 +49,10 @@ end
 %---------------------------------------------------------------------- get     
 function y = getModulus(NeoHookeanMaterial)
 y = NeoHookeanMaterial.E;
+end
+%---------------------------------------------------------------------- get     
+function y = getContactReaction(NeoHookeanMaterial)
+y = NeoHookeanMaterial.Rr*getModulus(NeoHookeanMaterial);
 end
 %---------------------------------------------------------------------- get     
 function y = getContactFriction(NeoHookeanMaterial)

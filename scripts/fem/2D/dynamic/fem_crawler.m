@@ -4,7 +4,8 @@ H = 15;
 
 %% generate mesh
 msh = Mesh('Crawler.png','BdBox',[0,W,0,H],...
-           'SimplifyTol',0.02,'Hmesh',[1,3,5]);
+           'SimplifyTol',0.02,'Hmesh',[1,3,5],...
+           'MatlabMeshType','quadratic');
 
 msh = msh.generate();
 msh.show();
@@ -13,7 +14,7 @@ msh.show();
 fem = Fem(msh,'TimeStep',1/800,'TimeEnd',2,...
     'BdBox',[-1.2*W,1.2*W,-15,H],'Linestyle','none');
 
-fem.Material = NeoHookeanMaterial(0.15,0.4);
+fem.Material = NeoHookeanMaterial(0.5,0.4);
 fem.Material.Rho  = fem.Material.Rho;
 fem.Material.Cfr  = 5e-6;
 
@@ -52,8 +53,8 @@ for ii = 1:fps(t,120):numel(t)
 end
 
 function y = pset(t,id)
-w  = 5*pi*2;
-P0 = 4*kpa;
+w  = 5*pi;
+P0 = 10*kpa;
 y  = P0*tsin(w*t - (id-1)*pi/2.75).*sigmoid(w*t);
 end
 

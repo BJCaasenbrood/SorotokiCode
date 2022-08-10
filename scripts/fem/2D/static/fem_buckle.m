@@ -10,23 +10,12 @@ fem = Fem(msh);
 fem = fem.set('TimeStep',1/100);
 
 %% add constraint
-fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,1]);
-fem = fem.AddConstraint('Support',fem.FindNodes('Right'),[0,1]);
-fem = fem.AddConstraint('Displace',fem.FindNodes('Right'),[-5,0]);
-
-%% add logger nodes
-fem = fem.AddConstraint('Output',fem.FindNodes('SE'),[0,0]);
+fem = fem.addSupport(fem.FindNodes('Left'),[1,1]);
+fem = fem.addSupport(fem.FindNodes('Right'),[0,1]);
+fem = fem.addDisplace(fem.FindNodes('Right'),[-2,0]);
 
 %% assign material
 fem.Material = Dragonskin30();
 
 %% solving
 fem.solve();
-
-%% plot force-displacement relation
-figure(101);
-subplot(2,1,1); fem.show('Svm');
-subplot(2,1,2); plot(fem.Log{3,2},fem.Log{6,2}*1e3,'linewidth',2,'Color',col(2));
-xlabel('Displacement (mm)','interpreter','latex','fontsize',12);
-ylabel('Reaction force (mN)','interpreter','latex','fontsize',12);
-grid on; set(gca,'linewidth',1);

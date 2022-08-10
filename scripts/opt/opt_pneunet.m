@@ -2,16 +2,16 @@ clr;
 %% generate mesh from sdf
 W = 20;  % width cell
 H = 40;  % width cell
-D = 2;   % inter distance
+D = 1.5;   % inter distance
 
 sdf = @(x) PneuNet(x,W,H,D,W);
 
-msh = Mesh(sdf,'BdBox',[0,W,0,H],'NElem',500);
+msh = Mesh(sdf,'BdBox',[0,W,0,H],'NElem',1200);
 msh = msh.generate();
 
 %% show generated mesh
-fem = Fem(msh,'VolumeInfill',0.4,'Penal',4,'FilterRadius',H/20,...
-              'Nonlinear',1,'TimeStep',1/30,'ReflectionPlane',[0,0],...
+fem = Fem(msh,'VolumeInfill',0.4,'Penal',4,'FilterRadius',H/10,...
+              'Nonlinear',0,'TimeStep',1/30,'ReflectionPlane',[0,0],...
               'OptimizationProblem','Compliant','Linestyle','None',...
               'MaxIterationMMA',70,'ChangeMax',0.1,'Movie',0);
 
@@ -20,19 +20,19 @@ fem = fem.set('Periodic',[1/2, 0],'Repeat',[ones(9,1)]);
 
 %% add boundary condition
 id = fem.FindNodes('Left'); 
-fem = fem.AddConstraint('Support',id,[1,1]);
+fem = fem.addSupport(id,[1,1]);
 
 id  = fem.FindNodes('Right'); 
-fem = fem.AddConstraint('Spring',id,[0,1]);
-fem = fem.AddConstraint('Output',id,[0,-1]);
+fem = fem.addSpring(id,[0,1]);
+fem = fem.addOutput(id,[0,-2]);
 id  = fem.FindElements('Location',[W/2,0.5*H],1);
-fem = fem.AddConstraint('PressureCell',id,10*kpa);
+fem = fem.addMyocyte(id,10*kpa);
 
 %% set density
 fem = fem.initialTopology('Hole',[W/2,0.5*H],0.85);
 
 %% material
-fem.Material = Ecoflex0030(2);
+fem.Material = Ecoflex0030();
 
 %% solving
 fem.optimize();
@@ -41,8 +41,8 @@ fem.show('ISO',0.2);
 %% convert topology result to mesh
 ISO  = 0.3;
 Simp = 0.05;
-GrowH = 1.5;
-MinH = 2.5;
+GrowH = 1;
+MinH = 2;
 MaxH = 40;
 
 mshr = fem.exportMesh(ISO,Simp,[GrowH,MinH,MaxH]); 
@@ -51,14 +51,9 @@ mshr.show(); pause(2);
 femr = Fem(mshr,'Nonlinear',true,'TimeStep',1/120,'Linestyle','none');
 
 %% assign boundary conditions to reduced fem
-id = femr.FindNodes('Left'); 
-femr = femr.AddConstraint('Support',id,[1,1]);
-
-id = femr.FindEdges('TopHole');
-femr = femr.AddConstraint('Pressure',id,15*kpa);
-
-id = femr.FindNodes('Bottom');
-femr = femr.AddConstraint('Output',id,[0,0]);
+femr = femr.addSupport(femr.FindNodes('Left'),[1,1]);
+femr = femr.addPressure(femr.FindEdges('TopHole'),8*kpa);
+femr = femr.addOutput(femr.FindNodes('Bottom'),[0,0]);
 
 %% assign material to reduced fem
 D = 25; % compress. factor (more stable)

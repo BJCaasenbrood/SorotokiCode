@@ -197,10 +197,12 @@ end
 
 %---------------------------------------------------------- polar decompose
 function F = DeformationGradient(U,dNdx,Dim)
-nn = length(U)/Dim;
+nn = round(length(U)/Dim);
 UU = zeros(nn,Dim);
-UU(:,1) = U(1:Dim:Dim*nn);
-UU(:,2) = U(2:Dim:Dim*nn);
+id1 = round(1:Dim:Dim*nn).';
+id2 = round(2:Dim:Dim*nn).';
+UU(:,1) = U(id1);
+UU(:,2) = U(id2);
 
 if Dim == 2
     F = (dNdx'*UU)';

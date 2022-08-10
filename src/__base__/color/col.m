@@ -1,5 +1,6 @@
 function color  = col(n,per)
-Colors = pallateV0;
+%Colors = pallateV0;
+Colors = NASApallate;
 
     if nargin < 1
         C = vertcat(Colors{:});
@@ -46,6 +47,19 @@ Colors{end+1} = '#0265FD';
 Colors{end+1} = '#FF2975'; % pink-dark
 Colors{end+1} = '#F4A460'; % pink-dark F4A460 F222FF
 Colors{end+1} = '#290CFF'; % blue
+end
+
+function Colors = NASApallate
+Colors{1}     = '#105bd8'; %  blue-soft 0053D0 0161E8 4169E1
+Colors{end+1} = '#dd361c'; % red-dark :was E82C0C
+Colors{end+1} = '#2e8540'; % green-dark
+Colors{end+1} = '#ff9d1e'; % yellow FF9632 FF901F
+Colors{end+1} = '#4c2c92'; % purple-dark
+Colors{end+1} = '#FF641E'; % purple-dark
+Colors{end+1} = '#02bfe7';
+Colors{end+1} = '#FF2975'; % pink-dark
+Colors{end+1} = '#323a45'; % pink-dark F4A460 F222FF
+Colors{end+1} = '#aeb0b5'; % blue
 end
 
 function  Colors = pallateV2

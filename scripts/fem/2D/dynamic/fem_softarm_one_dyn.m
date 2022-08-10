@@ -6,7 +6,9 @@ GrowH = 1;
 MinH  = 5;
 MaxH  = 8;
 
-msh = Mesh('SWR_robot_1.png','BdBox',[0,250,0,290],'SimplifyTol',Simp,...
+msh = Mesh('SWR_robot_1.png',...
+    'BdBox',[0,250,0,290],...
+    'SimplifyTol',Simp,...
     'Hmesh',[GrowH,MinH,MaxH]);
 
 msh = msh.generate();
@@ -17,15 +19,18 @@ msh.show('Holes');
 P0    = 3*kpa;
 pset0 = [23,21,18,15,12,9,6,3];
 
-%pset0 = [25,21,18,15,12,9,7,4];
 %% generate fem model
 fem = Fem(msh);
-fem = fem.set('TimeStep',1/50,'BdBox',[0,108,0,325],'Linestyle','none',...
-    'MovieAxis',[-25 120 -60 130],'Movie',0,'TimeEnd',4);
+fem = fem.set('TimeStep',1/50,...
+              'BdBox',[0,108,0,325],...
+              'Linestyle','none',...
+              'MovieAxis',[-25 120 -60 130],...
+              'Movie',0,'TimeEnd',4);
 
 %% add boundary constraint
-fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[1,1]);
-fem = fem.AddConstraint('Pressure',fem.FindEdges('Hole',pset0), @(x) P0*sigmoid(x.Time));
+fem = fem.addSupport(fem.FindNodes('Bottom'),[1,1]);
+fem = fem.addPressure(fem.FindEdges('Hole',...
+    pset0), @(x) P0*sigmoid(x.Time));
 
 %% assign material
 fem.Material = NeoHookeanMaterial(2,0.25);  

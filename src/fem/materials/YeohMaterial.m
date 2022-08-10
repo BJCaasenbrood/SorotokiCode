@@ -10,6 +10,7 @@ classdef YeohMaterial
         D3   = 1;
         Rho  = 1e-9;
         Zeta = 0.1;
+        Rr   = 0.1;
         Cfr  = 1e-6;
     end
     
@@ -59,6 +60,10 @@ end
 %---------------------------------------------------------------------- set
 function y = getModulus(YeohMaterial)
     y = 6*YeohMaterial.C1; 
+end
+%---------------------------------------------------------------------- set
+function y = getContactReaction(YeohMaterial)
+    y = 6*YeohMaterial.Rr*YeohMaterial.C1; 
 end
 %---------------------------------------------------------------------- set
 function y = getContactFriction(YeohMaterial)

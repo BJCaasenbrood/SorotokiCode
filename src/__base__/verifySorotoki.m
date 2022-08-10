@@ -192,9 +192,9 @@ cout('\t Fem.show()'); bic;
 boc;
 
 cout('\t Fem.AddConstraint()'); bic(1); 
-fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,1]);
-fem = fem.AddConstraint('Support',fem.FindNodes('Right'),[0,1]);
-fem = fem.AddConstraint('Displace',fem.FindNodes('Right'),[1,0]);
+fem = fem.addSupport(fem.FindNodes('Left'),[1,1]);
+fem = fem.addSupport(fem.FindNodes('Right'),[0,1]);
+fem = fem.addDisplace(fem.FindNodes('Right'),[1,0]);
 boc;
 
 fem.Material = Ecoflex0050(10);
@@ -208,7 +208,7 @@ fem = fem.reset();
 fem.Material = NeoHookeanMaterial(); fem.solve();
 boc();
 
-cout('\t MooneyMaterial()'); bic; 
+cout('\t MooneyMaterial()'); bic(1); 
 fem = fem.reset();
 fem.Material = MooneyMaterial(); fem.solve();
 boc();
@@ -219,19 +219,23 @@ fem.Material = YeohMaterial(); fem.solve();
 boc();
 
 cout('\t Fem.optimize()'); bic; 
-sdf = sRectangle(0,4,0,1);
-msh = Mesh(sdf,'Quads',[40,12]);
+sdf = sRectangle(0,5,0,2);
+msh = Mesh(sdf,'NElem',600);
 msh = msh.generate();
-fem = Fem(msh,'ShowProcess',false,'Nonlinear',0,'Penal',4,...
-    'FilterRadius',0.15,'ChangeMax',2,'MaxIterationMMA',20);
+fem = Fem(msh,'ShowProcess',0,'Nonlinear',0,...
+    'ChangeMax',0.2,'MaxIterationMMA',30);
 
-fem = fem.set('Periodic',[1, 0],'ReflectionPlane',[-1,0]);        
-fem = fem.AddConstraint('Support',fem.FindNodes('Right'),[1,1]);
-fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,0]);
-fem = fem.AddConstraint('Load',fem.FindNodes('SW'),[0,-1e-4]);
-fem = fem.initialTopology('Hole',[0,0.5],.25);
-fem.Material = Ecoflex0030;
+fem = fem.set('FilterRadius',0.1,'VolumeInfill',0.2,...
+              'Penal',3,'ReflectionPlane',[-1,0]);
+        
+fem = fem.addSupport(fem.FindNodes('SE'),[0,1]);
+fem = fem.addSupport(fem.FindNodes('Left'),[1,0]);
+fem = fem.addLoad(fem.FindNodes('Location',[0,2],1),[0,-1e-3]);
+
+fem = fem.initialTopology('Hole',[1,1;3,1],0.5);
+fem.Material = NeoHookeanMaterial(1,0.33);
 fem.optimize();
+fem.show('ISO',0.25);
 boc;
 
 end

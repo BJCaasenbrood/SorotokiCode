@@ -497,7 +497,7 @@ function xi = strain(Shapes,q)
     
 end
 %------------------------------------------------- estimate Cosserat string
-function [q, XI] = estimateJointSpace(Shapes,Xi,Nds)
+function [q, XI, Nc] = estimateJointSpace(Shapes,Xi,Nds)
 
 Kappa_ = Xi(:,1);
 Gamma_ = Xi(:,2);
@@ -522,6 +522,11 @@ XR = Lam1\trapz(Shapes.Sigma,PODr.*WR.*Kappa_).';
 XQ = Lam2\trapz(Shapes.Sigma,PODq.*WQ.*Gamma_).';
 
 q0 = [XR; XQ];
+
+if isempty(Shapes.Filter)
+    Shapes = GenerateRadialFilter(Shapes);
+end
+
 Nc = Shapes.Filter*Nds;  
 
 k1 = 0.000;
@@ -531,7 +536,7 @@ E = 1;
 q = q0;
 
 Itr = 1;
-Ids = [round(1:(Shapes.NNode/4):Shapes.NNode),(Shapes.NNode)];
+Ids = [round(1:(Shapes.NNode/10):Shapes.NNode),(Shapes.NNode)];
 
 while (E > 1e-3) && (Itr < 150)
     
@@ -549,7 +554,7 @@ while (E > 1e-3) && (Itr < 150)
         lam2 = Shapes.Kd;
         
         % conditioner
-        Ke = diag([k1,k1,k1,k2,k2,k2])*(ii/numel(Ids)).^2;
+        Ke = diag([k1,k1,k1,k2,k2,k2])*(ii/numel(Ids)).^4;
         
         Xi = logmapSE3(g\gd);
         Fu = Ke*tmapSE3(Xi)*wedge(Xi);

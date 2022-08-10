@@ -38,6 +38,7 @@ switch(arg)
     case('uninstall'); unloadSorotoki;
     case('remove');    unloadSorotoki;
     case('demo');      showDemo;
+
     case('cd');        getPath;
     case('check');     verifySorotoki;
     case('version');   disp(soropatch(1));
@@ -46,6 +47,8 @@ switch(arg)
     case('-c');        verifySorotoki;
     case('-i');        setupToolkit;
     case('-h');        help sorotoki;
+    case('-d');        showDemo;
+    case('-u');        unloadSorotoki;
 end
 
 end
@@ -417,6 +420,9 @@ write2file([Path,'\src\__version__']);
 write2file([Path,'\src\__base__\auxiliary']);
 write2file([Path,'\src\__base__\thirdparty']);
 write2file([Path,'\src\__base__\color']);
+write2file([Path,'\src\__base__\color\nasa']);
+write2file([Path,'\src\__base__\color\specific']);
+write2file([Path,'\src\__base__\color']);
 write2file([Path,'\src\__base__\colormap']);
 write2file([Path,'\src\__base__\userinput']);
 write2file([Path,'\src\__base__\plot']);
@@ -437,6 +443,8 @@ addPath([Path,'\src\__base__']);
 addPath([Path,'\src\__base__\auxiliary']);
 addPath([Path,'\src\__base__\thirdparty']);
 addPath([Path,'\src\__base__\color']);
+addPath([Path,'\src\__base__\color\nasa']);
+addPath([Path,'\src\__base__\color\specific']);
 addPath([Path,'\src\__base__\colormap']);
 addPath([Path,'\src\__base__\userinput']);
 addPath([Path,'\src\__base__\plot']);

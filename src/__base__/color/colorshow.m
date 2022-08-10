@@ -1,4 +1,4 @@
-N = 12; 
+N = 10; 
 X = linspace(0,pi*3,1e5);
 hold off;
 for ii=1:N

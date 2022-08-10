@@ -21,14 +21,12 @@ msh.show();
 fem = Fem(msh,'TimeStep',1/30,'Linestyle','none','SolverId',3);
 
 %% add boundary constraint
-fem = fem.AddConstraint('Displace',fem.FindNodes('Top'),[0,-20]);
-fem = fem.AddConstraint('Support',fem.FindNodes('Top'),[1,0]);
-fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[1,1]);
-
-%fem = fem.AddConstraint('Pressure',fem.FindEdges('AllHole'),P0);
+fem = fem.addSupport(fem.FindNodes('Top'),[1,0]);
+fem = fem.addSupport(fem.FindNodes('Bottom'),[1,1]);
+fem = fem.addDisplace(fem.FindNodes('Top'),[0,-20]);
 
 %% assign material
-fem.Material = Dragonskin10(150);
+fem.Material = NeoHookeanMaterial(1,0.3);
 
 %% solve
 fem.solve();

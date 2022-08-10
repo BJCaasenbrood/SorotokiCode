@@ -3,11 +3,11 @@ clr;
 Simp  = 0.025;
 GrowH = 2;
 
-MinH  = 2;
-MaxH  = 7;
+MinH  = 1;
+MaxH  = 3;
 
-msh = Mesh('SWR_robot_gripper.png','BdBox',...
-%msh = Mesh('SWR_robot.png','BdBox',...
+%msh = Mesh('SWR_robot_gripper.png','BdBox',...
+msh = Mesh('SWR_robot.png','BdBox',...
     [0,108,0,325],'SimplifyTol',Simp,...
     'Hmesh',[GrowH,MinH,MaxH]);
 
@@ -18,12 +18,6 @@ msh.show('Holes');
 %% pressure sets
 P0 = -1.5*kpa;
 P1 = 1.5*kpa;
-
-% pset0 = [46,47,50,51,53,55,63,62,61,60,59,58];
-% pset1 = [25,22,18,15,12,9,6,4];
-% pset2 = [24,21,19,16,13,10,7,3];
-% pset3 = [54,48,43,40,37,34,31,28];
-% pset4 = [56,49,44,41,38,35,32,29];
 
 pset0 = [0 100 250 400];
 pset1 = [0 40 0 120];
@@ -38,20 +32,13 @@ fem = fem.set('TimeStep',1/125,'BdBox',[0,120,0,325],'Linestyle','none',...
     'MovieAxis',[-25 120 -60 130],'Movie',0,'TimeEnd',3);
 
 %% add boundary constraint
-fem = fem.AddConstraint('Support',fem.FindNodes('Box',[0 150 0 2]),[1,1]);
-fem = fem.AddConstraint('Gravity',[],[0,-1e3]);
+fem = fem.addSupport(fem.FindNodes('Box',[0 150 0 2]),[1,1]);
+fem = fem.addGravity([0,-1e3]);
 
-%fem = fem.AddConstraint('Pressure',fem.FindEdges('BoxHole',pset0), @(x) 5*P0*sigmoid(x.Time));
-fem = fem.AddConstraint('Pressure',fem.FindEdges('BoxHole',pset1), @(x) 2*P1*sigmoid(x.Time));
-fem = fem.AddConstraint('Pressure',fem.FindEdges('BoxHole',pset2), @(x) 0.75*P0*sigmoid(x.Time));
-fem = fem.AddConstraint('Pressure',fem.FindEdges('BoxHole',pset3), @(x) 0.75*P0*sigmoid(x.Time));
-fem = fem.AddConstraint('Pressure',fem.FindEdges('BoxHole',pset4), @(x) 2*P1*sigmoid(x.Time));
-
-%fem = fem.AddConstraint('Contact',@(x) SDF(x),[0,0]);
-% fem = fem.AddConstraint('Pressure',pset1, @(x) P1*sigmoid(x.Time));
-% fem = fem.AddConstraint('Pressure',pset2, @(x) P2*sigmoid(x.Time));
-% fem = fem.AddConstraint('Pressure',pset3, @(x) P3*sigmoid(x.Time));
-% fem = fem.AddConstraint('Pressure',pset3, @(x) P4*sigmoid(x.Time));
+fem = fem.addPressure(fem.FindEdges('BoxHole',pset1), @(x) 2*P1*sigmoid(x.Time));
+fem = fem.addPressure(fem.FindEdges('BoxHole',pset2), @(x) 0.75*P0*sigmoid(x.Time));
+fem = fem.addPressure(fem.FindEdges('BoxHole',pset3), @(x) 0.75*P0*sigmoid(x.Time));
+fem = fem.addPressure(fem.FindEdges('BoxHole',pset4), @(x) 2*P1*sigmoid(x.Time));
 
 %% assign material
 fem.Material = NeoHookeanMaterial(2,0.33);  

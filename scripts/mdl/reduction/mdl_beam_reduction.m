@@ -8,11 +8,11 @@ msh = Mesh(sdf,'NElem',100);
 msh = msh.generate();
 
 %% generate fem model from mesh
-fem = Fem(msh,'TimeStep',1/50,'TimeEnd',1.5);
+fem = Fem(msh,'TimeStep',1/150,'TimeEnd',1.5);
 
 %% add constraint
 fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,1]);
-fem = fem.AddConstraint('Gravity',[],[-9.81e3,-1]);
+fem = fem.AddConstraint('Gravity',[],[0,-9.81e3]);
 
 %% select material
 fem.Material = NeoHookeanMaterial(0.1,0.3);
