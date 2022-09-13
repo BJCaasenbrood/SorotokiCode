@@ -20,6 +20,16 @@ Please visit [**Sorotoki**](https://bjcaasenbrood.github.io/SorotokiPage/) for t
 - [x] (NEW!) Real-time control of soft robots via Raspi-interface,
 - [x] Fast graphics rendering with responsive textures.
 
+## What can it do?
+
+
+<img src="https://github.com/BJCaasenbrood/SorotokiPage/blob/master/docs/documentation/img/mckibben.gif" height="150">  <img src="https://github.com/BJCaasenbrood/SorotokiPage/blob/master/docs/documentation/img/twist.gif" height="140"> <img src="https://github.com/BJCaasenbrood/SorotokiPage/blob/master/docs/documentation/img/buckling.png" height="140"> <img src="https://github.com/BJCaasenbrood/SorotokiPage/blob/master/docs/documentation/img/diamondbot.png" height="120"> <img src="https://github.com/BJCaasenbrood/SorotokiPage/blob/master/docs/documentation/img/opt_bellow.gif" height="150"> <img src="https://github.com/BJCaasenbrood/SorotokiPage/blob/master/docs/documentation/img/opt_pneunet_90.gif" height="160">
+
+<img src="https://github.com/BJCaasenbrood/SorotokiPage/blob/master/docs/documentation/img/straingauge.gif" height="145"> <img src="https://github.com/BJCaasenbrood/SorotokiPage/blob/master/docs/documentation/img/soft_finger.gif" height="140"> <img src="https://github.com/BJCaasenbrood/SorotokiPage/blob/master/docs/documentation/img/soro_softcrawl.gif" height="140"> <img src="https://github.com/BJCaasenbrood/SorotokiPage/blob/master/docs/documentation/img/soft_bounce.gif" height="140"> <img src="https://github.com/BJCaasenbrood/SorotokiPage/blob/master/docs/documentation/img/soro_gripper.png" height="140">
+
+
+<img src="https://github.com/BJCaasenbrood/SorotokiPage/blob/master/docs/documentation/img/beam.gif" height="160"> <img src="https://github.com/BJCaasenbrood/SorotokiPage/blob/master/docs/documentation/img/soro_hand.gif" height="150"> <img src="https://github.com/BJCaasenbrood/SorotokiPage/blob/master/docs/documentation/img/soft_control.gif" height="150"> <img src="https://github.com/BJCaasenbrood/SorotokiPage/blob/master/docs/documentation/img/soro_control.gif" height="140"> 
+
 ## Citation
 
 If you are planning on using Sorotoki in your (academic) work, please consider citing the toolkit  
