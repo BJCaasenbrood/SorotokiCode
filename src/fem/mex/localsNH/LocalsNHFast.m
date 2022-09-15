@@ -114,8 +114,9 @@ for q = 1:length(W)
     Ve = Ve  + tau*W(q)*Psi*dJ;
     
     % graviational energy
-    Vge = Vge - tau*W(q)*((N.'*Node0(eNode,:)) + ...
+    Vgetmp = tau*W(q)*((N.'*Node0(eNode,:)) + ...
         (NN*Delta).')*Rho*Grav(:)*dJ;
+    Vge = Vge - Vgetmp(1);
     
     % lagrangian strain
     Elagran = (1/2)*(F.'*F - eye(3));
