@@ -8,10 +8,10 @@ d = zeros(length(P),1);
 for ii = 1:length(xc)
     r = sqrt((P(:,1)-xc(ii)).^2+(P(:,2)-yc(ii)).^2 + ...
         +(P(:,3)-zc(ii)).^2);
-    d = RawGaussian(r,w(ii),R) + d; 
+    %d = RawGaussian(r,w,R(ii)) + d; 
     %d = PiecewiseGaussian(r,w,R) + d; 
-    %d = SoftObject(r,w,R) + d;
-    %d = BlobbyMolecules(r,w,R) + d;
+    d = SoftObject(r,w,R(ii)) + d;
+    %d = BlobbyMolecules(r,w,R(ii)) + d;
 end
 
 %d = d;

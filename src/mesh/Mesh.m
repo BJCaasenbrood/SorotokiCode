@@ -132,6 +132,8 @@ function obj = Mesh(Input,varargin)
           obj.Type = 'C3T4';  
        elseif obj.Dim == 3 && size(varargin{1},2) == 8
           obj.Type = 'C3H8';  
+       elseif obj.Dim == 3 && size(varargin{1},2) == 3
+          obj.Type = 'C3T3';     
        elseif obj.Dim == 2 && size(varargin{1},2) == 4
           obj.Type = 'C2Q4'; 
        else
@@ -660,18 +662,24 @@ Pc = zeros(Mesh.NElem,Mesh.Dim);
 A  = zeros(Mesh.NElem,1);
 
 if Mesh.Dim == 3
-F = f(1:Mesh.NElem)';     
-VCell = cellfun(@(E) v(E,:),F,'UniformOutput',false);
-TCell  = cellfun(@(E) convhulln(E,{'Qt','QbB','Pp'}),VCell,...
-'UniformOutput',false);
-
-[Pc, A] = cellfun(@(V,F) CentroidPolyhedron(Mesh,V,F),VCell,...
-TCell,'UniformOutput',false);
-
-Pc = vertcat(Pc{:}); 
-A = vertcat(A{:});
-
-return;
+    F = f(1:Mesh.NElem)';
+    VCell = cellfun(@(E) v(E,:),F,'UniformOutput',false);
+    
+    if strcmp(Mesh.Type,'C3H8') || strcmp(Mesh.Type,'C3T4')
+        TCell  = cellfun(@(E) convhulln(E,{'Qt','QbB','Pp'}),VCell,...
+            'UniformOutput',false);
+        [Pc, A] = cellfun(@(V,F) CentroidPolyhedron(Mesh,V,F),VCell,...
+            TCell,'UniformOutput',false);
+        
+        A  = vertcat(A{:});
+    else
+        [Pc] = cellfun(@(V) mean(V,1),VCell,'UniformOutput',false);
+        A = 0;
+    end
+    
+    Pc = vertcat(Pc{:});
+    
+    return;
 end
 
 for el = 1:Mesh.NElem

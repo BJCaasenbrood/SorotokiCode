@@ -1,4 +1,4 @@
 function color = metropolis
-color = [249,249,249]/255;
+color = [250,250,250]/255;
 end
 

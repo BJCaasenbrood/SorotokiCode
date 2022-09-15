@@ -263,7 +263,7 @@ set = find(~emptyMask);
 idx = 1;
 
 %cmdpb = cmdprogress('baking');
-progress('start');
+%progress('start');
 
 for i = set
     % We get all the facet coordinates (ie, triangle vertices) of triangles
@@ -334,12 +334,12 @@ for i = set
    idx = idx + 1;
    if mod(idx,5) == 1
        %cmdpb.print(ceil(100*(idx/length(set))),100);
-       progress(ceil(100*(idx/length(set))),100);
+       %progress(ceil(100*(idx/length(set))),100);
    end
 end
 %cmdpb.print(100,100);
-progress(100,100);
-progress('end');
+%progress(100,100);
+%progress('end');
 %CallProgress(-1);
 
 % If they provided X,Y,Z vectors of query points, our output is currently a

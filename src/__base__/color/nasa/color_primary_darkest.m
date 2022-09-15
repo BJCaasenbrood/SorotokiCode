@@ -1,1 +1,4 @@
-function [y, hex] = color_primary_darkest\n\t#061f4a\n\ty = hex2rgb(hex);\nend\n
+function [y, hex] = color_primary_darkest
+ hex = '#061f4a';
+ y = hex2rgb(hex);
+end

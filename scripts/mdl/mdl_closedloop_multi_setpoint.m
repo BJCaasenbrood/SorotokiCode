@@ -49,11 +49,11 @@ for ii = 1:fps(mdl.Log.t,FPS):length(mdl.Log.q)
     sph2 = Blender(sph2,'SE3',SE3(roty(pi/2),[0;0;0]));
     sph2.update();
     
-    axis([-.1*L 1.1*L -.25*L .5*L -0.45*L 0.1*L]);
+    axis([-.1*L 1.1*L -.25*L .5*L -0.25*L 0.1*L]);
     delete(h);
     h = shadowplot(5);
     
-    view(30,30);
+    view(30,60);
     
     drawnow();
 end
@@ -123,9 +123,9 @@ end
 function [rig, sph1, sph2] = setupRig(M,L,Modes)
 
 gmdl = Gmodel('Arm.stl','ShowProcess',0);
-gmdl = gmdl.set('Emission', [0.9 0.8 0.8],...
-    'SSSPower',0.065,'SSSRadius',0.85,'SSS',true);
-
+% gmdl = gmdl.set('Emission', [0.9 0.8 0.8],...
+%     'SSSPower',0.065,'SSSRadius',0.85,'SSS',true);
+gmdl = gmdl.set('TextureStretch',0.78);
 N = 200;
 X = linspace(0,L,N)';
 Y = GenerateFunctionSpace(X,N,M);
@@ -138,14 +138,15 @@ rig = rig.add(gmdl);
 rig = rig.parent(1,0,0);
 rig = rig.parent(1,1,1);
 
-rig    = rig.texture(1,rot90(mateplastic,2));
+%rig    = rig.texture(1,rot90(mateplastic,2));
+rig    = rig.texture(1,base);
 rig.g0 = SE3(roty(pi/2),zeros(3,1));
 
 sph1 = Gmodel(sTorus(0,0,0,9,2));
-sph1.Texture = diffuse(0.925);
+sph1.Texture = bluebase;%diffuse(0.925);
 sph1.bake.render();
 
-sph2 = Gmodel(sSphere(3),'ShowProcess',0);
+sph2 = Gmodel(sSphere(5),'ShowProcess',0);
 sph2.Texture = diffuse(0.925);
 sph2.bake.render();
 

@@ -8,8 +8,8 @@
    height="185.74734"
    viewBox="0 0 1049.3204 185.74734"
    sodipodi:docname="Pneunet.svg"
-   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
-   inkscape:export-filename="/home/brandon/Documents/MATLAB/SorotokiCode/data/contours/Pneunet.png"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   inkscape:export-filename="/home/brandon/Documents/MATLAB/SorotokiCode/data/contours/PneunetV2.png"
    inkscape:export-xdpi="140"
    inkscape:export-ydpi="140"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -32,10 +32,10 @@
      fit-margin-right="0"
      fit-margin-bottom="0"
      inkscape:zoom="0.59792569"
-     inkscape:cx="618.80599"
-     inkscape:cy="274.28157"
-     inkscape:window-width="1440"
-     inkscape:window-height="761"
+     inkscape:cx="715.80801"
+     inkscape:cy="167.24486"
+     inkscape:window-width="2048"
+     inkscape:window-height="1083"
      inkscape:window-x="0"
      inkscape:window-y="32"
      inkscape:window-maximized="1"
@@ -388,5 +388,75 @@
        height="129.39099"
        x="1402.9993"
        y="560.31567" />
+    <rect
+       style="fill:#000000;stroke:#000000;stroke-width:1.00157;stroke-linecap:round;stroke-linejoin:round;fill-opacity:1"
+       id="rect892"
+       width="16.054222"
+       height="48.621368"
+       x="559.97614"
+       y="623.95282" />
+    <rect
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1.00157;stroke-linecap:round;stroke-linejoin:round"
+       id="rect892-3"
+       width="16.054222"
+       height="48.621368"
+       x="649.42114"
+       y="623.95282" />
+    <rect
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1.00157;stroke-linecap:round;stroke-linejoin:round"
+       id="rect892-3-6"
+       width="16.054222"
+       height="48.621368"
+       x="736.57263"
+       y="623.95282" />
+    <rect
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1.00157;stroke-linecap:round;stroke-linejoin:round"
+       id="rect892-3-6-7"
+       width="16.054222"
+       height="48.621368"
+       x="826.01758"
+       y="623.95282" />
+    <rect
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1.00157;stroke-linecap:round;stroke-linejoin:round"
+       id="rect892-3-6-7-5"
+       width="16.054222"
+       height="48.621368"
+       x="913.16907"
+       y="623.95288" />
+    <rect
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1.00157;stroke-linecap:round;stroke-linejoin:round"
+       id="rect892-3-6-7-5-3"
+       width="16.054222"
+       height="48.621368"
+       x="1002.6141"
+       y="623.95282" />
+    <rect
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1.00157;stroke-linecap:round;stroke-linejoin:round"
+       id="rect892-3-6-7-5-3-5"
+       width="16.054222"
+       height="48.621368"
+       x="1094.8112"
+       y="623.95282" />
+    <rect
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1.00157;stroke-linecap:round;stroke-linejoin:round"
+       id="rect892-3-6-7-5-3-5-6"
+       width="16.054222"
+       height="48.621368"
+       x="1183.2181"
+       y="622.90936" />
+    <rect
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1.00157;stroke-linecap:round;stroke-linejoin:round"
+       id="rect892-3-6-7-5-3-5-6-2"
+       width="16.054222"
+       height="48.621368"
+       x="1268.9935"
+       y="622.90942" />
+    <rect
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1.00157;stroke-linecap:round;stroke-linejoin:round"
+       id="rect892-3-6-7-5-3-5-6-2-9"
+       width="16.054222"
+       height="48.621368"
+       x="1356.6038"
+       y="622.90936" />
   </g>
 </svg>

@@ -16,11 +16,10 @@ fem = Fem(msh,'TimeStep',1/50,'PrescribedDisplacement',true,...
 %% add boundary conditions
 fem = fem.addSupport(fem.FindNodes('Left'),[1,0]);
 fem = fem.addSupport(fem.FindNodes('SW'),[1,1]);
-fem = fem.addLoad(fem.FindNodes('Right'),[msh.BdBox(2)*Stretch(2),0]);
-%fem = fem.addOutput(fem.FindNodes('Location',[5,0]),[0,0]);
+fem = fem.addDisplace(fem.FindNodes('Right'),[msh.BdBox(2)*Stretch(2),0]);
 
 %% assign material
-fem.Material = Ecoflex0050();
+fem.Material = Ecoflex0030();
 
 %% solving extension
 fem.solve();

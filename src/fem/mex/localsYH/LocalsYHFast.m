@@ -53,7 +53,7 @@ for q = 1:length(W)
     dNdxi = dNdxis(:,:,q);
     J0    = Node0(eNode,:).'*dNdxi;
     dNdx  = dNdxi/J0;
-    dJ    = det(J0);
+    dJ    = sqrt(det(J0.'*J0));
     
     % deformation gradient   
     F = DeformationGradient(Delta,dNdx,Dim);

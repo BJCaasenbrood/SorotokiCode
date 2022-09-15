@@ -1,4 +1,4 @@
-function h = cplotarrow(x,y,c,map,varargin)
+function h = cplotarrow(x,y,c,map,Nmod,varargin)
 % orginal code by Michael Heidingsfeld 
 % Plot data:
 if ~(all(size(x) == size(y)) && all(size(x) == size(c)))
@@ -20,7 +20,7 @@ for k = 1:N
     Y = y; Y(indices(ii)) = NaN;
     h(k) = plot(X,Y,'Color',map(k,:),varargin{:});
     
-    if mod(k,6) == 0 
+    if mod(k,Nmod) == 0 
         X_ = X(~isnan(X)); nX = diff(X_);
         Y_ = Y(~isnan(Y)); nY = diff(Y_);
         nrm = [nX(end),nY(end)];

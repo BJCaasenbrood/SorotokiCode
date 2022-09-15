@@ -9,6 +9,7 @@ fem.ShapeFnc{4}.W = W;
 fem.ShapeFnc{4}.N = zeros(4,1,size(W,1));
 fem.ShapeFnc{4}.dNdxi = zeros(4,3,size(W,1));
 fem.ShapeFnc{4}.Q = Q;
+fem.ShapeFnc{4}.fnc = @(x) TetraShapeFnc(x);
 
 for q = 1:size(W,1)
     [N,dNdxi] = TetraShapeFnc(Q(q,:));

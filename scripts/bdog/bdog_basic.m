@@ -21,7 +21,12 @@ while brd.loop(10)
     data = brd.tcpRecvData(1);
     
     % desired pressure in kPa
-    pd = 20*(0.5*(sin(brd.t) + 1));
+    %pd = 20*(0.5*(sin(brd.t) + 1));
+    if brd.t < 5
+        pd = 0;
+    else
+        pd = 20;
+    end
     
     % pressure to Digital-Analog voltage
     V = pdac(pd);

@@ -6,8 +6,8 @@ classdef NeoHookeanMaterial
         Nu;
         Rho  = 970e-12;
         Zeta = 0.1;
-        Rr   = 0.1;      
-        Cfr  = 4e-6;
+        Rr   = 0.3;      
+        Cfr  = 2e-6;
         Lambda;
         Mu; 
     end
@@ -57,6 +57,16 @@ end
 %---------------------------------------------------------------------- get     
 function y = getContactFriction(NeoHookeanMaterial)
 y = NeoHookeanMaterial.Cfr*getModulus(NeoHookeanMaterial);
+end
+%---------------------------------------------------------------------- get    
+function y = uniaxial(NeoHookeanMaterial,x)
+y = zeros(numel(x),1);
+for ii = 1:numel(x)
+    F = diag([x(ii),sqrt(1/x(ii)),sqrt(1/x(ii))]);
+    [S0] = PiollaStress(NeoHookeanMaterial,F);
+    P = (1/det(F))*F*S0*(F.');
+    y(ii,1) = P(1,1);
+end
 end
 %---------------------------------------------------------------------- set
 function NeoHookeanMaterial = set(NeoHookeanMaterial,varargin)

@@ -1,6 +1,7 @@
 clr;
 %% pressure settings
-P0  = 15*kpa;
+R   = 20;     % radius object
+P0  = 15*kpa; % pressure PneuNet
 
 %% generate mesh
 msh = Mesh('PneunetFine.png','BdBox',[0,120,0,20],...
@@ -11,16 +12,17 @@ msh = msh.generate();
 
 %% generate fem model
 fem = Fem(msh);
-fem = fem.set('TimeStep',1/300,'BdBox',[-20,120,-80,20],...
+fem = fem.set('TimeStep',1/800,'BdBox',[-20,120,-80,20],...
               'Linestyle','none','TimeEnd',2);
 
 %% add boundary constraint
 fem = fem.addSupport(fem.FindNodes('Box',[0,0,0,10]),[1,1]);
-fem = fem.addContact(@(x) SDF(x,10,70,-30),[0,0]);
+fem = fem.addContact(SDF(R,30,-15),[0,0]);
 fem = fem.addGravity([0,-9.81e3]);
 
 fem = fem.addPressure(fem.FindEdges('AllHole'),...
    @(x) P0*sigmoid(x.Time));
+
 %% assign material
 fem.Material = NeoHookeanMaterial(0.35,0.3);
 fem.Material.Zeta = 1.45;
@@ -44,7 +46,6 @@ for ii = 1:fps(t,120):numel(t)
     drawnow();
 end
 
-function Dist = SDF(x,R,x0,y0)
-    sdf  = sCircle(x0,y0 + R,R);
-    Dist = sdf.eval(x);
+function sdf = SDF(R,x0,y0)
+sdf  = sCircle(x0,y0 - R/2,R);
 end

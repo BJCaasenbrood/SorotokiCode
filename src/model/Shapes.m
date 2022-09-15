@@ -31,6 +31,7 @@ classdef Shapes
     
     properties (Access = private)
         Table;
+        Gmodel;
 
         Center;
         Rotation;
@@ -61,7 +62,6 @@ function obj = Shapes(Input,NModal,varargin)
     obj.NDof   = sum(obj.Table);
     obj.xia0   = [0,0,0,1,0,0].';
     
-    
     if isa(Input,'Fem')
         obj.Fem    = Input;
         obj.NNode  = 30;        
@@ -88,7 +88,7 @@ function obj = Shapes(Input,NModal,varargin)
         obj.PODEnergy{2} = ones(size(Input,2),1);
         obj.PODEnergy{1} = ones(size(Input,2),1);
        
-        obj.Gvec = [0; 0 ;9.81e3];
+        obj.Gvec = [0; 0; 9.81e3];
     end
 
     % cross-section SDF
@@ -201,17 +201,42 @@ if strcmp(Request,'POD')
 end
 
 end
+%---------------------------------------------------------------- show mesh
+function Shapes = render(Shapes,q)
+    Shapes.Node = Shapes.FK(q);
+    if isempty(Shapes.Gmodel)
+        obj = Gmodel(Shapes);
+        obj = obj.bake;
+        obj = obj.render();
+        Shapes.Gmodel = obj;
+    else
+        [x,y,z] = tubeplot(Shapes.Node.',2,16,1e-6);
+        %h = mesh(x,y,z);
+        fv = surf2patch(x,y,z,'triangles');
+        v = fv.vertices;
+        Shapes.Gmodel.Node = v;
+        Shapes.Gmodel.update();
+    end
+    
+end
 %------------------------------------------------------------ set reference
 function Shapes = reference(Shapes,varargin)
-X0 = varargin{1};
-XL = varargin{2};
 
-% build Cosserat curve in reference
-Shapes.Node0 = [linspace(X0(1),XL(1),Shapes.NNode).', ...
-                linspace(X0(2),XL(2),Shapes.NNode).'];
-             
-%B = boxhull(Shapes.Node0);                 
-Shapes.L0 = sqrt((XL(1)-X0(1))^2 + (XL(2)-X0(2))^2);  
+if numel(varargin) == 2
+    % two points curve
+    X0 = varargin{1}; XL = varargin{2};
+    
+    % build Cosserat curve in reference
+    Shapes.Node0 = [linspace(X0(1),XL(1),Shapes.NNode).', ...
+        linspace(X0(2),XL(2),Shapes.NNode).'];
+    
+    %B = boxhull(Shapes.Node0);
+    Shapes.L0 = sqrt((XL(1)-X0(1))^2 + (XL(2)-X0(2))^2);
+elseif numel(varargin) == 1 && size(varargin{1},2) == 2
+    Shapes.Node0 = varargin{1};
+    Shapes.NNode = length(Shapes.Node0);
+    Shapes.L0 = sum(sqrt(sum(diff(Shapes.Node0).^2,2)),1);
+end
 
 % build discretization of curve domain
 Shapes.Sigma = linspace(0,Shapes.L0,Shapes.NNode);    
@@ -251,6 +276,7 @@ Shapes = BuildInertia(Shapes);
 
 JJ      = Shapes.Mtt/Shapes.Material.Rho;
 [SS,KK] = Shapes.Material.PiollaStress(eye(3));
+
 KK = 2*diag(voightextraction(KK));
 %KK2 = LinearStiffnessTensor(Shapes);
 % KQR = KK(4:6,4:6); 
@@ -274,7 +300,7 @@ if ~isempty(Shapes.PODR) || ~isempty(Shapes.PODQ)
         Shapes.PODQ = interp1(X,Shapes.PODQ,Shapes.Sigma*Shapes.L0);
     end
     
-%     % ensure orthonormality
+    % ensure orthonormality
     Shapes.PODR = gsogpoly(Shapes.PODR,Shapes.Sigma);
     Shapes.PODQ = gsogpoly(Shapes.PODQ,Shapes.Sigma);
     
@@ -423,7 +449,7 @@ if numel(q) ~= Shapes.NDim
 end    
 
 % ensures robustness for near-zero singularities in some PCC models
-q = q(:) + 1e-6;
+q = q(:) + 1e-16;
 
 [g,J] = computeForwardKinematicsFast_mex(q,... % states
     Shapes.ds,...         % spatial steps
@@ -587,6 +613,8 @@ end
 %------------------------------------------------- estimate Cosserat string
 function Xi = recoverStrain(Shapes,fem,varargin)
    
+Shapes = Shapes.set('Fem',fem);   
+    
 if isempty(varargin)
     N = fem.Log.Node{end};
     R = fem.Log.Rotation{end};
@@ -678,10 +706,6 @@ function P = ShapeFunction(Shapes,X)
 end
 %---------------------------------------------------------------------- set
 function P = IntrinsicFunction(Shapes,X)
-%    
-%     k  = 1;
-%     X0 = Shapes.Sigma;
-%     X = zclamp(X/Shapes.L0,0,1);  
     P = Shapes.xia0;
 end
 %-------------------------------------------------- compute Cosserat string
@@ -780,7 +804,7 @@ for ii = 2:Shapes.NNode-1
     Nii = Nod(ii+1,:);
     Nip = Nod(ii-1,:);
     
-    g  = [Rot{ii,1},    [Ni(1);  Ni(2);  0];   zeros(1,3), 1];
+    g  = [Rot{ii,1},    [Ni(1);  Ni(2);  0]; zeros(1,3), 1];
     dg = ([Rot{ii+1,1}, [Nii(1); Nii(2); 0]; zeros(1,3), 1] ...
         - [Rot{ii-1,1}, [Nip(1); Nip(2); 0]; zeros(1,3), 1])/(2*Shapes.ds);
     
@@ -1011,16 +1035,6 @@ y(4,1) = X(1,1);
 y(5,1) = X(2,1);
 y(6,1) = X(3,1);
 end
-% %----------------------------------------------------------- strain mapping
-% function Ktt = LinearStiffnessTensor(Shapes)
-% E0 = Shapes.Material.E;
-% G0 = (E0)/(2*(1+Shapes.Material.Nu));
-% 
-% QE  = diag([E0,G0,G0]);
-% QR  = diag([G0,E0,E0]);
-% Ktt = blkdiag(QR,QE);
-% end
-
 %------------------------------------------------------- optimal sphere fit
 function r = torusSolve(gp,x)
 % x  := [Nx3] of points

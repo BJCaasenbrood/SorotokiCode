@@ -17,4 +17,4 @@ for ii = 1:length(map)
    axis tight;
 end
 
-background(gitpage*0.75)
+background(gitpage)

@@ -1,10 +1,10 @@
 clr;
 %% 
-L = 50;     % length of robot
-M = 12;      % number of modes
-N = 50;     % number of discrete points on curve
-H = 1/60;  % timesteps
-FPS = 30;  % animation speed
+L = 50;    % length of robot
+M = 12;    % number of modes
+N = 150;    % number of discrete points on curve
+H = 1/200;  % timesteps
+  % animation speed
 
 Modes = [0,M,M,0,0,0];  % pure-XY curvature
 %%
@@ -15,7 +15,7 @@ Y = GenerateFunctionSpace(X,N,M,L);
 %%
 shp = Shapes(Y,Modes,'L0',L);
 
-shp.Material = NeoHookeanMaterial(0.15,0.3);
+shp.Material = NeoHookeanMaterial(0.03,0.3);
 shp.Gvec = [9.81e3;0;0];
 
 shp = shp.rebuild();
@@ -37,6 +37,8 @@ subplot(1,2,1);
 plot(mdl.Log.t,mdl.Log.Psi + mdl.Log.Kin + mdl.Log.Vg,'LineW',2);
 
 %% animation
+FPS = 50;
+fig(101,[9,9]); clf
 [rig] = setupRig(M,L,Modes);
 
 h = [];
@@ -45,11 +47,17 @@ for ii = 1:fps(mdl.Log.t,FPS):length(mdl.Log.q)
     rig = rig.computeFK(mdl.Log.q(ii,:));
     rig = rig.update();
     
-    axis([-.5*L .5*L -.5*L .5*L -1.2*L 0.1*L]);
+    axis([-.45*L .45*L -.45*L .45*L -1.2*L 0.01*L]);
     view(30,30);
-    delete(h);
-    h = shadowplot(5);
-    drawnow();
+%     delete(h);
+%     h = shadowplot(5);
+    background(metropolis); drawnow();
+    
+    if ii == 1, gif('swing.gif','frame',gcf,'nodither');
+    else, gif;
+    end
+    
+    %drawnow();
 end
 
 %%

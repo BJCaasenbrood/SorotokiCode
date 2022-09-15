@@ -1,18 +1,20 @@
 clr; beep off;
 %% settings
 L = 1;   % manipulator length
-M = 8;   % number of modes
-N = 301; % grid on SR
+M = 7;   % number of modes
+N = 1e3; % grid on SR
 
 %% build basis
 x = linspace(0,1,N).';
 Y = GenerateFunctionSpace(x,N,M,L);
 
 %% desired SE3
-R = 0.15;
-D = 0.055;
-Sd = sCircle(0.2,-0.15,R+D); % desired enveloping SDF
-sp = sSphere(0.2,0,0.15,R);  % offset due to occupance of soft arm
+H = 0.4;
+W = 0.2;
+R = 0.4;
+D = 0.01;
+Sd = sCircle(W,-H,R); % desired enveloping SDF
+sp = sSphere(W,0,H,R);  % offset due to occupance of soft arm
 
 %% soft sobotics shapes
 figure(101); subplot(1,2,1);
@@ -20,6 +22,7 @@ shp = Shapes(Y,[0,M,0,0,0,0]);      % generate basis
 rig = setupRig(M,L,[0,M,0,0,0,0]);  % rig the soft arm
 
 q = 1e-4*sort(rand(shp.NDim,1));
+q(1) = -2;
 
 %% solve IK
 obj = Gmodel(sp,'Texture',diffuse(0.925));
@@ -83,20 +86,20 @@ while norm(e) > 1e-3 && k < 400
     
     [~,N] = sp.normal(V);
     
-    delete(h); hold on;
-    h = quiver3(V(:,1),V(:,2),V(:,3),...
-                N(:,1),N(:,2),N(:,3),'b-');
+%     delete(h); hold on;
+%     h = quiver3(V(:,1),V(:,2),V(:,3),...
+%                 N(:,1),N(:,2),N(:,3),'b-');
     
     % setup figure
     setupFigure(BdBox);
     
-    subplot(1,2,2);
-    plot(shp.Sigma,R,'LineW',3);
-    axis([0 1 0 5e6]);
-    axis square; ax = gca;
-    grid on;
-    set(ax,'LineW',1.5);
-    ax.FontSize = 12;
+    %subplot(1,2,2);
+    %plot(shp.Sigma,R,'LineW',3);
+    %axis([0 1 0 5e6]);
+    %axis square; ax = gca;
+    %grid on;
+    %set(ax,'LineW',1.5);
+    %ax.FontSize = 12;
     drawnow;
     
     % compute update state and compute error
@@ -107,7 +110,7 @@ function [dq, E] = EnergyController(g,gd,J)
     
     k1   = 0;
     k2   = 0.75;
-    lam1 = 0.25;
+    lam1 = 0.15e-2;
     
     % conditioner
     Kp = diag([k1,k1,k1,k2,k2,k2]);
@@ -128,13 +131,15 @@ end
 function setupFigure(B)
     axis equal;
     axis(B);
-    background(gitpage);
+    background(metropolis);
 end
 
 function rig = setupRig(M,L,Modes)
 
-gmdl = Gmodel('Arm.stl','ShowProcess',0,'Alpha',0.3);
- 
+%gmdl = Gmodel('Arm.stl','ShowProcess',0,'Alpha',1);
+gmdl = Gmodel('SoftGripperShort.stl','ShowProcess',0,'Alpha',1);
+gmdl = Blender(gmdl,'Normalize');
+
 N = 100;
 X = linspace(0,L,N)';
 Y = GenerateFunctionSpace(X,N,M,L);
@@ -147,7 +152,7 @@ rig = rig.add(gmdl);
 rig = rig.parent(1,0,0);
 rig = rig.parent(1,1,1);
 
-rig    = rig.texture(1,1.1*base);
+%rig    = rig.texture(1,blue);
 rig.g0 = SE3(roty(pi/2),zeros(3,1));
 
 rig = rig.render();
@@ -161,8 +166,8 @@ function Y = GenerateFunctionSpace(X,N,M,L)
 Y = zeros(N,M);
 
 for ii = 1:M
-   %Y(:,ii) = chebyshev(X/L,ii-1); % chebyshev
-   Y(:,ii) = pcc(X/L,ii,M); %chebyshev(X/L,ii-1); % chebyshev
+   Y(:,ii) = chebyshev(X/L,ii-1); % chebyshev
+   %Y(:,ii) = pcc(X/L,ii,M); %chebyshev(X/L,ii-1); % chebyshev
 end
 
 % ensure its orthonormal (gram–schmidt)

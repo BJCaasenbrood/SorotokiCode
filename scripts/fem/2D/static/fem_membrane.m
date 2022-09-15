@@ -15,13 +15,13 @@ msh = msh.generate();
 fem = Fem(msh,'TimeStep',1/160,'Linestyle','none','SigmoidFactor',0.5);
 
 %% add constraint
-fem = fem.addConstraint('Spring',fem.FindNodes('SE'),[1,1]*1);
-fem = fem.addConstraint('Spring',fem.FindNodes('SW'),[1,1]*1);
-fem = fem.addConstraint('Spring',fem.FindNodes('NE'),[1,1]*1e3);
-fem = fem.addConstraint('Spring',fem.FindNodes('NW'),[1,1]*1e3);
+fem = fem.addSpring(fem.FindNodes('SE'),[1,1]*1);
+fem = fem.addSpring(fem.FindNodes('SW'),[1,1]*1);
+fem = fem.addSpring(fem.FindNodes('NE'),[1,1]*1e3);
+fem = fem.addSpring(fem.FindNodes('NW'),[1,1]*1e3);
 
 id  = fem.FindEdges('EdgeSelect',[W/2,0],30);
-fem = fem.AddConstraint('Pressure',id,P);
+fem = fem.addPressure(id,P);
 
 %% select material
 fem.Material = Material;

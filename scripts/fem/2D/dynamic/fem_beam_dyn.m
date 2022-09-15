@@ -6,7 +6,7 @@ msh = Mesh(sdf,'Quads',[30,2]);
 msh = msh.generate();
 
 %% generate fem model from mesh
-fem = Fem(msh,'TimeStep',1/100,'TimeEnd',3,'SolverPlot',1);
+fem = Fem(msh,'TimeStep',1/300,'TimeEnd',3,'SolverPlot',1);
 
 %% add constraint
 fem = fem.addSupport(fem.FindNodes('Left'),[1,1]);

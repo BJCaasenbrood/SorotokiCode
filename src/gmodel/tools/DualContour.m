@@ -1,5 +1,5 @@
 % adaption of the code: https://stackoverflow.com/questions/6485908/basic-dual-contouring-theory
-function [F,V] = DualContour(Sdf,N)
+function [F,V] = DualContour(Sdf,BdBox,N)
 if nargin < 2
    N = 16; 
 end
@@ -9,20 +9,20 @@ V = [];
 deps = 1e-3;
 
 % set Sdfs
-f  = @(x) Sdf.eval(x);
+f  = Sdf;%@(x) Sdf.eval(x);
 df = @(x) gradientEstimateMD(f,x,deps); % aka normal estimation
 
 % generate unit cell
-dx = (Sdf.BdBox(2) - Sdf.BdBox(1))/(N-1);
-dy = (Sdf.BdBox(4) - Sdf.BdBox(3))/(N-1);
-dz = (Sdf.BdBox(6) - Sdf.BdBox(5))/(N-1);
+dx = (BdBox(2) - BdBox(1))/(N-1);
+dy = (BdBox(4) - BdBox(3))/(N-1);
+dz = (BdBox(6) - BdBox(5))/(N-1);
 
 [Uv, Ue] = unitCube(dx,dy,dz);
 
 % generate meshgrid of cube centers
-[X,Y,Z] = meshgrid(linspace(Sdf.BdBox(1),Sdf.BdBox(2),N),...
-                   linspace(Sdf.BdBox(3),Sdf.BdBox(4),N),...
-                   linspace(Sdf.BdBox(5),Sdf.BdBox(6),N));
+[X,Y,Z] = meshgrid(linspace(BdBox(1),BdBox(2),N),...
+                   linspace(BdBox(3),BdBox(4),N),...
+                   linspace(BdBox(5),BdBox(6),N));
 
 % generate [8x3xN^3] matrix of cube vertices
 Vmat = repmat(Uv,1,1,N^3) + ...
@@ -34,10 +34,10 @@ Id      = zeros(N^3,1);
 Sdetect = false(N^3,1);
 Edetect = false(12,N^3);
 
-opt     = optimoptions('lsqlin','Display','none',...
-    'MaxIterations',1e3,'Algorithm','trust-region-reflective',...
-    'ConstraintTolerance',1e-8,...
-    'OptimalityTolerance',1e-8); %'');
+% opt     = optimoptions('lsqlin','Display','none',...
+%     'MaxIterations',10,'Algorithm','trust-region-reflective',...
+%     'ConstraintTolerance',1e-8,...
+%     'OptimalityTolerance',1e-8); %'');
 
 % opt = optimoptions(@lsqlin,'Algorithm','active-set',...
 %     'MaxIterations',1,'Display','off');
@@ -68,8 +68,8 @@ for ii = 1:size(Vmat,3)
         ub = [max(Ve(:,1)); max(Ve(:,2)); max(Ve(:,3))];
         
         %x0 = ;
-        y = lsqlin(A,b,[],[],[],[],lb,ub,mean(P,1),opt);
-        %y = A\b;
+        %y = lsqlin(A,b,[],[],[],[],lb,ub,mean(P,1),opt);
+        y = A\b;
         Vopt(ii,:) = (y).';   % optimal vertex placement in unit-cube
         Id(ii,1)   = ii;
         Edetect(:,ii) = Se;

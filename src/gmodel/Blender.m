@@ -5,6 +5,7 @@ switch(Request)
     case('Translate');    x = TranslateMesh(x,Arg);
     case('Rotate');       x = RotateMesh(x,Arg);
     case('Center');       x = CenterMesh(x);
+    case('Normalize');    x = NormalizeMesh(x);
     case('Fix');          x = FixMesh(x);
     case('Transform');    x = Transformation(x,Arg);
     case('Scale');        x = ScaleMesh(x,Arg);
@@ -64,7 +65,6 @@ end
 function mesh = RotateMesh(mesh,Arg)
 Ax = Arg{1};
 dr  = Arg{2}*(pi/180);
-
 Node0 = mesh.Node;
 
 if strcmp(Ax,'x')
@@ -124,6 +124,23 @@ Y0 = mean(Node0(:,2));
 Z0 = mean(Node0(:,3));
 
 mesh.Node = Node0 - [X0,Y0,Z0];
+end
+%-------------------------------------------------------------- ROTATE MESH
+function mesh = NormalizeMesh(mesh)
+
+Node0 = mesh.Node;
+BdBox = boxhull(Node0);
+DX = BdBox(2)-BdBox(1);
+DY = BdBox(4)-BdBox(3);
+DZ = BdBox(6)-BdBox(5);
+
+D = [DX,DY,DZ];
+[~,I] = max(D);
+
+alpha = (1/D(I));
+Node0(:,I) = Node0(:,I) - BdBox(2*(I-1)+1);
+mesh.Node  = alpha*Node0;
+mesh = mesh.set('BdBox',boxhull(alpha*Node0));
 end
 %-------------------------------------------------------------- ROTATE MESH
 function mesh = FixMesh(mesh)

@@ -11,8 +11,8 @@ msh = msh.generate();
 fem = Fem(msh,'TimeStep',1/150,'TimeEnd',1.5);
 
 %% add constraint
-fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,1]);
-fem = fem.AddConstraint('Gravity',[],[0,-9.81e3]);
+fem = fem.addSupport(fem.FindNodes('Left'),[1,1]);
+fem = fem.addGravity([0,-9.81e3]);
 
 %% select material
 fem.Material = NeoHookeanMaterial(0.1,0.3);
@@ -23,7 +23,7 @@ fem = fem.simulate();
 
 %% extract dominated modes
 NNode = 100;
-Modal = [0,3,0,1,0,0];
+Modal = [0,5,0,1,0,0];
 X     = linspace(0,1,NNode)';
 
 % shape function reconstruction

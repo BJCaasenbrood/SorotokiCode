@@ -6,7 +6,7 @@ P0  = 20*kpa;
 MinH  = 2;
 MaxH  = 3;
 
-msh = Mesh('Pneunet.png','BdBox',[0,107,0,16],...
+msh = Mesh('PneunetFine.png','BdBox',[0,107,0,16],...
     'SimplifyTol',0.02,'Hmesh',[1,MinH,MaxH]);
 
 msh = msh.generate();
@@ -17,14 +17,14 @@ fem = fem.set('TimeStep',1/120,...
               'BdBox',[0,120,-80,20],'TimeEnd',2);
 
 %% add boundary constraint
-fem = fem.AddConstraint('Support',fem.FindNodes('Box',[0,1,0,10]),[1,1]);
-fem = fem.AddConstraint('Gravity',[],[0,-9.81e3]);
-fem = fem.AddConstraint('Pressure',fem.FindEdges('AllHole'),...
+fem = fem.addSupport(fem.FindNodes('Box',[0,1,0,10]),[1,1]);
+fem = fem.addGravity([0,-9.81e3]);
+fem = fem.addPressure(fem.FindEdges('AllHole'),...
    @(x) P0*sigmoid(x.Time));
 
 %% add output nodes
 id  = fem.FindNodes('Bottom');
-fem = fem.AddConstraint('Output',id,[0,0]);
+fem = fem.addOutput(id,[0,0]);
 
 %% assign material
 fem.Material = NeoHookeanMaterial(1,0.25); 
@@ -57,17 +57,18 @@ for ii = 1:2
 end
 
 Z = shp.get('POD');
-gm = ones(shp.NNode,1);
+gm = Z(:,1);
 G  = trapz(shp.Sigma.',gm.*Z).';
 
 %% model
-shp.E    = 2;
-shp.Nu   = 0.1;
-shp.Zeta = 0.05;
+% shp.E    = 2;
+% shp.Nu   = 0.1;
+% shp.Zeta = 0.05;
+shp.Material = NeoHookeanMaterial(2,0.1);
 
 shp = shp.rebuild();
 
-mdl = Model(shp,'Tstep',1/60,'Tsim',8);
+mdl = Model(shp,'TimeStep',1/60,'TimeEnd',8);
 
 mdl.tau = @(M) Controller(M,G);
 
@@ -96,7 +97,7 @@ n = numel(mdl.Log.q);
 t = mdl.Log.t;
 
 P0 = 450;
-tau = -G*P0*sigmoid(max(t-3,0));
+tau = G.*P0*sigmoid(max(t-3,0));
 end
 
 function sdf = CrossSection

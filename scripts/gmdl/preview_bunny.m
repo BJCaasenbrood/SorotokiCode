@@ -1,7 +1,7 @@
 clr;
 %% loading .stl file
 obj = Gmodel('Bunny.stl');
-obj.Texture = base;
+%obj.Texture = base;
 
 %% rendering    
 obj = obj.bake().render(); view(10,20);

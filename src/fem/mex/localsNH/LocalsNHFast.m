@@ -51,6 +51,12 @@ for q = 1:length(W)
     % extract shape-functions
     N     = Ns(:,:,q);
     dNdxi = dNdxis(:,:,q);
+    
+    if numel(N) == 3 && Dim == 3
+        T = cross(dNdxi(:,1),dNdxi(:,2));
+        dNdxi = [dNdxi,(T)];
+    end
+    
     J0    = Node0(eNode,:).'*dNdxi;
     dNdx  = dNdxi/J0;
     dJ    = det(J0);

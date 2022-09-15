@@ -19,7 +19,7 @@ shp.Material = NeoHookeanMaterial(2,0.4);
 shp = shp.rebuild(); 
 
 %% build model class
-mdl = Model(shp,'TimeStep',H,'TimeEnd',5);
+mdl = Model(shp,'TimeStep',H,'TimeEnd',10);
 
 %% controller
 mdl.tau  = @(M) Controller(M);
@@ -48,8 +48,8 @@ for ii = 1:fps(mdl.Log.t,FPS):length(mdl.Log.q)
     drawnow();
 end
 
-function gd = gref(~)
-gd = SE3(eye(3),[30,0,-10]);
+function gd = gref(t)
+gd = SE3(eye(3),[50 + 30*sin(t),0,-10]);
 end
 
 %%
@@ -76,12 +76,12 @@ J = JJ(:,:,end);
 ge = gg(:,:,end); %SE3(mdl.Log.Phi,mdl.Log.gam);
 gd = gref(t);
 
-KI = 0.03;
-lam1 = 15 + KI*mdl.Log.AUX.z;
-lam2 = 1e1;
+KI = 0.0;
+lam1 = 1e4 + KI*mdl.Log.AUX.z;
+lam2 = 5e3;
 Kp = diag([1e-5,1e-5,1e-5,1,1,1]);
 
-Xi = smoothstep(2*t)*logmapSE3(ge\gd);
+Xi = smoothstep(4*t)*logmapSE3(ge\gd);
 Fu = Kp*tmapSE3(Xi)*wedge(Xi);
 
 tau = lam1*J.'*((J*J.' + lam2*eye(6))\Fu);

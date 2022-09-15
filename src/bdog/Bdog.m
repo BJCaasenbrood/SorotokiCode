@@ -2,6 +2,9 @@ classdef Bdog < handle
 
     properties (Access = public)
         t;
+        U;      % control signal
+        Y;      % measurement signal
+        P0;     %
         Ip;
         Usr;
         Pwd;
@@ -10,6 +13,7 @@ classdef Bdog < handle
         Sensor;
         Actuator;
         Frequency;
+        NVeab;
     end
     
     properties (Access = private)
@@ -35,7 +39,7 @@ methods
 %-------------------------------------------------------- ballong-dog class 
 function obj = Bdog(usr,ip,pwd,varargin)
     
-    obj.Port = 8889;
+    obj.Port = 8888;
     obj.Ip  = ip;
     obj.Usr = usr;
     obj.Pwd = pwd;
@@ -54,10 +58,17 @@ function obj = Bdog(usr,ip,pwd,varargin)
     obj.LoopIndex = uint8(1e6);
     obj.Frequency = 400;
     obj.Log = struct('y',[],'t',[]);
+    obj.NVeab = 1;
     
     for ii = 1:2:length(varargin)
         obj.(varargin{ii}) = varargin{ii+1};
     end
+    
+    if isempty(obj.P0)
+        obj.P0 = zeros(2*obj.NVeab,1);
+    end
+    
+    obj.U = pdac(obj.P0);
     
     % setup TCP client
     client = tcpip(obj.Ip,obj.Port,'NetworkRole', 'client');
@@ -84,6 +95,20 @@ function Bdog = set(Bdog,varargin)
     for ii = 1:2:length(varargin)
         Bdog.(varargin{ii}) = varargin{ii+1};
     end
+end
+%---------------------------------------------------------------------- set
+function Bdog = setInput(Bdog,x,varargin)
+    
+    if (numel(x) == 1) && ~isempty(varargin)
+       X = Bdog.U*0;
+       x(round(x)) = varargin{1};
+    end
+     
+    Bdog.U = clamp(pdac(x(:)),0,1);
+end
+%---------------------------------------------------------------------- set
+function y = getOutput(Bdog)
+   y = Bdog.Log.y(end,:); 
 end
 %--------------------------------------------------------- connect to board
 function Bdog = connect(Bdog)
@@ -193,15 +218,24 @@ function Bdog = transfertoPi(Bdog)
 end
 %-------------------------- Send data as a TCP client (formatted as double)
 function Bdog = tcpSendData(Bdog, data)
-    fwrite(Bdog.TCPclient,clamp(data,0,1),"double");
+    x = clamp(data,0,1);
+    dx = -pdac(Bdog.P0)-0.5;
+    dx = 0;
+    fwrite(Bdog.TCPclient,clamp(x(:)+dx(:),0,1),"double");
 end
 %-------------------------- Recv data as a TCP client (formatted as double)
 function data = tcpRecvData(Bdog,data_length)
-    data1 = fread(Bdog.TCPclient,data_length,"double");
-    data2 = fread(Bdog.TCPclient,data_length,"double");
     
-    data = [data1,data2];
-    Bdog.Log.y = vappend(Bdog.Log.y,[data1, data2]);
+    data = zeros(1,Bdog.NVeab*2);
+    for ii = 1:(Bdog.NVeab*2)
+        data(ii) = fread(Bdog.TCPclient,data_length,"double");
+    end
+    
+    %data1 = fread(Bdog.TCPclient,data_length,"double");
+    %data2 = fread(Bdog.TCPclient,data_length,"double");
+    
+    %data = [data1,data2];
+    Bdog.Log.y = vappend(Bdog.Log.y,data);
     
     Bdog.t = (1/Bdog.Frequency)*Bdog.LoopCounter;
     Bdog.Log.t = vappend(Bdog.Log.t,Bdog.t);
@@ -214,7 +248,13 @@ function flag = loop(Bdog,Ts)
         tic;
         Bdog.LoopCounter = 1;
         Bdog.LoopIndex   = Ts/(1/Bdog.Frequency);
+        tcpRecvData(Bdog,1);
+        Bdog.tcpSendData(Bdog.U);
     else
+        
+        tcpRecvData(Bdog,1);
+        Bdog.tcpSendData(Bdog.U);
+        
         while toc < 1/Bdog.Frequency
             continue
         end
@@ -232,6 +272,10 @@ function flag = loop(Bdog,Ts)
         flag = false;
     end
     
+end
+%----------------------------------------------------------- run executable 
+function reset(Bdog)
+    tcpSendData(Bdog,0);
 end
 %--------------------------------------------- reads log file, return array
 function A = read(Bdog,filename)

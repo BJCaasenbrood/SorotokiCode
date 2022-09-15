@@ -7,13 +7,17 @@ for nn = min(ElemNNode):max(ElemNNode)
     fem.ShapeFnc{nn}.W = W;
     fem.ShapeFnc{nn}.N = zeros(nn,1,size(W,1));
     fem.ShapeFnc{nn}.dNdxi = zeros(nn,2,size(W,1));
+    fem.ShapeFnc{nn}.fnc = @(x) PolyShapeFnc(nn,x);
     fem.ShapeFnc{nn}.Q = Q;
     
     for q = 1:size(W,1)
         [N, dNdxi] = PolyShapeFnc(nn,Q(q,:));
+        
         fem.ShapeFnc{nn}.N(:,:,q) = N;
         fem.ShapeFnc{nn}.dNdxi(:,:,q) = dNdxi;
-        fem.ShapeFnc{nn}.fnc = @(x) PolyShapeFnc(nn,x);
+        
+        eta = 2*pi*(q/size(W,1)) + 1e-6;
+        fem.ShapeFnc{nn}.Xi(q,:) = [cos(eta),sin(eta)];
     end
 end
 

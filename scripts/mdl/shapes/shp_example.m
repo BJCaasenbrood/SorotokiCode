@@ -24,7 +24,6 @@ axis equal;
 subplot(2,1,2);
 plot(x,Et,'LineW',1.5);
 
-
 function Y = GenerateFunctionSpace(X,N,M,L)
 % loop over functional space
 Y = zeros(N,M);

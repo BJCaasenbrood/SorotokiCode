@@ -1,4 +1,12 @@
 %% ------------------------------------------------------------------------
+% % SOROTOKI - Alpha - 2.09.15 - September 15 - 2022
+%
+% + Minor update to documentation, and Readme.md
+%  
+% ? Apparently there is a mex compile error for LocalsNHFast.m... Issue
+% remains unclear, perhaps a Matlab versioning issue.
+% 
+%% ------------------------------------------------------------------------
 % % SOROTOKI - Alpha - 2.07.22 - July 22 - 2022
 %
 % + Documentation update to the examples Modeling.
@@ -169,8 +177,8 @@ if isempty(varargin)
 end
 
 switch(varargin{1})
-    case(1); x = '2.08.09';
-    case(2); x = 'August 09, 2022';
+    case(1); x = '2.09.15';
+    case(2); x = 'September 15, 2022';
     case(3); x = 'August 30, 2018';
 end
 end

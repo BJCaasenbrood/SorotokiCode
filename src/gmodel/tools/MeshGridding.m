@@ -10,8 +10,12 @@ end
 
 x = linspace(BdBox(1),BdBox(2),N);
 y = linspace(BdBox(3),BdBox(4),N);
-if length(BdBox)>4, z = linspace(BdBox(5),BdBox(6),N);
-else, z = 0; end
+
+if numel(BdBox)>4
+    z = linspace(BdBox(5),BdBox(6),N);
+else
+    z = 0; 
+end
 
 [X,Y,Z] = meshgrid(x,y,z); X = (X); Y = (Y); Z = (Z);
 P = [X(:),Y(:),Z(:)]; 

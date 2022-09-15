@@ -9,6 +9,10 @@ fem.ShapeFnc{8}.W = W;
 fem.ShapeFnc{8}.N = zeros(8,1,size(W,1));
 fem.ShapeFnc{8}.dNdxi = zeros(8,3,size(W,1));
 fem.ShapeFnc{8}.Q = Q;
+fem.ShapeFnc{8}.fnc = @(x) HexaShapeFnc(x);
+fem.ShapeFnc{8}.Xi = [-1  1  1 -1 -1  1  1 -1;
+                      -1 -1  1  1 -1 -1  1  1;
+                      -1 -1 -1 -1  1  1  1  1].';
 
 for q = 1:size(W,1)
     [N,dNdxi] = HexaShapeFnc(Q(q,:));

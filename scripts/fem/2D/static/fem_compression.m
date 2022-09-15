@@ -8,16 +8,16 @@ msh = msh.generate();
 
 %% generate fem model from mesh
 fem = Fem(msh,'TimeStep',1/75,'Nonlinear',true,'Linestyle','-',...
-          'ColorAxis',[0 0.4]);
+          'ColorAxis',[0 0.4],'SigmoidFactor',-0.5);
 
 %% add constraint
-fem = fem.AddConstraint('Support',fem.FindNodes('Top'),[1,0]);
-fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[0,1]);
-fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,0]);
-fem = fem.AddConstraint('Displace',fem.FindNodes('Box',[0 5 10 10]),[0,-5]);
+fem = fem.addSupport(fem.FindNodes('Top'),[1,0]);
+fem = fem.addSupport(fem.FindNodes('Bottom'),[0,1]);
+fem = fem.addSupport(fem.FindNodes('Left'),[1,0]);
+fem = fem.addDisplace(fem.FindNodes('Box',[0 5 10 10]),[0,-5]);
 
 %% assign material
-fem.Material = Ecoflex0050(55);
+fem.Material = Ecoflex0050(12);
 
 %% solving
 fem.solve();

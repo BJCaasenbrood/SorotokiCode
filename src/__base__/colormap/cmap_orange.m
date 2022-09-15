@@ -25,10 +25,13 @@ else
 end
 
 WW = [0.8929    0.8929    0.8929];
-colmap = linspacen(WW.',C.',n).';
+
 
 if nargin>0
+    colmap = linspacen(WW.',C.',100).';
     colmap = clrmapping(colmap,n);
+else
+    colmap = linspacen(WW.',C.',n).';
 end
 
 end

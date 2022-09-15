@@ -16,4 +16,4 @@ fem = fem.addGravity([0,-9.81e3]);
 fem.Material = NeoHookeanMaterial(0.1,0.4);
 
 %% solving
-fem.simulate();
+fem.solve();

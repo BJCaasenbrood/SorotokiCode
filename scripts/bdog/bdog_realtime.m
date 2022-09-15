@@ -1,18 +1,22 @@
 clr;
 %% assign free DOF
+port = 8888;
 usr = 'pi';
 pwd = 'softroboticsSA';
 ip  = '192.168.0.2';
 
-brd = Bdog(usr,ip,pwd,'autoConnect',true);
+brd = Bdog(usr,ip,pwd,'autoConnect',false,'Port',port);
+
 
 %% desired pressure
-Pd = -10;
+brd.NVeab = 2;
+Pd = 10;
 
 %% get data
-brd = brd.set('Frequency',10);
+brd = brd.set('Frequency',50);
 
 %% execute control loop
+
 while brd.loop(10)
     
     % read data
@@ -24,18 +28,19 @@ while brd.loop(10)
     u = ControlLaw(brd.t,Pd,Pmeasure);
     
     % send data 
-    brd.tcpSendData([u, 0.5]);
+    brd.tcpSendData([u, 0.5, 0.5, 0.5]);
     
     fprintf('time = %2.3f\n',brd.t);
 end
 
-brd.tcpSendData([0.5, 0.5]);
+brd.tcpSendData([0.5, 0.5, 0.45, 0.5]); pause(0.1);
+
 brd.disconnect();
 
 %% plotting
-t = brd.Log.Time;
+t = brd.Log.t;
 plot(t,yd(t,Pd)); hold on;
-plot(t,padc(brd.Log.Data(:,1),0.4));
+plot(t,padc(brd.Log.y(:,1),0.4));
 
 %% additional functions
 function u = ControlLaw(t,Pd,Pm)
@@ -51,7 +56,7 @@ function u = ControlLaw(t,Pd,Pm)
 end
 
 function z = yd(t,Pd)
-    z = lerp(0,Pd,smoothstep(0.2*t));
+    z = Pd*sin(t);%lerp(0,Pd,smoothstep(0.75*t));
 end
 
 

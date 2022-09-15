@@ -11,17 +11,17 @@ msh = msh.generate();
 msh.showSDF();
 
 %% generate fem model from mesh
-fem = Fem(msh,'TimeStep',1/10,'OptimizationProblem','Compliant');
+fem = Fem(msh,'TimeStep',1/10,...
+ 'OptimizationProblem','Compliant'); % OptProb = compliant ensures f = L.'*x (displacement func)
 
 %% add constraint
 fem = fem.addSupport(fem.FindNodes('Bottom'),[1,1]);
 fem = fem.addSupport(fem.FindNodes('Top'),[1,0]);
-fem = fem.addDisplace(fem.FindNodes('Top'),[0,-5]);
+fem = fem.addDisplace(fem.FindNodes('Top'),[0,-10]);
 fem = fem.addOutput(fem.FindNodes('Top'),[0,1]);
 
 %% assign material
-%fem.Material = Dragonskin10;
-fem.Material = NeoHookeanMaterial(1,0.3);
+fem.Material = Dragonskin10;
 
 %% solving
 fem.solve();
@@ -29,7 +29,7 @@ fem.solve();
 %% plotting displacement
 figure(102);
 time = fem.Log.t;
-uy   = fem.Log.Out.f;
+uy   = fem.Log.Out.f; % f = L.'*x;
 
 plot(P*time/kpa,uy,'-o','Color',col(1),'linewidth',2);
 xaxis('Quasi-static pressure','kpa');

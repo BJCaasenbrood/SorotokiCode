@@ -3,7 +3,7 @@ clr;
 Simp  = 0.08;
 GrowH = 1;
 
-MinH  = 5;
+MinH  = 6;
 MaxH  = 8;
 
 msh = Mesh('SWR_robot_1.png',...
@@ -47,24 +47,11 @@ figure(101);
 t = fem.Log.t;
 
 for ii = 1:fps(t,20):numel(t)
-    subplot(1,3,[1,2]);
-        fem.set('Node',fem.Log.Node{ii});
-        fem.show('Field',fem.Log.Stress{ii});
-        axis([-300,300,-325,325]);      
-        
-    subplot(1,3,3);
-        cla;
-        K = fem.Log.Kin(1:ii);
-        plot(t(1:ii),K,'LineW',2); hold on;
-        %axis([0 1 -8e-3 7e-3]);
-       
-        U0 = fem.Log.Vg(end) + fem.Log.Psi(end) - fem.Log.Vf(end);
-        U = fem.Log.Psi(1:ii) + fem.Log.Vg(1:ii) - fem.Log.Vf(1:ii) - U0;
-        plot(t(1:ii),U,'LineW',2); 
-        axis([0 t(end) -1 3]);     
-
-        plot(t(1:ii),K+U,'LineW',2); 
-    
+    fem.set('Node',fem.Log.Node{ii});
+    fem.show('Field',fem.Log.Stress{ii});
+    axis([0,350,0,400]);
+    background();
     drawnow();
+
 end
 

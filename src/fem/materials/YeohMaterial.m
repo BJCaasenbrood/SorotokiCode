@@ -29,14 +29,14 @@ function obj = YeohMaterial(varargin)
     [obj.ID, obj.SET, obj.WGT] = Tensor4IdSymmetric;
     
     if ~isempty(varargin)
-    if numel(varargin{1}) == 3
-        C = varargin{1};
-        obj.C1 = C(1); obj.C2 = C(2); obj.C3 = C(3);
-    else
-    for ii = 1:2:length(varargin)
-        obj.(varargin{ii}) = varargin{ii+1};
-    end
-    end
+        if numel(varargin{1}) == 3
+            C = varargin{1};
+            obj.C1 = C(1); obj.C2 = C(2); obj.C3 = C(3);
+        else
+            for ii = 1:2:length(varargin)
+                obj.(varargin{ii}) = varargin{ii+1};
+            end
+        end
     end
     
 end
@@ -68,6 +68,16 @@ end
 %---------------------------------------------------------------------- set
 function y = getContactFriction(YeohMaterial)
     y = 6*YeohMaterial.Cfr*YeohMaterial.C1; 
+end
+%---------------------------------------------------------------------- set
+function y = uniaxial(YeohMaterial,x)
+y = zeros(numel(x),1);
+for ii = 1:numel(x)
+    F = diag([x(ii),sqrt(1/x(ii)),sqrt(1/x(ii))]);
+    [S0] = PiollaStress(YeohMaterial,F);
+    P = (1/det(F))*F*S0*(F.');
+    y(ii,1) = P(1,1);
+end
 end
 %------------------------------ 2ND PIOLLA STRESSAND STIFFNESS FOR YEOH
 function [S, D, P] = PiollaStress(YeohMaterial,F,~)

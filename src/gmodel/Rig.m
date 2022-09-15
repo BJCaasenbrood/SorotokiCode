@@ -67,7 +67,7 @@ function Rig = add(Rig,varargin)
         if Rig.AutoScale
            gmdl = gmdl.set('Node0',gmdl.Node*Rig.Domain);
            gmdl = gmdl.set('Node',gmdl.Node*Rig.Domain); 
-           gmdl.Texture = grey;
+           gmdl.Texture = bluebase;
            gmdl = gmdl.bake();
         end
 

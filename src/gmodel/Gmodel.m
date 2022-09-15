@@ -94,7 +94,7 @@ methods
 %---------------------------------------------------------------- Fem Class
 function obj = Gmodel(varargin) 
     
-    obj.Texture        = base;
+    obj.Texture        = bluebase;
     obj.TextureStretch = .8;
     obj.Quality        = 32;
     
@@ -208,7 +208,6 @@ function Gmodel = render(Gmodel,varargin)
     Gmodel.Figure.UserData = Gmodel;
     
     update(Gmodel);
-    %drawnow;
     
     function myprecallback(src,evnt)
         warning off;
@@ -218,8 +217,31 @@ function Gmodel = render(Gmodel,varargin)
         end
         class = whoClasses('Rig');
         for i = 1:length(class)
-        	r = class{i}.update();
+            if ~isempty(class{i})
+                r = class{i}.update();
+            end
         end
+        class = whoClasses('Shapes');
+        for i = 1:length(class)
+            obj = class{i}.get('Gmodel');
+            if ~isempty(obj)
+                r = obj.update();
+            end
+        end
+        
+        class = whoClasses('cell');
+        for i = 1:length(class)
+            cll = class{i};
+            for j = 1:length(cll)
+                if isa(cll{j},'Gmodel')
+                    r = update(cll{j},'tex');
+                end
+                if isa(cll{j},'Rig')
+                    r = cll{j}.update();
+                end
+            end
+        end
+        
         warning on;
     end
 
@@ -498,12 +520,21 @@ function Gmodel = GenerateObject(Gmodel,varargin)
        v = msh{1}.Node;
        f = msh{1}.Element;
     elseif  isa(msh{1},'Mmesh')
-       h = figure("Visible",false);
+       %h = figure("Visible",false);
        [x,y,z] = tubeplot(msh{1}.Node.',msh{1}.get('WireThickness'));
        h = mesh(x,y,z);
        fv = surf2patch(h);
        v = fv.vertices;
        f = fv.faces;
+    elseif  isa(msh{1},'Shapes')
+        %h = figure("Visible",false);
+        [x,y,z] = tubeplot(msh{1}.Node.',2,16,1e-6);
+        %h = mesh(x,y,z);
+        fv = surf2patch(x,y,z,'triangles');
+        v = fv.vertices;
+        f = fv.faces;
+        
+        %Gmodel.Texture = copper;
     end
     
     [vn,fn] = TriangleNormalFast_mex(v,f);

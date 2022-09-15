@@ -1,12 +1,10 @@
-name = 'color_green';
-hex = '#2e8540';
+name = 'color_visited_alt';
+hex = '#FF2975';
 
 HSV = rgb2hsv(hex2rgb(hex));
 
-set = {'darkest','dark','light','lighter','lightest'};
-SV  = [0.8235,0.6000;
-       0.8434,0.7765;
-       0.7309,0.9765;
+set = {'light','lighter','lightest'};
+SV  = [0.7309,0.9765;
        0.5412,1.0000;
        0.1804,1.0000];
 

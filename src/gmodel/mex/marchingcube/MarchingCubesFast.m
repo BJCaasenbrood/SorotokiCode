@@ -22,7 +22,6 @@ function [F,V] = MarchingCubesFast(x,y,z,c,iso)
 %
 % Revised 30 September, 2011 to add code by Oliver Woodford for removing 
 % duplicate vertices. 
-
 calc_cols = false;
 lindex = 4;
 
@@ -73,7 +72,8 @@ vertex_idx = {1:n(1), 1:n(2), 1:n(3); ...
     1:n(1), 2:n(2)+1, 2:n(3)+1 };
 
 for ii=1:8                             % loop thru vertices of all cubes
-    idx = c(vertex_idx{ii, :}) > iso;  % which cubes have vtx ii > iso
+    Ds = c(vertex_idx{ii, :});
+    idx = Ds > iso;  % which cubes have vtx ii > iso
     cc(idx) = bitset(cc(idx), ii);     % for those cubes, turn bit ii on
 end
 

@@ -2,14 +2,15 @@ clr;
 %% mesh
 
 sdf = sCircle(18,25,5) - sCircle(18,25,3.75);
-msh = Mesh(sdf,'NElem',25);
+msh = Mesh(sdf,'NElem',50);
 msh = msh.generate();
 
 %%
 fem = Fem(msh,'TimeStep',1/1e3,'TimeEnd',1.5,'BdBox',[-35,35,-15,30],...
-    'Linestyle','-');
+    'Linestyle','none');
 
-fem.Material = NeoHookeanMaterial(0.05,0.4);
+fem.Material = NeoHookeanMaterial(0.02,0.4);
+fem.Material.Cfr = 3e-6;
 
 fem = fem.addGravity();
 fem = fem.addContact(SDF(15),[0,0]);
@@ -26,7 +27,14 @@ for ii = 1:fps(t,200):numel(t)
     fem.show();
     caxis([-1e-6 1e-6])
     drawnow();
-    background(gitpage);
+    background(metropolis);
+    
+        
+    if ii == 1
+        gif('soft_bounce.gif','frame',gcf,'nodither');
+    else
+        gif; 
+    end
 
 end
 

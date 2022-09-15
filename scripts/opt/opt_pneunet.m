@@ -10,13 +10,13 @@ msh = Mesh(sdf,'BdBox',[0,W,0,H],'NElem',1200);
 msh = msh.generate();
 
 %% show generated mesh
-fem = Fem(msh,'VolumeInfill',0.4,'Penal',4,'FilterRadius',H/10,...
+fem = Fem(msh,'VolumeInfill',0.33,'Penal',4,'FilterRadius',H/10,...
               'Nonlinear',0,'TimeStep',1/30,'ReflectionPlane',[0,0],...
               'OptimizationProblem','Compliant','Linestyle','None',...
-              'MaxIterationMMA',70,'ChangeMax',0.1,'Movie',0);
+              'MaxIterationMMA',70,'ChangeMax',0.05,'Movie',0);
 
 %% set spatial settings
-fem = fem.set('Periodic',[1/2, 0],'Repeat',[ones(9,1)]);
+fem = fem.set('Periodic',[0, 0],'Repeat',[ones(9,1)]);
 
 %% add boundary condition
 id = fem.FindNodes('Left'); 
@@ -25,24 +25,30 @@ fem = fem.addSupport(id,[1,1]);
 id  = fem.FindNodes('Right'); 
 fem = fem.addSpring(id,[0,1]);
 fem = fem.addOutput(id,[0,-2]);
+
+id  = fem.FindNodes('Bottom'); 
+fem = fem.addSpring(id,[1,0]);
+fem = fem.addOutput(id,[-1,0]);
 id  = fem.FindElements('Location',[W/2,0.5*H],1);
 fem = fem.addMyocyte(id,10*kpa);
 
 %% set density
-fem = fem.initialTopology('Hole',[W/2,0.5*H],0.85);
+fem = fem.initialTopology('Hole',[W/2,0.5*H],0.25);
 
 %% material
 fem.Material = Ecoflex0030();
 
 %% solving
-fem.optimize();
 fem.show('ISO',0.2);
+background(metropolis)
+fem.optimize();
+fem.show('ISO',0.25);
 
 %% convert topology result to mesh
 ISO  = 0.3;
 Simp = 0.05;
 GrowH = 1;
-MinH = 2;
+MinH = 2.5;
 MaxH = 40;
 
 mshr = fem.exportMesh(ISO,Simp,[GrowH,MinH,MaxH]); 
@@ -56,7 +62,7 @@ femr = femr.addPressure(femr.FindEdges('TopHole'),8*kpa);
 femr = femr.addOutput(femr.FindNodes('Bottom'),[0,0]);
 
 %% assign material to reduced fem
-D = 25; % compress. factor (more stable)
+D = 5; % compress. factor (more stable)
 femr.Material = Ecoflex0030(D);
 
 %% solve final finite-element problem

@@ -29,7 +29,7 @@ mdl = mdl.set('MaxIteration',100);
 mdl.tau  = @(M) Controller(M);
 
 %%
-mdl.q0 = 1e-2*ones(shp.NDim,1);
+mdl.q0 = 1e-6*ones(shp.NDim,1);
 mdl = mdl.simulate(); 
 
 %% 
@@ -79,8 +79,8 @@ J  = mdl.Log.EL.J;
 ge = SE3(mdl.Log.Phi,mdl.Log.gam);%gg(:,:,end);
 gd = gref(t);
 
-lam1 = 1e-6;
-lam2 = 1e-3;
+lam1 = 1e5;
+lam2 = 1e6;
 Kp = diag([0,0,0,1,1,1]);
 
 Xi = smoothstep(t)*logmapSE3(ge\gd);
@@ -89,7 +89,7 @@ Fu = Kp*tmapSE3(Xi)*wedge(Xi);
 tau = lam1*J.'*((J*J.' + lam2*eye(6))\Fu);
 %tau = lam1*J.'*Fu;
 tau = tau + mdl.Log.EL.fg + mdl.Log.EL.K*mdl.Log.q;
-tau = tau*0;
+%tau = tau*0;
 end
 
 function gd = gref(~)
