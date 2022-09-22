@@ -30,7 +30,7 @@ Please visit [**Sorotoki**](https://bjcaasenbrood.github.io/SorotokiPage/) for t
 
 <img src="https://github.com/BJCaasenbrood/SorotokiPage/blob/master/docs/documentation/img/beam.gif" height="160"> <img src="https://github.com/BJCaasenbrood/SorotokiPage/blob/master/docs/documentation/img/soro_hand.gif" height="150"> <img src="https://github.com/BJCaasenbrood/SorotokiPage/blob/master/docs/documentation/img/soft_control.gif" height="150"> <img src="https://github.com/BJCaasenbrood/SorotokiPage/blob/master/docs/documentation/img/soro_control.gif" height="140"> 
 
-<img src="https://github.com/BJCaasenbrood/SorotokiPage/blob/master/docs/documentation/img/bdog_bellow.gif" height="160"> <img src="https://github.com/BJCaasenbrood/SorotokiPage/blob/master/docs/documentation/img/bdog_grip.gif" height="150"> <img src="https://github.com/BJCaasenbrood/SorotokiPage/blob/master/docs/documentation/img/bdog_srm.gif" height="140"> 
+<img src="https://github.com/BJCaasenbrood/SorotokiPage/blob/master/docs/documentation/img/bdog_bellow.gif" height="160"> <img src="https://github.com/BJCaasenbrood/SorotokiPage/blob/master/docs/documentation/img/bdog_grip.gif" height="160"> <img src="https://github.com/BJCaasenbrood/SorotokiPage/blob/master/docs/documentation/img/bdog_srm.gif" height="160"> 
 
 ## Citation
 
