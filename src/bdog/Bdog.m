@@ -108,7 +108,13 @@ function Bdog = setInput(Bdog,x,varargin)
 end
 %---------------------------------------------------------------------- set
 function y = getOutput(Bdog)
-   y = Bdog.Log.y(end,:); 
+    
+%    data = zeros(1,Bdog.NVeab*2);
+%    for ii = 1:(Bdog.NVeab*2)
+%     data(ii) = fread(Bdog.TCPclient,1,"double");
+%    end 
+    
+   y = padc(Bdog.Log.y(end,:)); 
 end
 %--------------------------------------------------------- connect to board
 function Bdog = connect(Bdog)
@@ -219,9 +225,7 @@ end
 %-------------------------- Send data as a TCP client (formatted as double)
 function Bdog = tcpSendData(Bdog, data)
     x = clamp(data,0,1);
-    dx = -pdac(Bdog.P0)-0.5;
-    dx = 0;
-    fwrite(Bdog.TCPclient,clamp(x(:)+dx(:),0,1),"double");
+    fwrite(Bdog.TCPclient,clamp(x(:),0,1),"double");
 end
 %-------------------------- Recv data as a TCP client (formatted as double)
 function data = tcpRecvData(Bdog,data_length)
@@ -235,7 +239,8 @@ function data = tcpRecvData(Bdog,data_length)
     %data2 = fread(Bdog.TCPclient,data_length,"double");
     
     %data = [data1,data2];
-    Bdog.Log.y = vappend(Bdog.Log.y,data);
+    Yn = padc(data) - Bdog.P0;
+    Bdog.Log.y = vappend(Bdog.Log.y,Yn);
     
     Bdog.t = (1/Bdog.Frequency)*Bdog.LoopCounter;
     Bdog.Log.t = vappend(Bdog.Log.t,Bdog.t);
