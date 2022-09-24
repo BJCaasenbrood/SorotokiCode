@@ -17,19 +17,19 @@ fem = fem.set('TimeStep',1/3,'ResidualNorm',1e-3,'VolumeInfill',0.4,...
               'MaxIterationMMA',75,'OptimizationProblem','Compliant','Movie',0);
 
 %% add constraint
-fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[0,1]);
-fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,0]);
+fem = fem.addSupport(fem.FindNodes('Bottom'),[0,1]);
+fem = fem.addSupport(fem.FindNodes('Left'),[1,0]);
 
 id = fem.FindNodes('Location',[0.01*W,H]);
-fem = fem.AddConstraint('Output',id,[0,-1]);
-fem = fem.AddConstraint('Spring',id,[0,2]);
+fem = fem.addOutput(id,[0,-1]);
+fem = fem.addSpring(id,[0,2]);
 
 id = fem.FindNodes('Location',[W,0.01*H]);
-fem = fem.AddConstraint('Output',id,[.01,0]);
-fem = fem.AddConstraint('Spring',id,[2,0]);
+fem = fem.addOutput(id,[.01,0]);
+fem = fem.addSpring(id,[2,0]);
 
 id = fem.FindElements('Location',[0,0],1);
-fem = fem.AddConstraint('PressureCell',id,[-1e-1,0]);
+fem = fem.addMyocyte(id,[-1e-1,0]);
 
 %% set density
 fem = fem.initialTopology('Hole',[0,0;0,H/2],  15.0);
@@ -37,7 +37,7 @@ fem = fem.initialTopology('Hole',[0,0;0,H/2],  15.0);
 % fem = fem.initialTopology('Hole',[0,H/2],6.0);
 
 %% material
-fem.Material = Dragonskin30();
+fem.Material = Dragonskin10();
 
 %% solving
 fem.optimize();
@@ -57,14 +57,14 @@ femr = Fem(mshr,'Nonlinear',true,'TimeStep',1/15,'Linestyle','none');
 
 %% assign boundary conditions to reduced fem
 id = femr.FindNodes('Top'); 
-femr = femr.AddConstraint('Support',id,[1,1]);
+femr = femr.addSupport(id,[1,1]);
 
 id = femr.FindEdges('AllHole');
-femr = femr.AddConstraint('Pressure',id,[5*kpa,0]);
+femr = femr.addPressure(id,[5*kpa,0]);
 
 id = femr.FindNodes('Bottom');
-femr = femr.AddConstraint('Support',id,[1,0]);
-femr = femr.AddConstraint('Output',id,[0,0]);
+femr = femr.addSupport(id,[1,0]);
+femr = femr.addOutput(id,[0,0]);
 
 %% assign material to reduced fem
 D = 5; % compress. factor (more stable)

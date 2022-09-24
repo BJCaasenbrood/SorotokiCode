@@ -66,6 +66,7 @@ classdef Fem < handle
         Pressure;      % list of edges subjected to pressures
         PressureCell;  % list of elements undergoing volumetric expansion
         Contact;       % SDF contact function
+        Source;        
         
         ElemNDof;      % Degrees-of-freedom of elements
         ElemSort;      % Elements in sorted list
@@ -918,6 +919,10 @@ while flag
     % evaluate objective and constraints
     [f,dfdE,dfdV] = ObjectiveFunction(Fem);
     [g,dgdE,dgdV] = ConstraintFunction(Fem);
+
+    if ~isempty(Fem.Source)
+        dfdE(Fem.Source(:,1)) = -1e-4*Fem.ChangeMax;
+    end
     
     % compute design sensitivities
     dfdz = Fem.SpatialFilter'*(dEdy.*dfdE + dVdy.*dfdV);
@@ -928,6 +933,7 @@ while flag
     
     % determine material change
     Fem.Change  = clamp(ZNew - Fem.Density,-Fem.ChangeMax,Fem.ChangeMax);
+
     Fem.Density = Fem.Density + Fem.Change;
     
     % evaluate fitness
@@ -1014,6 +1020,10 @@ end
 %---------------------------------------------------------------- add loads
 function Fem = addSpring(Fem,varargin)
  Fem = AddConstraint(Fem,'Spring',varargin{1:end});
+end
+%---------------------------------------------------------------- add loads
+function Fem = addSource(Fem,varargin)
+ Fem = AddConstraint(Fem,'Source',varargin{1:end});
 end
 %--------------------------------------------------------- add displacement
 function Fem = addDisplace(Fem,varargin)
@@ -1627,7 +1637,7 @@ for el = 1:Fem.NElem
     if LocalType == 1
         nn = length(Fem.Element{el});
         [Fe,Fb,Qe,Me,Ce,Ke,Kte,Svme,SS,EE,Te,Ve,Vge,~,Re,Ue] = ...
-            LocalsNHFast_mex(Fem.Element{el},eDof,dV(el),full(V(el)),...
+            LocalsNHFast_mex(Fem.Element{el},eDof,dV(el),full(E(el)),...
             Fem.Dim,Fem.Node0,...
             Fem.ShapeFnc{nn}.N,...
             Fem.ShapeFnc{nn}.dNdxi,...
@@ -1781,20 +1791,28 @@ if ~isempty(Fem.Tendon) && ~Fem.PrescribedDisplacement
         el  = List(N2F(Fem.Tendon(jj,1),:) > 0);
         
         % compute mean rotation matrix between elements
-        Rot = zeros(3);
+        %Rot = zeros(3);
         
-        for kk = 1:numel(el)
-            if Fem.Increment == 1
-                Rot = Rot + (1/numel(el))*Fem.ElemRot{el(kk)};
-            else
-                Rot = Rot + (1/numel(el))*Fem.Log.Rotation{Fem.Increment-1}...
-                    {el(kk)}; 
-            end
-        end
+%         for kk = 1:numel(el)
+%             if Fem.Increment == 1
+%                 Rot = Rot + (1/numel(el))*Fem.ElemRot{el(kk)};
+%             else
+%                 Rot = Rot + (1/numel(el))*Fem.Log.Rotation{Fem.Increment-1}...
+%                     {el(kk)}; 
+%             end
+%         end
         
         % ensure orthogonal
-        [Ur,~,Vr] = svd(Rot);
-        Rot = (Ur*Vr.');
+        %[Ur,~,Vr] = svd(Rot);
+        %Rot = (Ur*Vr.');
+
+        if isempty(Fem.Log)
+            Rot = eye(3);
+        else
+            id = Fem.Tendon(jj,1);
+            R = Fem.Log.Rotation{end};
+            Rot = R{id};
+        end
         
         if Fem.Dim == 2
             Ftend = Rot(1:2,1:2)*Fem.Tendon(jj,2:end).';
@@ -2536,7 +2554,12 @@ Fem.fyNodal  = force(2*(1:Fem.NNode));
 Fem.rotNodal = 0*force((1:Fem.NNode));
 
 list = 1:Fem.NElem;
-F2V  = Fem.Mesh.FaceToNode;
+
+%if Fem.Dim == 2
+F2V = Fem.Mesh.FaceToNode;
+% else
+%     F2V = Fem.Mesh.ElementToFace;
+% end
 
 % for eacth element 
 for ii = 1:Fem.NNode
@@ -2862,7 +2885,14 @@ if iter > 2, Fem.xold2 = Fem.xold2; else, Fem.xold2 = 0; end
     Fem.upp,A0,A,C,D);
 
 dx   = clamp(xmma - xval,-Fem.ChangeMax*15,Fem.ChangeMax*15);    
-zNew = xval + dx;
+% if ~isempty(Fem.Source)
+%     %zNew(Fem.Source(:,1)) = mean(zNew);
+%     %I = ~ismember(1:Fem.NElem,Fem.Source(:,1));
+%     dx(Fem.Source(:,1)) = 0;
+%     zNew = xval + dx;
+% else
+     zNew = xval + dx;
+% end
 
 if iter >= 1, Fem.xold1 = xval; end
 if iter >= 2, Fem.xold2 = Fem.xold1; end

@@ -1,6 +1,6 @@
 clear; close all; clc;
 
-P0 = -1*kpa;
+P0 = -0.1*kpa;
 
 %% set signed distance function
 W = 24;
@@ -13,10 +13,10 @@ msh = msh.generate();
 msh.show(); pause(2);
 
 %% show generated mesh
-fem = Fem(msh,'VolumeInfill',0.225,'Penal',4,'FilterRadius',3,...
-              'Nonlinear',0,'TimeStep',1/5,'ReflectionPlane',[1,1],...
-              'OptimizationProblem','Compliant','Repeat',[1,2,2],...
-              'MaxIterationMMA',60,'Movie',0);
+fem = Fem(msh,'VolumeInfill',0.225,'Penal',2,'FilterRadius',3,...
+              'Nonlinear',1,'TimeStep',1/5,'ReflectionPlane',[1,1],...
+              'OptimizationProblem','Compliant','Repeat',[],...%[1,2,2],...
+              'MaxIterationMMA',60,'Movie',0,'ChangeMax',0.015);
 
 %% add constraint
 fem = fem.addSupport(fem.FindNodes('Bottom'),[0,1]);
@@ -33,10 +33,10 @@ id = fem.FindElements('Location',[0,0],1);
 fem = fem.addMyocyte(id,[P0,0]);
 
 %% set density
-fem = fem.initialTopology('Hole',[0,0],1.5);
+fem = fem.initialTopology('Hole',[0,0],5);
 
 %% material
-fem.Material = Ecoflex0030(0.75);
+fem.Material = NeoHookeanMaterial(0.01,0.45);
 
 %% solving
 fem.optimize();

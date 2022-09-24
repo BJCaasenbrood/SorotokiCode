@@ -65,10 +65,13 @@ for q = 1:length(W)
     F = DeformationGradient(Delta,dNdx,Dim);
     
     % polar decompostion
-    [R, Q, ~] = PolarDecomposition(F);
+    [R, Q0, ~] = PolarDecomposition(F);
 
     % increase robustness low density
-    Q = Rb*(Q-eye(3)) + eye(3);
+    Q = Rb*(Q0-eye(3)) + eye(3);
+
+    % robust deform
+    %F = R*Q;
     
     % get internal stress matrix
     [S0, D0, Psi] = PiollaStress(Mu,Lambda,F);
@@ -209,8 +212,8 @@ UU(:,1) = U(id1);
 UU(:,2) = U(id2);
 
 if Dim == 2
-    F = (dNdx'*UU)';
-    F = [F(1,1)+1,F(1,2),0; F(2,1),F(2,2)+1,0;0,0,1];
+    F0 = (dNdx'*UU)';
+    F = [F0(1,1)+1,F0(1,2),0; F0(2,1),F0(2,2)+1,0;0,0,1];
 else
     id3 = round(3:Dim:Dim*nn).';
     UU(:,3) = U(id3);

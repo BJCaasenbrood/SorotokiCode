@@ -71,8 +71,9 @@ function obj = Bdog(usr,ip,pwd,varargin)
     obj.U = pdac(obj.P0);
     
     % setup TCP client
-    client = tcpip(obj.Ip,obj.Port,'NetworkRole', 'client');
-    client.ByteOrder = 'littleEndian';
+    %client = tcpip(obj.Ip,obj.Port,'NetworkRole', 'client');
+    client = tcpclient(obj.Ip,obj.Port);
+    client.ByteOrder = 'little-endian';
     obj.TCPclient    = client;
       
     if obj.autoConnect

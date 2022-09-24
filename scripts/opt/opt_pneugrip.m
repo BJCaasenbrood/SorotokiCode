@@ -3,7 +3,7 @@ clr;
 sdf = @(x) PneuGrip(x);
 
 %% generate mesh
-msh = Mesh(sdf,'BdBox',[-5,13,0,5],'NElem',3e3);%'Quads',[50 25]);
+msh = Mesh(sdf,'BdBox',[-5,13,0,5],'NElem',7e2);%'Quads',[50 25]);
 msh = msh.generate();
 
 %% generate fem model
@@ -16,7 +16,7 @@ fem = Fem(msh,'VolumeInfill',0.25,'Penal',1,'FilterRadius',0.5,...
 fem = fem.set('ReflectionPlane',[0 -1]);
 
 %% add constraint
-fem = fem.AddConstraint('Support',fem.FindNodes('Left'),[1,1]);
+fem = fem.addConstraint('Support',fem.FindNodes('Left'),[1,1]);
 fem = fem.AddConstraint('Support',fem.FindNodes('Top'),[0,1]);
 
 id = fem.FindNodes('Location',[13,4.5],1);

@@ -1025,15 +1025,22 @@ if Mesh.Dim < 3
     Mesh.ElemMat = tri;
 else
     
-    if ~strcmp(Mesh.Type,'C3T3')
+     if ~strcmp(Mesh.Type,'C3T3')
         [A,tri,triID] = GenerateElementalMatrix(Mesh);
-    else
-        A = vertcat(Mesh.Element{:});
-        tri = vertcat(Mesh.Element{:});
-        triID = (1:Mesh.NElem).';
-    end
+        Mesh.ElemMat = A;
+        %max(cellfun(@numel,num2cell(tri,2)));
+     else
+        A   = vertcat(Mesh.Element{:});
+        Mesh.ElemMat = A;
+%         tri = vertcat(Mesh.Element{:});
+%         triID = (1:Mesh.NElem).';
+        %MaxNVer = max(cellfun(@numel,num2cell(tri,2)));
+     end
     
-    Mesh.ElemMat = A;
+    %Mesh.ElemMat = A;
+    A   = vertcat(Mesh.Element{:});
+    tri = vertcat(Mesh.Element{:});
+    triID = (1:Mesh.NElem).';
     MaxNVer = max(cellfun(@numel,num2cell(tri,2)));
     edges = cellfun(@numel,num2cell(tri,2));
     %p = max(cellfun(@max,num2cell(tri,2)));
@@ -1044,6 +1051,7 @@ end
 set = 1:n;
 
 %if Mesh.Dim == 2
+%tri = vertcat(Mesh.Element{:});
 maxver = num2cell(1:size(tri,2));
 fnc = @(x) sum(tri(:,x)>=1);
 countsperrow = cellfun(@(x) fnc(x), maxver);
