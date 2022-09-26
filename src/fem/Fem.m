@@ -314,6 +314,7 @@ switch(Request)
     case('Un'),    [~,~,Z] = DisplacementField(Fem,Fem.Utmp);
     case('Ux'),    [Z,~,~] = DisplacementField(Fem,Fem.Utmp);
     case('Uy'),    [~,Z,~] = DisplacementField(Fem,Fem.Utmp);
+    case('Uz'),    [~,~,~,Z] = DisplacementField(Fem,Fem.Utmp);
     case('E'),     [~,~,Z] = MaterialField(Fem); S = 'flat'; 
                    V = Fem.Node0; colormap(barney(-1)); background('w');
     case('E+'),    [~,~,Z] = MaterialField(Fem); S = 'flat'; 
@@ -369,7 +370,7 @@ if Fem.Dim == 3, view(30,10); end
 
 if ~isempty(Fem.Contact) && Fem.Dim == 2
     sdfFNC = Fem.Contact{1};
-    Move = Fem.Contact{2};
+    Move   = Fem.Contact{2};
     BD = Fem.BdBox;
     %BD = [-BD,BD,-BD,BD];
     [px,py] = meshgrid(linspace(BD(1),BD(2),50),linspace(BD(3),BD(4),50));
@@ -1871,15 +1872,18 @@ if ~isempty(Fem.Contact) && Fem.PrescribedDisplacement == false
     Cmod = Fem.Material.getContactFriction();
     
     Y0 = Fem.Node0;
+    %if isempty(Fem.Log)
+        [Ux,Uy,~,Uz] = DisplacementField(Fem,Fem.Utmp);
+    %else
+        %[Ux,Uy,~,Uz] = DisplacementField(Fem,Fem.Log.U(end,:).');
+    %end
     
-    [Ux,Uy]   = DisplacementField(Fem,Fem.Utmp);
     [dUx,dUy] = DisplacementField(Fem,Fem.dUtmp);
-    
     Y(:,1) = Y0(:,1) + Ux - clamp(Fem.Time,0,1)*Move(1);
     Y(:,2) = Y0(:,2) + Uy - clamp(Fem.Time,0,1)*Move(2);
     
     if Fem.Dim == 3
-        Y(:,3) = Y0(:,3) + Uy - clamp(Fem.Time,0,1)*Move(3);
+        Y(:,3) = Y0(:,3) + Uz - clamp(Fem.Time,0,1)*Move(3);
     end
     
     eps = 1e-2;
@@ -2282,16 +2286,20 @@ Svme = Svm(:);
 
 end
 %----------------------------------------------- compute displacement field
-function [ux,uy,un] = DisplacementField(Fem,U)
+function [ux,uy,un,uz] = DisplacementField(Fem,U)
     
 ux = zeros(Fem.NNode,1);
 uy = zeros(Fem.NNode,1);
+uz = zeros(Fem.NNode,1);
 un = zeros(Fem.NNode,1);
 
 for node = 1:Fem.NNode
-    ux(node) = U(2*node - 1,1);
-    uy(node) = U(2*node,1);
-    un(node) = sqrt(ux(node)^2 + uy(node)^2);
+    ux(node) = U(Fem.Dim*node - (Fem.Dim-1),1);
+    uy(node) = U(Fem.Dim*node - (Fem.Dim-2),1);
+    if Fem.Dim == 3
+        uz(node) = U(Fem.Dim*node - (Fem.Dim-3),1);
+    end
+    un(node) = sqrt(ux(node)^2 + uy(node)^2 + uz(node)^2);
 end
 
 end

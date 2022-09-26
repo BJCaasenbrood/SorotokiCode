@@ -1,8 +1,8 @@
 clr;
 %% meshing
 msh = Mesh('PneuNetHalf.stl','Hmesh',[2,3,5]);
-%msh = msh.generate();
-
+msh = msh.generate();
+msh.show();
 %% fem
 % fem = Fem(msh,'TimeStep',1/30,'Linestyle','-','TimeEnd',3);
 % fem.Material = Ecoflex0030(30);

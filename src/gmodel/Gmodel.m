@@ -593,12 +593,10 @@ function Gmodel = BakeCubemap(Gmodel,Cubemap)
     end
     
     if strcmp(Gmodel.Shading,'Face')
-        if Gmodel.FlipNormals, Normals = -Gmodel.Normal*Phi;
-        else, Normals = -Gmodel.Normal*Phi; end
+        Normals = -Gmodel.Normal*Phi;
         N = length(Gmodel.Element);
     else
-        if Gmodel.FlipNormals, Normals = -Gmodel.VNormal*Phi;
-        else, Normals = -Gmodel.VNormal*Phi; end
+        Normals = -Gmodel.VNormal*Phi;
         N = length(Gmodel.Node);
     end
  

@@ -1,4 +1,18 @@
 %% ------------------------------------------------------------------------
+% % SOROTOKI - Alpha - 2.09.26 - September 26 - 2022
+%
+% **Fem.m**
+%  
+% + Improved stability for the Fem.addTendon() for 3D simulations. The FEM
+% solver now ensure rotations are being followed more accuratelly.
+%
+% - Fixed issues with LocalsFastYH and LocalsFastMN mex files. the cpp 
+% compiller complained about matrix(vector) instead of vector(vector)
+% indexing for the deformationGradient computation. Weirdly the same code 
+% does not result in an issue for LocalsFastNH (Neohookean). Issue seems to
+% be unique to Matlab 2022 release, and not Matlab 2021 or earlier...
+%
+%% ------------------------------------------------------------------------
 % % SOROTOKI - Alpha - 2.09.15 - September 15 - 2022
 %
 % + Minor update to documentation, and Readme.md
@@ -177,8 +191,8 @@ if isempty(varargin)
 end
 
 switch(varargin{1})
-    case(1); x = '2.09.15';
-    case(2); x = 'September 15, 2022';
+    case(1); x = '2.09.26';
+    case(2); x = 'September 26, 2022';
     case(3); x = 'August 30, 2018';
 end
 end

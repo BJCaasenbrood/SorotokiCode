@@ -356,8 +356,6 @@ if Mesh.Triangulate
     Mesh.NNode = length(v);  
     Mesh.Node    = v;
     Mesh.Element = f;
-    
-%     Mesh = ComputeCotanLaplacian(Mesh);
 
 end
 
@@ -374,6 +372,20 @@ Mesh = ElementAdjecency(Mesh);
 
 if Mesh.Dim < 3
     Mesh.BndMat = ConstructBounds(Mesh);
+else
+    List = (1:Mesh.NNode).';
+    Bnd  = [];
+    if ~isempty(Mesh.SDF)
+        for ii = 1:size(Mesh.ElemMat,1)
+            Face = Mesh.ElemMat(ii,1:end-1).';
+            D = Mesh.SDF(Mesh.Node(Face,:));
+
+            if sum(abs(D(:,end))) < 1e-3
+                Bnd = [Bnd; Face.'];
+            end
+        end
+        
+    end
 end
 
 if strcmp(Mesh.Type,'C3T3') || strcmp(Mesh.Type,'C2T3')
@@ -406,7 +418,6 @@ if strcmp(Mesh.Type,'C3T3') || strcmp(Mesh.Type,'C2T3')
     end
     
     Mesh.Node  = v;
-  
 end
 
 end
@@ -916,7 +927,7 @@ function [ElemMat,RawConnect,id] = GenerateElementalMatrix(Mesh)
 El = Mesh.Element(1:Mesh.NElem)';   
 if Mesh.Dim == 3
 nodeset = cellfun(@(X) Mesh.Node(X,:),Mesh.Element,'UniformOutput',false);
-faceEl = cellfun(@(X) convhulln(X,{'Qt','Pp'}),nodeset,'UniformOutput',false);
+faceEl  = cellfun(@(X) convhulln(X,{'Qt','Pp'}),nodeset,'UniformOutput',false);
 faceDis = cellfun(@(V,F,E) CollectCoplanar(V,F,E),...
            nodeset,faceEl,Mesh.Element,'UniformOutput',false);
 IdEl = cellfun(@(X,Y) Y*ones(size(X,1),1),faceDis,...
@@ -1016,7 +1027,6 @@ end
 
 edges = cellfun(@numel,face);
 n = Mesh.NElem;    
-%p = max(cellfun(@max,face));    
 p = Mesh.NNode;
 MaxNVer = max(cellfun(@numel,face));     
 
@@ -1025,19 +1035,15 @@ if Mesh.Dim < 3
     Mesh.ElemMat = tri;
 else
     
-     if ~strcmp(Mesh.Type,'C3T3')
-        [A,tri,triID] = GenerateElementalMatrix(Mesh);
-        Mesh.ElemMat = A;
-        %max(cellfun(@numel,num2cell(tri,2)));
-     else
-        A   = vertcat(Mesh.Element{:});
-        Mesh.ElemMat = A;
-%         tri = vertcat(Mesh.Element{:});
-%         triID = (1:Mesh.NElem).';
-        %MaxNVer = max(cellfun(@numel,num2cell(tri,2)));
-     end
+    if ~strcmp(Mesh.Type,'C3T3')
+       [A0,~,~] = GenerateElementalMatrix(Mesh);
+    else
+       A0 = vertcat(Mesh.Element{:});
+    end
+
+    %A = RecoverOuterFaces(A0);
     
-    %Mesh.ElemMat = A;
+    Mesh.ElemMat = A0;
     A   = vertcat(Mesh.Element{:});
     tri = vertcat(Mesh.Element{:});
     triID = (1:Mesh.NElem).';
@@ -1195,4 +1201,22 @@ A0 = reshape(A0,[],1); MaxN = max(cellfun(@(E) size(E,2),A0));
 PadWNaN = @(E) [E, NaN(size(E,1),MaxN- size(E,2))]; 
 A = cellfun(PadWNaN,A0,'UniformOutput',false);
 end
+%------------------------------------------ PLANAR PROJECTION OF 3D-POLYGON
+function A = RecoverOuterFaces(A0)
+N = numel(A0);
+
+A = [];
+B0 = A0(:,1:end-1);
+B = sort(B0,2);
+
+for ii = 1:size(B,1)
+    C = sum(B - B(ii,:),2);
+
+    if sum(C == 0) == 1
+        A = [A;A0(ii,:)];
+    end
+end
+
+end
+
 
