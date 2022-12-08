@@ -1,0 +1,2 @@
+ffmpeg -i input.mp4 -codec:v libtheora -qscale:v 3 -codec:a libvorbis \
+  -qscale:a 3 -f ogv output.ogv

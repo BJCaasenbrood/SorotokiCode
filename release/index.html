@@ -1,0 +1,596 @@
+
+<!DOCTYPE html>
+
+<html class="no-js" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<link href="../images/favicon.png" rel="icon"/>
+<meta content="mkdocs-1.4.2, mkdocs-material-8.5.10" name="generator"/>
+<title>Release Notes - Sorotoki</title>
+<link href="../assets/stylesheets/main.975780f9.min.css" rel="stylesheet"/>
+<link href="../assets/stylesheets/palette.2505c338.min.css" rel="stylesheet"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback" rel="stylesheet"/>
+<style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+<link href="../stylesheets/extra.css" rel="stylesheet"/>
+<script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+<link href="../assets/stylesheets/glightbox.min.css" rel="stylesheet"/><style>
+            html.glightbox-open { overflow: initial; height: 100%; }
+            .gslide-title { margin-top: 0px; user-select: text; }
+            .gslide-desc { color: #666; user-select: text; }
+            .gslide-image img { background: white; }
+            
+                .gscrollbar-fixer { padding-right: 15px; }
+                .gdesc-inner { font-size: 0.75rem; }
+                body[data-md-color-scheme="slate"] .gdesc-inner { background: var(--md-default-bg-color);}
+                body[data-md-color-scheme="slate"] .gslide-title { color: var(--md-default-fg-color);}
+                body[data-md-color-scheme="slate"] .gslide-desc { color: var(--md-default-fg-color);}
+                </style><script src="../assets/javascripts/glightbox.min.js"></script></head>
+<body data-md-color-accent="" data-md-color-primary="deep-purple" data-md-color-scheme="default" dir="ltr">
+<script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+<input autocomplete="off" class="md-toggle" data-md-toggle="drawer" id="__drawer" type="checkbox"/>
+<input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
+<label class="md-overlay" for="__drawer"></label>
+<div data-md-component="skip">
+<a class="md-skip" href="#release-notes">
+          Skip to content
+        </a>
+</div>
+<div data-md-component="announce">
+</div>
+<div data-md-component="outdated" hidden="">
+</div>
+<header class="md-header" data-md-component="header">
+<nav aria-label="Header" class="md-header__inner md-grid">
+<a aria-label="Sorotoki" class="md-header__button md-logo" data-md-component="logo" href=".." title="Sorotoki">
+<img alt="logo" src="../assets/logo.png"/>
+</a>
+<label class="md-header__button md-icon" for="__drawer">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"></path></svg>
+</label>
+<div class="md-header__title" data-md-component="header-title">
+<div class="md-header__ellipsis">
+<div class="md-header__topic">
+<span class="md-ellipsis">
+            Sorotoki
+          </span>
+</div>
+<div class="md-header__topic" data-md-component="header-topic">
+<span class="md-ellipsis">
+            
+              Release Notes
+            
+          </span>
+</div>
+</div>
+</div>
+<form class="md-header__option" data-md-component="palette">
+<input aria-label="Switch to dark mode" class="md-option" data-md-color-accent="" data-md-color-media="(prefers-color-scheme: light)" data-md-color-primary="deep-purple" data-md-color-scheme="default" id="__palette_1" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_2" hidden="" title="Switch to dark mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"></path></svg>
+</label>
+<input aria-label="Switch to light mode" class="md-option" data-md-color-accent="" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-primary="deep-purple" data-md-color-scheme="slate" id="__palette_2" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_1" hidden="" title="Switch to light mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12c0-2.42-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"></path></svg>
+</label>
+</form>
+<label class="md-header__button md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"></path></svg>
+</label>
+<div class="md-search" data-md-component="search" role="dialog">
+<label class="md-search__overlay" for="__search"></label>
+<div class="md-search__inner" role="search">
+<form class="md-search__form" name="search">
+<input aria-label="Search" autocapitalize="off" autocomplete="off" autocorrect="off" class="md-search__input" data-md-component="search-query" name="query" placeholder="Search" required="" spellcheck="false" type="text"/>
+<label class="md-search__icon md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"></path></svg>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"></path></svg>
+</label>
+<nav aria-label="Search" class="md-search__options">
+<button aria-label="Clear" class="md-search__icon md-icon" tabindex="-1" title="Clear" type="reset">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"></path></svg>
+</button>
+</nav>
+</form>
+<div class="md-search__output">
+<div class="md-search__scrollwrap" data-md-scrollfix="">
+<div class="md-search-result" data-md-component="search-result">
+<div class="md-search-result__meta">
+            Initializing search
+          </div>
+<ol class="md-search-result__list"></ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="md-header__source">
+<a class="md-source" data-md-component="source" href="https://github.com/BJCaasenbrood/SorotokiCode" title="Go to repository">
+<div class="md-source__icon md-icon">
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"></path></svg>
+</div>
+<div class="md-source__repository">
+    SorotokiCode
+  </div>
+</a>
+</div>
+</nav>
+</header>
+<div class="md-container" data-md-component="container">
+<main class="md-main" data-md-component="main">
+<div class="md-main__inner md-grid">
+<div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Navigation" class="md-nav md-nav--primary" data-md-level="0">
+<label class="md-nav__title" for="__drawer">
+<a aria-label="Sorotoki" class="md-nav__button md-logo" data-md-component="logo" href=".." title="Sorotoki">
+<img alt="logo" src="../assets/logo.png"/>
+</a>
+    Sorotoki
+  </label>
+<div class="md-nav__source">
+<a class="md-source" data-md-component="source" href="https://github.com/BJCaasenbrood/SorotokiCode" title="Go to repository">
+<div class="md-source__icon md-icon">
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"></path></svg>
+</div>
+<div class="md-source__repository">
+    SorotokiCode
+  </div>
+</a>
+</div>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_1" id="__nav_1" type="checkbox"/>
+<div class="md-nav__link md-nav__link--index">
+<a href="..">About Sorotoki</a>
+</div>
+<nav aria-label="About Sorotoki" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_1">
+<span class="md-nav__icon md-icon"></span>
+          About Sorotoki
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../install/">
+        Installation
+      </a>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" id="__nav_3" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3">
+          Documentation
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-label="Documentation" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_3">
+<span class="md-nav__icon md-icon"></span>
+          Documentation
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../fem/sdf/">
+        Implicit CAD
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../fem/mesh/">
+        Mesh generation
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../fem/fem/">
+        Finite Elements
+      </a>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_4" id="__nav_3_4" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3_4">
+          Plotting
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-label="Plotting" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_3_4">
+<span class="md-nav__icon md-icon"></span>
+          Plotting
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../plotting/figure/">
+        Figures
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../plotting/colors/">
+        Colors
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../plotting/colormaps/">
+        Colormaps
+      </a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" id="__nav_4" type="checkbox"/>
+<label class="md-nav__link" for="__nav_4">
+          Open Soft Robots
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-label="Open Soft Robots" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_4">
+<span class="md-nav__icon md-icon"></span>
+          Open Soft Robots
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../sorobots/softmanipulator/">
+        Soft manipulator
+      </a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../contact/">
+        Developer(s)
+      </a>
+</li>
+<li class="md-nav__item md-nav__item--active">
+<input class="md-nav__toggle md-toggle" data-md-toggle="toc" id="__toc" type="checkbox"/>
+<label class="md-nav__link md-nav__link--active" for="__toc">
+          Release Notes
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<a class="md-nav__link md-nav__link--active" href="./">
+        Release Notes
+      </a>
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#20722-july-22-2022">
+    2.07.22 - July 22 - 2022
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#20519-may-19-2022">
+    2.05.19 - May 19 - 2022
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#20517-may-17-2022">
+    2.05.17 - May 17 - 2022
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#20128-jan-28-2022">
+    2.01.28 - Jan 28 - 2022
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#22401-jan-24-2022">
+    2.24.01 - Jan 24 - 2022
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#21301-jan-13-2022">
+    2.13.01 - Jan 13 - 2022
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#11206-dec-6-2021">
+    1.12.06 - Dec 6 - 2021
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#11202-dec-2-2021">
+    1.12.02 - Dec 2 - 2021
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#11006-oct-6-2021">
+    1.10.06 - Oct 6 - 2021
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#11001-oct-1-2021">
+    1.10.01 - Oct 1 - 2021
+  </a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#20722-july-22-2022">
+    2.07.22 - July 22 - 2022
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#20519-may-19-2022">
+    2.05.19 - May 19 - 2022
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#20517-may-17-2022">
+    2.05.17 - May 17 - 2022
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#20128-jan-28-2022">
+    2.01.28 - Jan 28 - 2022
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#22401-jan-24-2022">
+    2.24.01 - Jan 24 - 2022
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#21301-jan-13-2022">
+    2.13.01 - Jan 13 - 2022
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#11206-dec-6-2021">
+    1.12.06 - Dec 6 - 2021
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#11202-dec-2-2021">
+    1.12.02 - Dec 2 - 2021
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#11006-oct-6-2021">
+    1.10.06 - Oct 6 - 2021
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#11001-oct-1-2021">
+    1.10.01 - Oct 1 - 2021
+  </a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-content" data-md-component="content">
+<article class="md-content__inner md-typeset">
+<a class="md-content__button md-icon" href="https://github.com/BJCaasenbrood/SorotokiCode/edit/master/docs/release.md" title="Edit this page">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"></path></svg>
+</a>
+<h1 id="release-notes">Release Notes</h1>
+<h2 id="20722-july-22-2022">2.07.22 - July 22 - 2022</h2>
+<ul>
+<li>Documentation update to the examples Modeling.</li>
+<li>
+<p>Added minor description in auxilary functions in /src/</p>
+</li>
+<li>
+<p><strong>Fem.m</strong></p>
+<ul>
+<li>
+<p>Generated new mex files for the Local element computation. Now each matrix computation in during the fem simulation calls a <code>.mex64</code> file. This significantly improves performance ~40% compare to .m files. During install, Sorotoki will ask to install the new mex files.</p>
+</li>
+<li>
+<p>Added (proper) friction effects to the contact simulations. A good  example is <code>fem_bouncingball.m</code> which initally started spinning due to improper implementation of the friction forces during contact. The interaction friction can be modified under Material.Cfr (default = 1e-6 for most sample materials). Added example to show the friction effects is: <code>./scripts/fem/2D/dynamics/fem_crawler.m</code></p>
+</li>
+<li>High interaction friction forces lead to instabilities, implement with caution. A fix will be issued later.</li>
+<li>Added initial conditions to the dynamic Fem simulations. Now Fem.Utmpcan be overwritten before calling fem.simulate. This can be extremely handy if we like to simulate from a quasi-static equilbrium, e.g.,  gravity deflection. One can first call fem.solve(), get the displacement through <code>U0 = fem.Log.U(end,:)</code>, then a new simulation:
+<div class="highlight"><pre><span></span><code><span class="n">fem</span><span class="p">.</span><span class="n">reset</span><span class="p">();</span><span class="w"></span>
+<span class="n">fem</span><span class="p">.</span><span class="n">set</span><span class="p">(</span><span class="s">'Utmp'</span><span class="p">,</span><span class="n">U0</span><span class="p">);</span><span class="w"></span>
+<span class="n">fem</span><span class="p">.</span><span class="n">simulate</span><span class="p">();</span><span class="w"></span>
+</code></pre></div>
+We can also ensure there is no ramping of the gravity force by setting
+the following fem.set('GravityRamp',false);</li>
+</ul>
+</li>
+<li>
+<p><strong>Shapes.m</strong></p>
+<ul>
+<li>
+<p>Major update to the class. Now, Shapes.reconstruct() will produce better POD bases from the finite element simulations. As example:
+<div class="highlight"><pre><span></span><code><span class="n">shp</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Shapes</span><span class="p">(</span><span class="n">fem</span><span class="p">,</span><span class="n">Modal</span><span class="p">,</span><span class="s">'NNode'</span><span class="p">,</span><span class="mi">100</span><span class="p">,</span><span class="s">'L0'</span><span class="p">,</span><span class="mi">120</span><span class="p">,</span><span class="s">'FilterRadius'</span><span class="p">,[</span><span class="mi">15</span><span class="p">,</span><span class="mi">15</span><span class="p">]);</span><span class="w"></span>
+<span class="n">shp</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">shp</span><span class="p">.</span><span class="n">reference</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">119</span><span class="p">,</span><span class="mi">0</span><span class="p">]);</span><span class="w"></span>
+<span class="n">shp</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">shp</span><span class="p">.</span><span class="n">reconstruct</span><span class="p">();</span><span class="w"></span>
+</code></pre></div>
+This code will generate a basis from the data in Fem, and project its
+dynamics onto a curve spanned by the points: (0,0) -&gt; (119,0). During
+the reconstruction, all system tensors are build accordingly.</p>
+</li>
+<li>
+<p>Shapes.show() is implemented and will show the strain basis.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Model.m</strong></p>
+<ul>
+<li>Fixed a minus error in the gravitional force compuation that lead to
+incorrect orientation of the gravity vector.</li>
+</ul>
+</li>
+</ul>
+<h2 id="20519-may-19-2022">2.05.19 - May 19 - 2022</h2>
+<ul>
+<li><strong>Fem.m</strong>:<ul>
+<li>Addressed to solve <a href="https://github.com/BJCaasenbrood/SorotokiCode/issues/7">Issue #7</a>: Fixed issue with Fem.Log. If a nonlinear residual increment takes less than 2 iterations, data was not properly stored. To solve this, any nonlinear time increment must take at least two steps, as to ensure a
+new displacement field is introduced to the stress-strain calculations.</li>
+</ul>
+</li>
+</ul>
+<h2 id="20517-may-17-2022">2.05.17 - May 17 - 2022</h2>
+<ul>
+<li>Added MEX compiler for Model, Gmodel, and Fem classes. This significantly improves the computation times of the Sorotoki toolkit. When calling <em>sorotoki.m</em>, the installer asks to compile the mex files. <em>Note</em> we do not support the original Matlab functions anymore, simple because of computational speed. Hence, the Matlab Coder Toolkit is a prerequisite for Sorotoki.</li>
+<li>Updated <code>verifySorotoki.m</code> to include also Model.</li>
+<li><strong>Shapes</strong><ul>
+<li>Updated the Fem -&gt; Shapes converter that extracts the geometric modes from dynamic or quasi-static FEM data. This can be done using <code>shp.Fem = Fem</code> followed by <code>shp.reconstruct</code>, <code>shp.rebuild</code>. Then a dynamic model can be generated using <code>mdl = Model(shp)</code>. We call this new strain basis the <strong>Geometry-Informed Variable Strain</strong> basis as the geometry of the soft robot is preserved into the functional basis.</li>
+<li>Added Shapes.Material. Now hyper-elastic materials can be loaded into the stiffness and inertia tensor construction. The work is experimental since more research is required to properly include hyper-elastic materials into the Cosserat beam models.</li>
+</ul>
+</li>
+<li><strong>Model</strong><ul>
+<li>Added an auxiliary flow function to the Model class: <code>dx = f(x,t)</code>. This can be used for integrator actions, like PI controllers. or adaptive controllers where unknown parameters evolutions can be included.</li>
+</ul>
+</li>
+</ul>
+<h2 id="20128-jan-28-2022">2.01.28 - Jan 28 - 2022</h2>
+<ul>
+<li>Improved stability of Newmark solver.</li>
+</ul>
+<h2 id="22401-jan-24-2022">2.24.01 - Jan 24 - 2022</h2>
+<ul>
+<li>Fixed broken installer. <code>vernum.m</code> file was missing on Repo. It has been replaced with <code>soropatch.m</code> which also includes the patch notes.</li>
+<li>@martijnschouten Missing DOI for citation, and long-term support/access.</li>
+<li><strong>Signed Distance Functions</strong>:<ul>
+<li>Added a new function <code>Sdf.showcontour()</code>. It will show the contour of 2D signed distance functions. Currently not implemented for 3D Sdfs.</li>
+</ul>
+</li>
+</ul>
+<h2 id="21301-jan-13-2022">2.13.01 - Jan 13 - 2022</h2>
+<ul>
+<li>
+<p>Moved SOROTOKI from early alpha to alpha (prepping for official release).</p>
+</li>
+<li>
+<p><strong>Shapes.m</strong>:</p>
+<ul>
+<li>Significant update to the class Shapes. Shapes now requests a Fem class
+, a Matlab function_handle of functionals, or a evaluated matrix of
+shape functions (); to construct the class. Then, it serves as an input
+for the class Model (e.g., dynamic modeling of soft robots), or as an
+Inverse Kinematic solver for beam models.</li>
+<li>Added a function <code>Shapes.jointEstimate(Fem)</code>. This will produce an
+optimal set of modal coefficient to reconstruct the beam model from
+FEM-driven data (accessed by Fem.Log).</li>
+<li>Current <code>Shapes.jointEstimate()</code> exploits the fact that the shapes are
+orthonormal w.r.t. their integral over the spatial domain [0,L]. If shapes do not satisfy this conditions, inaccurate estimates can occur.</li>
+<li>Added <code>Y = gsog_poly(X)</code> which ensure the columns of Y are mutually orthonormal derived from the matrix X. X must be full-rank. This function is simply the gramm-smith method for the innerproduct space int_C y_i y_j ds on the domain C := [0,L].</li>
+</ul>
+</li>
+</ul>
+<h2 id="11206-dec-6-2021">1.12.06 - Dec 6 - 2021</h2>
+<ul>
+<li><strong>Fem.m</strong>:<ul>
+<li>Fixed some numerical issues with <code>Fem.simulate()</code> function. Stability is
+now further improved for larger timesteps.</li>
+<li>Fixed some numerical issues with <code>Fem.Contact</code>. A wider range of
+TimeSteps result now in stable solutions. Still the timestep size
+should be taken with care. Also fixed the issues of induced
+(unstable) oscillations due to fast impact. Contact is now based on the
+initial Modulus of the hyper-elastic material,i.e., <code>Material.Emod()</code>.</li>
+<li>Added time-base function_handle for the external pressures in dynamic
+finite-element simulations. They can added using:
+<code>Fem.AddConstraint('Pressure',id, @(t) sin(t))</code>;</li>
+<li>Dynamic simulations now record the potential and kinetic energies.</li>
+<li>Future implementation will have Load and Tendon-based dynamic forces</li>
+<li>The potential energy of the external load is still missing...</li>
+</ul>
+</li>
+</ul>
+<h2 id="11202-dec-2-2021">1.12.02 - Dec 2 - 2021</h2>
+<ul>
+<li>
+<p><strong>Finite Elements</strong>:</p>
+<ul>
+<li>Added Fem.simulate() function to the Nonlinear Finite Element. The
+function is a standard Newmark-Beta dynamic solver routine for NLFEM.
+Alternatively, <code>fem.simulate()</code> can be used as an alternative for
+fem.solve() by setting the Fem.Material.Zeta large (overdamped).</li>
+<li>Fixed the stability issue of Fem.Contact. Contact can now be added with
+<code>Fem.AddConstraint('Contact',@(x) sdf(x), [x,y])</code> (x and y move the SDF).
+for best stability, use <code>Fem.simulate()</code> with a <code>TimeStep &lt; 1/75</code>.</li>
+</ul>
+</li>
+<li>
+<p><strong>Open issues</strong>:</p>
+<ul>
+<li>Fem.simulate does not use dynamic external forces, rather the forces are scaled with a sigmoid function f_ext = f*sigmoid(t); This will be removed in the future with <code>fext = @(t) f* ....</code> - an    explicit function of time that can be evaluated at time t.</li>
+<li>Possible implementations: Displace, Load, Pressure, Gravity.</li>
+</ul>
+</li>
+</ul>
+<h2 id="11006-oct-6-2021">1.10.06 - Oct 6 - 2021</h2>
+<ul>
+<li>Added patch.md file to keep track of any changes to SOROTOKI.</li>
+<li><strong>Meshing</strong>:<ul>
+<li>Fixed an issue where Mesh.showSDF was not producing plots.</li>
+</ul>
+</li>
+</ul>
+<h2 id="11001-oct-1-2021">1.10.01 - Oct 1 - 2021</h2>
+<ul>
+<li>Official beta release of SOROTOKI</li>
+</ul>
+</article>
+</div>
+</div>
+</main>
+<footer class="md-footer">
+<nav aria-label="Footer" class="md-footer__inner md-grid">
+<a aria-label="Previous: Developer(s)" class="md-footer__link md-footer__link--prev" href="../contact/" rel="prev">
+<div class="md-footer__button md-icon">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"></path></svg>
+</div>
+<div class="md-footer__title">
+<div class="md-ellipsis">
+<span class="md-footer__direction">
+                Previous
+              </span>
+              Developer(s)
+            </div>
+</div>
+</a>
+</nav>
+<div class="md-footer-meta md-typeset">
+<div class="md-footer-meta__inner md-grid">
+<div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" rel="noopener" target="_blank">
+      Material for MkDocs
+    </a>
+</div>
+</div>
+</div>
+</footer>
+</div>
+<div class="md-dialog" data-md-component="dialog">
+<div class="md-dialog__inner md-typeset"></div>
+</div>
+<script id="__config" type="application/json">{"base": "..", "features": ["navigation.indexes", "content.code.annotate"], "search": "../assets/javascripts/workers/search.16e2a7d4.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"provider": "brandon"}}</script>
+<script src="../assets/javascripts/bundle.5a2dcb6a.min.js"></script>
+<script src="../javascripts/mathjax.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script src="../javascripts/sketchfab.js"></script>
+<script>document$.subscribe(() => {const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});})</script></body>
+</html>
