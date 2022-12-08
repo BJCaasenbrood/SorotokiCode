@@ -34,6 +34,17 @@ elseif numel(X) == 6
     Y(1:3,1:3) = Wh;
     Y(4:6,4:6) = Wh;
     Y(4:6,1:3) = Uh;
+    
+elseif numel(X) == 16    
+    R = X(1:3,1:3);
+    p = X(1:3,4);
+    
+    S = skew(p);
+    Y = zeros(6);
+    Y(1:3,1:3) = R;
+    Y(4:6,4:6) = R;
+    Y(4:6,1:3) = S*R;
+
 end
 
 end

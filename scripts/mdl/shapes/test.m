@@ -1,1 +1,0 @@
-[E,Et] = shp.tangentPoint(q);

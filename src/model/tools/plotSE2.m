@@ -64,13 +64,14 @@ end
 function h = plotarrow(p,n,id)
 hold on; 
 h = quiver(p(1),p(2),...
-    n(1), n(2),'Color',col(id));
+    n(1), n(2),'Color',col(id),'LineW',1,'AutoScaleFactor',norm(n));
+%h.MaxHeadSize = norm(n);
 end
 
 function h = plotarrowmany(p,n,id)
 hold on; 
 h = quiver(p(:,1),p(:,2),...
-    n(:,1), n(:,2),'Color',col(id));
+    n(:,1), n(:,2),'Color',col(id),'LineW',1,'AutoScaleFactor',norm(n));
 end
 
 

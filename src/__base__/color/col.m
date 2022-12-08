@@ -1,5 +1,4 @@
 function color  = col(n,per)
-%Colors = pallateV0;
 Colors = NASApallate;
 
     if nargin < 1

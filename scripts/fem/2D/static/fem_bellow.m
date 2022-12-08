@@ -11,17 +11,17 @@ msh = msh.generate();
 msh.showSDF();
 
 %% generate fem model from mesh
-fem = Fem(msh,'TimeStep',1/10,...
+fem = Fem(msh,'TimeStep',1/30,...
  'OptimizationProblem','Compliant'); % OptProb = compliant ensures f = L.'*x (displacement func)
 
 %% add constraint
 fem = fem.addSupport(fem.FindNodes('Bottom'),[1,1]);
 fem = fem.addSupport(fem.FindNodes('Top'),[1,0]);
-fem = fem.addDisplace(fem.FindNodes('Top'),[0,-10]);
+fem = fem.addDisplace(fem.FindNodes('Top'),[0,40]);
 fem = fem.addOutput(fem.FindNodes('Top'),[0,1]);
 
 %% assign material
-fem.Material = Dragonskin10;
+fem.Material = Dragonskin30;
 
 %% solving
 fem.solve();

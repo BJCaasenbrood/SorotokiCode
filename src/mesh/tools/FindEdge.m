@@ -76,6 +76,9 @@ function id = BoxHoles(Mesh,tol,Line)
 Bnd = Mesh.get('BndMat');
 Nds = Mesh.Node;
 
+% remove outer edge
+Bnd = Bnd(2:end);
+
 for ii = 1:length(Bnd)
     E = unique(Bnd{ii}(:),'stable');
     E = [E;E(1)];
@@ -92,13 +95,18 @@ function id = FindAllHoles(Mesh)
 Bnd = Mesh.get('BndMat');
 Nds = Mesh.Node;
 
+S = [];
 for ii = 1:length(Bnd)
     E = unique(Bnd{ii}(:),'stable');
     E = [E;E(1)];
     S{ii,1} = E;
 end   
 
-id = S(2:end);
+if ~isempty(S)
+   id = S(2:end);
+else
+   id = []; 
+end
 end
 
 function id = FindEdgeSelect(Mesh,BdBox,Point,AngleMax)

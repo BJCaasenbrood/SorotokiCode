@@ -1,4 +1,4 @@
-function y = stepspace(d1, st, n)
+function y = stepspace(x, stepsize, numstep)
 %LINSPACE Linearly spaced vector.
 %   LINSPACE(X1, X2) generates a row vector of 100 linearly
 %   equally spaced points between X1 and X2.
@@ -14,15 +14,15 @@ function y = stepspace(d1, st, n)
 %   Copyright 1984-2016 The MathWorks, Inc.
 
 if nargin == 2
-    n = 100;
+    numstep = 100;
 else
-    n = floor(double(n));
+    numstep = floor(double(numstep));
 end
-if ~isscalar(d1) || ~isscalar(st) || ~isscalar(n)
+if ~isscalar(x) || ~isscalar(stepsize) || ~isscalar(numstep)
     error(message('MATLAB:linspace:scalarInputs'));
 end
 
-n1 = n-1;
+n1 = numstep-1;
 %c = (d2 - d1).*(n1-1); %check intermediate value for appropriate treatment
 % if isinf(c)
 %     if isinf(d2 - d1) %opposite signs overflow
@@ -31,7 +31,7 @@ n1 = n-1;
 %         y = d1 + (0:n1).*((d2 - d1)./n1);
 %     end
 % else
-    y = d1 + (0:n1).*st;
+y = x + (0:n1).*stepsize;
 %end
 
 % if ~isempty(y)

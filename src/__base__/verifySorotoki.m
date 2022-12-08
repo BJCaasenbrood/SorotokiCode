@@ -322,10 +322,11 @@ boc;
 cout('\t Shapes.string()'); bic(1); 
 figure(101);
 Q = 2e-2*diag(1:M);
+
 for ii = 1:M
    cla;
    g = shp.string(Q(:,ii));
-   plotSE2(g); axis equal; 
+   plotSE2(g,'xz',0.1); axis equal; 
    axis(100*[0,1,-1,1]); axis off;
    axis tight;
    drawnow;
@@ -342,14 +343,14 @@ E    = 3.00;     % Young's modulus in Mpa
 Nu   = 0.42;     % Poisson ratio
 shp.Material = NeoHookeanMaterial(E,Nu);
 shp.Material.Zeta = 0.03;
-shp.Gvec = [9.81e3; 0; 0];
+shp.Gravity = [9.81e3; 0; 0];
 
 cout('\t Shapes.rebuild()'); bic(1); 
 shp = shp.rebuild(); boc();
 
 cout('\t Model(shp) \t'); bic(1); 
 mdl = Model(shp,'TimeStep',1/120,'TimeEnd',1,'ShowProcess',false);
-mdl.q0(1) = 0.12;
+mdl.X0(1) = 0.12;
 boc();
 
 cout('\t Model.simulate()'); bic(1); 
@@ -369,12 +370,12 @@ figure(101); clf;
 rig = rig.render();
 axis(100*[-.5 .5 -.5 .5 -1 0.1]);
 view(30,30);
-rig = rig.computeFK(mdl.Log.q(1,:));
+rig = rig.computeFK(mdl.Log.x(ii,1:M));
 rig = rig.update();
 
-for ii = 1:fps(mdl.Log.t,70):length(mdl.Log.q)
+for ii = 1:fps(mdl.Log.t,70):length(mdl.Log.x)
 
-    rig = rig.computeFK(mdl.Log.q(ii,:));
+    rig = rig.computeFK(mdl.Log.x(ii,1:M));
     rig = rig.update();
     
     axis(100*[-.5 .5 -.5 .5 -1 0.1]);

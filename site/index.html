@@ -1,0 +1,544 @@
+
+<!DOCTYPE html>
+
+<html class="no-js" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<link href="images/favicon.png" rel="icon"/>
+<meta content="mkdocs-1.4.2, mkdocs-material-8.5.10" name="generator"/>
+<title>Sorotoki - a MATLAB toolkit for soft robotics - Sorotoki</title>
+<link href="assets/stylesheets/main.975780f9.min.css" rel="stylesheet"/>
+<link href="assets/stylesheets/palette.2505c338.min.css" rel="stylesheet"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback" rel="stylesheet"/>
+<style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+<link href="stylesheets/extra.css" rel="stylesheet"/>
+<script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+<link href="assets/stylesheets/glightbox.min.css" rel="stylesheet"/><style>
+            html.glightbox-open { overflow: initial; height: 100%; }
+            .gslide-title { margin-top: 0px; user-select: text; }
+            .gslide-desc { color: #666; user-select: text; }
+            .gslide-image img { background: white; }
+            
+                .gscrollbar-fixer { padding-right: 15px; }
+                .gdesc-inner { font-size: 0.75rem; }
+                body[data-md-color-scheme="slate"] .gdesc-inner { background: var(--md-default-bg-color);}
+                body[data-md-color-scheme="slate"] .gslide-title { color: var(--md-default-fg-color);}
+                body[data-md-color-scheme="slate"] .gslide-desc { color: var(--md-default-fg-color);}
+                </style><script src="assets/javascripts/glightbox.min.js"></script></head>
+<body data-md-color-accent="" data-md-color-primary="deep-purple" data-md-color-scheme="default" dir="ltr">
+<script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+<input autocomplete="off" class="md-toggle" data-md-toggle="drawer" id="__drawer" type="checkbox"/>
+<input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
+<label class="md-overlay" for="__drawer"></label>
+<div data-md-component="skip">
+<a class="md-skip" href="#sorotoki-a-matlab-toolkit-for-soft-robotics">
+          Skip to content
+        </a>
+</div>
+<div data-md-component="announce">
+</div>
+<div data-md-component="outdated" hidden="">
+</div>
+<header class="md-header" data-md-component="header">
+<nav aria-label="Header" class="md-header__inner md-grid">
+<a aria-label="Sorotoki" class="md-header__button md-logo" data-md-component="logo" href="." title="Sorotoki">
+<img alt="logo" src="assets/logo.png"/>
+</a>
+<label class="md-header__button md-icon" for="__drawer">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"></path></svg>
+</label>
+<div class="md-header__title" data-md-component="header-title">
+<div class="md-header__ellipsis">
+<div class="md-header__topic">
+<span class="md-ellipsis">
+            Sorotoki
+          </span>
+</div>
+<div class="md-header__topic" data-md-component="header-topic">
+<span class="md-ellipsis">
+            
+              Sorotoki - a MATLAB toolkit for soft robotics
+            
+          </span>
+</div>
+</div>
+</div>
+<form class="md-header__option" data-md-component="palette">
+<input aria-label="Switch to dark mode" class="md-option" data-md-color-accent="" data-md-color-media="(prefers-color-scheme: light)" data-md-color-primary="deep-purple" data-md-color-scheme="default" id="__palette_1" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_2" hidden="" title="Switch to dark mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"></path></svg>
+</label>
+<input aria-label="Switch to light mode" class="md-option" data-md-color-accent="" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-primary="deep-purple" data-md-color-scheme="slate" id="__palette_2" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_1" hidden="" title="Switch to light mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12c0-2.42-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"></path></svg>
+</label>
+</form>
+<label class="md-header__button md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"></path></svg>
+</label>
+<div class="md-search" data-md-component="search" role="dialog">
+<label class="md-search__overlay" for="__search"></label>
+<div class="md-search__inner" role="search">
+<form class="md-search__form" name="search">
+<input aria-label="Search" autocapitalize="off" autocomplete="off" autocorrect="off" class="md-search__input" data-md-component="search-query" name="query" placeholder="Search" required="" spellcheck="false" type="text"/>
+<label class="md-search__icon md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"></path></svg>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"></path></svg>
+</label>
+<nav aria-label="Search" class="md-search__options">
+<button aria-label="Clear" class="md-search__icon md-icon" tabindex="-1" title="Clear" type="reset">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"></path></svg>
+</button>
+</nav>
+</form>
+<div class="md-search__output">
+<div class="md-search__scrollwrap" data-md-scrollfix="">
+<div class="md-search-result" data-md-component="search-result">
+<div class="md-search-result__meta">
+            Initializing search
+          </div>
+<ol class="md-search-result__list"></ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="md-header__source">
+<a class="md-source" data-md-component="source" href="https://github.com/BJCaasenbrood/SorotokiCode" title="Go to repository">
+<div class="md-source__icon md-icon">
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"></path></svg>
+</div>
+<div class="md-source__repository">
+    SorotokiCode
+  </div>
+</a>
+</div>
+</nav>
+</header>
+<div class="md-container" data-md-component="container">
+<main class="md-main" data-md-component="main">
+<div class="md-main__inner md-grid">
+<div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Navigation" class="md-nav md-nav--primary" data-md-level="0">
+<label class="md-nav__title" for="__drawer">
+<a aria-label="Sorotoki" class="md-nav__button md-logo" data-md-component="logo" href="." title="Sorotoki">
+<img alt="logo" src="assets/logo.png"/>
+</a>
+    Sorotoki
+  </label>
+<div class="md-nav__source">
+<a class="md-source" data-md-component="source" href="https://github.com/BJCaasenbrood/SorotokiCode" title="Go to repository">
+<div class="md-source__icon md-icon">
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"></path></svg>
+</div>
+<div class="md-source__repository">
+    SorotokiCode
+  </div>
+</a>
+</div>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item md-nav__item--active md-nav__item--nested">
+<input checked="" class="md-nav__toggle md-toggle" data-md-toggle="__nav_1" id="__nav_1" type="checkbox"/>
+<div class="md-nav__link md-nav__link--index md-nav__link--active">
+<a href=".">About Sorotoki</a>
+<label for="__nav_1">
+<span class="md-nav__icon md-icon"></span>
+</label>
+</div>
+<nav aria-label="About Sorotoki" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_1">
+<span class="md-nav__icon md-icon"></span>
+          About Sorotoki
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="install/">
+        Installation
+      </a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" id="__nav_2" type="checkbox"/>
+<label class="md-nav__link" for="__nav_2">
+          Documentation
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-label="Documentation" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_2">
+<span class="md-nav__icon md-icon"></span>
+          Documentation
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_1" id="__nav_2_1" type="checkbox"/>
+<label class="md-nav__link" for="__nav_2_1">
+          Plotting
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-label="Plotting" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_2_1">
+<span class="md-nav__icon md-icon"></span>
+          Plotting
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="plotting/figure/">
+        Figures
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="plotting/colors/">
+        Colors
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="plotting/colormaps/">
+        Colormaps
+      </a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" id="__nav_3" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3">
+          Soft Robots
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-label="Soft Robots" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_3">
+<span class="md-nav__icon md-icon"></span>
+          Soft Robots
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="softmanipulator/">
+        Soft manipulator
+      </a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="contact/">
+        Developer(s)
+      </a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#about-sorotoki">
+    About Sorotoki
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#what-can-sorotoki-do">
+    What can Sorotoki do?
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#list-of-functionalities">
+    List of functionalities
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#short-examples">
+    Short examples
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#how-to-cite">
+    How to cite
+  </a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-content" data-md-component="content">
+<article class="md-content__inner md-typeset">
+<a class="md-content__button md-icon" href="https://github.com/BJCaasenbrood/SorotokiCode/edit/master/docs/index.md" title="Edit this page">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"></path></svg>
+</a>
+<h1 id="sorotoki-a-matlab-toolkit-for-soft-robotics">Sorotoki - a MATLAB toolkit for soft robotics</h1>
+<!-- <div align="center"> <img src="./softrobot_.png" width="700"> </div> <br/> -->
+<div align="center"> <a class="glightbox" data-desc-position="bottom" data-height="auto" data-width="100%" href="./img/softrobot.svg"><img src="./img/softrobot.svg" width="700"/></a> <br/>
+</div>
+<p><a class="md-button md-button--secondary center" href="#">Sorotoki v3.0.01 stable (Code)</a>
+<a class="md-button md-button--secondary center" href="#">Sorobots v1.0 (Soft robot STL)</a>
+<a class="md-button md-button--secondary center" href="mailto:b.j.caasenbrood@gmail.com"><span class="twemoji"><svg viewbox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M498.1 5.6c10.1 7 15.4 19.1 13.5 31.2l-64 416c-1.5 9.7-7.4 18.2-16 23s-18.9 5.4-28 1.6L284 427.7l-68.5 74.1c-8.9 9.7-22.9 12.9-35.2 8.1S160 493.2 160 480v-83.6c0-4 1.5-7.8 4.2-10.7l167.6-182.9c5.8-6.3 5.6-16-.4-22s-15.7-6.4-22-.7L106 360.8l-88.3-44.2C7.1 311.3.3 300.7 0 288.9s5.9-22.8 16.1-28.7l448-256c10.7-6.1 23.9-5.5 34 1.4z"></path></svg></span></a></p>
+<h2 id="about-sorotoki">About Sorotoki</h2>
+<p>Sorotoki is an open-source MATLAB toolkit for soft robotics that includes an array of tools for design, modeling, and control. Due to its scientific diversity, it can be challenging for new researchers to quickly familiarize themselves with multiple scientific areas. With the aim to lower this threshold, Sorotoki aims to incorporate multiple layers of soft robotics research into one compact toolkit. Examples include: continuum mechanics, dynamic systems and control theory, topology optimization, computer graphics, and much more to come! The combination provides a highly flexible programming environment and will hopefully aid the development of novel soft robotic research.</p>
+<!-- ## What can Sorotoki do?
+To summarize, the main features of Sorotoki are listed below:
+
+- Implicit modeling with Signed Distance Functions (SDFs),
+- Finite element method (FEM) using hyper-elastic materials,
+- Topology optimization of (pressure-driven) soft robots,
+- Dynamical modeling through geometric theory,
+- Real-time control of soft robots via Raspi-interface,
+- Fast graphics rendering with responsive textures.
+
+But perhaps, the best way of showing its capabilities are through a few example.  -->
+<h2 id="what-can-sorotoki-do">What can Sorotoki do?</h2>
+<p>Sorotoki started out small, but at its current state, it contains a vast collection of functionalities -- tailored towards many aspects of soft robotics. Suppose, for example, you are inspired by the multi-gait soft crawler developed by Shepard et al.<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup> -- <a href="https://www.youtube.com/watch?v=lUyuBOtsDu4">see video</a>. Can we model such a system easily? Well.... Short answer: <strong>no</strong>. As matter of fact, simplifying the (infinite-dimensional) dynamics of soft robots is no easy feat. It has been an active topic of research for the better part of the last two decades.</p>
+<video autoplay="" controls="" height="310" loop="" width="800">
+<source src="./assets/fem_crawler.mp4" type="video/mp4"/>
+</video>
+<figcaption>Simulation of multi-gait crawling soft robot undergoing an undulating motion. The model is inspired by the work of Shepard et al. (2011). Original soft robot can be found here:
+<a href="https://www.youtube.com/watch?v=lUyuBOtsDu4">Youtube video</a>
+</figcaption>
+<div align="center">
+<video autoplay="" controls="" height="110" loop="" width="300">
+<source src="./assets/mdl_suzumori_beaker.ogv" type="video/ogg"/>
+</video>
+<video autoplay="" controls="" height="110" loop="" width="225">
+<source src="./assets/mdl_suzumori_screw.ogv" type="video/ogg"/>
+</video>
+</div>
+<figcaption>Simulation of multi-gait crawling soft robot undergoing an undulating motion. The model is inspired by the work of Shepard et al. (2011). Original soft robot can be found here:
+<a href="https://www.youtube.com/watch?v=lUyuBOtsDu4">Youtube video</a>
+</figcaption>
+<details class="info">
+<summary>Is it easy to code?</summary>
+<p>Well, absolutely!</p>
+</details>
+<h2 id="list-of-functionalities">List of functionalities</h2>
+<p>To summarize, some of the functionalities included in the toolkit are listed below:</p>
+<ul>
+<li><strong>Design:</strong> Implicit modeling using signed distance functions (SDFs), 2D-3D mesh generation, computational design using gradient-based optimization</li>
+<li><strong>Modeling:</strong> Finite Element Models (FEM), high-efficiency reduced-order soft beam models (Lagrangian or port-Hamiltonian), easy programmable interconnections of a network of dynamical (soft robot) systems</li>
+<li><strong>Control:</strong> Real-time (pneumatic) control platform using Raspberry Pi, vision-based sensing algorithms using Intel Realsense Depth camera</li>
+<li><strong>Visualization:</strong> Fast and responsive 3D graphics rendering, mesh deformation modifiers (scaling, rotation, bending, twisting, mirroring), Forward Kinematic/Inverse Kinematic-rigging</li>
+<li><strong>Accessibility:</strong> Minimal programming environment (i.e, focused on expressing complex problems with minimal lines of code).</li>
+<li><strong>Open hardware:</strong> Four 3D-printable soft robots (e.g., soft hand, soft manipulator), and control interface).</li>
+</ul>
+<h2 id="short-examples">Short examples</h2>
+<details class="example">
+<summary>Example 1: PneuNet deformations</summary>
+<p><div align="center">
+<video autoplay="" controls="" height="310" loop="" width="400">
+<source src="./assets/fem_pneunet.mp4" type="video/mp4"/>
+</video>
+</div></p>
+<p>A classic example in soft robotics is the PneuNet soft bending actuator. The PneuNet (pneumatic network) belongs to a class of soft actuators that, due to a geometrically induced stiffness differential, undergoes bending when pressurized. The geometry of the PneuNet is developed (and popularized) by Mosadegh et al.<sup id="fnref:3"><a class="footnote-ref" href="#fn:3">3</a></sup> , but historically it is much older<sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup>. To model the PneuNet actuator, lets consider the following numerical example. Assuming <em>plane strain</em>, we can simulate the nonlinear bending characteristics of the Pneunet actuator using the super-short code below (only 10 lines of code!):</p>
+<details class="info" open="open">
+<summary>Code for simulation</summary>
+<div class="highlight"><pre><span></span><code><span class="c">% generate mesh from image</span><span class="w"></span>
+<span class="n">msh</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Mesh</span><span class="p">(</span><span class="s">'Pneunet.png'</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="w"></span>
+<span class="w">          </span><span class="s">'ElementSize'</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="w"></span>
+<span class="w">          </span><span class="s">'BdBox'</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">120</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">20</span><span class="p">]);</span><span class="w"></span>
+
+<span class="c">% finite element solver (FEM)</span><span class="w"></span>
+<span class="n">fem</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Fem</span><span class="p">(</span><span class="n">msh</span><span class="p">,</span><span class="s">'Material'</span><span class="p">,</span><span class="w"> </span><span class="n">NeoHookean</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.4</span><span class="p">),</span><span class="w"> </span><span class="k">...</span><span class="w"></span>
+<span class="w">              </span><span class="s">'TimeStep'</span><span class="p">,</span><span class="w"> </span><span class="mf">1e-2</span><span class="p">);</span><span class="w"></span>
+
+<span class="c">% boundary conditions</span><span class="w"></span>
+<span class="n">fem</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">fem</span><span class="p">.</span><span class="n">addGravity</span><span class="p">();</span><span class="w"></span>
+<span class="n">fem</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">fem</span><span class="p">.</span><span class="n">addPressure</span><span class="p">(</span><span class="s">'All'</span><span class="p">,</span><span class="w"> </span><span class="mi">30</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">kpa</span><span class="p">);</span><span class="w"></span>
+<span class="n">fem</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">fem</span><span class="p">.</span><span class="n">addConstraint</span><span class="p">(</span><span class="s">'Left'</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]);</span><span class="w"></span>
+
+<span class="c">% magic</span><span class="w"></span>
+<span class="n">fem</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">fem</span><span class="p">.</span><span class="n">solve</span><span class="p">();</span><span class="w"></span>
+
+<span class="c">% take away message: simplicity &gt; complexity</span><span class="w"></span>
+</code></pre></div>
+</details>
+<details class="info">
+<summary>Code for plotting</summary>
+<p>Once a simulation is completed, there exist simple command to export the simulation as a <code>.gif</code> file. We can simple use the command below. This sets the frames-per-second (FPS), the axis for the replay video, and <code>gif = true</code> to make a gif file.</p>
+<div class="highlight"><pre><span></span><code><span class="n">fem</span><span class="p">.</span><span class="n">replay</span><span class="p">(</span><span class="s">'fps'</span><span class="p">,</span><span class="mi">60</span><span class="p">,</span><span class="k">...</span><span class="w"></span>
+<span class="w">           </span><span class="s">'axis'</span><span class="p">,[</span><span class="o">-</span><span class="mi">33</span><span class="p">,</span><span class="w"> </span><span class="mi">120</span><span class="w"> </span><span class="o">-</span><span class="mi">86</span><span class="w"> </span><span class="mi">21</span><span class="p">],</span><span class="k">...</span><span class="w"></span>
+<span class="w">           </span><span class="s">'gif'</span><span class="p">,</span><span class="nb">true</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+</details>
+</details>
+<details class="example">
+<summary>Example 2: Task-space controller for soft manipulator</summary>
+<p><div align="center">
+<video autoplay="" controls="" height="310" loop="" width="400">
+<source src="./assets/mdl_control_jacobian.mp4" type="video/mp4"/>
+</video>
+</div></p>
+<p>The next example shows the implementation of model-based controllers in Sorotoki. Consider a soft tentacle of length <span class="arithmatex">\(L = 100\)</span> mm, radius <span class="arithmatex">\(R = 5\)</span> mm, and a tapering of <span class="arithmatex">\(75\%\)</span>. We assume the tentacle is composed of DragonSkin10A silicone. </p>
+<div class="arithmatex">\[\tau = J_v(q)^\top\left[k_p (X_d - X) - k_d \dot{X}\right] + \nabla_q \mathcal{V}\]</div>
+<p>where <span class="arithmatex">\(J_v(q) := \lfloor J(q,L) \rfloor_3\)</span> is the linear velocity part of the manipulator Jacobian matrix at the tip (<span class="arithmatex">\(\sigma = L\)</span>), <span class="arithmatex">\(\nabla_q \mathcal{V}\)</span> is simply the gradient of the potential energy w.r.t to its states <span class="arithmatex">\(q\)</span>, <span class="arithmatex">\(X\)</span> and <span class="arithmatex">\(X_d\)</span> the end-effector position and the desired position, respectively. Note that we can compute the end-effector velocity by <span class="arithmatex">\(\dot{X} = J_v(q) \dot{q}\)</span>. </p>
+<details class="info" open="open">
+<summary>Code for simulation</summary>
+<div class="highlight"><pre><span></span><code><span class="c">% CODE: Example 2 -- Task-space controller</span><span class="w"></span>
+<span class="c">% assign desired setpoint</span><span class="w"></span>
+<span class="n">Xd</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="mi">30</span><span class="p">;</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="w"> </span><span class="mi">10</span><span class="p">];</span><span class="w"> </span>
+
+<span class="c">% build continuum shape</span><span class="w"></span>
+<span class="n">POD</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">chebyspace</span><span class="p">(</span><span class="mi">60</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span><span class="w">            </span><span class="c">% POD basis</span><span class="w"></span>
+<span class="n">shp</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Shapes</span><span class="p">(</span><span class="n">POD</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="w"> </span><span class="k">...</span><span class="c"> % pure bending XY</span><span class="w"></span>
+<span class="w">                </span><span class="s">'Length'</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="w"></span>
+<span class="w">                </span><span class="s">'Material'</span><span class="p">,</span><span class="w"> </span><span class="n">Dragonskin10</span><span class="p">);</span><span class="w"></span>
+
+<span class="c">% geometry and boundary conditions</span><span class="w"></span>
+<span class="n">shp</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">shp</span><span class="p">.</span><span class="n">setRadius</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span><span class="w">   </span><span class="c">% R = 5 mm</span><span class="w"></span>
+<span class="n">shp</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">shp</span><span class="p">.</span><span class="n">setRamp</span><span class="p">(</span><span class="mf">0.75</span><span class="p">);</span><span class="w">  </span><span class="c">% R is reduced by 75% at s=L</span><span class="w"></span>
+<span class="n">shp</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">shp</span><span class="p">.</span><span class="n">addGravity</span><span class="p">();</span><span class="w"></span>
+
+<span class="c">% model composer</span><span class="w"></span>
+<span class="n">mdl</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Model</span><span class="p">(</span><span class="n">shp</span><span class="p">,</span><span class="s">'TimeStep'</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">60</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="w"></span>
+<span class="w">                </span><span class="s">'Controller'</span><span class="p">,</span><span class="w"> </span><span class="p">@(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="n">tau</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">Xd</span><span class="p">)</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+
+<span class="c">% magic ;)</span><span class="w"></span>
+<span class="n">mdl</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">mdl</span><span class="p">.</span><span class="n">simulate</span><span class="p">();</span><span class="w"></span>
+
+<span class="c">% task-space controller (called by solver)</span><span class="w"></span>
+<span class="k">function</span><span class="w"> </span>tau<span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nf">tau</span><span class="p">(</span>mdl,Xd<span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="nb">log</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">mdl</span><span class="p">.</span><span class="n">Systems</span><span class="p">{</span><span class="mi">1</span><span class="p">}.</span><span class="n">Log</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="n">X</span><span class="w">   </span><span class="p">=</span><span class="w"> </span><span class="nb">log</span><span class="p">.</span><span class="n">FK</span><span class="p">.</span><span class="n">g</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="k">end</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">Jv</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="nb">log</span><span class="p">.</span><span class="n">FK</span><span class="p">.</span><span class="n">J</span><span class="p">(</span><span class="mi">4</span><span class="p">:</span><span class="mi">6</span><span class="p">,:,</span><span class="k">end</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">Vq</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="nb">log</span><span class="p">.</span><span class="n">PH</span><span class="p">.</span><span class="n">dVdq</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">  </span><span class="n">tau</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Jv</span><span class="p">.</span><span class="o">'*</span><span class="p">(</span><span class="mf">1e-3</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">Xd</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">X</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">1e-4</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Jv</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nb">log</span><span class="p">.</span><span class="n">dq</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Vq</span><span class="p">;</span><span class="w"></span>
+<span class="k">end</span><span class="w"></span>
+</code></pre></div>
+</details>
+<details class="info">
+<summary>Code for plotting</summary>
+<div class="highlight"><pre><span></span><code><span class="c">% Example 2b: plotting Model data</span><span class="w"></span>
+<span class="c">% for loop over Model log files</span><span class="w"></span>
+<span class="k">for</span><span class="w"> </span><span class="n">ii</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">1</span><span class="p">:</span><span class="nb">numel</span><span class="p">(</span><span class="n">mdl</span><span class="p">.</span><span class="n">Log</span><span class="p">.</span><span class="n">t</span><span class="p">)</span><span class="w">  </span>
+
+<span class="w">    </span><span class="n">shp</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">shp</span><span class="p">.</span><span class="n">render</span><span class="p">(</span><span class="n">mdl</span><span class="p">.</span><span class="n">Log</span><span class="p">.</span><span class="n">x</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span><span class="mi">1</span><span class="p">:</span><span class="mi">6</span><span class="p">));</span><span class="w"> </span><span class="c">% render shape</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">ii</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="c">% render setpoint Xd</span><span class="w"></span>
+<span class="w">      </span><span class="n">plotpoint</span><span class="p">(</span><span class="n">Xd</span><span class="p">);</span><span class="w">  </span>
+<span class="w">    </span><span class="k">end</span><span class="w"></span>
+
+<span class="w">    </span><span class="nb">axis</span><span class="p">([</span><span class="mi">0</span><span class="w"> </span><span class="mi">100</span><span class="w"> </span><span class="o">-</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">30</span><span class="p">]);</span><span class="w"></span>
+<span class="w">    </span><span class="nb">view</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span><span class="mi">30</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="nb">drawnow</span><span class="p">;</span><span class="w"></span>
+<span class="k">end</span><span class="w"></span>
+</code></pre></div>
+</details>
+</details>
+<details class="example">
+<summary>Example 3: Open-loop control of soft hand</summary>
+<p><div align="center">
+<video autoplay="" controls="" height="310" width="300">
+<source src="./assets/soft_hand.mp4" type="video/mp4"/>
+</video>
+</div></p>
+<div class="highlight"><pre><span></span><code><span class="c">% CODE: Example 3 -- Open-loop controller</span><span class="w"></span>
+<span class="c">% connect to controller board</span><span class="w"></span>
+<span class="n">brd</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Bdog</span><span class="p">(</span><span class="s">'pi'</span><span class="p">,</span><span class="s">'local'</span><span class="p">,</span><span class="s">'pwd'</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="w"></span>
+<span class="w">           </span><span class="s">'NVeab'</span><span class="p">,</span><span class="mi">3</span><span class="p">);</span><span class="w"></span>
+
+<span class="c">% set board update frequency</span><span class="w"></span>
+<span class="n">brd</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">brd</span><span class="p">.</span><span class="n">set</span><span class="p">(</span><span class="s">'Frequency'</span><span class="p">,</span><span class="mi">120</span><span class="p">);</span><span class="w"></span>
+
+<span class="c">% phase offset per finger</span><span class="w"></span>
+<span class="n">phi</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">@(</span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="nb">pi</span><span class="o">/</span><span class="mi">6</span><span class="p">;</span><span class="w"></span>
+
+<span class="c">%% execute control loop for T=10s</span><span class="w"></span>
+<span class="k">while</span><span class="w"> </span><span class="n">brd</span><span class="p">.</span><span class="n">loop</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">T</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">ones</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">brd</span><span class="p">.</span><span class="n">t</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">Pd</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">6</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">Pd</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mi">5</span><span class="p">)</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">80</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nb">sign</span><span class="p">(</span><span class="nb">sin</span><span class="p">(</span><span class="mi">4</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">phi</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mi">5</span><span class="p">).</span><span class="o">'</span><span class="p">))</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">...</span><span class="w"></span>
+<span class="w">              </span><span class="n">smoothstep</span><span class="p">(</span><span class="n">t</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">brd</span><span class="p">.</span><span class="n">setInput</span><span class="p">(</span><span class="n">Pd</span><span class="p">);</span><span class="w"></span>
+<span class="k">end</span><span class="w"></span>
+
+<span class="c">% disconnect system</span><span class="w"></span>
+<span class="n">brd</span><span class="p">.</span><span class="n">disconnect</span><span class="p">();</span><span class="w"></span>
+</code></pre></div>
+</details>
+<h2 id="how-to-cite">How to cite</h2>
+<p>If you are planning on using Sorotoki in your (academic) work, please consider citing the toolkit  </p>
+<div class="highlight"><pre><span></span><code><span class="nc">@misc</span><span class="p">{</span><span class="nl">Caasenbrood2020</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="na">author</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">{Caasenbrood, Brandon}</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="na">title</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">{Sorotoki - A Soft Robotics Toolkit for MATLAB}</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="na">year</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">{2020}</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="na">publisher</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">{GitHub}</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="na">journal</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">{GitHub repository}</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="na">howpublished</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">{\url{https://github.com/BJCaasenbrood/SorotokiCode}}</span><span class="p">,</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<div class="footnote">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>Shepherd, R. F., Ilievski, F., Choi, W., Morin, S. A., Stokes, A. A., Mazzeo, A. D., ...Whitesides, G. M. (2011). Multigait soft robot. Proc. Natl. Acad. Sci. U.S.A., 22123978. Retrieved from https://pubmed.ncbi.nlm.nih.gov/22123978 doi: <a href="https://doi.org/10.1073/pnas.1116564108">https://doi.org/10.1073/pnas.1116564108 </a> <a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">↩</a></p>
+</li>
+<li id="fn:2">
+<p>Mosadegh, B., Polygerinos, P., Keplinger, C., Wennstedt, S., Shepherd, R. F., Gupta, U., ...Whitesides, G. M. (2014). Pneumatic Networks for Soft Robotics that Actuate Rapidly. Adv. Funct. Mater., 24(15), 2163–2170. doi: <a href="https://doi.org/10.1002/adfm.201303288">https://doi.org/10.1002/adfm.201303288</a> <a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">↩</a></p>
+</li>
+<li id="fn:3">
+<p>1981 - Robot Arm with Pneumatic Gripper - Nikolai Teleshev (Russian) - cyberneticzoo.com. (2012, April 08). Retrieved from <a href="http://cyberneticzoo.com/bionics/1981-robot-arm-with-pneumatic-gripper-nikolai-teleshev-russian">http://cyberneticzoo.com/bionics/1981-robot-arm-with-pneumatic-gripper-nikolai-teleshev-russian</a> <a class="footnote-backref" href="#fnref:3" title="Jump back to footnote 3 in the text">↩</a></p>
+</li>
+</ol>
+</div>
+</article>
+</div>
+</div>
+</main>
+<footer class="md-footer">
+<nav aria-label="Footer" class="md-footer__inner md-grid">
+<a aria-label="Next: Installation" class="md-footer__link md-footer__link--next" href="install/" rel="next">
+<div class="md-footer__title">
+<div class="md-ellipsis">
+<span class="md-footer__direction">
+                Next
+              </span>
+              Installation
+            </div>
+</div>
+<div class="md-footer__button md-icon">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"></path></svg>
+</div>
+</a>
+</nav>
+<div class="md-footer-meta md-typeset">
+<div class="md-footer-meta__inner md-grid">
+<div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" rel="noopener" target="_blank">
+      Material for MkDocs
+    </a>
+</div>
+</div>
+</div>
+</footer>
+</div>
+<div class="md-dialog" data-md-component="dialog">
+<div class="md-dialog__inner md-typeset"></div>
+</div>
+<script id="__config" type="application/json">{"base": ".", "features": ["navigation.indexes", "content.code.annotate"], "search": "assets/javascripts/workers/search.16e2a7d4.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"provider": "brandon"}}</script>
+<script src="assets/javascripts/bundle.5a2dcb6a.min.js"></script>
+<script src="javascripts/mathjax.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script src="javascripts/sketchfab.js"></script>
+<script>document$.subscribe(() => {const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});})</script></body>
+</html>

@@ -109,6 +109,7 @@ for q = 1:length(W)
     
     % dampings matrix
     Ce = Ce + Zeta*Me;
+    %Ce = Ce + Zeta*Kte;
     
     % thermal expansion force
     Te = Te + tau*W(q)*Bnl.'*De*Et*dJ;

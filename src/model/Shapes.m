@@ -1,38 +1,60 @@
 classdef Shapes
 
     properties (Access = public)
-        Fem;   
-        Sdf;
-        Material;
-        Sigma;
+        NDim;       % State dimensions
+        NJoint;     % Joint dimension (i.e, NDim/2)
+        NDof;       % Shape joint DoF (max 6 -- geometric freedom)
+        NInput;     % Number of inputs (=dim(q) by default)
+        NModal;     % Number of modes
+        NNode;      % Number of nodes (spatial discretization)
+        
+        Length;         % Intrinic length
+        Theta;      % Shape Basis Matrix functional
+        Xi0;        % Intrinsic strain fucntional
+        g0;         % Initial orientation frame
+        gL;         % End-efector frame
+        X0;         % Initial conditions x0:=(q0,dq0)
+              
+        Texture;    % Texture for render
+        Material;   % Material model    
+        Gravity;    % Gravity vector
+        Sdf;        % Cross-sectional SDF
+        Contact;    % Contact model
+        
+        Fem;        % a-priori fem solution
+        Sigma;      % spatial discretization
 
-        g0; gL;
-        xia0;
-        Node;
-        Node0;
-        
-        NDof;
-        NModal;
-        NDim;
-        NNode;
+        InputMap;   % (Nonlinear) input mapping G(q)
+        Log;        % Log file
 
-        Theta;
-        Xi0;
+        Node;       % 
+        Node0;     
         
-        Ba; ds; L0;
-        Mtt; Dtt;
-        Ktt; Ktt0;
-        Jtt; Att;
-        Gvec;
+        TubeRadiusA;
+        TubeRadiusB;
+        TubeRadiusAlpha;
+        TubeRamp;
         
-        Kp;     %IK proportional gain
-        Kd;     %IK differential gain
+        TubeMatCap;
+        ContactDistance;
+        
+        Kp;     % IK proportional gain
+        Kd;     % IK differential gain
     end
     
     properties (Access = private)
         Table;
         Gmodel;
-
+        xia0;
+        ds;
+        Ba;
+        
+        Att;
+        Jtt;
+        Mtt;
+        Ktt;
+        Dtt;
+        
         Center;
         Rotation;
         Gamma;
@@ -50,6 +72,7 @@ classdef Shapes
         
         ThetaEval;
         Xi0Eval;
+        VolumetricContact;
     end
    
 %--------------------------------------------------------------------------
@@ -60,7 +83,7 @@ function obj = Shapes(Input,NModal,varargin)
     obj.NModal = NModal;
     obj.Table  = double(NModal > 0); 
     obj.NDof   = sum(obj.Table);
-    obj.xia0   = [0,0,0,1,0,0].';
+    obj.xia0   = [0,0,0,0,0,1].';
     
     if isa(Input,'Fem')
         obj.Fem    = Input;
@@ -68,12 +91,12 @@ function obj = Shapes(Input,NModal,varargin)
         gvec = Input.get('Gravity');
         if ~isempty(gvec)
             if numel(gvec) == 2
-                obj.Gvec = [0; gvec(:)];
+                obj.Gravity = [0; gvec(:)];
             else
-                obj.Gvec = gvec(:);
+                obj.Gravity = gvec(:);
             end
         else
-            obj.Gvec = zeros(3,1);
+            obj.Gravity = zeros(3,1);
         end
         
     elseif isa(Input,'double')
@@ -81,27 +104,41 @@ function obj = Shapes(Input,NModal,varargin)
         obj.PODQ = Input;
         obj.PODR = Input;
         
-        obj.L0    = 1;
+        obj.Length    = 100;
         obj.Sigma = linspace(0,1,obj.NNode); 
-        obj.ds    = obj.L0/(obj.NNode);
+        obj.ds    = obj.Length/(obj.NNode);
 
         obj.PODEnergy{2} = ones(size(Input,2),1);
         obj.PODEnergy{1} = ones(size(Input,2),1);
        
-        obj.Gvec = [0; 0; 9.81e3];
+        obj.Gravity = zeros(3,1);
     end
 
     % cross-section SDF
-    obj.Sdf          = sCircle(10);
+    obj.Sdf          = sCircle(5);
     obj.Center       = zeros(3,1);
-    obj.Material     = NeoHookeanMaterial(1,0.33);
-    obj.FilterRadius = 10;
+    obj.Material     = NeoHookeanMaterial(5,0.33);
+    obj.Texture      = whitebase;
+    
+    obj.FilterRadius      = 10;
+    obj.VolumetricContact = true;
+    obj.ContactDistance   = 1e-3;
 
     obj.g0 = SE3(eye(3),zeros(3,1));
     obj.gL = [];
+    obj.Log = struct;
+    
+    obj.Log.FK  = [];
+    obj.Log.EL  = [];
+    obj.Log.Shp = [];
+
     obj.Kp = 1e-4;
     obj.Kd = 1e3;
-       
+    obj.TubeRadiusA     = 5;
+    obj.TubeRadiusB     = 5;
+    obj.TubeRadiusAlpha = 0;  
+    obj.TubeRamp        = 0;  
+           
     for ii = 1:2:length(varargin)
         obj.(varargin{ii}) = varargin{ii+1};
     end
@@ -117,6 +154,18 @@ function obj = Shapes(Input,NModal,varargin)
     end
     end
 
+    obj.NJoint = sum(obj.NModal);
+    obj.NDim  = 2*obj.NJoint;
+
+    if isempty(obj.X0)
+        obj.X0 = zeros(obj.NDim,1);
+    end
+    
+    if isempty(obj.InputMap)
+        obj.InputMap = @(x) eye(obj.NJoint);
+        obj.NInput = obj.NJoint;
+    end
+    
     obj = rebuild(obj);
     
 end
@@ -137,6 +186,47 @@ function Shapes = set(Shapes,varargin)
         Shapes.(varargin{ii}) = varargin{ii+1};
     end
 end
+%--------------------------------------------------------------- set radius
+function Shapes = setRadius(Shapes,varargin)
+   if numel(varargin) == 1 && numel(varargin{1}) == 1
+       Shapes.TubeRadiusA = varargin{1};
+       Shapes.TubeRadiusB = varargin{1};
+   elseif numel(varargin) == 1 && numel(varargin{1}) == 2
+      R = varargin{1};
+      Shapes.TubeRadiusA = R(1);
+      Shapes.TubeRadiusB = R(2); 
+   elseif numel(varargin) == 1 && numel(varargin{1}) == 3
+      R = varargin{1};
+      Shapes.TubeRadiusA = R(1);
+      Shapes.TubeRadiusB = R(2);  
+      Shapes.TubeRadiusAlpha = R(3);
+   end
+   
+   Shapes.Sdf = sCircle(Shapes.TubeRadiusA);
+   Shapes = rebuild(Shapes);
+end
+%----------------------------------------------------------------- set ramp
+function Shapes = setRamp(Shapes,x)
+    y = clamp(x,0,1);  
+    Shapes.TubeRamp = y;
+end
+%-------------------------------------------------------------- set gravity 
+function Shapes = setInputMap(Shapes,varargin)
+Shapes.InputMap = varargin{1};
+G0 = Shapes.InputMap(Shapes);
+Shapes.NInput = size(G0,2);
+end
+%-------------------------------------------------------------- set gravity 
+function Shapes = addGravity(Shapes,varargin)
+if isempty(varargin)
+    varargin{1} = -9810*Shapes.xia0(4:6,1);
+end
+Shapes.Gravity = varargin{1};    
+end
+%-------------------------------------------------------------- set gravity 
+function Shapes = addContact(Shapes,varargin)
+Shapes.Contact = varargin{1};    
+end
 %---------------------------------------------------------------- show mesh
 function Shapes = show(Shapes,varargin)
     
@@ -154,7 +244,7 @@ end
 
 if strcmp(Request,'POD') 
     
-    X = Shapes.Sigma*Shapes.L0;
+    X = Shapes.Sigma*Shapes.Length;
     Y = [];
     
     for ii = 1:numel(X)
@@ -201,22 +291,44 @@ if strcmp(Request,'POD')
 end
 
 end
-%---------------------------------------------------------------- show mesh
-function Shapes = render(Shapes,q)
-    Shapes.Node = Shapes.FK(q);
-    if isempty(Shapes.Gmodel)
+%------------------------------------------------------------ render string
+function Shapes = render(Shapes,varargin)
+
+    if nargin < 2
+       q = ones(Shapes.NJoint,1)*1e-12; 
+    else
+       q = varargin{1};
+    end
+    
+    p0     = Shapes.g0(1:3,4);
+    [g, J] = string(Shapes,q);
+    
+    Shapes.Node = [p0.'; reshape(g(1:3,4,1:end),3,[]).'];
+    Shapes.Log.FK.g = g;
+    Shapes.Log.FK.J = J;
+    Shapes.Log.FK.Node = Shapes.Node;
+
+    if isempty(Shapes.Gmodel) 
         obj = Gmodel(Shapes);
+        obj = obj.set('Texture',Shapes.Texture);
         obj = obj.bake;
         obj = obj.render();
         Shapes.Gmodel = obj;
     else
-        [x,y,z] = tubeplot(Shapes.Node.',2,16,1e-6);
+        [x,y,z] = rtubeplot(Shapes.Node.',...
+            Shapes.TubeRadiusA,...
+            Shapes.TubeRadiusB,...
+            Shapes.TubeRadiusAlpha,...
+            16,1e-6,...
+            Shapes.TubeRamp);
         %h = mesh(x,y,z);
         fv = surf2patch(x,y,z,'triangles');
         v = fv.vertices;
         Shapes.Gmodel.Node = v;
         Shapes.Gmodel.update();
     end
+    
+    hold on;
     
 end
 %------------------------------------------------------------ set reference
@@ -231,16 +343,16 @@ if numel(varargin) == 2
         linspace(X0(2),XL(2),Shapes.NNode).'];
     
     %B = boxhull(Shapes.Node0);
-    Shapes.L0 = sqrt((XL(1)-X0(1))^2 + (XL(2)-X0(2))^2);
+    Shapes.Length = sqrt((XL(1)-X0(1))^2 + (XL(2)-X0(2))^2);
 elseif numel(varargin) == 1 && size(varargin{1},2) == 2
     Shapes.Node0 = varargin{1};
     Shapes.NNode = length(Shapes.Node0);
-    Shapes.L0 = sum(sqrt(sum(diff(Shapes.Node0).^2,2)),1);
+    Shapes.Length = sum(sqrt(sum(diff(Shapes.Node0).^2,2)),1);
 end
 
 % build discretization of curve domain
-Shapes.Sigma = linspace(0,Shapes.L0,Shapes.NNode);    
-Shapes.ds    = Shapes.L0/(Shapes.NNode);
+Shapes.Sigma = linspace(0,Shapes.Length,Shapes.NNode);    
+Shapes.ds    = Shapes.Length/(Shapes.NNode);
 
 % finds associated nodes from Fem mesh.
 if isempty(Shapes.Fem)
@@ -267,25 +379,25 @@ for ii = 1:6
     end
 end
 
-Shapes.NDim  = sum(Shapes.NModal);
-Shapes.Ba    = I6(:,Xa);
-Shapes.Sigma = linspace(0,1,Shapes.NNode);
-Shapes.ds    = Shapes.L0/(Shapes.NNode);
+Shapes.NJoint  = sum(Shapes.NModal);
+Shapes.NDim    = 2*Shapes.NJoint;
+Shapes.Ba      = I6(:,Xa);
+Shapes.Sigma   = linspace(0,1,Shapes.NNode);
+Shapes.ds      = Shapes.Length/(Shapes.NNode);
 
 Shapes = BuildInertia(Shapes);
+JJ     = Shapes.Mtt/Shapes.Material.Rho;
 
-JJ      = Shapes.Mtt/Shapes.Material.Rho;
-[SS,KK] = Shapes.Material.PiollaStress(eye(3));
+% linear approximation of the stiffness
+[~,KK] = Shapes.Material.PiollaStress(eye(3));
+KK     = 4.15*diag(voightextraction(KK));
 
-KK = 2*diag(voightextraction(KK));
-%KK2 = LinearStiffnessTensor(Shapes);
-% KQR = KK(4:6,4:6); 
-% KQG = KK(1:3,1:3);
-% 
-% KK = blkdiag(KQR,KQG);
-Shapes.Ktt  = JJ*KK;%diag(diag(JJ))*diag(diag(KK));
-%Shapes.Mtt  = diag(diag(Shapes.Mtt));
-%Shapes.Ktt0 = Shapes.Ktt;
+% E  = Shapes.Material.getModulus();
+% Nu = Shapes.Material.Nu;
+% G  = E/(2*(Nu+1));
+% KK = pi*diag([G,E,E,E,G,G]);
+
+Shapes.Ktt  = diag(diag(JJ))*KK;
 Shapes.Dtt  = Shapes.Material.Zeta*Shapes.Ktt;
   
 if ~isempty(Shapes.Node0)
@@ -295,9 +407,9 @@ end
 if ~isempty(Shapes.PODR) || ~isempty(Shapes.PODQ)
     
     if length(Shapes.PODQ) ~= Shapes.NNode
-        X = linspace(0,Shapes.L0,length(Shapes.PODQ));
-        Shapes.PODR = interp1(X,Shapes.PODR,Shapes.Sigma*Shapes.L0);
-        Shapes.PODQ = interp1(X,Shapes.PODQ,Shapes.Sigma*Shapes.L0);
+        X = linspace(0,Shapes.Length,length(Shapes.PODQ));
+        Shapes.PODR = interp1(X,Shapes.PODR,Shapes.Sigma*Shapes.Length);
+        Shapes.PODQ = interp1(X,Shapes.PODQ,Shapes.Sigma*Shapes.Length);
     end
     
     % ensure orthonormality
@@ -330,10 +442,10 @@ if ~isempty(Shapes.Theta)
 % precompute Theta matrix
 FncT = @(x) Shapes.Theta(x);
 FncX = @(x) Shapes.Xi0(x);
-s   = sort([Shapes.Sigma*Shapes.L0,...
-            Shapes.Sigma*Shapes.L0+(2/3)*Shapes.ds]);
+s   = sort([Shapes.Sigma*Shapes.Length,...
+            Shapes.Sigma*Shapes.Length+(2/3)*Shapes.ds]);
 
-[nx,ny]     = size(FncT(0));
+[nx,ny]          = size(FncT(0));
 Shapes.ThetaEval = zeros(nx,ny,numel(s));
 Shapes.Xi0Eval   = zeros(6,1,numel(s));
 
@@ -443,15 +555,15 @@ end
 %--------------------------------------------------------- compute jacobian
 function [g, J] = string(Shapes,q)
     
-if numel(q) ~= Shapes.NDim
+if numel(q) ~= Shapes.NJoint
    error(['Dimension of joint inconstisten with POD matrix. Please ', ...
        'check your input dimensions dim(q).']) 
 end    
 
 % ensures robustness for near-zero singularities in some PCC models
-q = q(:) + 1e-16;
+q = q(:) + 1e-12;
 
-[g,J] = computeForwardKinematicsFast_mex(q,... % states
+[g,J] = computeForwardKinematicsFast_mex(q,q*0,... % states
     Shapes.ds,...         % spatial steps
     Shapes.g0(1:3,4),...         % position zero
     Shapes.g0(1:3,1:3),...       % phi zeroclc
@@ -481,6 +593,110 @@ q = q(:) + 1e-16;
     
 end
 %--------------------------------------------------------- compute jacobian
+function [dx, Shapes] = flow(Shapes,q,varargin)
+if ~isempty(varargin)
+    u = varargin{1}(:);
+    if numel(varargin)>1
+        t = varargin{2};
+    end
+else
+    t = 0;
+    u = zeros(Shapes.NInput,1);
+end
+    
+NQ   = Shapes.NJoint;
+Q    = q(1:NQ);
+dQ   = q(NQ+1:2*NQ);
+    
+[g,J,eta] = computeForwardKinematicsFast_mex(Q,dQ,... % states
+    Shapes.ds,...         % spatial steps
+    Shapes.g0(1:3,4),...         % position zero
+    Shapes.g0(1:3,1:3),...       % phi zero
+    Shapes.Xi0Eval,...    % intrinsic strain vector
+    Shapes.ThetaEval,...  % evaluated Theta matrix
+    Shapes.Ba);
+
+[M_,C_,K_,R_,fg_,...
+    gam_,Phi_,J_,dJdt_,Grav,Kin] = computeLagrangianFast_mex(...
+    Q,dQ,...
+    Shapes.ds,...
+    Shapes.g0(1:3,4),...
+    Shapes.g0(1:3,1:3),...
+    Shapes.Xi0Eval,...
+    Shapes.ThetaEval,...
+    Shapes.Ba,...
+    Shapes.Ktt,...
+    Shapes.Mtt,...
+    Shapes.Material.Zeta,...
+    Shapes.Gravity);
+
+% overwrite dynamics
+Shapes.Log.EL.M     = M_;
+Shapes.Log.EL.C     = C_;
+Shapes.Log.EL.R     = R_;
+Shapes.Log.EL.K     = K_;
+Shapes.Log.EL.fg    = fg_;
+Shapes.Log.EL.J     = J_;
+Shapes.Log.EL.dJdt  = dJdt_;
+Shapes.Log.EL.fc    = 0;
+Shapes.Log.EL.dfcdq = 0;
+
+% overwrite energies
+Shapes.Log.PH.Kinetic = Kin;
+Shapes.Log.PH.Elastic = 0.5*Q.'*K_*Q;
+Shapes.Log.PH.Gravity = Grav;
+Shapes.Log.PH.dVdq    = K_*Q + fg_;
+
+Shapes.Log.EL.G = Shapes.InputMap(Shapes);
+
+% pre-compute Minverse
+Minv = M_\eye(numel(Q));
+Shapes.Log.EL.Minv = Minv;
+
+Shapes.Log.t    = t;
+Shapes.Log.q    = Q;
+Shapes.Log.dq   = dQ;
+Shapes.Log.p    = M_*dQ;
+
+Shapes.Log.FK.g    = g;
+Shapes.Log.FK.J    = J;
+Shapes.Log.FK.eta  = eta;
+Shapes.Log.FK.Node = reshape(g(1:3,4,:),3,[]).';
+
+Shapes.Log.FK.gam = gam_;
+Shapes.Log.FK.Phi = Phi_;
+
+if ~isempty(Shapes.Contact)
+   [Shapes.Log.EL.fc,Wc,Wt] = computeContactWrench(Shapes,Q,dQ);
+
+   Nds = Shapes.Log.FK.Node;
+   I = ~~sign(sum(abs(Wc),2));
+   
+   Shapes.Log.Con.Wc = Wc(I,:);  % Wrench normal contact
+   Shapes.Log.Con.Wt = Wt(I,:);  % Wrench tangent contact
+   Shapes.Log.Con.Node = Nds(I,:);
+end
+
+% flow field
+dx = [dQ; ...
+     Minv*(Shapes.Log.EL.G*u - Shapes.Log.EL.C*dQ - ...
+           Shapes.Log.EL.K*Q - Shapes.Log.EL.R*dQ - ...
+           Shapes.Log.EL.fg + Shapes.Log.EL.fc)];
+    
+end  
+%--------------------------------------------------------- compute jacobian
+function H = hessian(Shapes,~,varargin)
+
+Minv = Shapes.Log.EL.Minv;
+Nq   = Shapes.NJoint;
+
+H                      = zeros(Shapes.NDim,Shapes.NDim);
+H(1:Nq,Nq+1:2*Nq)      = eye(Nq);
+H(Nq+1:2*Nq,1:Nq)      = -Minv*(Shapes.Log.EL.K + Shapes.Log.EL.dfcdq);
+H(Nq+1:2*Nq,Nq+1:2*Nq) = -Minv*(Shapes.Log.EL.R + Shapes.Log.EL.C);
+
+end
+%--------------------------------------------------------- compute jacobian
 function varargout = FK(Shapes,q,dq)
     
     if nargin < 2
@@ -495,6 +711,7 @@ function varargout = FK(Shapes,q,dq)
         V = zeros(Shapes.NNode,6);
         
         for ii = 1:Shapes.NNode
+            Ge = SE3(g(1:3,1:3,ii));
             V(ii,:) = (J(:,:,ii)*dq).';
         end
         
@@ -682,8 +899,8 @@ function P = ShapeFunction(Shapes,X)
     k  = 1;
     X0 = Shapes.Sigma;
     Pc = cell(Shapes.NDof,1); 
-    %X  = zclamp(X,0,Shapes.L0); % make bounded
-    X = zclamp(X/Shapes.L0,0,1);
+    %X  = zclamp(X,0,Shapes.Length); % make bounded
+    X = zclamp(X/Shapes.Length,0,1);
 
     % construct shape-matrix 
     for jj = 1:6
@@ -959,22 +1176,6 @@ Y.J   = Admap(Phi_,p_)*Shapes.Ba*Shapes.Theta(s);
 
 end
 %--------------------------------------- forwards integration of kinematics
-function [dp,dPhi,dJ] = ForwardKinematicODE2(Shapes,s,q,Phi_,p_)
-    
-%compute strain field    
-xi = Shapes.Ba*Shapes.Theta(s)*q + Shapes.xia0(:);
-
-% construct geometric vectors
-Kap = xi(1:3);  % get curvature-torsion
-Gam = xi(4:6);  % get stretch-shear
-
-% build forward kin - position
-dp   = Phi_*Gam;
-dPhi = Phi_*isomSO3(Kap);
-dJ   = Admap(Phi_,p_)*Shapes.Ba*Shapes.Theta(s)*q;
-
-end
-%--------------------------------------- forwards integration of kinematics
 function Shapes = BuildInertia(Shapes)
     
 N  = round(Shapes.NNode/1.5);
@@ -1018,6 +1219,125 @@ Shapes.Mtt = Shapes.Material.Rho*blkdiag(Shapes.Jtt,Shapes.Att*eye(3));
 
 end
 %--------------------------------------- forwards integration of kinematics
+function [Fr,Wc,Wt]= computeContactWrench(Shapes,Q0,dQ0)
+ 
+Wc = zeros(3,Shapes.NNode);
+Wt = zeros(3,Shapes.NNode);    
+Fr = zeros(Shapes.NJoint,1);
+
+if ~isempty(Shapes.Log.FK)
+    [g, J] = Shapes.string(Q0);
+else
+    g   = Shapes.Log.FK.g;
+    J   = Shapes.Log.FK.J;
+end
+
+Nqu  = 6; 
+Emod = Shapes.Material.getModulus();
+Rmod = Shapes.Material.getContactReaction();
+Cmod = Shapes.Material.getContactFriction();
+Eps  = Shapes.ContactDistance;
+
+% generate vector of radii
+if Shapes.VolumetricContact
+    R = ones(Shapes.NNode,1)*Shapes.TubeRadiusA;
+    X = 1:Shapes.NNode;
+    
+    if ~isempty(Shapes.TubeRamp)
+        y = Shapes.TubeRamp;
+        if numel(y) == 1
+            R = R(1,1)*(1-y*(X/Shapes.NNode));
+        else
+            S = linspace(1,Shapes.NNode,numel(y));
+            R = interp1(S,R(1,1)*y,X);
+        end
+    end
+end
+
+Pos = reshape(g(1:3,4,1:end),3,[]).';
+Id = Shapes.Contact.intersect(Pos,Shapes.TubeRadiusA*2); 
+Set = 1:Shapes.NNode;
+DetectionSet = Set(Id);
+
+for ii = DetectionSet
+
+    % generate sample set
+    if Shapes.VolumetricContact
+        XY = SampleRing(R(ii),Nqu,g(:,:,ii));
+    else
+        XY = g(1:3,4,ii).';
+    end
+    
+    D = Shapes.Contact.eval(XY); 
+    D = D(:,end);
+    
+    ConU  = D(D<Eps);
+    ConXY = XY(D<Eps,:);
+    JJ = J(4:6,:,ii);
+    
+    if ~isempty(ConXY)
+        [T_,~,B_] = Shapes.Contact.normal(g(1:3,4,ii).');
+        [~,N]  = Shapes.Contact.normal(ConXY);
+
+        Vt = JJ*dQ0;
+        VT = Vt./(sqrt(sum((Vt.^2))) + 1e-3);
+        FT = (-T_.*dot(VT.',T_.').').';
+        FB = (-B_.*dot(VT.',B_.').').';
+    end
+    
+    Rw = zeros(3,1);
+    Rf = zeros(3,1);
+    
+    for jj = 1:sum(D<Eps)     
+        U = (N(jj,:).')*(ConU(jj));
+        Rw = Rw - (1/Nqu)*Emod*Rmod*U(:);
+    end
+
+    if ~isempty(ConXY)
+        Rf = Cmod*(dot(Rw,FT)).*FT + Cmod*(dot(Rw,FB)).*FB ;
+    end
+
+    % project wrench onto conf. space
+    Fr = JJ.'*(Rw + Rf);
+    
+    Wc(:,ii) = Rw;
+    Wt(:,ii) = Rf;
+end
+
+Shapes.Log.EL.fc = Fr;
+Wc = Wc.';
+Wt = Wt.';
+
+% -------- 
+    function XY = SampleRing(R,Quality,Gd)
+        th = linspace(0,2*pi,Quality+1);
+        th = th(1:end-1);
+        N0 = th(:)*0;
+        Circ0 = [N0,R*cos(th(:)),R*sin(th(:)),N0 + 1];
+        Circ = (Gd*Circ0.').';
+        XY = Circ(:,1:3);
+    end
+% --------
+end
+%--------------------------------------------- isomorphism from R3 to so(3)
+function Kc = computeContactJacobian(Shapes,Q0,dQ0)
+   
+n = Shapes.NJoint;    
+epsilon = 1e-3;
+delta   = epsilon*eye(n);
+
+[Fc0] = computeContactWrench(Shapes,Q0,dQ0);
+Kc  = zeros(n);
+Dc  = zeros(n);
+
+% finite difference for tau(q(t),.)
+for ii = 1:n
+    Q  = Q0 + delta(:,ii);
+    [Fc_] = computeContactWrench(Shapes,Q,dQ0);
+    Kc(:,ii) = (Fc_ - Fc0)/epsilon;
+end
+
+end
 end
 end
 
@@ -1035,23 +1355,23 @@ y(4,1) = X(1,1);
 y(5,1) = X(2,1);
 y(6,1) = X(3,1);
 end
-%------------------------------------------------------- optimal sphere fit
-function r = torusSolve(gp,x)
-% x  := [Nx3] of points
-% gp := [4x4] SE(3) matrix of tangent-point orgin 
-R0 = fliplr(gp(1:3,1:3));
-x0 = gp(1:3,4);
-%x = 
-x = x + rand(length(x),3)*1e-5;
-dx = x.' - x0;
-
-X1 = (R0(1,:)*(dx)).^2;
-X2 = (R0(2,:)*(dx)).^2;
-X3 = (R0(3,:)*(dx)).^2;
-
-r = sqrt((((X1 + X2 + X3).^2) ...
-     ./(4*(X1 + X2))));
- 
-r(isnan(r)) = 0;
- 
-end
+% %------------------------------------------------------- optimal sphere fit
+% function r = torusSolve(gp,x)
+% % x  := [Nx3] of points
+% % gp := [4x4] SE(3) matrix of tangent-point orgin 
+% R0 = fliplr(gp(1:3,1:3));
+% x0 = gp(1:3,4);
+% %x = 
+% x = x + rand(length(x),3)*1e-5;
+% dx = x.' - x0;
+% 
+% X1 = (R0(1,:)*(dx)).^2;
+% X2 = (R0(2,:)*(dx)).^2;
+% X3 = (R0(3,:)*(dx)).^2;
+% 
+% r = sqrt((((X1 + X2 + X3).^2) ...
+%      ./(4*(X1 + X2))));
+%  
+% r(isnan(r)) = 0;
+%  
+% end

@@ -3,8 +3,16 @@ clr;
 W = 1;
 H = 60;
 
-sdf = @(x) dCube(x,-W,W,-W,W,0,H);
-msh = Mesh(sdf,'BdBox',[-W,W,-W,W,0,H],'Hexahedron',[W,W,H]);
+sdf = sCube(-W,W,-W,W,0,H);
+
+obj = Gmodel(sdf,'Quality',60);
+obj.export('tmp.stl');
+
+%%
+msh = Mesh('tmp.stl','Hmesh',[1,3,4]);
+delete('tmp.stl');
+
+%msh = Mesh(sdf,'BdBox',[-W,W,-W,W,0,H],'Hexahedron',[W,W,H]);
 
 msh = msh.generate();
 msh = msh.show();
@@ -13,13 +21,13 @@ msh = msh.show();
 fem = Fem(msh,'TimeEnd',3,'TimeStep',1/125);
 
 %% add constraint
-fem = fem.AddConstraint('Support',fem.FindNodes('Bottom'),[1,1,1]);
+fem = fem.addSupport(fem.FindNodes('Bottom'),[1,1,1]);
 %fem = fem.AddConstraint('Support',fem.FindNodes('Top'),[0,0,1]);
-fem = fem.AddConstraint('Gravity',[],[0,-9.81e3,0]);
+fem = fem.addGravity([-9.81e3,0,0]);
 
 %% select material
-fem.Material = Dragonskin10(35);
-fem.Material.Rho = 2e-9
+fem.Material = NeoHookeanMaterial();%Dragonskin10(35);
+fem.Material.Rho = 2e-9;
 
 %% solving
 fem.simulate();

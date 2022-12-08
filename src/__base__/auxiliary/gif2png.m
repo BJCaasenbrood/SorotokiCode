@@ -1,4 +1,4 @@
-function gif2png(file,N)
+function gif2png(file,varargin)
 % Pedro.F Rodenas Perez
 % Get images from gif and save then to the folder
 
@@ -7,6 +7,12 @@ infos = imfinfo(file, 'gif');
 [allframedata, ~] = imread(file, 'frames', 'all');
 alldimensions = size(allframedata);
 N0 = alldimensions(end);
+
+if ~isempty(varargin)
+    N = varargin{1};
+else
+    N = N0;
+end
 
 setImg = round(linspace(1,N0,N));
 j = 0;

@@ -14,6 +14,9 @@ function x = FindNode(Node,varargin)
 %   x = FINDNODE(Node, 'LeftMid')   -  Returns node at the middle of left 
 %   x = FINDNODE(Node, 'RightMid')  -  Returns node at the middle of right
 %
+%   x = FINDNODE(Node, 'Line',[x1,x2,y1,x2])  -  Line search
+%   x = FINDNODE(Node, 'Box',[x1,x2,y1,x2])   -  Box search
+%
 %   x = FINDNODE(Node, 'Location', P0, N)  -  Returns N number of nodes 
 %       closest to the point P0 (euclidean distnace)
 %
@@ -22,7 +25,11 @@ function x = FindNode(Node,varargin)
 %   Brandon Caasenbrood
 %   2020, MIT LICENSE.
 
-tol   = BuildTolerance(Node); 
+if size(Node,2) == 2
+    tol = BuildTolerance(Node); 
+else
+    tol = 3*BuildTolerance(Node); 
+end
 BdBox = BoundingBox(Node);
 
 Request = varargin{1}; 
@@ -176,7 +183,12 @@ id = find(abs(d(:,end))<tol);
 end
 
 function id = BoxSelect(Node,Line,tol)
-d = dRectangle(Node,Line(1)-eps,Line(2)+eps,Line(3)-eps,Line(4)+eps);
+if numel(Line) == 4
+    d = dRectangle(Node,Line(1)-eps,Line(2)+eps,Line(3)-eps,Line(4)+eps);
+else
+    d = dCube(Node,Line(1)-eps,Line(2)+eps,Line(3)-eps,Line(4)+eps,...
+        Line(5)-eps,Line(6)+eps);
+end
 id = find(d(:,end)<tol);
 end
 

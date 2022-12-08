@@ -53,7 +53,7 @@ function obj = Bdog(usr,ip,pwd,varargin)
     obj.autoConnect = false;
     obj.i2cBusses   = [1,3,4,5,6];
     obj.isConnected = false;
-    obj.autoConnect = false;
+    obj.autoConnect = true;
     obj.LoopCounter = 0;
     obj.LoopIndex = uint8(1e6);
     obj.Frequency = 400;
@@ -74,7 +74,7 @@ function obj = Bdog(usr,ip,pwd,varargin)
     %client = tcpip(obj.Ip,obj.Port,'NetworkRole', 'client');
     client = tcpclient(obj.Ip,obj.Port);
     client.ByteOrder = 'little-endian';
-    obj.TCPclient    = client;
+    obj.TCPclient = client;
       
     if obj.autoConnect
         obj = connect(obj); 
@@ -104,19 +104,19 @@ function Bdog = setInput(Bdog,x,varargin)
        X = Bdog.U*0;
        x(round(x)) = varargin{1};
     end
-     
-    Bdog.U = clamp(pdac(x(:)),0,1);
+
+    Bdog.U = clamp(pdac(x(:) + Bdog.P0(:)),0,1);
 end
 %---------------------------------------------------------------------- set
 function y = getOutput(Bdog)
-    
-%    data = zeros(1,Bdog.NVeab*2);
-%    for ii = 1:(Bdog.NVeab*2)
-%     data(ii) = fread(Bdog.TCPclient,1,"double");
-%    end 
-    
    y = padc(Bdog.Log.y(end,:)); 
 end
+%---------------------------------------------------------------------- set
+function resetInput(Bdog)
+    Bdog.U = clamp(pdac(zeros(Bdog.NVeab*2,1) + Bdog.P0(:)),0,1);
+    Bdog.tcpSendData(Bdog.U);
+end
+
 %--------------------------------------------------------- connect to board
 function Bdog = connect(Bdog)
 
@@ -226,21 +226,23 @@ end
 %-------------------------- Send data as a TCP client (formatted as double)
 function Bdog = tcpSendData(Bdog, data)
     x = clamp(data,0,1);
-    fwrite(Bdog.TCPclient,clamp(x(:),0,1),"double");
+    %fwrite(Bdog.TCPclient,clamp(x(:),0,1),"double");
+    Bdog.TCPclient.write(clamp(x(:),0,1),"double");
 end
 %-------------------------- Recv data as a TCP client (formatted as double)
 function data = tcpRecvData(Bdog,data_length)
     
     data = zeros(1,Bdog.NVeab*2);
     for ii = 1:(Bdog.NVeab*2)
-        data(ii) = fread(Bdog.TCPclient,data_length,"double");
+        %data(ii) = fread(Bdog.TCPclient,data_length,"double");
+        data(ii) = Bdog.TCPclient.read(data_length,"double");
     end
     
     %data1 = fread(Bdog.TCPclient,data_length,"double");
     %data2 = fread(Bdog.TCPclient,data_length,"double");
     
     %data = [data1,data2];
-    Yn = padc(data) - Bdog.P0;
+    Yn = padc(data(:).') - Bdog.P0(:).';
     Bdog.Log.y = vappend(Bdog.Log.y,Yn);
     
     Bdog.t = (1/Bdog.Frequency)*Bdog.LoopCounter;
@@ -250,7 +252,16 @@ end
 function flag = loop(Bdog,Ts)
     
     if Bdog.LoopCounter == 0
-        fopen(Bdog.TCPclient);
+        %fopen(Bdog.TCPclient);
+
+        tic;
+        fprintf('Waiting for VEABs to calibrate, please wait...\n');
+        while toc<3
+            tcpRecvData(Bdog,1);
+            Bdog.tcpSendData(Bdog.U);
+            pause(0.01);
+        end
+
         tic;
         Bdog.LoopCounter = 1;
         Bdog.LoopIndex   = Ts/(1/Bdog.Frequency);
@@ -261,15 +272,13 @@ function flag = loop(Bdog,Ts)
         tcpRecvData(Bdog,1);
         Bdog.tcpSendData(Bdog.U);
         
-        while toc < 1/Bdog.Frequency
-            continue
-        end
-        tic;
+%         while toc < 1/Bdog.Frequency
+%             continue
+%         end
+%         
+%         tic;
         Bdog.LoopCounter = Bdog.LoopCounter + 1;
         
-        % write data
-        %Bdog.Log.y = vappend(Bdog.Log.y,tcpRecvData(4));
-        %Bdog.Log.t = vappend(Bdog.Log.t,Bdog.t);
     end
     
     if Bdog.LoopCounter <= Bdog.LoopIndex

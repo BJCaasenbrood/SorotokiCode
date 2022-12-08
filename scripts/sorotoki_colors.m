@@ -1,6 +1,6 @@
-clr; 
+%clr; 
 %% loop over colors
-figure(101);
+figure(102);
 
 %colorlist = redgreen(10);
 colorlist = col;

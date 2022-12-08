@@ -12,11 +12,11 @@ Modes = [0,M,0,M,0,0];   % curvature-elongation
 
 shp = Shapes(Y,Modes,'L0',L);
 
-shp.E    = 5.00;    % Young's modulus in Mpa
-shp.Nu   = 0.49;     % Poisson ratio
-shp.Rho  = 1000e-12; % Density in kg/mm^3
-shp.Zeta = 1;     % Damping coefficient
-shp = shp.rebuild();
+% shp.E    = 5.00;    % Young's modulus in Mpa
+% shp.Nu   = 0.49;     % Poisson ratio
+% shp.Rho  = 1000e-12; % Density in kg/mm^3
+% shp.Zeta = 1;     % Damping coefficient
+% shp = shp.rebuild();
 
 %% eval theta
 Fnc = @(x) shp.Theta(x);
@@ -35,6 +35,7 @@ end
 
 %% entries
 x    = 0.01*rand(shp.NDim,1);
+dx   = 0.01*rand(shp.NDim,1);
 Ba   = shp.Ba;
 ds   = shp.ds;
 p0   = zeros(3,1);
@@ -42,7 +43,7 @@ Phi0 = eye(3);
 xia0 = Xi0;
 Th   = Theta;
 
-[g,J] = computeForwardKinematicsFast(x,... % states
+[g,J] = computeForwardKinematicsFast(x,dx,... % states
     ds,...      % spatial steps
     p0,...      % position zero
     Phi0,...    % phi zeroclc

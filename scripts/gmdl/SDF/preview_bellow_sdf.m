@@ -1,12 +1,12 @@
 clr;
 %% model
 Dist  = @(x) SDF(x);
-BdBox = [-50,80,-50,50,0,22*5];
+BdBox = [-50,80,-50,50,0,22*3];
 
 obj = Gmodel(Dist,BdBox,'Quality',80);
 
 %% set texture
-obj.Texture = softmath;
+%obj.Texture = softmath;
 obj.bake();
 
 %% show

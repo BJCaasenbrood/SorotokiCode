@@ -6,7 +6,7 @@ else
     if numel(varargin) == 1 && numel(varargin{1}) == 1
         if numel(varargin{1}) == 1
             n = varargin{1};
-            C = col(1);
+            C = color_orange;
         elseif numel(varargin{1}) == 3
             C = varargin{1};
             n = 100;

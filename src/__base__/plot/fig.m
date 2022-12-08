@@ -21,9 +21,16 @@ Dy = 2^B(2);
 b = 0.5715;
 a = 512;
 f.Position = round([a,a,b*Dx,b*Dy]);
-set(gca,'LineW',1.5);
+set(gca,'LineW',1.25);
 background();
 hold on;
+box on;
+grid on;
+
+set(0,'defaultLineLineWidth',1.75);
+set(0,'defaultTextInterpreter','latex');
+set(0,'defaultLegendEdgeColor','none');
+sorocolor;
 
 end
 

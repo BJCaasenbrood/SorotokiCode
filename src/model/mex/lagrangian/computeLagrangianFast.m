@@ -1,5 +1,5 @@
 %#codegen
-function [M,C,K,R,G,p,Phi,J,Vg,Kin] = computeLagrangianFast(x,dx,... % states
+function [M,C,K,R,G,p,Phi,J,dJdt,Vg,Kin] = computeLagrangianFast(x,dx,... % states
     ds,...      % spatial steps
     p0,...      % position zero
     Phi0,...    % phi zero
@@ -12,8 +12,8 @@ function [M,C,K,R,G,p,Phi,J,Vg,Kin] = computeLagrangianFast(x,dx,... % states
     Gvec)       % gravitional vector  
 
 % compute total length
-n    = numel(x);
-s    = 0;
+n = numel(x);
+s = 0;
 
 Z1 = zeros(6,6+2*(n-1));
 Z2 = zeros(n,3*n+1);
@@ -40,10 +40,22 @@ for ii = 1:(size(Th,3)/2)
 end
 
 % recover the kinematics entities
-p   = Z1(1:3,4);
-Phi = Z1(1:3,1:3);
-B1  = Z1(1:6,5:5+n-1);
-J   = Admapinv(Phi,p)*B1;
+p    = Z1(1:3,4);
+Phi  = Z1(1:3,1:3);
+B1   = Z1(1:6,5:5+n-1);
+B2   = Z1(1:6,6+n-1:6+2*(n-1));
+J0   = Admapinv(Phi,p)*B1;
+dJ0  = Admapinv(Phi,p)*B2;
+
+V    = J0*dx; 
+adV  = admap(V);
+
+% set linear velocity zero -- dJ worldframe 
+V(4:6)  = 0;
+adV_ = admap(V);
+J    = Admap(Phi,[0;0;0])*J0; % world-frame Jacobian
+dJdt = Admap(Phi,[0;0;0])*adV_*J0 + ... % world-frame dt Jacobian
+    Admap(Phi,[0;0;0])*(-adV*J0 + dJ0);
 
 % recover the dynamics entities
 M  = Z2(1:n,1:n);
@@ -55,7 +67,6 @@ Vg  = Z1(5,4);
 Kin = Z1(6,4);
 
 R = Zeta*K;
-
 end
 
 function [dZ1,dZ2] = LagrangianODEX(x,dx,Z1,...
@@ -97,7 +108,7 @@ dC = (Jg).'*((Mtt*adV - adV.'*Mtt)*Jg  + Mtt*Jgt);
 dG = -(Jg).'*(Ai*Mtt*[0;0;0;Gvec]);
 
 % compute (nonlinear stiffness)
-dK = diag(diag((BTh).'*Ktt*(BTh)));
+dK = (((BTh).'*Ktt*(BTh)));
 
 % compute grav. potential energy
 dKe = 0.5*V.'*Mtt*V;

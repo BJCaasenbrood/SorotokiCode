@@ -1,0 +1,95 @@
+site_name: Sorotoki 
+extra_css:
+  - stylesheets/extra.css
+
+nav:
+  - About Sorotoki: 
+    - index.md
+  - install.md
+  - Documentation:
+      - fem/sdf.md
+      - fem/mesh.md
+      - fem/fem.md
+      - Plotting:
+        - plotting/figure.md
+        - plotting/colors.md
+        - plotting/colormaps.md
+  - Open Soft Robots:
+    - sorobots/softmanipulator.md
+  - contact.md  
+  - release.md
+
+theme:
+  name: material
+  logo: assets/logo.png
+  favicon: images/favicon.png
+  language: en
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: deep purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: deep purple
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode  
+  font:
+    text: Roboto
+    code: Roboto Mono
+  features:
+    - navigation.indexes
+    - content.code.annotate
+
+extra:
+  version:
+    provider: brandon    
+
+markdown_extensions:
+  - admonition
+  - abbr
+  - attr_list
+  - mdx_math
+  - md_in_html
+  - pymdownx.details
+  - tables
+  - footnotes
+  - pymdownx.critic
+  - pymdownx.caret
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.highlight:
+      anchor_linenums: false
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.arithmatex:
+      generic: true
+
+plugins:
+  - search
+  - glightbox
+  - mkdocs-video:
+      is_video: True
+      css_style:
+        width: "100%"
+        height: "65%"
+        position: center
+      video_autoplay: True
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+  - javascripts/sketchfab.js
+
+repo_url: https://github.com/BJCaasenbrood/SorotokiCode
+repo_name: SorotokiCode

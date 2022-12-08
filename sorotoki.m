@@ -600,11 +600,13 @@ write2file([Path,'\scripts\mdl']);
 write2file([Path,'\livescripts\mdl']);
 write2file([Path,'\src\model']);
 write2file([Path,'\src\model\tools']);
+write2file([Path,'\src\model\systems']);
+write2file([Path,'\src\model\shpfnc']);
 write2file([Path,'\src\model\tools\liegroup']);
 write2file([Path,'\src\model\tools\shapefnc']);
 write2file([Path,'\src\model\mex\forwardkin']);
 write2file([Path,'\src\model\mex\lagrangian']);
-%write2file([Path,'\src\model\tools\solver']);
+
 % mexPath = genpath([Path,'\src\model\mex']);
 % write2file(mexPath);
 else
@@ -612,6 +614,8 @@ addPath([Path,'\scripts\mdl']);
 addPath([Path,'\livescripts\mdl']);
 addPath([Path,'\src\model']);
 addPath([Path,'\src\model\tools']);
+addPath([Path,'\src\model\systems']);
+addPath([Path,'\src\model\shpfnc']);
 addPath([Path,'\src\model\tools\liegroup']);
 addPath([Path,'\src\model\tools\shapefnc']);
 addPath([Path,'\src\model\tools']);

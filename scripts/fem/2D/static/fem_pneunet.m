@@ -1,35 +1,32 @@
 clr;
 %% simulation settings
-P = 15*kpa;
-W = 120;
-H = 20;
+L = 120;  % Lenght
+H = 20;   % Height
+T = 15;   % Thickness
+P = 5 * kpa;
 
 %% finite element settings
 Simp  = 0.02;
 GrowH = 1;
-MinH  = 1.5;
-MaxH  = 2.5;
+MinH  = 2;
+MaxH  = 3;
 
 %% generate mesh
-msh = Mesh('PneunetFine.png','BdBox',[0,W,0,H],...
+msh = Mesh('PneunetFine.png','BdBox',[0,L,0,H],...
     'SimplifyTol',Simp,'Hmesh',[GrowH,MinH,MaxH]);
 
 msh = msh.generate();
 
-figure(101);
-subplot(2,1,1); imshow('Pneunet.png');
-subplot(2,1,2); msh.show();
-
 %% generate fem model
-fem = Fem(msh);
-fem = fem.set('TimeStep',1/120,'TimeEnd',1,'Linestyle','none');
+fem = Fem(msh,'TimeStep',1/1000);
 
 %% add boundary constraint
-fem = fem.addSupport(fem.FindNodes('Left'),[1,1]);
-fem = fem.addPressure(fem.FindEdges('Hole'),P);
+fem = fem.addSupport('Left',[1,1]);
+fem = fem.addGravity();
+fem = fem.addPressure([],P);
 
 %% assign material
-fem.Material = Dragonskin10();
+fem.Material = Ecoflex0030;%Dragonskin10();
 
 %% solve
 fem.solve();

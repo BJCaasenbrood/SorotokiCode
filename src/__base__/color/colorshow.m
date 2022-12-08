@@ -1,9 +1,20 @@
+clr;
+fig(101,[10,9]);
 N = 10; 
 X = linspace(0,pi*3,1e5);
-hold off;
+label = [];
+
 for ii=1:N
-    Y = cos(X+0.75*ii*pi/N);
-    plot(X,Y,'color',col(ii),'linewidth',3);
+    Y = cos(X+1*ii*pi/N);
+    plot(X,Y);
     hold on;
-    pause(0.05);
+    pause(0.01);
+    label{ii} = ['col(',num2str(ii),')'];
 end
+
+% magick color change
+sorocolor;
+
+xlim([0,14]);
+legend(label);
+axis off;

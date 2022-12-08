@@ -3,12 +3,9 @@ clr;
 obj = Gmodel(SDF,'Quality',100);
 
 %% set texture
-obj.set('Texture',bubble);
 obj.bake().render(); 
    
 view(-30,30);
-obj.ground();
-obj.update();
 
 function y = SDF
     C1 = sCube(0,1,0,1,0,1);

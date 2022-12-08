@@ -1,6 +1,6 @@
 clr;
 
-fig(101,[10,9]);
+fig(101,[11,9]);
 subplot(2,5,[1:5]);
 showcolor(color_primary,color_primary_darker,color_primary_darkest,color_base);
 legend({'primary','primary darker','primary darkest','base'},...

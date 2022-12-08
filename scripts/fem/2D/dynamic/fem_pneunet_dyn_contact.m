@@ -12,7 +12,7 @@ msh = msh.generate();
 
 %% generate fem model
 fem = Fem(msh);
-fem = fem.set('TimeStep',1/800,'BdBox',[-20,120,-80,20],...
+fem = fem.set('TimeStep',1/500,'BdBox',[-20,120,-80,20],...
               'Linestyle','none','TimeEnd',2);
 
 %% add boundary constraint

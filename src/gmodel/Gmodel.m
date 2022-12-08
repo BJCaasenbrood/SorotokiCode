@@ -264,7 +264,7 @@ function vargout = update(Gmodel,varargin)
     
     if nargout < 1 || strcmp(varargin ,'tex')
     set(Gmodel.FigHandle,'FaceVertexCData',Gmodel.TextureMap,...
-        'Facecolor',shading);
+        'Facecolor',shading,'FaceAlpha',Gmodel.Alpha);
     
     vargout = [];
     else
@@ -277,8 +277,26 @@ function vargout = update(Gmodel,varargin)
 end
 %---------------------------------------- return mesh to base configuration
 function Gmodel = reset(Gmodel)
-    Gmodel.Node = Gmodel.Node0;
+    
+    v = Gmodel.Node0;
+    f = Gmodel.Element0;
+    
+    [vn,fn] = TriangleNormalFast_mex(v,f);
+    
+    Gmodel.Node = v;
+    Gmodel.Node0 = v;
+    Gmodel.Element = f;
+    Gmodel.Element0 = f;
+    Gmodel.VNormal = -vn;
+    Gmodel.Normal = fn;  
+    Gmodel.RMatrix = eye(4);
+    Gmodel.BdBox = boxhull(Gmodel.Node); 
+    
+    Gmodel.Node    = Gmodel.Node0;
     Gmodel.Element = Gmodel.Element0;
+    Gmodel.NNode   = size(Gmodel.Node,1);
+    Gmodel.NElem   = size(Gmodel.Element,1);
+    
 end
 %---------------------------------- seeks middle and pull to origin (0,0,0)
 function Gmodel = center(Gmodel)
@@ -394,23 +412,19 @@ if nargin < 2
 end
 
 fv = struct;
-f = Gmodel.Element;
+f = fliplr(Gmodel.Element);
 v = Gmodel.Node;
 
-[v, ~, indexn] =  unique(v, 'rows');
-f = indexn(f);
-
 if strcmp(type,'stl')
-fv.vertices = v;
-fv.faces = f;
-stlwriter(char(filename),fv);
+    fv.vertices = v;
+    fv.faces    = f;
+    stlwriter(char(filename),fv);
 elseif strcmp(type,'obj')
-fv.vertices = v;
-fv.faces = f;
-fv.objects(1).type='f';
-fv.objects(1).data.vertices=fv.faces;
-objwriter(fv,'test.obj');
-
+    fv.vertices = v;
+    fv.faces    = f;
+    fv.objects(1).type ='f';
+    fv.objects(1).data.vertices = fv.faces;
+    objwriter(fv,'test.obj');
 end
 
 
@@ -528,7 +542,12 @@ function Gmodel = GenerateObject(Gmodel,varargin)
        f = fv.faces;
     elseif  isa(msh{1},'Shapes')
         %h = figure("Visible",false);
-        [x,y,z] = tubeplot(msh{1}.Node.',2,16,1e-6);
+        [x,y,z] = rtubeplot(msh{1}.Node.',...
+            msh{1}.TubeRadiusA,...
+            msh{1}.TubeRadiusB,...
+            msh{1}.TubeRadiusAlpha,...
+            16,1e-6,...
+            msh{1}.TubeRamp);
         %h = mesh(x,y,z);
         fv = surf2patch(x,y,z,'triangles');
         v = fv.vertices;
@@ -562,7 +581,7 @@ function Gmodel = GenerateObject(Gmodel,varargin)
     Nf = size(Gmodel.Element,1);
     C = zeros(Nf,3);
     
-    for ii = 1:1
+    for ii = 1:Nf
         el = Gmodel.Element(ii,:);
         C(ii,:) = mean(Gmodel.Node(el,:),1);
     end
@@ -737,7 +756,7 @@ f = [1,2,3,4];
 dX = (tmp(2)-tmp(1));
 dY = (tmp(4)-tmp(3));
 
-if dY/dX >= 2, I = vertzcat(I,I);
+if dY/dX >= 2, I = vertcat(I,I);
 elseif dX/dY >= 2, I = horzcat(I,I);
 end
 

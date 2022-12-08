@@ -1,8 +1,8 @@
 %#codegen
-function [gtmp,Jtmp] = computeForwardKinematicsFast(x,... % states
+function [gtmp,Jtmp,vtmp] = computeForwardKinematicsFast(x,dx,... % states
     ds,...      % spatial steps
     p0,...      % position zero
-    Phi0,...    % phi zeroclc
+    Phi0,...    % phi zero
     xia0,...    % intrinsic strain vector
     Th,...      % evaluated Theta matrix
     Ba)         % state to strain matrix        
@@ -18,6 +18,7 @@ Z1(1:3,4)   = p0;
 
 gtmp = zeros(4,4,Ns); 
 Jtmp = zeros(6,n,Ns); 
+vtmp = zeros(6,1,Ns); 
 
 for ii = 1:Ns
     
@@ -39,8 +40,8 @@ for ii = 1:Ns
     B1  = Z1(1:6,5:5+n-1);
     
     gtmp(:,:,ii) = SE3(Phi,p);
-    Jtmp(:,:,ii) = Admapinv(Phi,p)*B1;
-
+    Jtmp(:,:,ii) = Admap(Phi,[0;0;0])*Admapinv(Phi,p)*B1;
+    vtmp(:,:,ii) = Jtmp(:,:,ii)*dx;
 end
 
 end
@@ -80,7 +81,9 @@ end
 %--------------------------------------------------------------------------
 function y = isomSO3(x)
     x1 = x(1); x2 = x(2); x3 = x(3);
-    y = [0, -x3, x2; x3, 0, -x1; -x2, x1, 0];
+    y = [0, -x3, x2; 
+         x3, 0, -x1; 
+         -x2, x1, 0];
 end
 %--------------------------------------------------------------------------
 function Ad = Admap(R,p)

@@ -13,6 +13,8 @@ sdf.BdBox = [xc-r-1e-6,xc+r+1e-6,....
              yc-r-1e-6,yc+r+1e-6,...
              z1-1e-6,z2+1e-6];
          
+sdf.Center = sdf.centerofmass();         
+         
 [sdf.Node,sdf.Element] = generateNodeSet(xc,yc,z1,z2,r,30);
          
 end

@@ -1,4 +1,4 @@
-function [Y,X] = pccspace(N,M)
+function [Y,X] = pccspace(N,M,varargin)
 % loop over functional space
 X = linspace(0,1,N).';
 Y = zeros(N,M);
@@ -8,6 +8,8 @@ for ii = 1:M
 end
 
 % ensure its orthonormal (gram–schmidt)
-Y = gsogpoly(Y,X);
+if isempty(varargin)
+    Y = gsogpoly(Y,X);
+end
 end
 

@@ -7,11 +7,12 @@ classdef Rig < handle
         IKlist;
         Frame;
         g;
-        g0;
+        g0; g00;
         q0;
     end
     
     properties (Access = private)
+        CPattern;
         MaxIterations;
         SweepHandle;
         Domain;
@@ -32,14 +33,14 @@ function obj = Rig(fnc,varargin)
     obj.AutoScale = true;
     obj.Domain = 1;
     obj.MaxIterations = 500;
-    obj.g0 = [1,0,0,0,0,0,0];
+    obj.g0  = eye(4);
+    obj.g00 = eye(4);
     obj.eps = 1e-3;
     
     for ii = 1:2:length(varargin)
         obj.(varargin{ii}) = varargin{ii+1};
     end
 end
-
 %---------------------------------------------------------------------- get     
 function varargout = get(Rig,varargin)
     if nargin > 1
@@ -94,6 +95,10 @@ function Rig = scale(Rig,Child,Scale)
     Rig.List{Child} = gmdl;
 end
 %---------------------------------------------------------------------- rig
+function Rig = cpattern(Rig,Child,option)
+    Rig.CPattern = {Child,option};
+end
+%---------------------------------------------------------------------- rig
 function Rig = texture(Rig,Child,TexMap)
     for ii = 1:length(Child)
         Rig.List{Child(ii)}.Texture = TexMap;
@@ -108,7 +113,7 @@ end
 %----------------------------------------------------------- compute ik rig
 function Rig = computeFK(Rig,q,varargin)
     
-    Rig = Rig.reset();    
+    Rig   = Rig.reset();    
     Rig.g = Rig.FK(q);
 
     s = Rig.Domain;
@@ -166,7 +171,19 @@ function Rig = computeFK(Rig,q,varargin)
     end
     
     for ii = 1:length(Rig.List)
-        Rig.List{ii} = Blender(Rig.List{ii},'SE3', Rig.g0);
+        
+        if ~isempty(Rig.g00)
+            Rig.List{ii} = Blender(Rig.List{ii},'SE3',Rig.g00);
+        end
+        
+        if ~isempty(Rig.CPattern)
+        if ii == Rig.CPattern{1}
+            Rig.List{ii} = Blender(Rig.List{ii},'CArray',...
+                    Rig.CPattern{2}(:));
+        end
+        end
+        
+        Rig.List{ii} = Blender(Rig.List{ii},'SE3',Rig.g0);
     end
        
 end
@@ -269,7 +286,8 @@ function Rig = render(Rig)
     
    for ii = 1:length(Rig.List)
        if Rig.ListDraw{ii}
-        Rig.List{ii}.bake().render();
+        Rig.List{ii}.bake();
+        Rig.List{ii}.render();
        end
    end
    

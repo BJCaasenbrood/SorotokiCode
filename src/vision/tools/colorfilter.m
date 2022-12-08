@@ -15,9 +15,13 @@ function [I,mask] = colorfilter(image, range)
         % Regular case
         mask = (I(:,:,1)>range(1)) & (I(:,:,1)<range(2));
     end
+
+    masksat = I(:,:,2)>=0.5;
+    mask = masksat.*mask;
     
     % Saturation is modified according to the mask
     I(:,:,2) = mask .* I(:,:,2);
+    I(:,:,3) = mask .* I(:,:,3);
     
     % HSV to RGB conversion
     I = hsv2rgb(I);

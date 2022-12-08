@@ -1,5 +1,10 @@
 function C = linspacen(A,B,n)
-
+% LINESPACEN.m is an extension to LINESPACE.m but for matrixes. Usage:
+%   A = rand(3,3);
+%   B = eye(3);
+%   X = linspacen(A,B,100);
+%
+%   Last edit Dec 3, 2022
 N = size(A);
 
 if ~all(size(A)==size(B)), error('A and B should be the same size'); end

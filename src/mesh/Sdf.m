@@ -10,6 +10,9 @@ classdef Sdf
         Element;
         Sample;
         Quality;
+        Velocity;
+        Rotation;
+        Center;
     end
     
 %--------------------------------------------------------------------------    
@@ -17,16 +20,23 @@ classdef Sdf
 %---------------------------------------------------- Signed Distance Class     
         function obj = Sdf(fnc,varargin)
             obj.sdf = @(x) [fnc(x),fnc(x)];
-            obj.cmap = redgreen;
+            obj.cmap = viridis;
             obj.Quality = 50;
+            obj.Velocity = zeros(6,1);
             for ii = 1:2:length(varargin)
                 obj.(varargin{ii}) = varargin{ii+1};
-            end
+            end           
         end
 %-------------------------------------------------------------------- union
         function r = plus(obj1,obj2)
-            fnc = @(x) dUnion(obj1.sdf(x),obj2.sdf(x));
-            r = Sdf(fnc);
+            if ~isempty(obj2)
+                fnc = @(x) dUnion(obj1.sdf(x),obj2.sdf(x));
+                r = Sdf(fnc);
+            else
+                r = obj1;
+                obj2 = obj1;
+            end
+            
             B1 = box2node(obj1.BdBox); 
             B2 = box2node(obj2.BdBox);
             
@@ -38,6 +48,8 @@ classdef Sdf
                 B = [box2node(obj1.BdBox); box2node(obj2.BdBox)];
                 r.BdBox = boxhull(B);
             end
+            
+            r.BdBox = (r.BdBox(:)).';
         end
 %--------------------------------------------------------------- difference        
         function r = minus(obj1,varargin)
@@ -64,7 +76,7 @@ classdef Sdf
         end
 %---------------------------------------------------------------- intersect                
         function r = repeat(obj,dX,varargin)
-            if isempty(varargin),
+            if isempty(varargin)
                 N = 2;
             else
                 N = varargin{1};
@@ -86,16 +98,19 @@ classdef Sdf
         function r = transpose(obj1)
             
             B = obj1.BdBox;
+            C = obj1.Center; 
             if numel(B) == 4
                 fnc = @(x) obj1.sdf([x(:,2),x(:,1)]);
                 r = Sdf(fnc);
                 r.BdBox = [B(3), B(4), B(1), B(2)];
                 r.Node = [obj1.Node(:,2), obj1.Node(:,1)];
+                r.Center = [C(2),C(1)];
                 r.Element = obj1.Element;
             else
                 fnc = @(x) obj1.sdf([x(:,2),x(:,3),x(:,1)]);
                 r = Sdf(fnc);
                 r.BdBox = [B(5), B(6), B(3), B(4), B(1), B(2)];
+                r.Center = [C(3),C(2),C(1)];
 %                 r.Node = [obj1.Node(:,2), obj1.Node(:,3), obj1.Node(:,1)];
 %                 r.BdBox = boxhull(r.Node);
 %                 r.Element = obj1.Element;
@@ -106,37 +121,51 @@ classdef Sdf
         function r = translate(obj1,move)
             
            B = obj1.BdBox; 
+           %C = obj1.Center; 
            if numel(move) == 2
-               y = @(x) x - repmat(move(:)',length(x),1);
+               y = @(x) x - repmat(move(:)',size(x,1),1);
                fnc = @(x) obj1.sdf(y(x));
                r = Sdf(fnc);
                r.BdBox = [B(1)+move(1), B(2)+move(2),...
                           B(3)+move(1), B(4)+move(2)];
-               r.Node = [obj1.Node(:,1)+move(1), obj1.Node(:,2)+move(2)];
-               r.Element = obj1.Element;
+               %r.Center= [C(1)+move(1);C(2)+move(2)];       
            else
-               y = @(x) x - repmat(move(:)',length(x),1);
+               y = @(x) x - repmat(move(:)',size(x,1),1);
                fnc = @(x) obj1.sdf(y(x));
                r = Sdf(fnc);
                r.BdBox = [B(1)+move(1), B(2)+move(1),...
                           B(3)+move(2), B(4)+move(2),...
                           B(5)+move(3), B(6)+move(3)];
-%                r.Node = [obj1.Node(:,1)+move(1), obj1.Node(:,2)+move(2),...
-%                    obj1.Node(:,3)+move(3)];
-%                r.Element = obj1.Element;
+               %r.Center= [C(1)+move(1);C(2)+move(2);C(3)+move(3)];       
            end
            
         end        
 %----------------------------------------------------------- rotate X <-> Y              
         function r = rotate(obj1,varargin)
-            if isempty(varargin), k = pi/2;
-            else, k = varargin{1};
+            
+            Rot = [];
+            if isempty(varargin)
+                k = pi/2;
+            else
+                if isa(varargin{1},'char')
+                    Rot = varargin{1};
+                    k = deg2rad(varargin{2});
+                else
+                    k = deg2rad(varargin{1});
+                    Rot = '';
+                end
             end
-            R = TwoDRotation(k);
+            
+            switch(Rot)
+                case('x'), R = rotx(k);
+                case('y'), R = roty(k);
+                case('z'), R = rotz(k);
+                otherwise, R = rot2d(k);
+            end
+            
             fnc = @(x) obj1.sdf((R*x.').');
             r = Sdf(fnc);
-            B = obj1.BdBox;
-            BB = [B(1),B(3);B(1),B(4);B(2),B(3);B(2),B(4)];
+            BB = box2node(obj1.BdBox);
             
             r.BdBox = boxhull((R*BB.').').';
         end        
@@ -181,6 +210,23 @@ classdef Sdf
             end
         end          
 %----------------------------------------------------------- rotate X <-> Y    
+        function r = extrude(obj1,varargin)
+            
+            if numel(varargin) == 1
+                z1 = 0;
+                z2 = varargin{1};
+            else
+                z1 = varargin{1};
+                z2 = varargin{2};
+            end
+            
+            fnc = @(x) max([obj1.sdf(x(:,1:2)),...
+                z1-x(:,3)+1e-12, x(:,3)-z2],[],2);
+            r = Sdf(fnc);
+            r.BdBox = [obj1.BdBox,z1,z2];
+            r.Center = [obj1.Center;mean([z1;z2])];
+        end
+%----------------------------------------------------------- rotate X <-> Y    
         function r = shell(obj,T)
             fnc = @(x) abs(obj.sdf(x)) - T/2;
             r = Sdf(fnc);
@@ -191,7 +237,7 @@ classdef Sdf
                        B(5)-T/2,B(6)+T/2];
             else
             r.BdBox = [B(1)-T/2,B(2)+T/2,...
-                       B(3)-T/2,B(4)+T/2]
+                       B(3)-T/2,B(4)+T/2];
             end
         end
     end
@@ -199,15 +245,25 @@ classdef Sdf
 methods (Access = public)
 %--------------------------------------------------------- evalution of SDF
 function d = eval(Sdf,x)
+if ~isempty(Sdf.Rotation)
+   R = rot3d(Sdf.Rotation);
+   x = (R*x.').';
+end
+    
 d = Sdf.sdf(x);
 end
 %--------------------------------------------------------- evalution of SDF
-function y = intersect(Sdf,x)
+function y = intersect(Sdf,x,varargin)
+if isempty(varargin)
+    delta = 0;
+else
+    delta = varargin{1} ;
+end
 d = Sdf.sdf(x);
-y = d(:,end)<0;
+y = d(:,end)<delta;
 end
 %--------------------------------------------------------- evalution of SDF
-function [Nds,X,Y] = sampleSet(Sdf,Quality)
+function [Nds,X,Y] = sampleSet(Sdf)
 if nargin < 2
     if numel(Sdf.BdBox) < 6, Sdf.Quality = 250;
     else, Sdf.Quality = 50;
@@ -218,7 +274,6 @@ x = linspace(Sdf.BdBox(1),Sdf.BdBox(2),Sdf.Quality);
 y = linspace(Sdf.BdBox(3),Sdf.BdBox(4),Sdf.Quality);
 [X,Y] = meshgrid(x,y);
 Nds = [X(:), Y(:)];
-
 end
 %------------------------------------------------- evalution of tangent SDF
 function [T,N,B,Z] = normal(Sdf,x)
@@ -242,20 +297,56 @@ else
     %N = [n1(:,end),n2(:,end),n3(:,end)];
 end
 
-N = N./sqrt((sum((N.^2),2)));
+N = N./sqrt((sum((N.^2),2)) + 1e-3 );
 T = ([0,1,0;-1,0,0;0,0,1]*N.').';
 B = cross(T,N);
 Z = atan2(N(:,2).*sign(-d(:,end)),N(:,1).*sign(-d(:,end)));
     
 end
+%------------------------------------------------- evalution of tangent SDF
+function C = centerofmass(Sdf)
+    
+    C = zeros(numel(Sdf.BdBox)/2,1);
+    x = linspace(Sdf.BdBox(1),Sdf.BdBox(2),Sdf.Quality);
+    y = linspace(Sdf.BdBox(3),Sdf.BdBox(4),Sdf.Quality);
+    if numel(Sdf.BdBox) < 6
+        [X,Y] = meshgrid(x,y);
+        V =  [X(:),Y(:)];
+    else
+        z = linspace(Sdf.BdBox(5),Sdf.BdBox(6),Sdf.Quality);
+        [X,Y,Z] = meshgrid(x,y,z);
+        V = [X(:),Y(:),Z(:)];
+    end
+    
+    I = Sdf.intersect(V);
+    
+    for ii = 1:numel(C)
+       C(ii) = mean(V(I,ii));
+    end
+    
+end
+%-------------------------------------------- find closest point on surface
+function P = surfaceproject(Sdf,p0)
+
+P = zeros(size(p0));
+
+for ii = 1:size(p0,1)
+    Nd = p0(ii,:);
+    Dist = 1e3;
+    while abs(Dist) > 1e-2
+        D = eval(Sdf,[Nd]); 
+        [~,N] = normal(Sdf,[Nd;Nd]);
+        Dist = D(end);
+        Nd = Nd - 0.5*N(end,:)*Dist;
+    end
+    
+    P(ii,:) = Nd;
+end
+    
+end
 %--------------------------------------------------------------------- show
 function show(Sdf,varargin)
 %     
-%     if nargin < 2 
-%         if numel(Sdf.BdBox) < 6, Quality = 250;
-%         else, Quality = 50;
-%         end
-%     end
 
     for ii = 1:2:length(varargin)
         Sdf.(varargin{ii}) = varargin{ii+1};
@@ -268,26 +359,24 @@ function show(Sdf,varargin)
         [X,Y] = meshgrid(x,y);
 
         D = Sdf.eval([X(:),Y(:)]);
-        D = abs(D(:,end)).^(0.5).*sign(D(:,end));
+        D = abs(D(:,end)).^(0.75).*sign(D(:,end));
         
         figure(101);
         cplane(X,Y,reshape(D,[Sdf.Quality Sdf.Quality])-1e-6);
         axis equal; hold on;
         
         if isempty(Sdf.Element)
-            contour3(X,Y,reshape(D,[Sdf.Quality Sdf.Quality]),[0 0],'linewidth',...
+            contour3(X,Y,reshape(D,[Sdf.Quality Sdf.Quality]),...
+                [0 0],'linewidth',...
                 2.5,'Color','w');
         else
             patch('Vertices',Sdf.Node,'Faces',Sdf.Element,...
                 'LineW',2.5,'EdgeColor','w');
         end
         
-        cmax = max(abs(D));
-        caxis([-cmax,1.25*cmax]);
         axis(Sdf.BdBox);
         colormap(Sdf.cmap);
         view(0,90);
-        
     else
         z = linspace(Sdf.BdBox(5),Sdf.BdBox(6),Sdf.Quality);
         [X,Y,Z] = meshgrid(x,y,z);
@@ -303,44 +392,49 @@ function show(Sdf,varargin)
         colormap(Sdf.cmap);
     end
 end
-
+%------------------------------------------------------------ show skeleton
 function skeleton(Sdf)
     patch('Vertices',Sdf.Node,'Faces',Sdf.Element,...
                 'LineW',2.5,'EdgeColor',col(1),'FaceColor','none');
 end
-
 %------------------------------------------------------------- show contour
-function showcontour(Sdf,Quality)
-    if nargin < 2 
-        if numel(Sdf.BdBox) < 6
-            Quality = 250;
-        else
-            Quality = 25;
-        end
+function showcontour(Sdf,varargin)
+    
+    
+     for ii = 1:2:length(varargin)
+        Sdf.(varargin{ii}) = varargin{ii+1};
     end
     
-    x = linspace(Sdf.BdBox(1),Sdf.BdBox(2),Quality);
-    y = linspace(Sdf.BdBox(3),Sdf.BdBox(4),Quality);
+    x = linspace(Sdf.BdBox(1),Sdf.BdBox(2),Sdf.Quality);
+    y = linspace(Sdf.BdBox(3),Sdf.BdBox(4),Sdf.Quality);
     
     if numel(Sdf.BdBox) < 6
+
         [X,Y] = meshgrid(x,y);
 
         D = Sdf.eval([X(:),Y(:)]);
-        D = D(:,end);
+        D = abs(D(:,end)).^(0.75).*sign(D(:,end));
         
-        %figure(101);
-        contour3(X,Y,reshape(D,[Quality Quality]),[0 0],'linewidth',...
-            2,'Color','k'); hold on;
+        %D(D<=0)   = 0;
+        D(D>1e-6) = NaN;
         
-        D(D<=0) = 0;
-        D(D>1e-6)  = NaN;
+        figure(101);
+        cplane(X,Y,reshape(D,[Sdf.Quality Sdf.Quality])-1e-6);
+        axis equal; hold on;
         
-        cplane(X,Y,reshape(D,[Quality Quality]));
-        %axis equal; 
+        if isempty(Sdf.Element)
+            contour3(X,Y,reshape(D,[Sdf.Quality Sdf.Quality]),...
+                [0 0],'linewidth',...
+                2.5,'Color','w');
+        else
+            patch('Vertices',Sdf.Node,'Faces',Sdf.Element,...
+                'LineW',2.5,'EdgeColor','w');
+        end
         
-        
+        axis(Sdf.BdBox);
         colormap(Sdf.cmap);
-        caxis([-1 1]);
+        view(0,90);
+        
     else
         hold on;
         patch('Vertices',Sdf.Node,'Faces',Sdf.Element,...
@@ -354,9 +448,10 @@ methods (Access = private)
 end
 end
 
-function [R] = TwoDRotation(x)
+function [R] = rot2d(x)
 R = [cos(x),sin(x);-sin(x),cos(x)];
 end
+
 function BdBox = boxhull(Node,eps)
 if nargin < 2, eps = 1e-6; end
 

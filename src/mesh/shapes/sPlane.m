@@ -1,4 +1,4 @@
-function sdf = sCube(x1,x2,y1,y2,z1,z2)
+function sdf = sPlane(x1,x2,y1,y2,z1,z2)
 if nargin < 2
     if numel(x1) == 1
         a = x1; x1 = -a; x2 = a; 

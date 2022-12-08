@@ -15,6 +15,7 @@ classdef Mesh
 
     properties (Access = public)
         SDF;
+        SDF0;
         BdBox;
         Node;
         Element;
@@ -80,7 +81,6 @@ function obj = Mesh(Input,varargin)
     obj.Type         = 'C2PX';
     obj.Image        = [];
     obj.SimplifyTol  = 0.05;
-    obj.Hmesh        = 0.05;
     obj.STLFile      = [];
     
     if isa(Input,'char')
@@ -96,6 +96,9 @@ function obj = Mesh(Input,varargin)
            warning on  
            Input = v;
            varargin{1} = f;
+           obj.STLFile = struct;
+           obj.STLFile.Node    = v;
+           obj.STLFile.Element = f;
        elseif strcmp(ext,'.obj')
            [v,f] = objreader(Input);
        elseif strcmp(ext,'.png') 
@@ -115,7 +118,7 @@ function obj = Mesh(Input,varargin)
     end
        
     if isa(Input,'double')
-       if (size(Input,2) ~= 2) && (size(Input,2) ~= 3),
+       if (size(Input,2) ~= 2) && (size(Input,2) ~= 3)
            error('First input should be a Nx2 or Nx3 matrix');
        end
        
@@ -156,7 +159,8 @@ function obj = Mesh(Input,varargin)
        obj.NElem = 200;
        
     elseif isa(Input,'Sdf')
-       obj.SDF = @(x) Input.eval(x);
+       obj.SDF0 = Input;
+       obj.SDF  = @(x) Input.eval(x);
        obj.NElem = 200;
        if ~isempty(Input.BdBox)
           obj.BdBox = Input.BdBox;
@@ -272,6 +276,8 @@ elseif strcmp(Mesh.Type,'C2Q4')
     else
         return;
     end
+elseif ~isempty(Mesh.STLFile)
+    return;
 else
     %Mesh.MaxIteration = 1;
     Pc = Mesh.Center; 
@@ -327,10 +333,18 @@ while flag == 0
   Mesh.Iteration = Mesh.Iteration + 1;
   
   if Mesh.Movie
-     Mesh.Center = Pc;
-     Mesh.Node = v;
-     Mesh.Element = f(1:Mesh.NElem);
-     Mesh = show(Mesh,'Velocity');
+      [Pc,A] = computeCentroid(Mesh,f,v);
+      
+      Mesh.Center  = Pc;
+      Mesh.Node    = v;
+      Mesh.Element = f(1:Mesh.NElem);
+      Mesh.NNode   = length(v);
+      Mesh.Area    = A;
+      
+      Mesh = ElementAdjecency(Mesh);
+      show(Mesh,'Area');
+      hold on;
+      plot(Pc(:,1),Pc(:,2),'k.','MarkerSize',10);
   end
   
 end
@@ -339,11 +353,15 @@ f = f(1:Mesh.NElem);
 
 [v,f] = RemoveDuplicates(Mesh,v,f);
 [v,f] = ExtractNode(Mesh,v,f);
+
 if Mesh.Dim < 3
-[v,f] = CollapseEdges(Mesh,v,f); 
-[v,f] = ResequenceNodes(Mesh,v,f);
+    [v,f] = CollapseEdges(Mesh,v,f); 
+    [v,f] = ResequenceNodes(Mesh,v,f);
 end
-if strcmp(Mesh.Type,'C3H8'), [v,f] = HexahedronOrder(Mesh,v,f); end
+
+if strcmp(Mesh.Type,'C3H8')
+    [v,f] = HexahedronOrder(Mesh,v,f);
+end
 
 if Mesh.Triangulate
     Mesh.Node    = v;
@@ -422,13 +440,14 @@ end
 
 end
 %---------------------------------------------------------------- show mesh
-function Mesh = show(Mesh,varargin)
+function h = show(Mesh,varargin)
 if nargin<2, Request = -1; 
 else, Request = varargin{1}; end
 
 figure(101);
 
 % generate elemental matrices for plotting
+AreaC = sum(abs(Mesh.Area(:)))/(0.5*Mesh.NElem)+1e-3;
 Mesh = ElementAdjecency(Mesh);
 fs = 'flat';
 
@@ -439,6 +458,7 @@ switch(Request)
     case('Node'),     Z = varargin{2};
     case('Element'),  Z = varargin{2};
     case('Holes'),    Z = zeros(Mesh.NNode,1);
+    case('Area'),     Z = abs(Mesh.Area); caxis([0, AreaC]);
     otherwise;        Z = zeros(Mesh.NNode,1);
 end
 
@@ -448,13 +468,13 @@ if ~strcmp(Request,'Node') && ~strcmp(Request,'Element') ...
 cla; axis equal; axis off; hold on;
     
 % plot tesselation
-patch('Faces',Mesh.ElemMat,'Vertices',Mesh.Node,'FaceVertexCData',Z,...
+h{1} = patch('Faces',Mesh.ElemMat,'Vertices',Mesh.Node,'FaceVertexCData',Z,...
     'Facecolor',fs,'LineStyle',Mesh.LineStyle,'Linewidth',1.5,...
     'EdgeColor','k');
 
 % plot boundaries
-patch('Faces',Mesh.Boundary,'Vertices',Mesh.Node,'LineStyle','-',...
-    'Linewidth',2,'EdgeColor','k');
+h{2} = patch('Faces',Mesh.Boundary,'Vertices',Mesh.Node,'LineStyle','-',...
+    'Linewidth',1.5,'EdgeColor','k');
 
 hold on;
 
@@ -485,17 +505,6 @@ end
 
 axis(Mesh.BdBox); axis tight;
 colormap(Mesh.Colormap);
-drawnow;
-
-if Mesh.Movie 
-    background(gitpage);
-    if Mesh.MovieStart == false
-       Mesh.MovieStart = true;
-       MovieMaker(Mesh,'mesh','Start');
-    else
-       MovieMaker(Mesh,'mesh','');
-    end
-end
 
 end
 %----------------------------------------------------------------- show SDF
@@ -985,10 +994,16 @@ function [Node,Element] = GenerateMeshImage(Mesh,Image)
             %plot(Xscale*c_red(:,1), (Yscale)*c_red(:,2),'k.-'); hold on;
         end
     end
-
+    
+    if isempty(Mesh.Hmesh)
+        AreaBd = (B(2)-B(1))*(B(4)-B(3));
+        Hmin = sqrt(AreaBd/Mesh.NElem);
+        Hmax = 1.5*sqrt(AreaBd/Mesh.NElem);
+        Mesh.Hmesh = [1,Hmin,Hmax];
+    end
+    
     H = Mesh.Hmesh;
-    %axis equal; drawnow;    
-    %pause();
+
     Tesselation = triangulationCreate(c_cell, H(1), H(2), H(3),...
         Mesh.MatlabMeshType);
     
@@ -1138,28 +1153,6 @@ end
 fprintf(' %i  \t| %1.3e | %1.3e |\n',...
     Mesh.Iteration,Mesh.Convergence(end),max(Mesh.Velocity));   
 end
-end
-
-end
-
-%-------------------------------------------------------------- movie maker
-function MovieMaker(Mesh,Name,Request)
-if nargin < 2, Request = ''; end
-
-if Mesh.Movie
-    switch(Request)
-        case('Start')
-            filename = string([Name,'_', char(datetime(now,...
-                              'ConvertFrom','datenum')),'.gif']);
-            
-            filename = erase(filename,[":"," "]);
-            background(gitpage); drawnow;
-            gif(char(filename),'frame',gcf,'nodither','Timestep',1/12);
-        otherwise
-            background(gitpage);
-            drawnow;
-            gif;
-    end
 end
 
 end

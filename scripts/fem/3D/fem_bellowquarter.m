@@ -9,7 +9,7 @@ fem.Material = NeoHookeanMaterial();
 
 %%
 fem = fem.addSupport(fem.FindNodes('Bottom'),[1,1,1]);
-fem = fem.addDisplace(fem.FindNodes('Top'),[0,0,12]);
+fem = fem.addTendon(fem.FindNodes('Top'),[0,0,20e-4]);
 
 %%
 fem.solve();

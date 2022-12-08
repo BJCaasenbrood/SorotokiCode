@@ -16,7 +16,7 @@ fem = Fem(msh,'VolumeInfill',0.33,'Penal',4,'FilterRadius',H/10,...
               'MaxIterationMMA',70,'ChangeMax',0.05,'Movie',0);
 
 %% set spatial settings
-fem = fem.set('Periodic',[0, 0],'Repeat',[ones(9,1)]);
+fem = fem.set('Periodic',[0.5, 0],'Repeat',[ones(1,1)]);
 
 %% add boundary condition
 id = fem.FindNodes('Left'); 
@@ -39,8 +39,6 @@ fem = fem.initialTopology('Hole',[W/2,0.5*H],0.25);
 fem.Material = Ecoflex0030();
 
 %% solving
-fem.show('ISO',0.2);
-background(metropolis)
 fem.optimize();
 fem.show('ISO',0.25);
 

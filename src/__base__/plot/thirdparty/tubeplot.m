@@ -1,4 +1,4 @@
-function [x,y,z]=tubeplot(curve,r,n,ct)
+function [x,y,z]=tubeplot(curve,r,n,ct,varargin)
 % Usage: [x,y,z]=tubeplot(curve,r,n,ct)
 % 
 % Tubeplot constructs a tube, or warped cylinder, along
@@ -19,6 +19,9 @@ function [x,y,z]=tubeplot(curve,r,n,ct)
 %
 % The algorithms fails if you have bends beyond 90 degrees.
 % Janus H. Wesenberg, july 2004
+% Modified 14 Nov, 2022 - Brandon Caasenbrood
+% re     the radius at the end
+%
 
   if nargin<3 || isempty(n), n=8;
      if nargin<2, error('Give at least curve and radius');
@@ -30,7 +33,16 @@ function [x,y,z]=tubeplot(curve,r,n,ct)
   if nargin<4 || isempty(ct)
     ct=0.5*r;
   end
-
+  
+  if isempty(varargin) 
+      re = r;
+  else
+      if ~isempty(varargin{1})
+        re = varargin{1};
+      else
+        re = r;
+      end
+  end
   
   %Collapse points within 0.5 r of each other
   npoints=1;
@@ -56,9 +68,18 @@ function [x,y,z]=tubeplot(curve,r,n,ct)
 
   xyz=repmat([0],[3,n+1,npoints+2]);
   
+  X = linspace(0,2*pi,n+1);
+  
+  Fx = cos(X);
+  Fy = sin(X);
+  
+  Fx = (1+1/8*sin(2*X).^2)*cos(X)
+  
   %precalculate cos and sing factors:
-  cfact=repmat(cos(linspace(0,2*pi,n+1)),[3,1]);
-  sfact=repmat(sin(linspace(0,2*pi,n+1)),[3,1]);
+  cfact=repmat(Fx,[3,1]);
+  sfact=repmat(Fy,[3,1]);
+  
+  R = linspace(r,re,npoints);
   
   %Main loop: propagate the normal (nvec) along the tube
   for k=1:npoints
@@ -68,13 +89,13 @@ function [x,y,z]=tubeplot(curve,r,n,ct)
     nvec=nvec./norm(nvec);
     %update xyz:
     xyz(:,:,k+1)=repmat(curve(:,k),[1,n+1])+...
-        cfact.*repmat(r*nvec,[1,n+1])...
-        +sfact.*repmat(r*convec,[1,n+1]);
+        cfact.*repmat(R(k)*nvec,[1,n+1])...
+        +sfact.*repmat(R(k)*convec,[1,n+1]);
   end;
   
   %finally, cap the ends:
-  xyz(:,:,1)=repmat(curve(:,1),[1,n+1]);
-  xyz(:,:,end)=repmat(curve(:,end),[1,n+1]);
+  xyz(:,:,1)   =repmat(curve(:,1),[1,n+1]);
+  xyz(:,:,end) =repmat(curve(:,end),[1,n+1]);
   
   %,extract results:
   x=squeeze(xyz(1,:,:));

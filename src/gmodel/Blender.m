@@ -16,6 +16,7 @@ switch(Request)
     case('SO3');          x = SO3Mesh(x,Arg);
     case('SE3x');         x = SE3MeshXTangent(x,Arg);
     case('Twist');        x = TwistMesh(x,Arg);
+    case('CArray');       x = CopyRotate(x,Arg);
 end
 
 end
@@ -43,18 +44,23 @@ end
 %--------------------------------------------------------------- SCALE MESH
 function mesh = TranslateMesh(mesh,Arg)
 
-Ax = Arg{1};
-Move  = Arg{2};
+if ~isfloat(Arg)
+    Ax    = Arg{1};
+    Move  = Arg{2};
+else
+    Move = Arg;
+    Ax = '3D';
+end
 Node0 = mesh.Node;
-Node = Node0;
+Node  = Node0;
 
 if strcmp(Ax,'x'),     Node(:,1) = Node0(:,1) + Move;
 elseif strcmp(Ax,'y'), Node(:,2) = Node0(:,2) + Move;
 elseif strcmp(Ax,'z'), Node(:,3) = Node0(:,3) + Move;
 elseif strcmp(Ax,'3D')
-    dx  = Arg{2}; Node(:,1) = Node0(:,1) + dx;
-    dy  = Arg{3}; Node(:,2) = Node0(:,2) + dy;
-    dz  = Arg{4}; Node(:,3) = Node0(:,3) + dz;  
+    Node(:,1) = Node0(:,1) + Move(1);
+    Node(:,2) = Node0(:,2) + Move(2);
+    Node(:,3) = Node0(:,3) + Move(3);
 else, Node(:,3) = Node0(:,3) + Move;
 end
 
@@ -63,7 +69,7 @@ mesh.Node = Node;
 end
 %-------------------------------------------------------------- ROTATE MESH
 function mesh = RotateMesh(mesh,Arg)
-Ax = Arg{1};
+Ax  = Arg{1};
 dr  = Arg{2}*(pi/180);
 Node0 = mesh.Node;
 
@@ -94,9 +100,11 @@ elseif strcmp(Ax,'3D')
     R(3,3) =  c_2*c_3;
 end
 
-if size(Node0,2) == 2,
+if size(Node0,2) == 2
     R = R(2:3,2:3);
 end
+
+%VBox = mesh.BdBox;
 
 Node = transpose(R*(Node0')); 
 mesh.Node = Node;
@@ -148,7 +156,7 @@ Node0 = mesh.Node;
 mesh.set('Node0',Node0);
 end
 %-------------------------------------------------------------- ROTATE MESH
-function mesh = SE3Mesh(mesh,Arg)
+function [mesh, H] = SE3Mesh(mesh,Arg)
 Node0 = [mesh.Node, ones(mesh.NNode,1)]; 
 
 % R = quat2rot(Arg(1:4));
@@ -162,7 +170,7 @@ Node = H*Node0.';
 mesh.Node = Node(1:3,:).';
 end
 %-------------------------------------------------------------- ROTATE MESH
-function mesh = SO3Mesh(mesh,Arg)
+function [mesh, R] = SO3Mesh(mesh,Arg)
 Node0 = [mesh.Node]; 
 
 R = Arg;
@@ -170,7 +178,7 @@ Node = R*Node0.';
 mesh.Node = Node.';
 end
 %-------------------------------------------------------------- ROTATE MESH
-function mesh = SE3MeshXTangent(mesh,Arg)
+function [mesh, H] = SE3MeshXTangent(mesh,Arg)
 Node0 = [mesh.Node, ones(mesh.NNode,1)]; 
 
 % R = Quat2Rot(Arg(1:4));
@@ -206,7 +214,7 @@ elseif strcmp(Ax,'y')
 elseif strcmp(Ax,'z')
     Node(:,3) = Scale*Node0(:,3);
     Node(:,3) = Node(:,3);% - min(Node0(:,3));
-elseif strcmp(Ax,'axi')
+elseif strcmp(Ax,'axi') || strcmp(Ax,'xy')
     Node(:,1) = Scale*Node0(:,1);
     Node(:,1) = Node(:,1);  
     Node(:,2) = Scale*Node0(:,2);
@@ -231,25 +239,27 @@ for ii = 1:length(Node0)
     v = Node0(ii,:);
     vx = v(1);
     vy = v(2);
+    if v(3) > 0
     id = List(ii);
     
     p1 = [vx; vy; 0];
     p0 = (Swp([3,2,1].',4,id));    %[Swp(id,7);Swp(id,6);Swp(id,5)];
     R  = rot90(Swp(1:3,1:3,id),2); %Quat2Rot(Swp(id,1:4)).';
-    %R = [R(:,3),R(:,2),R(:,1)];
-    
+
     H0 = [R,p0;0,0,0,1];
     H1 = [eye(3),p1;0,0,0,1];
     
     H = H0*H1;
     V(ii,:) = reshape(H(1:3,4),1,3);
+    else
+        V(ii,:) = [vx,vy,v(3)];
+    end
 end
 
 % fixes cosserat frame
 mesh.Node = V;
 
 end
-
 %--------------------------------------------------------------- SCALE MESH
 function [mesh, H0] = LoftMesh(mesh,Scale)
 
@@ -290,7 +300,6 @@ end
 mesh.Node = V;
 
 end
-
 %---------------------------------------------------------------- CURL MESH
 function [mesh, H] = CurveMesh(mesh,Arg)
 
@@ -371,6 +380,49 @@ end
 mesh.Node = Node;
 
 end
+
+function mesh = CopyRotate(mesh,Arg)
+
+Ax    = Arg{1};
+Num   = Arg{2};
+dth   = 2*pi/(Num);
+Node0 = mesh.Node;
+NNode = mesh.NNode;
+Elem0 = mesh.Element;
+
+if strcmp(Ax,'x')
+    R = @(dr) [1,0,0; 0, cos(dr),-sin(dr); 0, sin(dr), cos(dr)];
+elseif strcmp(Ax,'y')
+    R = @(dr) [cos(dr), 0,-sin(dr);0,1,0;sin(dr), 0, cos(dr)];
+elseif strcmp(Ax,'z')
+    R = @(dr) [cos(dr),-sin(dr), 0; sin(dr), cos(dr), 0; 0,0,1];
+end
+
+for ii = 1:Num-1
+    V = (R(dth*ii)*mesh.Node.').';
+    Node0 = [Node0; V];
+    Elem0 = [Elem0; mesh.Element+ii*NNode];
+end
+
+v = Node0;
+f = Elem0;
+mesh.NNode = size(Node0,1);
+
+[vn,fn] = TriangleNormalFast_mex(Node0,Elem0);
+
+mesh.Node = v;
+mesh.Element = f;
+mesh.set('VNormal',-vn);
+mesh.set('Normal',fn);
+mesh.set('BdBox',boxhull(mesh.Node));    
+mesh.NNode = size(v,1);
+mesh.NElem = size(f,1);
+%mesh = mesh.bake;
+
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %------------------------------------------------------- CURVATURE OPERATOR 
 function [V, H0] = CurveCellOperation(Node,kx,ky)
 

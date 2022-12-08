@@ -12,6 +12,9 @@ elseif numel(X) == 9
     else
        p = zeros(3,1); 
     end
+elseif numel(X) == 16
+    R = X(1:3,1:3);
+    p = X(1:3,4);    
 end
 
 Rt = R.';

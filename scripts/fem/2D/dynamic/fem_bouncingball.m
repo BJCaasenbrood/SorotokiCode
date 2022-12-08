@@ -1,42 +1,25 @@
 clr;
 %% mesh
+Y0 = 25;
 
-sdf = sCircle(18,25,5) - sCircle(18,25,3.75);
+sdf = sCircle(18,Y0,5) - sCircle(18,Y0,3.5);
 msh = Mesh(sdf,'NElem',50);
 msh = msh.generate();
 
-%%
-fem = Fem(msh,'TimeStep',1/1e3,'TimeEnd',1.5,'BdBox',[-35,35,-15,30],...
-    'Linestyle','none');
+%% f%% fem model
+fem = Fem(msh,'TimeStep',1/800,'TimeEnd',1.5,...
+    'BdBox',[-35,35,-15,30],'Linestyle','-');
 
-fem.Material = NeoHookeanMaterial(0.02,0.4);
-fem.Material.Cfr = 3e-6;
+fem.Material = NeoHookeanMaterial(0.1,0.4);
+fem.Material.Rho = fem.Material.Rho;
+fem.Material.Zeta = 1e-6;
+fem.Material.Cfr  = 0.5;
+fem.Material.Rr   = 5;
 
 fem = fem.addGravity();
 fem = fem.addContact(SDF(15),[0,0]);
 
 fem = fem.simulate();
-
-%% movie
-t = fem.Log.t; close all;
-figure(101); clf;
-
-for ii = 1:fps(t,200):numel(t)
-    fem.set('Node',fem.Log.Node{ii});
-    
-    fem.show();
-    caxis([-1e-6 1e-6])
-    drawnow();
-    background(metropolis);
-    
-        
-    if ii == 1
-        gif('soft_bounce.gif','frame',gcf,'nodither');
-    else
-        gif; 
-    end
-
-end
 
 %% Signed distance environment
 function D = SDF(W)
@@ -44,4 +27,5 @@ function D = SDF(W)
     S2 = sLine(W,4,0,-10);
     S3 = sLine(-W,-W,-1,1);
     D = S1 + S2 + S3;
+    %D = sLine(0,-1,0,0);
 end
