@@ -1,24 +1,20 @@
-clr;
 %% mesh
-Y0 = 25;
-
-sdf = sCircle(18,Y0,5) - sCircle(18,Y0,3.5);
-msh = Mesh(sdf,'NElem',50);
+sdf = sCircle(18,25,5) - sCircle(18,25,3.5);
+msh = Mesh(sdf,'NElem',35);
 msh = msh.generate();
 
-%% f%% fem model
-fem = Fem(msh,'TimeStep',1/800,'TimeEnd',1.5,...
-    'BdBox',[-35,35,-15,30],'Linestyle','-');
+%% fem model
+fem = Fem(msh,'TimeStep',1/750);
 
-fem.Material = NeoHookeanMaterial(0.1,0.4);
+fem.Material = NeoHookeanMaterial(0.01,0.49);
 fem.Material.Rho = fem.Material.Rho;
-fem.Material.Zeta = 1e-6;
-fem.Material.Cfr  = 0.5;
+fem.Material.Cfr  = 0.15;
 fem.Material.Rr   = 5;
 
 fem = fem.addGravity();
 fem = fem.addContact(SDF(15),[0,0]);
 
+fig(101,[9.5,9.5]);
 fem = fem.simulate();
 
 %% Signed distance environment
@@ -27,5 +23,4 @@ function D = SDF(W)
     S2 = sLine(W,4,0,-10);
     S3 = sLine(-W,-W,-1,1);
     D = S1 + S2 + S3;
-    %D = sLine(0,-1,0,0);
 end

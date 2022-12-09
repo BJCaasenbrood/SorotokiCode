@@ -418,8 +418,11 @@ if ~isempty(Fem.Contact) && Fem.Dim == 2
         quiver(Fem.Node(:,1),Fem.Node(:,2),Ft(:,1),Ft(:,2),...
             'AutoScale','on','Color',col(2));
     end
-    
 end
+
+    if ~isempty(Fem.MovieAxis)
+        axis(Fem.MovieAxis);
+    end
 end
 
 if flag == 1

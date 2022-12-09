@@ -17,7 +17,7 @@ svm_ = TrueStress;
 lam_ = TrueStrain + 1;
 
 %% plot orignal data
-fig(101,[9.25,9]); plot(lam,svm);
+fig(101,[9.25+.25,9+.25]); plot(lam,svm);
 
 %%
 [~,lb,ub,Pi0] = YHModel(0,[]);
@@ -25,7 +25,7 @@ Model = @(x,Pi) YHModel(x,Pi);
 Obj   = @(Pi) Objective(Model,Pi,lam_,svm_);
 
 format short
-opt = optimoptions(@fmincon,'FiniteDifferenceStepSize',1e-12);
+opt = optimoptions(@fmincon,'FiniteDifferenceStepSize',1e-12,'Algorithm','sqp-legacy');
 x   = fmincon(Obj,Pi0,[],[],[],[],lb,ub,[],opt);
 
 disp('Material parameters');
@@ -52,12 +52,17 @@ C1 = ['C1 = ', num2str(Pi(1),2)];
 C2 = ['C2 = ', num2str(Pi(2),2)];
 C3 = ['C3 = ', num2str(Pi(3),2)];
 
-xlim([0, max(Xd)*1.1]);
+xlim([-0.2,max(Xd)*1.1]);
 ylim([-0.2*max(Yd), max(Yd)*1.1]);
 legend({'Experiment','Model (Yeoh)',C1,C2,C3},'Location','NorthWest');
 xlabel('stretch $\lambda$');
 ylabel('engineering stress $\sigma_{11}$');
 drawnow;
+if Pi(2) == 0 && Pi(3) == 0
+    gif('yy.gif','TimeDelay',1/120,'frame',gcf,'nodither');
+else
+   gif; 
+end
 end
 
 function [y ,y0] = EnrichStrain(x)

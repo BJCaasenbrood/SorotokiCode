@@ -141,13 +141,10 @@
 </a>
 </div>
 <ul class="md-nav__list" data-md-scrollfix="">
-<li class="md-nav__item md-nav__item--active md-nav__item--nested">
-<input checked="" class="md-nav__toggle md-toggle" data-md-toggle="__nav_1" id="__nav_1" type="checkbox"/>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_1" id="__nav_1" type="checkbox"/>
 <div class="md-nav__link md-nav__link--index">
 <a href="..">About Sorotoki</a>
-<label for="__nav_1">
-<span class="md-nav__icon md-icon"></span>
-</label>
 </div>
 <nav aria-label="About Sorotoki" class="md-nav" data-md-level="1">
 <label class="md-nav__title" for="__nav_1">
@@ -155,6 +152,9 @@
           About Sorotoki
         </label>
 <ul class="md-nav__list" data-md-scrollfix="">
+</ul>
+</nav>
+</li>
 <li class="md-nav__item md-nav__item--active">
 <input class="md-nav__toggle md-toggle" data-md-toggle="toc" id="__toc" type="checkbox"/>
 <label class="md-nav__link md-nav__link--active" for="__toc">
@@ -182,8 +182,8 @@
   </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#step-3-run-the-installation-script">
-    Step 3: Run the installation script
+<a class="md-nav__link" href="#step-3-run-the-installation">
+    Step 3: Run the installation
   </a>
 </li>
 <li class="md-nav__item">
@@ -202,36 +202,53 @@
 </ul>
 </nav>
 </li>
-</ul>
-</nav>
-</li>
 <li class="md-nav__item md-nav__item--nested">
-<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" id="__nav_2" type="checkbox"/>
-<label class="md-nav__link" for="__nav_2">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" id="__nav_3" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3">
           Documentation
           <span class="md-nav__icon md-icon"></span>
 </label>
 <nav aria-label="Documentation" class="md-nav" data-md-level="1">
-<label class="md-nav__title" for="__nav_2">
+<label class="md-nav__title" for="__nav_3">
 <span class="md-nav__icon md-icon"></span>
           Documentation
         </label>
 <ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../fem/sdf/">
+        Implicit CAD
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../fem/mesh/">
+        Mesh generation
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../fem/fem/">
+        Finite Elements
+      </a>
+</li>
 <li class="md-nav__item md-nav__item--nested">
-<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_1" id="__nav_2_1" type="checkbox"/>
-<label class="md-nav__link" for="__nav_2_1">
-          Plotting
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_4" id="__nav_3_4" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3_4">
+          Visualization
           <span class="md-nav__icon md-icon"></span>
 </label>
-<nav aria-label="Plotting" class="md-nav" data-md-level="2">
-<label class="md-nav__title" for="__nav_2_1">
+<nav aria-label="Visualization" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_3_4">
 <span class="md-nav__icon md-icon"></span>
-          Plotting
+          Visualization
         </label>
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
 <a class="md-nav__link" href="../plotting/figure/">
         Figures
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../plotting/rendering/">
+        Rendering
       </a>
 </li>
 <li class="md-nav__item">
@@ -251,20 +268,40 @@
 </nav>
 </li>
 <li class="md-nav__item md-nav__item--nested">
-<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" id="__nav_3" type="checkbox"/>
-<label class="md-nav__link" for="__nav_3">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" id="__nav_4" type="checkbox"/>
+<label class="md-nav__link" for="__nav_4">
           Soft Robots
           <span class="md-nav__icon md-icon"></span>
 </label>
 <nav aria-label="Soft Robots" class="md-nav" data-md-level="1">
-<label class="md-nav__title" for="__nav_3">
+<label class="md-nav__title" for="__nav_4">
 <span class="md-nav__icon md-icon"></span>
           Soft Robots
         </label>
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
-<a class="md-nav__link" href="../softmanipulator/">
+<a class="md-nav__link" href="../sorobots/softmanipulator/">
         Soft manipulator
+      </a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" id="__nav_5" type="checkbox"/>
+<label class="md-nav__link" for="__nav_5">
+          Control Interface
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-label="Control Interface" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_5">
+<span class="md-nav__icon md-icon"></span>
+          Control Interface
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../control/controlboard/">
+        VEAB hat (RPi)
       </a>
 </li>
 </ul>
@@ -273,6 +310,11 @@
 <li class="md-nav__item">
 <a class="md-nav__link" href="../contact/">
         Developer(s)
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../release/">
+        Release Notes
       </a>
 </li>
 </ul>
@@ -301,8 +343,8 @@
   </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#step-3-run-the-installation-script">
-    Step 3: Run the installation script
+<a class="md-nav__link" href="#step-3-run-the-installation">
+    Step 3: Run the installation
   </a>
 </li>
 <li class="md-nav__item">
@@ -330,8 +372,8 @@
 </a>
 <h1 id="installation">Installation</h1>
 <p>The toolkit is easy to install. The fastest and easiest way to acquire the toolkit is through <a href="https://git-scm.com/downloads">git</a>. We highly recommend using Git, since this allows you also to update the toolkit. </p>
-<details class="prerequisites">
-<summary>Prerequisites</summary>
+<details class="warning" open="open">
+<summary>Prerequisite toolboxes of MATLAB</summary>
 <p>To use Sorotoki, make sure you have the following dependencies installed:</p>
 <ul>
 <li><a href="https://nl.mathworks.com/products/optimization.html">Optimization Toolbox</a> </li>
@@ -355,7 +397,7 @@
 <p><a class="md-button md-button--primary" href="#">Sorotoki v.2.19.stable (code)</a>
 <a class="md-button md-button--primary" href="#">Sorotoki v.2.19.stable (code + STLs)</a></p>
 </details>
-<h5 id="step-3-run-the-installation-script">Step 3: Run the installation script</h5>
+<h5 id="step-3-run-the-installation">Step 3: Run the installation</h5>
 <p>Once all the prerequisites are (properly) installed, you first have to configure the toolkit with MATLAB's search paths. Setting up these paths is relatively straightforward. Simply run:</p>
 <div class="highlight"><pre><span></span><code><span class="n">sorotoki</span><span class="p">();</span><span class="w"></span>
 </code></pre></div>
@@ -395,13 +437,13 @@
             </div>
 </div>
 </a>
-<a aria-label="Next: Figures" class="md-footer__link md-footer__link--next" href="../plotting/figure/" rel="next">
+<a aria-label="Next: Implicit CAD" class="md-footer__link md-footer__link--next" href="../fem/sdf/" rel="next">
 <div class="md-footer__title">
 <div class="md-ellipsis">
 <span class="md-footer__direction">
                 Next
               </span>
-              Figures
+              Implicit CAD
             </div>
 </div>
 <div class="md-footer__button md-icon">

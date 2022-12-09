@@ -1,8 +1,8 @@
 # Colors
 
-The standard color schemes are not optimized well (in my opinion). Especially when compared to the [MatplotLib](https://matplotlib.org/) in Python. Therefore, Sorotoki comes equipped with a new color scheme.
+The standard color schemes are not optimized well (in my opinon). Especially when compared to the [MatplotLib](https://matplotlib.org/) in Python. Therefore, Sorotoki comes equipped with a new color scheme.
 
-##### Improved color scheme for plotting lines
+##### Improved color scheme
 
 ???+ example "Using Sorotoki color scheme(s)"
     ``` matlab

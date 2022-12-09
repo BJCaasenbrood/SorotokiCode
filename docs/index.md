@@ -8,11 +8,16 @@
 [Sorobots v1.0 (Soft robot STL)](#){ .md-button .md-button--secondary .center}
 [:fontawesome-brands-discord:](https://discord.gg/tXtSMZPM){ .md-button .md-button--secondary .center}
 
+!!! warning "Github page is still under construction. Not all documentation is present at the this stage of development."
+    
+
 ## About Sorotoki
 Sorotoki is an open-source MATLAB toolkit for soft robotics that includes an array of tools for design, modeling, and control. Due to its scientific diversity, it can be challenging for new researchers to quickly familiarize themselves with multiple scientific areas. With the aim to lower this threshold, Sorotoki aims to incorporate multiple layers of soft robotics research into one compact toolkit. Examples include: continuum mechanics, dynamic systems and control theory, topology optimization, computer graphics, and much more to come! The combination provides a highly flexible programming environment and will hopefully aid the development of novel soft robotic research.
 
 ## What can Sorotoki do?
-Sorotoki started out small, but at its current state, it contains a vast collection of functionalities -- tailored towards many aspects of soft robotics. Suppose, for example, you are inspired by the multi-gait soft crawler developed by Shepard et al.[^1] -- <a href="https://www.youtube.com/watch?v=lUyuBOtsDu4">see video</a>. Can we model such a system easily? Well.... Short answer: **no**. As matter of fact, simplifying the (infinite-dimensional) dynamics of soft robots is no easy feat. It has been an active topic of research for the better part of the last two decades.
+Sorotoki started out small, but at its current state, it contains a vast collection of functionalities -- tailored towards many aspects of soft robotics. For example, suppose you are inspired by the multi-gait soft crawler developed by Shepard et al.[^1] -- <a href="https://www.youtube.com/watch?v=lUyuBOtsDu4">See video</a>. Or you want to simulate the incredibly dexterous soft gripper developed by Suzumori et al.[^2] -- <a href="https://www.youtube.com/watch?v=kHGLYRUKWeM&t=100s">See video</a>. Can we model such systems easily? Well.... Short answer: **no**. As matter of fact, simplifying the (infinite-dimensional) dynamics of soft robots is no easy feat. It has been an active topic of research for the better part of the last two decades. Ironically, studying *"soft"* robotics is incredibly *"hard"*.
+
+Sorotoki, however, can simplify the process of design, modeling and control for soft robots. Our aim is to make research into soft robotics more accessable by dividing the problem into smaller, more manageable steps. Multi-physics solvers are included into Sorotoki and can accesses with minimal programming complexity.  
 
 <video width="800" height="310" autoplay controls loop>
 <source src="./assets/fem_crawler.mp4" type="video/mp4">
@@ -26,19 +31,21 @@ Sorotoki started out small, but at its current state, it contains a vast collect
 <video width="300" height="110" autoplay controls loop>
 <source src="./assets/mdl_suzumori_beaker.ogv" type="video/ogg">
 </video>
-<video width="225" height="110" autoplay controls loop>
+<video width="231" height="110" autoplay controls loop>
 <source src="./assets/mdl_suzumori_screw.ogv" type="video/ogg">
 </video>
 </div>
 
-<figcaption>Simulation of multi-gait crawling soft robot undergoing an undulating motion. The model is inspired by the work of Shepard et al. (2011). Original soft robot can be found here:
-<a href="https://www.youtube.com/watch?v=lUyuBOtsDu4">Youtube video</a>
+<figcaption>Simulation of multi-finger soft gripper grasping a beaker and manipulating a M10 boltscrew. The model is inspired by the work of Suzumori et al. (1989). Original soft gripper can be found here:
+<a href="https://www.youtube.com/watch?v=kHGLYRUKWeM&t=100s">Youtube video</a>
 </figcaption>
 
 ??? info "Is it easy to code?"
     Well, absolutely!
 
 [^1]: Shepherd, R. F., Ilievski, F., Choi, W., Morin, S. A., Stokes, A. A., Mazzeo, A. D., ...Whitesides, G. M. (2011). Multigait soft robot. Proc. Natl. Acad. Sci. U.S.A., 22123978. Retrieved from https://pubmed.ncbi.nlm.nih.gov/22123978 doi: [https://doi.org/10.1073/pnas.1116564108 ](https://doi.org/10.1073/pnas.1116564108)
+
+[^2]: Suzumori, K., Iikura, S., & Tanaka, H. (1991). Development of flexible microactuator and its applications to robotic mechanisms. Proceedings. 1991 IEEE International Conference on Robotics and Automation. IEEE. doi: [https://doi.org/10.1109/ROBOT.1991.131850](https://doi.org/10.1109/ROBOT.1991.131850)
 
 ## List of functionalities
 To summarize, some of the functionalities included in the toolkit are listed below:
@@ -59,11 +66,11 @@ To summarize, some of the functionalities included in the toolkit are listed bel
     </video>
     </div>
 
-    A classic example in soft robotics is the PneuNet soft bending actuator. The PneuNet (pneumatic network) belongs to a class of soft actuators that, due to a geometrically induced stiffness differential, undergoes bending when pressurized. The geometry of the PneuNet is developed (and popularized) by Mosadegh et al.[^3] , but historically it is much older[^2]. To model the PneuNet actuator, lets consider the following numerical example. Assuming *plane strain*, we can simulate the nonlinear bending characteristics of the Pneunet actuator using the super-short code below (only 10 lines of code!):
+    A classic example in soft robotics is the PneuNet soft bending actuator. The PneuNet (pneumatic network) belongs to a class of soft actuators that, due to a geometrically induced stiffness differential, undergoes bending when pressurized. The geometry of the PneuNet is developed (and popularized) by Mosadegh et al.[^3] , but historically it is much older[^4]. To model the PneuNet actuator, consider the following numerical example. Assuming *plane strain*, we can simulate the nonlinear bending characteristics of the Pneunet actuator using the super-short code below (only 10 lines of code!):
 
-    [^2]: Mosadegh, B., Polygerinos, P., Keplinger, C., Wennstedt, S., Shepherd, R. F., Gupta, U., ...Whitesides, G. M. (2014). Pneumatic Networks for Soft Robotics that Actuate Rapidly. Adv. Funct. Mater., 24(15), 2163–2170. doi: [https://doi.org/10.1002/adfm.201303288](https://doi.org/10.1002/adfm.201303288)
+    [^3]: Mosadegh, B., Polygerinos, P., Keplinger, C., Wennstedt, S., Shepherd, R. F., Gupta, U., ...Whitesides, G. M. (2014). Pneumatic Networks for Soft Robotics that Actuate Rapidly. Adv. Funct. Mater., 24(15), 2163–2170. doi: [https://doi.org/10.1002/adfm.201303288](https://doi.org/10.1002/adfm.201303288)
 
-    [^3]: 1981 - Robot Arm with Pneumatic Gripper - Nikolai Teleshev (Russian) - cyberneticzoo.com. (2012, April 08). Retrieved from [http://cyberneticzoo.com/bionics/1981-robot-arm-with-pneumatic-gripper-nikolai-teleshev-russian](http://cyberneticzoo.com/bionics/1981-robot-arm-with-pneumatic-gripper-nikolai-teleshev-russian)
+    [^4]: 1981 - Robot Arm with Pneumatic Gripper - Nikolai Teleshev (Russian) - cyberneticzoo.com. (2012, April 08). Retrieved from [http://cyberneticzoo.com/bionics/1981-robot-arm-with-pneumatic-gripper-nikolai-teleshev-russian](http://cyberneticzoo.com/bionics/1981-robot-arm-with-pneumatic-gripper-nikolai-teleshev-russian)
 
     ???+ info "Code for simulation"
         ``` matlab
@@ -95,7 +102,15 @@ To summarize, some of the functionalities included in the toolkit are listed bel
                    'gif',true)
         ```
 
-??? example "Example 2: Task-space controller for soft manipulator"
+??? example "Example 2: Fitting hyper-elastic materials"
+
+    <div align="center">
+    <video width="400" height="310" autoplay controls loop>
+    <source src="./assets/fem_material_fit.mp4" type="video/mp4">
+    </video>
+    </div>
+
+??? example "Example 3: Task-space controller for soft manipulator"
 
     <div align="center">
     <video width="400" height="310" autoplay controls loop>
@@ -162,9 +177,9 @@ To summarize, some of the functionalities included in the toolkit are listed bel
         end
         ```
 
-??? example "Example 3: Open-loop control of soft hand"
+??? example "Example 4: Open-loop control of soft hand"
     <div align="center">
-    <video width="300" height="310" autoplay controls>
+    <video width="300" height="310" autoplay controls loop>
     <source src="./assets/soft_hand.mp4" type="video/mp4">
     </video>
     </div>
@@ -172,7 +187,7 @@ To summarize, some of the functionalities included in the toolkit are listed bel
     ``` matlab
     % CODE: Example 3 -- Open-loop controller
     % connect to controller board
-    brd = Bdog('pi','local','pwd', ...
+    brd = Bdog('pi','192.168.0.2','pwd', ...
                'NVeab',3);
 
     % set board update frequency
@@ -196,7 +211,7 @@ To summarize, some of the functionalities included in the toolkit are listed bel
     brd.disconnect();
     ```
 
-## How to cite
+## How to cite?
 
 If you are planning on using Sorotoki in your (academic) work, please consider citing the toolkit  
 

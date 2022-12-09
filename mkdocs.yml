@@ -10,12 +10,15 @@ nav:
       - fem/sdf.md
       - fem/mesh.md
       - fem/fem.md
-      - Plotting:
+      - Visualization:
         - plotting/figure.md
+        - plotting/rendering.md
         - plotting/colors.md
         - plotting/colormaps.md
-  - Open Soft Robots:
+  - Soft Robots:
     - sorobots/softmanipulator.md
+  - Control Interface:
+    - control/controlboard.md
   - contact.md  
   - release.md
 
@@ -28,16 +31,15 @@ theme:
     - media: "(prefers-color-scheme: light)"
       scheme: default
       primary: deep purple
-      toggle:
-        icon: material/brightness-7
-        name: Switch to dark mode
-
-    - media: "(prefers-color-scheme: dark)"
-      scheme: slate
-      primary: deep purple
-      toggle:
-        icon: material/brightness-4
-        name: Switch to light mode  
+      #toggle:
+      #  icon: material/brightness-7
+      #  name: Switch to dark mode
+    # - media: "(prefers-color-scheme: dark)"
+    #   scheme: slate
+    #   primary: deep purple
+    #   toggle:
+    #     icon: material/brightness-4
+    #     name: Switch to light mode  
   font:
     text: Roboto
     code: Roboto Mono

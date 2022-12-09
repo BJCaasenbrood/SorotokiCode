@@ -1,22 +1,24 @@
-clr;
 %% generate mesh from sdf
-sdf = sRectangle(0,40,0,2);
+sdf = sRectangle(0,40,0,3);
 
-msh = Mesh(sdf,'Quads',[30,2]);
+msh = Mesh(sdf,'Quads',[80,2]);
 msh = msh.generate();
 
 %% generate fem model from mesh
-fem = Fem(msh,'TimeStep',1/300,'TimeEnd',3,'SolverPlot',1,'Thickness',100);
+fem = Fem(msh,'TimeStep',1/250,'TimeEnd',1);
+fem = fem.set('MovieAxis',[-25,40,-40,4]);
 
 %% add constraint
-fem = fem.addSupport(fem.FindNodes('Left'),[1,1]);
+fem = fem.addSupport('Left',[1,1]);
 fem = fem.addGravity();
+fem = fem.addContact(sCircle(5,-15,6));
 
 %% select material
-fem.Material = NeoHookeanMaterial(0.1,0.3);
-fem.Material.Zeta = 0.01;
+fem.Material = NeoHookeanMaterial(0.01,0.33);
+fem.Material.Rr = 5;
 
 %% solving
+fig(101,[9.5,9.25]);
 fem.simulate();
 
 %% plot energies

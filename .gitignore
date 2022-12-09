@@ -3,6 +3,8 @@
 vendor
 _vendor
 _site
+docs
+site
 _includes
 _layouts
 _sass

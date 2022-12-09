@@ -145,9 +145,6 @@
 <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_1" id="__nav_1" type="checkbox"/>
 <div class="md-nav__link md-nav__link--index">
 <a href="..">About Sorotoki</a>
-<label for="__nav_1">
-<span class="md-nav__icon md-icon"></span>
-</label>
 </div>
 <nav aria-label="About Sorotoki" class="md-nav" data-md-level="1">
 <label class="md-nav__title" for="__nav_1">
@@ -155,41 +152,61 @@
           About Sorotoki
         </label>
 <ul class="md-nav__list" data-md-scrollfix="">
+</ul>
+</nav>
+</li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../install/">
         Installation
       </a>
 </li>
-</ul>
-</nav>
-</li>
 <li class="md-nav__item md-nav__item--nested">
-<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" id="__nav_2" type="checkbox"/>
-<label class="md-nav__link" for="__nav_2">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" id="__nav_3" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3">
           Documentation
           <span class="md-nav__icon md-icon"></span>
 </label>
 <nav aria-label="Documentation" class="md-nav" data-md-level="1">
-<label class="md-nav__title" for="__nav_2">
+<label class="md-nav__title" for="__nav_3">
 <span class="md-nav__icon md-icon"></span>
           Documentation
         </label>
 <ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../fem/sdf/">
+        Implicit CAD
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../fem/mesh/">
+        Mesh generation
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../fem/fem/">
+        Finite Elements
+      </a>
+</li>
 <li class="md-nav__item md-nav__item--nested">
-<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_1" id="__nav_2_1" type="checkbox"/>
-<label class="md-nav__link" for="__nav_2_1">
-          Plotting
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_4" id="__nav_3_4" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3_4">
+          Visualization
           <span class="md-nav__icon md-icon"></span>
 </label>
-<nav aria-label="Plotting" class="md-nav" data-md-level="2">
-<label class="md-nav__title" for="__nav_2_1">
+<nav aria-label="Visualization" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_3_4">
 <span class="md-nav__icon md-icon"></span>
-          Plotting
+          Visualization
         </label>
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
 <a class="md-nav__link" href="../plotting/figure/">
         Figures
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../plotting/rendering/">
+        Rendering
       </a>
 </li>
 <li class="md-nav__item">
@@ -209,20 +226,40 @@
 </nav>
 </li>
 <li class="md-nav__item md-nav__item--nested">
-<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" id="__nav_3" type="checkbox"/>
-<label class="md-nav__link" for="__nav_3">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" id="__nav_4" type="checkbox"/>
+<label class="md-nav__link" for="__nav_4">
           Soft Robots
           <span class="md-nav__icon md-icon"></span>
 </label>
 <nav aria-label="Soft Robots" class="md-nav" data-md-level="1">
-<label class="md-nav__title" for="__nav_3">
+<label class="md-nav__title" for="__nav_4">
 <span class="md-nav__icon md-icon"></span>
           Soft Robots
         </label>
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
-<a class="md-nav__link" href="../softmanipulator/">
+<a class="md-nav__link" href="../sorobots/softmanipulator/">
         Soft manipulator
+      </a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" id="__nav_5" type="checkbox"/>
+<label class="md-nav__link" for="__nav_5">
+          Control Interface
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-label="Control Interface" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_5">
+<span class="md-nav__icon md-icon"></span>
+          Control Interface
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../control/controlboard/">
+        VEAB hat (RPi)
       </a>
 </li>
 </ul>
@@ -232,6 +269,11 @@
 <input class="md-nav__toggle md-toggle" data-md-toggle="toc" id="__toc" type="checkbox"/>
 <a class="md-nav__link md-nav__link--active" href="./">
         Developer(s)
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../release/">
+        Release Notes
       </a>
 </li>
 </ul>
@@ -270,7 +312,7 @@
 </main>
 <footer class="md-footer">
 <nav aria-label="Footer" class="md-footer__inner md-grid">
-<a aria-label="Previous: Soft manipulator" class="md-footer__link md-footer__link--prev" href="../softmanipulator/" rel="prev">
+<a aria-label="Previous: VEAB hat (RPi)" class="md-footer__link md-footer__link--prev" href="../control/controlboard/" rel="prev">
 <div class="md-footer__button md-icon">
 <svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"></path></svg>
 </div>
@@ -279,8 +321,21 @@
 <span class="md-footer__direction">
                 Previous
               </span>
-              Soft manipulator
+              VEAB hat (RPi)
             </div>
+</div>
+</a>
+<a aria-label="Next: Release Notes" class="md-footer__link md-footer__link--next" href="../release/" rel="next">
+<div class="md-footer__title">
+<div class="md-ellipsis">
+<span class="md-footer__direction">
+                Next
+              </span>
+              Release Notes
+            </div>
+</div>
+<div class="md-footer__button md-icon">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"></path></svg>
 </div>
 </a>
 </nav>

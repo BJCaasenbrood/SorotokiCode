@@ -2,7 +2,7 @@
 
 The toolkit is easy to install. The fastest and easiest way to acquire the toolkit is through [git](https://git-scm.com/downloads). We highly recommend using Git, since this allows you also to update the toolkit. 
 
-??? prerequisites 
+???+ warning "Prerequisite toolboxes of MATLAB"
     To use Sorotoki, make sure you have the following dependencies installed:
 
     - [Optimization Toolbox](https://nl.mathworks.com/products/optimization.html) 
