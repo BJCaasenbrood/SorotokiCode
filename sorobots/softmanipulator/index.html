@@ -221,13 +221,13 @@
 <li class="md-nav__item md-nav__item--active md-nav__item--nested">
 <input checked="" class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" id="__nav_4" type="checkbox"/>
 <label class="md-nav__link" for="__nav_4">
-          Soft Robots
+          Open soft robots
           <span class="md-nav__icon md-icon"></span>
 </label>
-<nav aria-label="Soft Robots" class="md-nav" data-md-level="1">
+<nav aria-label="Open soft robots" class="md-nav" data-md-level="1">
 <label class="md-nav__title" for="__nav_4">
 <span class="md-nav__icon md-icon"></span>
-          Soft Robots
+          Open soft robots
         </label>
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item md-nav__item--active">
@@ -245,6 +245,16 @@
       Table of contents
     </label>
 <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#about">
+    About
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#fabrication-details">
+    Fabrication details
+  </a>
+</li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#downloadable-content">
     Downloadable content
@@ -269,18 +279,23 @@
 <li class="md-nav__item md-nav__item--nested">
 <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" id="__nav_5" type="checkbox"/>
 <label class="md-nav__link" for="__nav_5">
-          Control Interface
+          Control interface
           <span class="md-nav__icon md-icon"></span>
 </label>
-<nav aria-label="Control Interface" class="md-nav" data-md-level="1">
+<nav aria-label="Control interface" class="md-nav" data-md-level="1">
 <label class="md-nav__title" for="__nav_5">
 <span class="md-nav__icon md-icon"></span>
-          Control Interface
+          Control interface
         </label>
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../control/controlboard/">
         VEAB hat (RPi)
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../control/i2chat/">
+        I2C expander hat (RPi)
       </a>
 </li>
 <li class="md-nav__item">
@@ -316,6 +331,16 @@
     </label>
 <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
 <li class="md-nav__item">
+<a class="md-nav__link" href="#about">
+    About
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#fabrication-details">
+    Fabrication details
+  </a>
+</li>
+<li class="md-nav__item">
 <a class="md-nav__link" href="#downloadable-content">
     Downloadable content
   </a>
@@ -336,14 +361,37 @@
 <svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"></path></svg>
 </a>
 <h1 id="soft-manipulator">Soft Manipulator</h1>
+<h2 id="about">About</h2>
 <p><a class="glightbox" data-desc-position="bottom" data-height="auto" data-width="100%" href="../img/soft_manipulator.mp4"><div class="video-container"><video autoplay="" controls="" style="width: 100%; height: 65%; position: center"><source src="../img/soft_manipulator.mp4" type="video/mp4"/></video></div></a></p>
+<h2 id="fabrication-details">Fabrication details</h2>
+<p>The soft manipulator is fully printable. Below, we provided a list of the printer materials. </p>
+<ul>
+<li>1<span class="arithmatex">\(\times\)</span>: Soft Bellow - Elastic 80A - Formlabs (recommended)</li>
+<li>3<span class="arithmatex">\(\times\)</span>: Soft Finger - Elastic 80A - Formlabs (recommended)</li>
+<li>1<span class="arithmatex">\(\times\)</span>: Connector One-way - Rigid 10k - Formlabs (optional)</li>
+<li>1<span class="arithmatex">\(\times\)</span>: Connector Three-way - Rigid 10k - Formlabs (optional)</li>
+<li>1<span class="arithmatex">\(\times\)</span>: Base mount M6 - Prusament PLA Azure - Prusa (optional)</li>
+</ul>
+<details class="tip" open="open">
+<summary>Printing of Elastic 80A</summary>
+<p>When printing Elastic 80A, the recommended supports for the material are very thick -- thus difficult to remove. We recommend generating the supports using <em>Rigid 10K</em>, then change the material to <em>Elastic 80A</em>. Support can then be easily removed manually (no pliers required). </p>
+</details>
+<details class="warning" open="open">
+<summary>Cleaning and closing of Soft Actuators</summary>
+<p>A crucial step is cleaning of the elastic resin parts. If residual resin is not properly removed/cleaned, it will greatly affect the quality and performance of the soft actuator. We recommend following the cleaning procedures proposed in Proper et al. <sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup>, see <a href="https://github.com/ReshapeTUe/Peristaltic-Pump-Documentation">Git documentation</a>. The paper draft can be found here: <a href="https://raw.githubusercontent.com/ReshapeTUe/Peristaltic-Pump-Documentation/main/paper/%5BB.W.B.%20Proper%20et%20al.%2C%202023%5D%20Easy%20Cleaning%20of%203D%20SLADLP%20Printed%20Soft%20Fluidic%20Actuators%20with%20Complex%20Internal%20Geometry.pdf">Paper.pdf</a>. In their approach, a perastaltic pump is used to pump cleaning fluid through the soft actuator prior to curing. 
+<strong>To allow fluid to flow, both sides of the soft actuator are open!</strong> They must be closed using 3 mm plug printed from the same material! The plug can be glued in place using uncured resin, and then placed in an UV chamber for a short duration.</p>
+</details>
+<details class="tip" open="open">
+<summary>Connecting Soft Actuator to Rigid Connector</summary>
+<p>Similar to closing of the soft actuators, uncured resin can be used to make a robust connection to the rigid pressure connector. This greatly improves air-tightness of the complete system. </p>
+</details>
 <h2 id="downloadable-content">Downloadable content</h2>
-<p><a class="md-button md-button--primary" href="#">Complete Soft Robot Manipulator (.zip) -- size 25 MB</a></p>
-<p><a class="md-button md-button--primary" href="#">Soft body (STL)</a>
-<a class="md-button md-button--primary" href="#">Soft finger (STL)</a>
-<a class="md-button md-button--primary" href="#">Connector (one-way) (STL)</a> </p>
-<p><a class="md-button md-button--primary" href="#">Connector (three-way) (STL)</a>
-<a class="md-button md-button--primary" href="#">Base mount (M6 screw mount) (STL)</a></p>
+<p><a class="md-button md-button--primary" href="https://raw.githubusercontent.com/BJCaasenbrood/SorotokiBots/master/softmanipulator/completemanipulator.zip">Complete Soft Robot Manipulator - 14.6 MB uncompressed (.zip)</a></p>
+<p><a class="md-button md-button--primary" href="https://raw.githubusercontent.com/BJCaasenbrood/SorotokiBots/master/softmanipulator/SoftRobotBellow.stl">Soft Bellow (STL)</a>
+<a class="md-button md-button--primary" href="https://raw.githubusercontent.com/BJCaasenbrood/SorotokiBots/master/softmanipulator/SoftGripperFinger.stl">Soft Finger (STL)</a>
+<a class="md-button md-button--primary" href="https://raw.githubusercontent.com/BJCaasenbrood/SorotokiBots/master/softmanipulator/ConnectorOneWay.stl">Connector One-way (STL)</a> </p>
+<p><a class="md-button md-button--primary" href="https://raw.githubusercontent.com/BJCaasenbrood/SorotokiBots/master/softmanipulator/ConnectorThreeWay.stl">Connector Three-way (STL)</a>
+<a class="md-button md-button--primary" href="https://raw.githubusercontent.com/BJCaasenbrood/SorotokiBots/master/softmanipulator/FrameHolder.stl">Base mount M6 (STL)</a></p>
 <script src="https://static.sketchfab.com/api/sketchfab-viewer-1.12.1.js" type="text/javascript"></script>
 <h2 id="3d-visualization">3D Visualization</h2>
 <div align="center">
@@ -378,6 +426,14 @@
     } );
     </script>
 </body>
+</div>
+<div class="footnote">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>Proper. B, Caasenbrood, B., &amp; I. Kuling (2023). Easy Cleaning of 3D SLA/DLP Printed Soft Fluidic Actuators with Complex Internal Geometry. 6th IEEE International Conference on Soft Robotics, RoboSoft 2023. (submitted). <a href="https://github.com/ReshapeTUe/Peristaltic-Pump-Documentation">https://github.com/ReshapeTUe/Peristaltic-Pump-Documentation</a> <a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">↩</a></p>
+</li>
+</ol>
 </div>
 </article>
 </div>

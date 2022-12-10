@@ -7,7 +7,7 @@
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
 <link href="../../images/favicon.png" rel="icon"/>
 <meta content="mkdocs-1.4.2, mkdocs-material-8.5.10" name="generator"/>
-<title>Finite Elements - Sorotoki</title>
+<title>I2C expander hat (RPi) - Sorotoki</title>
 <link href="../../assets/stylesheets/main.975780f9.min.css" rel="stylesheet"/>
 <link href="../../assets/stylesheets/palette.2505c338.min.css" rel="stylesheet"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
@@ -33,7 +33,7 @@
 <input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
 <label class="md-overlay" for="__drawer"></label>
 <div data-md-component="skip">
-<a class="md-skip" href="#finite-elements">
+<a class="md-skip" href="#i2c-expander-hat-rpi">
           Skip to content
         </a>
 </div>
@@ -59,7 +59,7 @@
 <div class="md-header__topic" data-md-component="header-topic">
 <span class="md-ellipsis">
             
-              Finite Elements
+              I2C expander hat (RPi)
             
           </span>
 </div>
@@ -153,8 +153,8 @@
         Installation
       </a>
 </li>
-<li class="md-nav__item md-nav__item--active md-nav__item--nested">
-<input checked="" class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" id="__nav_3" type="checkbox"/>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" id="__nav_3" type="checkbox"/>
 <label class="md-nav__link" for="__nav_3">
           Documentation
           <span class="md-nav__icon md-icon"></span>
@@ -166,18 +166,17 @@
         </label>
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
-<a class="md-nav__link" href="../sdf/">
+<a class="md-nav__link" href="../../fem/sdf/">
         Implicit CAD
       </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../mesh/">
+<a class="md-nav__link" href="../../fem/mesh/">
         Mesh generation
       </a>
 </li>
-<li class="md-nav__item md-nav__item--active">
-<input class="md-nav__toggle md-toggle" data-md-toggle="toc" id="__toc" type="checkbox"/>
-<a class="md-nav__link md-nav__link--active" href="./">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../fem/fem/">
         Finite Elements
       </a>
 </li>
@@ -244,8 +243,8 @@
 </ul>
 </nav>
 </li>
-<li class="md-nav__item md-nav__item--nested">
-<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" id="__nav_5" type="checkbox"/>
+<li class="md-nav__item md-nav__item--active md-nav__item--nested">
+<input checked="" class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" id="__nav_5" type="checkbox"/>
 <label class="md-nav__link" for="__nav_5">
           Control interface
           <span class="md-nav__icon md-icon"></span>
@@ -257,17 +256,40 @@
         </label>
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
-<a class="md-nav__link" href="../../control/controlboard/">
+<a class="md-nav__link" href="../controlboard/">
         VEAB hat (RPi)
       </a>
 </li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="../../control/i2chat/">
+<li class="md-nav__item md-nav__item--active">
+<input class="md-nav__toggle md-toggle" data-md-toggle="toc" id="__toc" type="checkbox"/>
+<label class="md-nav__link md-nav__link--active" for="__toc">
+          I2C expander hat (RPi)
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<a class="md-nav__link md-nav__link--active" href="./">
         I2C expander hat (RPi)
       </a>
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#printer-circuit-board-pcb-schematics-v211">
+    Printer-Circuit Board (PCB) Schematics (v2.11)
+  </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../../control/orderveab/">
+<a class="md-nav__link" href="#bill-of-material-bom">
+    Bill of material (BOM)
+  </a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../orderveab/">
         Place-and-order (JLCPCB)
       </a>
 </li>
@@ -293,24 +315,49 @@
 <div class="md-sidebar__scrollwrap">
 <div class="md-sidebar__inner">
 <nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#printer-circuit-board-pcb-schematics-v211">
+    Printer-Circuit Board (PCB) Schematics (v2.11)
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bill-of-material-bom">
+    Bill of material (BOM)
+  </a>
+</li>
+</ul>
 </nav>
 </div>
 </div>
 </div>
 <div class="md-content" data-md-component="content">
 <article class="md-content__inner md-typeset">
-<a class="md-content__button md-icon" href="https://github.com/BJCaasenbrood/SorotokiCode/edit/master/docs/fem/fem.md" title="Edit this page">
+<a class="md-content__button md-icon" href="https://github.com/BJCaasenbrood/SorotokiCode/edit/master/docs/control/i2chat.md" title="Edit this page">
 <svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"></path></svg>
 </a>
-<h1 id="finite-elements">Finite Elements</h1>
-<p><a class="glightbox" data-desc-position="bottom" data-height="auto" data-width="100%" href="../img/fem_example.mp4"><div class="video-container"><video autoplay="" controls="" style="width: 100%; height: 65%; position: center"><source src="../img/fem_example.mp4" type="video/mp4"/></video></div></a></p>
+<h1 id="i2c-expander-hat-rpi">I2C expander hat (RPi)</h1>
+<figure>
+<p><a class="glightbox" data-desc-position="bottom" data-height="auto" data-width="100%" href="../img/pcb_i2c.png"><img alt="Image title" src="../img/pcb_i2c.png" width="500"/></a> </p>
+<figcaption>Schematics of the VEAB Raspberry Pi controller hat</figcaption>
+</figure>
+<h2 id="printer-circuit-board-pcb-schematics-v211">Printer-Circuit Board (PCB) Schematics (v2.11)</h2>
+<figure>
+<p><a class="glightbox" data-desc-position="bottom" data-height="auto" data-width="100%" href="../img/schematics_i2c.png"><img alt="Image title" src="../img/schematics_i2c.png" width="800"/></a></p>
+<figcaption>Schematics of the VEAB Raspberry Pi controller hat</figcaption>
+</figure>
+<h2 id="bill-of-material-bom">Bill of material (BOM)</h2>
 </article>
 </div>
 </div>
 </main>
 <footer class="md-footer">
 <nav aria-label="Footer" class="md-footer__inner md-grid">
-<a aria-label="Previous: Mesh generation" class="md-footer__link md-footer__link--prev" href="../mesh/" rel="prev">
+<a aria-label="Previous: VEAB hat (RPi)" class="md-footer__link md-footer__link--prev" href="../controlboard/" rel="prev">
 <div class="md-footer__button md-icon">
 <svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"></path></svg>
 </div>
@@ -319,17 +366,17 @@
 <span class="md-footer__direction">
                 Previous
               </span>
-              Mesh generation
+              VEAB hat (RPi)
             </div>
 </div>
 </a>
-<a aria-label="Next: Figures" class="md-footer__link md-footer__link--next" href="../../plotting/figure/" rel="next">
+<a aria-label="Next: Place-and-order (JLCPCB)" class="md-footer__link md-footer__link--next" href="../orderveab/" rel="next">
 <div class="md-footer__title">
 <div class="md-ellipsis">
 <span class="md-footer__direction">
                 Next
               </span>
-              Figures
+              Place-and-order (JLCPCB)
             </div>
 </div>
 <div class="md-footer__button md-icon">
