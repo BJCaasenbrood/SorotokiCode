@@ -232,7 +232,12 @@
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
 <a class="md-nav__link" href="sorobots/softmanipulator/">
-        Soft manipulator
+        Soft Manipulator
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="sorobots/softhand/">
+        Soft Robotic Hand
       </a>
 </li>
 </ul>
@@ -253,6 +258,11 @@
 <li class="md-nav__item">
 <a class="md-nav__link" href="control/controlboard/">
         VEAB hat (RPi)
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="control/orderveab/">
+        Place-and-order (JLCPCB)
       </a>
 </li>
 </ul>
@@ -351,7 +361,11 @@
 </figcaption>
 <details class="info">
 <summary>Is it easy to code?</summary>
-<p>Well, absolutely!</p>
+<p>Well, absolutely! And it can be programmed with less than 30 lines of code! </p>
+<ul>
+<li>Code for Multi-gait soft crawler: <a href="help">help</a></li>
+<li>Code for Multi-finger soft gripper: </li>
+</ul>
 </details>
 <h2 id="list-of-functionalities">List of functionalities</h2>
 <p>To summarize, some of the functionalities included in the toolkit are listed below:</p>
@@ -403,13 +417,50 @@
 </code></pre></div>
 </details>
 </details>
-<details class="example">
+<details class="example" open="open">
 <summary>Example 2: Fitting hyper-elastic materials</summary>
 <p><div align="center">
 <video autoplay="" controls="" height="310" loop="" width="400">
 <source src="./assets/fem_material_fit.mp4" type="video/mp4"/>
 </video>
 </div></p>
+<p>Soft robots own their name to soft materials. Regarding design analysis, it is essential that the constitutive material models reflect the mechanical nature of these soft material. However, finding the appropriate material parameters for these models can be challenging without the proper tools. Sorotoki is equipped with tools for hyper-elastic material fitting. Consider for instance the cubic Yeoh model:</p>
+<div class="arithmatex">\[ \Psi_{\textrm{YH}}(I_1; \pi) = \sum_{i = 1}^3 \pi_i (I_1 - 3)^{i} \]</div>
+<p>where <span class="arithmatex">\(I_1 = {\lambda_1}^2 + {\lambda_2}^2 + {\lambda_3}^2\)</span> is the first strain invariant, and <span class="arithmatex">\(\pi\)</span> a vector of unknown material parameters. For uniaxial tension, we have that <span class="arithmatex">\(\lambda_1 = \lambda\)</span> and <span class="arithmatex">\(\lambda_2 = \lambda_3 = 1/{\lambda^2}\)</span>. Therefore, the stress along the uniaxial tension test is given by <span class="arithmatex">\( \sigma_{11} = 2 \left(\lambda^2 - \frac{1}{\lambda} \right)\Psi' \)</span> with <span class="arithmatex">\(\Psi'\)</span> the partial derivative of <span class="arithmatex">\(\Psi\)</span> with respect to <span class="arithmatex">\(I_1\)</span>. Luckily, these uniaxial stress-strain relations are included in every hyperelastic material model of Sorotoki. Simply call <code>S = material.uniaxial(x)</code>. The optimal material parameters <span class="arithmatex">\(\pi\)</span> can then be easily found using standard optimization routines such as <code>fmincon</code>. See the example below.</p>
+<details class="info" open="open">
+<summary>Code for simulation</summary>
+<div class="highlight"><pre><span></span><code><span class="c">% CODE: Example 2 -- Material fitting using fmincon</span><span class="w"></span>
+<span class="p">[</span><span class="n">lam</span><span class="p">,</span><span class="w"> </span><span class="n">str</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">materialDataBase</span><span class="p">(</span><span class="s">'DragonSkin10'</span><span class="p">);</span><span class="w"></span>
+
+<span class="c">% define objective (Yeoh model)</span><span class="w"></span>
+<span class="n">obj</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">@(</span><span class="n">Pi</span><span class="p">)</span><span class="w"> </span><span class="n">Objective</span><span class="p">(</span><span class="n">Pi</span><span class="p">,</span><span class="n">lam</span><span class="p">,</span><span class="n">str</span><span class="p">);</span><span class="w"></span>
+
+<span class="n">Pi0</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">];</span><span class="w">  </span><span class="c">% initial guess</span><span class="w"></span>
+<span class="n">lb</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="mf">1e-6</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="w">  </span><span class="o">-</span><span class="mi">2</span><span class="p">];</span><span class="w">  </span><span class="c">% lower bounds</span><span class="w"></span>
+<span class="n">ub</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="nb">Inf</span><span class="p">,</span><span class="w"> </span><span class="nb">Inf</span><span class="p">,</span><span class="w"> </span><span class="nb">Inf</span><span class="p">];</span><span class="w">  </span><span class="c">% upper bounds</span><span class="w"></span>
+
+<span class="n">opt</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">optimoptions</span><span class="p">(@</span><span class="n">fmincon</span><span class="p">,</span><span class="s">'FiniteDifferenceStepSize'</span><span class="p">,</span><span class="mf">1e-12</span><span class="p">,</span><span class="w">  </span>
+<span class="w">                            </span><span class="s">'Algorithm'</span><span class="p">,</span><span class="s">'sqp-legacy'</span><span class="p">);</span><span class="w"></span>
+
+<span class="n">fig</span><span class="p">(</span><span class="mi">101</span><span class="p">,[</span><span class="mi">9</span><span class="p">,</span><span class="mi">9</span><span class="p">]);</span><span class="w"></span>
+<span class="n">Pi</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">fmincon</span><span class="p">(</span><span class="n">Obj</span><span class="p">,</span><span class="n">Pi0</span><span class="p">,[],[],[],[],</span><span class="n">lb</span><span class="p">,</span><span class="n">ub</span><span class="p">,[],</span><span class="n">opt</span><span class="p">);</span><span class="w"></span>
+
+<span class="k">function</span><span class="w"> </span>obj<span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nf">Objective</span><span class="p">(</span>Pi,X,Y<span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">Q</span><span class="w">   </span><span class="p">=</span><span class="w"> </span><span class="nb">diag</span><span class="p">(</span><span class="n">Y</span><span class="o">.^-</span><span class="mi">2</span><span class="p">);</span><span class="w">   </span><span class="c">% weighting - emphasis low strains  </span><span class="w"></span>
+<span class="w">    </span><span class="n">E</span><span class="w">   </span><span class="p">=</span><span class="w"> </span><span class="n">Y</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">YeohMaterial</span><span class="p">(</span><span class="n">Pi</span><span class="p">).</span><span class="n">uniaxial</span><span class="p">(</span><span class="n">X</span><span class="p">);</span><span class="w"> </span><span class="c">% stress resid.</span><span class="w"></span>
+
+<span class="w">    </span><span class="c">% quadratic lost function</span><span class="w"></span>
+<span class="w">    </span><span class="n">obj</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">E</span><span class="p">(:).</span><span class="o">'</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Q</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">E</span><span class="p">(:);</span><span class="w"></span>
+
+<span class="w">    </span><span class="nb">cla</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="nb">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="s">'Color'</span><span class="p">,</span><span class="w"> </span><span class="n">color_light_gray</span><span class="p">);</span><span class="w"> </span><span class="n">hold</span><span class="w"> </span><span class="s">on</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="nb">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">YeohMaterial</span><span class="p">(</span><span class="n">Pi</span><span class="p">).</span><span class="n">uniaxial</span><span class="p">(</span><span class="n">x</span><span class="p">),</span><span class="w"> </span><span class="k">...</span><span class="w"></span>
+<span class="w">            </span><span class="s">'Color'</span><span class="p">,</span><span class="w"> </span><span class="n">color_visited_alt</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="nb">ylabel</span><span class="p">(</span><span class="s">'engineering stress $\sigma_{11}$'</span><span class="p">);</span><span class="w">    </span>
+<span class="w">    </span><span class="nb">xlabel</span><span class="p">(</span><span class="s">'stretch $\lambda$'</span><span class="p">);</span><span class="w"></span>
+<span class="k">end</span><span class="w"></span>
+</code></pre></div>
+</details>
 </details>
 <details class="example">
 <summary>Example 3: Task-space controller for soft manipulator</summary>
@@ -419,7 +470,7 @@
 </video>
 </div></p>
 <p>The next example shows the implementation of model-based controllers in Sorotoki. Consider a soft tentacle of length <span class="arithmatex">\(L = 100\)</span> mm, radius <span class="arithmatex">\(R = 5\)</span> mm, and a tapering of <span class="arithmatex">\(75\%\)</span>. We assume the tentacle is composed of DragonSkin10A silicone. </p>
-<div class="arithmatex">\[\tau = J_v(q)^\top\left[k_p (X_d - X) - k_d \dot{X}\right] + \nabla_q \mathcal{V}\]</div>
+<div class="arithmatex">\[\tau = J_v^\top\left[k_p (X_d - X) - k_d \dot{X}\right] + \nabla_q \mathcal{V}\]</div>
 <p>where <span class="arithmatex">\(J_v(q) := \lfloor J(q,L) \rfloor_3\)</span> is the linear velocity part of the manipulator Jacobian matrix at the tip (<span class="arithmatex">\(\sigma = L\)</span>), <span class="arithmatex">\(\nabla_q \mathcal{V}\)</span> is simply the gradient of the potential energy w.r.t to its states <span class="arithmatex">\(q\)</span>, <span class="arithmatex">\(X\)</span> and <span class="arithmatex">\(X_d\)</span> the end-effector position and the desired position, respectively. Note that we can compute the end-effector velocity by <span class="arithmatex">\(\dot{X} = J_v(q) \dot{q}\)</span>. </p>
 <details class="info" open="open">
 <summary>Code for simulation</summary>

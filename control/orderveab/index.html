@@ -7,7 +7,7 @@
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
 <link href="../../images/favicon.png" rel="icon"/>
 <meta content="mkdocs-1.4.2, mkdocs-material-8.5.10" name="generator"/>
-<title>Implicit CAD - Sorotoki</title>
+<title>Place-and-order (JLCPCB) - Sorotoki</title>
 <link href="../../assets/stylesheets/main.975780f9.min.css" rel="stylesheet"/>
 <link href="../../assets/stylesheets/palette.2505c338.min.css" rel="stylesheet"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
@@ -33,7 +33,7 @@
 <input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
 <label class="md-overlay" for="__drawer"></label>
 <div data-md-component="skip">
-<a class="md-skip" href="#implicit-cad">
+<a class="md-skip" href="#place-and-order-jlcpcb">
           Skip to content
         </a>
 </div>
@@ -59,7 +59,7 @@
 <div class="md-header__topic" data-md-component="header-topic">
 <span class="md-ellipsis">
             
-              Implicit CAD
+              Place-and-order (JLCPCB)
             
           </span>
 </div>
@@ -153,8 +153,8 @@
         Installation
       </a>
 </li>
-<li class="md-nav__item md-nav__item--active md-nav__item--nested">
-<input checked="" class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" id="__nav_3" type="checkbox"/>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" id="__nav_3" type="checkbox"/>
 <label class="md-nav__link" for="__nav_3">
           Documentation
           <span class="md-nav__icon md-icon"></span>
@@ -165,19 +165,18 @@
           Documentation
         </label>
 <ul class="md-nav__list" data-md-scrollfix="">
-<li class="md-nav__item md-nav__item--active">
-<input class="md-nav__toggle md-toggle" data-md-toggle="toc" id="__toc" type="checkbox"/>
-<a class="md-nav__link md-nav__link--active" href="./">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../fem/sdf/">
         Implicit CAD
       </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../mesh/">
+<a class="md-nav__link" href="../../fem/mesh/">
         Mesh generation
       </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../fem/">
+<a class="md-nav__link" href="../../fem/fem/">
         Finite Elements
       </a>
 </li>
@@ -244,8 +243,8 @@
 </ul>
 </nav>
 </li>
-<li class="md-nav__item md-nav__item--nested">
-<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" id="__nav_5" type="checkbox"/>
+<li class="md-nav__item md-nav__item--active md-nav__item--nested">
+<input checked="" class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" id="__nav_5" type="checkbox"/>
 <label class="md-nav__link" for="__nav_5">
           Control Interface
           <span class="md-nav__icon md-icon"></span>
@@ -257,14 +256,67 @@
         </label>
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
-<a class="md-nav__link" href="../../control/controlboard/">
+<a class="md-nav__link" href="../controlboard/">
         VEAB hat (RPi)
       </a>
 </li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="../../control/orderveab/">
+<li class="md-nav__item md-nav__item--active">
+<input class="md-nav__toggle md-toggle" data-md-toggle="toc" id="__toc" type="checkbox"/>
+<label class="md-nav__link md-nav__link--active" for="__toc">
+          Place-and-order (JLCPCB)
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<a class="md-nav__link md-nav__link--active" href="./">
         Place-and-order (JLCPCB)
       </a>
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#step-1-choosing-a-pcb-manufacturer">
+    Step 1: Choosing a PCB manufacturer
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#step-2-download-and-place-gerber-files">
+    Step 2: Download and place gerber files
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#step-3-setting-the-pcb-options">
+    Step 3: Setting the PCB options
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#step-4-selecting-smt-manufacturing">
+    Step 4: Selecting SMT manufacturing
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#step-5-adding-the-bill-of-materials-bom-and-footprint-placement-files">
+    Step 5: Adding the bill-of-materials (BOM) and footprint placement files
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#step-6-checking-the-jlcpcbs-parts-in-stock">
+    Step 6: Checking the JLCPCB's parts (in stock)
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#step-7-checking-component-placement">
+    Step 7: Checking component placement
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#step-8-placing-your-order">
+    Step 8: Placing your order
+  </a>
+</li>
+</ul>
+</nav>
 </li>
 </ul>
 </nav>
@@ -288,23 +340,144 @@
 <div class="md-sidebar__scrollwrap">
 <div class="md-sidebar__inner">
 <nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#step-1-choosing-a-pcb-manufacturer">
+    Step 1: Choosing a PCB manufacturer
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#step-2-download-and-place-gerber-files">
+    Step 2: Download and place gerber files
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#step-3-setting-the-pcb-options">
+    Step 3: Setting the PCB options
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#step-4-selecting-smt-manufacturing">
+    Step 4: Selecting SMT manufacturing
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#step-5-adding-the-bill-of-materials-bom-and-footprint-placement-files">
+    Step 5: Adding the bill-of-materials (BOM) and footprint placement files
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#step-6-checking-the-jlcpcbs-parts-in-stock">
+    Step 6: Checking the JLCPCB's parts (in stock)
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#step-7-checking-component-placement">
+    Step 7: Checking component placement
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#step-8-placing-your-order">
+    Step 8: Placing your order
+  </a>
+</li>
+</ul>
 </nav>
 </div>
 </div>
 </div>
 <div class="md-content" data-md-component="content">
 <article class="md-content__inner md-typeset">
-<a class="md-content__button md-icon" href="https://github.com/BJCaasenbrood/SorotokiCode/edit/master/docs/fem/sdf.md" title="Edit this page">
+<a class="md-content__button md-icon" href="https://github.com/BJCaasenbrood/SorotokiCode/edit/master/docs/control/orderveab.md" title="Edit this page">
 <svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"></path></svg>
 </a>
-<h1 id="implicit-cad">Implicit CAD</h1>
+<h1 id="place-and-order-jlcpcb">Place-and-order (JLCPCB)</h1>
+<p>In the following documentation, we will show how to reproduce the VEAB controller hat (see below) step-by-step. This board can be produced by hand, but a better and easier alternative is to order it from a PCB manufacturer. </p>
+<p><a class="glightbox" data-desc-position="bottom" data-height="auto" data-width="100%" href="../img/0_board.png?raw=true"><img alt="Alt text" src="../img/0_board.png?raw=true" title="VEAB controller hat"/></a></p>
+<h2 id="step-1-choosing-a-pcb-manufacturer">Step 1: Choosing a PCB manufacturer</h2>
+<p>There exist a couple of options for suitable PCB manufacturers. One we can recommend is JLCPCB located in Shenzhen, China. There website can be found at <a href="https://jlcpcb.com/">https://jlcpcb.com</a>. The manufacturing files of the PCB board comply with this manufacturer. For the following steps, its easier to make an account with the PCB manufacturer.</p>
+<h2 id="step-2-download-and-place-gerber-files">Step 2: Download and place gerber files</h2>
+<p>Click on <strong>Order now</strong> (on the top right). Then add the <strong>gerber.zip</strong> (this contains all the macturing files for the VEAB control board) which can be downloaded from below:</p>
+<p><a class="md-button md-button--primary" href="#">Download PCB gerber files (.zip)</a></p>
+<p><a class="glightbox" data-desc-position="bottom" data-height="auto" data-width="100%" href="../img/1_addgerber.png?raw=true"><img alt="Alt text" src="../img/1_addgerber.png?raw=true" title="Adding the gerber.zip"/></a></p>
+<h2 id="step-3-setting-the-pcb-options">Step 3: Setting the PCB options</h2>
+<p>Once the upload is complete, make sure you have "similar" options. *<em>A minimum of ten boards must be selected to comply for SMT manufacturing.</em> 
+Alternatively, if you wish to solder the boards by hand, the order number does not matter. </p>
+<p>Also make sure you select <strong>Specify a location</strong> under <strong>Remove order number</strong></p>
+<p><a class="glightbox" data-desc-position="bottom" data-height="auto" data-width="100%" href="../img/2_pcboptions.png?raw=true"><img alt="Alt text" src="../img/2_pcboptions.png?raw=true" title="PCB options"/></a></p>
+<h2 id="step-4-selecting-smt-manufacturing">Step 4: Selecting SMT manufacturing</h2>
+<p>Once you've selected the PCB setting, we can continue with SMT manufacturing. JLCPCB will not only produce the PCBs but also solder the components for us with this option enabled.</p>
+<p>Make sure you have the <strong>Top</strong> selected for the component placement, and also have <strong>Added by customers</strong> under <strong>Tooling holes</strong>. 
+These tooling holes might depend on the PCB manufacturer (1.152mm for JLCPCB), and they assist with the component placement. 
+The gerber files already have these holes on the board, thus no extra manufacturing steps are needed to be taken by JLCPCB.</p>
+<p>Press <strong>Confirm</strong>, and you'll be taken to a new page.</p>
+<p><a class="glightbox" data-desc-position="bottom" data-height="auto" data-width="100%" href="../img/3_smt.png?raw=true"><img alt="Alt text" src="../img/3_smt.png?raw=true" title="SMT manufacturing option"/></a></p>
+<h2 id="step-5-adding-the-bill-of-materials-bom-and-footprint-placement-files">Step 5: Adding the bill-of-materials (BOM) and footprint placement files</h2>
+<p>In order for JLCPCB to assemble the board,they need to know which component are required and where they need to be placed. 
+To do so, they require a bill-of-materials (BOM) and footprint placement file. These files can be found below:</p>
+<p><a class="md-button md-button--primary" href="#">Download BOM file (.csv)</a>
+<a class="md-button md-button--primary" href="#">Download Footprint position file (.csv)</a></p>
+<p><a class="glightbox" data-desc-position="bottom" data-height="auto" data-width="100%" href="../img/4_addBOM_placement.png?raw=true"><img alt="Alt text" src="../img/4_addBOM_placement.png?raw=true" title="SMT manufacturing option"/></a></p>
+<h2 id="step-6-checking-the-jlcpcbs-parts-in-stock">Step 6: Checking the JLCPCB's parts (in stock)</h2>
+<p>You'll be greeted with an overview of all the components JLCPCB has in stock. Sometimes, it can happen that these components are not in stock. 
+In most cases, the passive parts like resistors, capacitors, and inductors are in stock; but specialized components like the DACs, ADCs are not.
+If so, there are two options:</p>
+<ul>
+<li><strong>Option 1:</strong> Find a replacement part that has an identical footprint, value, and property; and replace them in the BOM.csv.</li>
+<li><strong>Option 2:</strong> Continue with the order, and JLCPCB will omit these parts from the assembly. This means you have to order the part elsewhere (i.e., Mouser/Farnell/Digikey) and hand-solder them.
+(only recommended for those with experience in SMD soldering).</li>
+</ul>
+<p>Options for the Digital-Analog converter (MCP4725 -- U3, U4):</p>
+<ul>
+<li>MCP4725A0T-E/CH -- C144198 (recommended)</li>
+<li>MCP4725A1T-E/CH -- C61423</li>
+<li>MCP4726A0T-E/CH -- C191581</li>
+</ul>
+<p>Options for the Analog-Digital converter (ADS1013 -- U5, U8):</p>
+<ul>
+<li>ADS1013IDGSR -- C524815 (recommended)</li>
+<li>ADS1014IDGST -- C132086</li>
+<li>ADS1114IDGST -- C206016 </li>
+<li>ADS1015IDGSR -- C193969</li>
+</ul>
+<p>Options for the buck-boost converter (SB6286 -- U2):</p>
+<ul>
+<li>SB6286 -- C157668 (recommended)</li>
+<li>SX1308 -- C78162</li>
+<li>SY7208ABC -- C80514</li>
+<li>AP2008TCER-ADJ -- C130341</li>
+</ul>
+<p>Options for the OP-amp (LM358 -- U1, U6, U7, U9):
+- LM358DR2G -- C7950 (recommended)
+- LM358ADR  -- C404320</p>
+<p>If you wish to choose a different component, make the nessecary changes to <strong>BOM.csv</strong> under the column <strong>LCSC</strong> and add the corresponding <strong>Cxxxxxx</strong> number. 
+In the next step, we will check the placement of these components is correct. </p>
+<p><a class="glightbox" data-desc-position="bottom" data-height="auto" data-width="100%" href="../img/5_checkstock.png?raw=true"><img alt="Alt text" src="../img/5_checkstock.png?raw=true" title="JLCPCB stock"/></a></p>
+<h2 id="step-7-checking-component-placement">Step 7: Checking component placement</h2>
+<p>The next step is crucial -- the component placement. Although JLCPCB will (sometimes) double check any misplacements, it is better to check the placement yourself to be sure.
+JLCPCB will render the gerber files and the component placement files. Visualizations of bad placements (red boxes) and correct placements (green boxes) are show below.
+<strong>The red dots should match the white dots on the silkscreen.</strong> Here, we can see that the orientation of U2,U3, and U4 are off by 180 degrees. </p>
+<p>To fix the issue (if they may occur), we can modify the orientation in the <strong>Footprint_position.csv</strong> which can be done using a simple text editor, or using Excel.
+<strong>Possible orientations are: 0,90,180, and 270</strong>; which can be modified under <strong>Rotation</strong> in the .csv file.</p>
+<p><a class="glightbox" data-desc-position="bottom" data-height="auto" data-width="100%" href="../img/6_goodplacement.png?raw=true"><img alt="Alt text" src="../img/6_goodplacement.png?raw=true" title="Placement"/></a></p>
+<h2 id="step-8-placing-your-order">Step 8: Placing your order</h2>
+<p>Once all the orientations are correct, press <strong>Save to Cart</strong> to finalize the order! Its that easy ;)</p>
+<ul>
+<li>PCB production is 2-3 days, </li>
+<li>SMT assembly is 3 days</li>
+</ul>
+<p>Hence, production time is <strong>roughly one week!</strong></p>
 </article>
 </div>
 </div>
 </main>
 <footer class="md-footer">
 <nav aria-label="Footer" class="md-footer__inner md-grid">
-<a aria-label="Previous: Installation" class="md-footer__link md-footer__link--prev" href="../../install/" rel="prev">
+<a aria-label="Previous: VEAB hat (RPi)" class="md-footer__link md-footer__link--prev" href="../controlboard/" rel="prev">
 <div class="md-footer__button md-icon">
 <svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"></path></svg>
 </div>
@@ -313,17 +486,17 @@
 <span class="md-footer__direction">
                 Previous
               </span>
-              Installation
+              VEAB hat (RPi)
             </div>
 </div>
 </a>
-<a aria-label="Next: Mesh generation" class="md-footer__link md-footer__link--next" href="../mesh/" rel="next">
+<a aria-label="Next: Developer(s)" class="md-footer__link md-footer__link--next" href="../../contact/" rel="next">
 <div class="md-footer__title">
 <div class="md-ellipsis">
 <span class="md-footer__direction">
                 Next
               </span>
-              Mesh generation
+              Developer(s)
             </div>
 </div>
 <div class="md-footer__button md-icon">
