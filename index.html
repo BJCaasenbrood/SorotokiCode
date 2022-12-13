@@ -180,14 +180,24 @@
         Finite Elements
       </a>
 </li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="beam/shapes/">
+        Beam Shapes and Geometry
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="beam/model/">
+        Model Composer
+      </a>
+</li>
 <li class="md-nav__item md-nav__item--nested">
-<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_4" id="__nav_3_4" type="checkbox"/>
-<label class="md-nav__link" for="__nav_3_4">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_6" id="__nav_3_6" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3_6">
           Visualization
           <span class="md-nav__icon md-icon"></span>
 </label>
 <nav aria-label="Visualization" class="md-nav" data-md-level="2">
-<label class="md-nav__title" for="__nav_3_4">
+<label class="md-nav__title" for="__nav_3_6">
 <span class="md-nav__icon md-icon"></span>
           Visualization
         </label>
@@ -257,12 +267,12 @@
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
 <a class="md-nav__link" href="control/controlboard/">
-        VEAB hat (RPi)
+        VEAB HAT (RPi)
       </a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="control/i2chat/">
-        I2C expander hat (RPi)
+        I2C Expander HAT (RPi)
       </a>
 </li>
 <li class="md-nav__item">
@@ -297,11 +307,6 @@
       Table of contents
     </label>
 <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#about-sorotoki">
-    About Sorotoki
-  </a>
-</li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#what-can-sorotoki-do">
     What can Sorotoki do?
@@ -342,7 +347,7 @@
 <div class="admonition warning">
 <p class="admonition-title">Github page is still under construction. Not all documentation is present at the this stage of development.</p>
 </div>
-<h2 id="about-sorotoki">About Sorotoki</h2>
+<!-- ## About Sorotoki -->
 <p>Sorotoki is an open-source MATLAB toolkit for soft robotics that includes an array of tools for design, modeling, and control. Due to its scientific diversity, it can be challenging for new researchers to quickly familiarize themselves with multiple scientific areas. With the aim to lower this threshold, Sorotoki aims to incorporate multiple layers of soft robotics research into one compact toolkit. Examples include: continuum mechanics, dynamic systems and control theory, topology optimization, computer graphics, and much more to come! The combination provides a highly flexible programming environment and will hopefully aid the development of novel soft robotic research.</p>
 <h2 id="what-can-sorotoki-do">What can Sorotoki do?</h2>
 <p>Sorotoki started out small, but at its current state, it contains a vast collection of functionalities -- tailored towards many aspects of soft robotics. For example, suppose you are inspired by the multi-gait soft crawler developed by Shepard et al.<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup> -- <a href="https://www.youtube.com/watch?v=lUyuBOtsDu4">See video</a>. Or you want to simulate the incredibly dexterous soft gripper developed by Suzumori et al.<sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup> -- <a href="https://www.youtube.com/watch?v=kHGLYRUKWeM&amp;t=100s">See video</a>. Can we model such systems easily? Well.... Short answer: <strong>no</strong>. As matter of fact, simplifying the (infinite-dimensional) dynamics of soft robots is no easy feat. It has been an active topic of research for the better part of the last two decades. Ironically, studying <em>"soft"</em> robotics is incredibly <em>"hard"</em>.</p>
@@ -422,14 +427,14 @@
 </code></pre></div>
 </details>
 </details>
-<details class="example" open="open">
+<details class="example">
 <summary>Example 2: Fitting hyper-elastic materials</summary>
 <p><div align="center">
 <video autoplay="" controls="" height="310" loop="" width="400">
 <source src="./assets/fem_material_fit.mp4" type="video/mp4"/>
 </video>
 </div></p>
-<p>Soft robots own their name to soft materials. Regarding design analysis, it is essential that the constitutive material models reflect the mechanical nature of these soft material. However, finding the appropriate material parameters for these models can be challenging without the proper tools. Sorotoki is equipped with tools for hyper-elastic material fitting. Consider for instance the cubic Yeoh model:</p>
+<p>Soft robots own their name to soft materials. It is therefore of paramount importance that the constitutive material models reflect the mechanical nature truthfully. However, finding the "<em>true</em>" material parameters for these material models can be challenging without the proper tools. Sorotoki is equipped with tools for hyper-elastic material fitting. Consider for instance the cubic Yeoh model:</p>
 <div class="arithmatex">\[ \Psi_{\textrm{YH}}(I_1; \pi) = \sum_{i = 1}^3 \pi_i (I_1 - 3)^{i} \]</div>
 <p>where <span class="arithmatex">\(I_1 = {\lambda_1}^2 + {\lambda_2}^2 + {\lambda_3}^2\)</span> is the first strain invariant, and <span class="arithmatex">\(\pi\)</span> a vector of unknown material parameters. For uniaxial tension, we have that <span class="arithmatex">\(\lambda_1 = \lambda\)</span> and <span class="arithmatex">\(\lambda_2 = \lambda_3 = 1/{\lambda^2}\)</span>. Therefore, the stress along the uniaxial tension test is given by <span class="arithmatex">\( \sigma_{11} = 2 \left(\lambda^2 - \frac{1}{\lambda} \right)\Psi' \)</span> with <span class="arithmatex">\(\Psi'\)</span> the partial derivative of <span class="arithmatex">\(\Psi\)</span> with respect to <span class="arithmatex">\(I_1\)</span>. Luckily, these uniaxial stress-strain relations are included in every hyperelastic material model of Sorotoki. Simply call <code>S = material.uniaxial(x)</code>. The optimal material parameters <span class="arithmatex">\(\pi\)</span> can then be easily found using standard optimization routines such as <code>fmincon</code>. See the example below.</p>
 <details class="info" open="open">
