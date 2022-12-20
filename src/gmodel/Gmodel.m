@@ -95,7 +95,7 @@ methods
 function obj = Gmodel(varargin) 
     
     obj.Texture        = bluebase;
-    obj.TextureStretch = .8;
+    obj.TextureStretch = 0.75;
     obj.Quality        = 32;
     
     obj.FlipNormals = false;
@@ -212,34 +212,59 @@ function Gmodel = render(Gmodel,varargin)
     function myprecallback(src,evnt)
         warning off;
         class = whoClasses('Gmodel');
+        if ~isa(class{1},'double')
         for i = 1:length(class)
-        	r = update(class{i},'tex');
-        end
-        class = whoClasses('Rig');
-        for i = 1:length(class)
-            if ~isempty(class{i})
-                r = class{i}.update();
+            try
+                r = update(class{i},'tex');
             end
         end
+        end
+        class = whoClasses('Sdf');
+        if ~isa(class{1},'double')
+        for i = 1:length(class)
+            if ~isempty(class{i}.Gmodel)
+                try
+                    r = update(class{i}.Gmodel,'tex');
+                end
+            end
+        end
+        end
+        class = whoClasses('Rig');
+        if ~isa(class{1},'double')
+        for i = 1:length(class)
+            if ~isempty(class{i})
+                try
+                    r = class{i}.update();
+                end
+            end
+        end
+        end
         class = whoClasses('Shapes');
+        if ~isa(class{1},'double')
         for i = 1:length(class)
             obj = class{i}.get('Gmodel');
             if ~isempty(obj)
-                r = obj.update();
+                try
+                    r = obj.update();
+                end
             end
         end
-        
+        end
         class = whoClasses('cell');
+        if ~isa(class{1},'double')
         for i = 1:length(class)
             cll = class{i};
             for j = 1:length(cll)
-                if isa(cll{j},'Gmodel')
-                    r = update(cll{j},'tex');
-                end
-                if isa(cll{j},'Rig')
-                    r = cll{j}.update();
+                try
+                    if isa(cll{j},'Gmodel')
+                        r = update(cll{j},'tex');
+                    end
+                    if isa(cll{j},'Rig')
+                        r = cll{j}.update();
+                    end
                 end
             end
+        end
         end
         
         warning on;

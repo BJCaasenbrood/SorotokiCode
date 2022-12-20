@@ -9,7 +9,7 @@ else
     k =  min(max(k,-1+eps),1-eps); 
 end
 
-x = min(max(x,-1),1); % ensure x is bounded
+x = min(max(x,-1),1);            % ensure x is bounded
 y = (x - k*x)./(k-2*k*abs(x)+1); % sigmoid function
 end
 

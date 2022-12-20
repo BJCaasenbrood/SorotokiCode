@@ -860,10 +860,12 @@ while true
         b = Fe + Fu - Fi - R*Fem.dUtmp(FreeDofs);
         
         % solve for acceleration    
+        dA = decomposition(A,'qr');
+        DeltaU = dA\b;
         %DeltaU = A\b;
         %[DeltaU,~] = gmres(A,b,[],Fem.ResidualNorm,100);
-        [L,D,P] = ldl(A,'vector');
-        DeltaU  = sparse(P,1,(L'\(D\(L\b(P))))); % thanks Ondrej ;)
+        %[L,D,P] = ldl(A,'vector');
+        %DeltaU  = sparse(P,1,(L'\(D\(L\b(P))))); % thanks Ondrej ;)
  
         ddDelta(FreeDofs,1) = ddDelta(FreeDofs,1) + DeltaU(:,1);
         

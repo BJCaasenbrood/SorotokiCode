@@ -8,7 +8,7 @@ classdef Shapes
         NModal;     % Number of modes
         NNode;      % Number of nodes (spatial discretization)
         
-        Length;         % Intrinic length
+        Length;     % Intrinic length
         Theta;      % Shape Basis Matrix functional
         Xi0;        % Intrinsic strain fucntional
         g0;         % Initial orientation frame
@@ -20,6 +20,7 @@ classdef Shapes
         Gravity;    % Gravity vector
         Sdf;        % Cross-sectional SDF
         Contact;    % Contact model
+        Muscle;     % Muscle function
         
         Fem;        % a-priori fem solution
         Sigma;      % spatial discretization
@@ -72,7 +73,13 @@ classdef Shapes
         
         ThetaEval;
         Xi0Eval;
+        MuscleEval;
         VolumetricContact;
+        MuscleLines;
+        RenderMuscles = true;
+        
+        Umin = 0;
+        Umax = 1;
     end
    
 %--------------------------------------------------------------------------
@@ -118,7 +125,7 @@ function obj = Shapes(Input,NModal,varargin)
     obj.Sdf          = sCircle(5);
     obj.Center       = zeros(3,1);
     obj.Material     = NeoHookeanMaterial(5,0.33);
-    obj.Texture      = whitebase;
+    obj.Texture      = bluebase;
     
     obj.FilterRadius      = 10;
     obj.VolumetricContact = true;
@@ -138,6 +145,8 @@ function obj = Shapes(Input,NModal,varargin)
     obj.TubeRadiusB     = 5;
     obj.TubeRadiusAlpha = 0;  
     obj.TubeRamp        = 0;  
+    obj.Umin            = -1;
+    obj.Umax            = 1;
            
     for ii = 1:2:length(varargin)
         obj.(varargin{ii}) = varargin{ii+1};
@@ -186,6 +195,14 @@ function Shapes = set(Shapes,varargin)
         Shapes.(varargin{ii}) = varargin{ii+1};
     end
 end
+%----------------------------------------------------------- set base SE(3)
+function Shapes = setBase(Shapes,varargin)
+if numel(varargin{1}) == 9 || numel(varargin{1}) == 3
+    Shapes.g0 = SE3(varargin{1});
+else
+    Shapes.g0 = varargin{1};
+end     
+end
 %--------------------------------------------------------------- set radius
 function Shapes = setRadius(Shapes,varargin)
    if numel(varargin) == 1 && numel(varargin{1}) == 1
@@ -217,15 +234,28 @@ G0 = Shapes.InputMap(Shapes);
 Shapes.NInput = size(G0,2);
 end
 %-------------------------------------------------------------- set gravity 
+function Shapes = setMaterial(Shapes,varargin)
+   Shapes.Material = varargin{1};
+end
+%-------------------------------------------------------------- set gravity 
+function Shapes = setTexture(Shapes,varargin)
+   Shapes.Texture = varargin{1};
+end
+%-------------------------------------------------------------- set gravity 
 function Shapes = addGravity(Shapes,varargin)
 if isempty(varargin)
-    varargin{1} = -9810*Shapes.xia0(4:6,1);
+     vec = -9810*Shapes.xia0(4:6);
+     varargin{1} = vec(:);
 end
 Shapes.Gravity = varargin{1};    
 end
 %-------------------------------------------------------------- set gravity 
 function Shapes = addContact(Shapes,varargin)
 Shapes.Contact = varargin{1};    
+end
+%--------------------------------------------------------------- add muscle
+function Shapes = addMuscle(Shapes,varargin)
+    Shapes.Muscle{end+1} = varargin{1};
 end
 %---------------------------------------------------------------- show mesh
 function Shapes = show(Shapes,varargin)
@@ -291,6 +321,30 @@ if strcmp(Request,'POD')
 end
 
 end
+%---------------------------------------------------- render muscle lines
+function h = showMuscle(Shapes,varargin)
+    
+% if nargin < 2
+%     q = ones(Shapes.NJoint,1)*1e-12;
+% else
+%     q = varargin{1};
+% end
+
+% [G] = string(Shapes,q);
+G = Shapes.Log.FK.g;
+M = Shapes.MuscleEval;
+
+hold on;
+for ii = 1:size(M,3)
+    P = M(1:2:end,1:3,ii);
+    for jj = 1:Shapes.NNode
+        P_ = G(1:3,1:3,jj)*(P(jj,:).') + G(1:3,4,jj);
+        PP(jj,:) = P_.';
+    end
+    h{ii} = fplot(PP);
+end
+
+end
 %------------------------------------------------------------ render string
 function Shapes = render(Shapes,varargin)
 
@@ -300,16 +354,20 @@ function Shapes = render(Shapes,varargin)
        q = varargin{1};
     end
     
-    p0     = Shapes.g0(1:3,4);
+    p0 = Shapes.g0(1:3,4);
     [g, J] = string(Shapes,q);
     
     Shapes.Node = [p0.'; reshape(g(1:3,4,1:end),3,[]).'];
     Shapes.Log.FK.g = g;
     Shapes.Log.FK.J = J;
     Shapes.Log.FK.Node = Shapes.Node;
+    Shapes.Log.FK.L    = sum(sqrt(sum(diff(Shapes.Log.FK.Node).^2,2))) ...
+                         + Shapes.Length/Shapes.NNode;
+
+    Stretch = Shapes.Log.FK.L/Shapes.Length;
 
     if isempty(Shapes.Gmodel) 
-        obj = Gmodel(Shapes);
+        obj = Gmodel(Shapes,varargin{2:end});
         obj = obj.set('Texture',Shapes.Texture);
         obj = obj.bake;
         obj = obj.render();
@@ -320,8 +378,8 @@ function Shapes = render(Shapes,varargin)
             Shapes.TubeRadiusB,...
             Shapes.TubeRadiusAlpha,...
             16,1e-6,...
-            Shapes.TubeRamp);
-        %h = mesh(x,y,z);
+            Shapes.TubeRamp*Stretch^3);
+
         fv = surf2patch(x,y,z,'triangles');
         v = fv.vertices;
         Shapes.Gmodel.Node = v;
@@ -329,6 +387,38 @@ function Shapes = render(Shapes,varargin)
     end
     
     hold on;
+    if Shapes.RenderMuscles && ~isempty(Shapes.Muscle) 
+        M = Shapes.MuscleEval;
+        P = zeros(Shapes.NNode,3,numel(Shapes.Muscle));
+        
+        for ii = 1:size(M,3)
+                        
+            Nds = M(1:2:end,1:3,ii);
+            for jj = 1:Shapes.NNode
+                P(jj,:,ii) = (g(1:3,1:3,jj)*(Nds(jj,:).') ...
+                    + g(1:3,4,jj)).';
+            end
+        end
+        
+        Ns   = Shapes.NNode;
+        Cmap = polarmap(Ns);
+        Xmap = linspace(0,1,Ns);
+ 
+        if isempty(Shapes.MuscleLines)
+            Shapes.MuscleLines = fplot(P);
+        else
+            h = Shapes.MuscleLines;
+            for ii = 1:numel(h)
+               h(ii).XData = P(:,1,ii);
+               h(ii).YData = P(:,2,ii);
+               h(ii).ZData = P(:,3,ii);
+               
+               %v = invlerp(U(ii),Shapes.Umin,Shapes.Umax);
+               %h(ii).Color = interp1(Xmap.',Cmap,clamp(v,0,1));
+            end
+        end
+        
+    end
     
 end
 %------------------------------------------------------------ set reference
@@ -398,6 +488,7 @@ KK     = 4.15*diag(voightextraction(KK));
 % KK = pi*diag([G,E,E,E,G,G]);
 
 Shapes.Ktt  = diag(diag(JJ))*KK;
+%Shapes.Ktt(4:6,4:6) = 0.001*Shapes.Ktt(4:6,4:6);
 Shapes.Dtt  = Shapes.Material.Zeta*Shapes.Ktt;
   
 if ~isempty(Shapes.Node0)
@@ -453,6 +544,29 @@ for ii = 1:numel(s)
     Shapes.ThetaEval(:,:,ii) = FncT(s(ii));
     Shapes.Xi0Eval(:,1,ii)   = FncX(s(ii));
 end
+end
+
+if ~isempty(Shapes.Muscle)
+    M = numel(Shapes.Muscle);
+    N = numel(s);
+    h = mean(diff(s/Shapes.Length));
+    
+    Shapes.MuscleEval = zeros(N,6,M);
+    [P, P0] = computeMuscleGroups(Shapes,s/Shapes.Length);
+    
+    for ii = 1:M
+        
+       % compute derivative along the tendon 
+       [~,dP0] = gradient(P0(:,:,ii),h); 
+
+       Shapes.MuscleEval(:,1:3,ii) = P0(:,:,ii);
+       Shapes.MuscleEval(:,4:6,ii) = dP0;
+    end
+    
+    Shapes.NInput = M;
+else
+   N = numel(s);
+   Shapes.MuscleEval = zeros(N,6,1);
 end
 
 end 
@@ -615,8 +729,22 @@ dQ   = q(NQ+1:2*NQ);
     Shapes.Xi0Eval,...    % intrinsic strain vector
     Shapes.ThetaEval,...  % evaluated Theta matrix
     Shapes.Ba);
+% 
+% [M_,C_,K_,R_,fg_,...
+%     gam_,Phi_,J_,dJdt_,Grav,Kin] = computeLagrangianFast_mex(...
+%     Q,dQ,...
+%     Shapes.ds,...
+%     Shapes.g0(1:3,4),...
+%     Shapes.g0(1:3,1:3),...
+%     Shapes.Xi0Eval,...
+%     Shapes.ThetaEval,...
+%     Shapes.Ba,...
+%     Shapes.Ktt,...
+%     Shapes.Mtt,...
+%     Shapes.Material.Zeta,...
+%     Shapes.Gravity);
 
-[M_,C_,K_,R_,fg_,...
+[M_,C_,K_,R_,fg_,G_,...
     gam_,Phi_,J_,dJdt_,Grav,Kin] = computeLagrangianFast_mex(...
     Q,dQ,...
     Shapes.ds,...
@@ -624,6 +752,7 @@ dQ   = q(NQ+1:2*NQ);
     Shapes.g0(1:3,1:3),...
     Shapes.Xi0Eval,...
     Shapes.ThetaEval,...
+    Shapes.MuscleEval,...
     Shapes.Ba,...
     Shapes.Ktt,...
     Shapes.Mtt,...
@@ -647,7 +776,17 @@ Shapes.Log.PH.Elastic = 0.5*Q.'*K_*Q;
 Shapes.Log.PH.Gravity = Grav;
 Shapes.Log.PH.dVdq    = K_*Q + fg_;
 
-Shapes.Log.EL.G = Shapes.InputMap(Shapes);
+if isempty(Shapes.Muscle)
+   Shapes.Log.EL.G = eye(Shapes.NJoint);
+else
+   Shapes.Log.EL.G = G_; 
+end
+
+% Shapes.Log.EL.G = Shapes.InputMap(Shapes);
+
+% if ~isempty(Shapes.Muscle)
+%    P = computeMuscleGroups(Shapes); 
+% end
 
 % pre-compute Minverse
 Minv = M_\eye(numel(Q));
@@ -662,6 +801,8 @@ Shapes.Log.FK.g    = g;
 Shapes.Log.FK.J    = J;
 Shapes.Log.FK.eta  = eta;
 Shapes.Log.FK.Node = reshape(g(1:3,4,:),3,[]).';
+Shapes.Log.FK.L    = sum(sqrt(sum(diff(Shapes.Log.FK.Node).^2,2))) ...
+    + Shapes.Length/Shapes.NNode;
 
 Shapes.Log.FK.gam = gam_;
 Shapes.Log.FK.Phi = Phi_;
@@ -672,8 +813,8 @@ if ~isempty(Shapes.Contact)
    Nds = Shapes.Log.FK.Node;
    I = ~~sign(sum(abs(Wc),2));
    
-   Shapes.Log.Con.Wc = Wc(I,:);  % Wrench normal contact
-   Shapes.Log.Con.Wt = Wt(I,:);  % Wrench tangent contact
+   Shapes.Log.Con.Wc = Wc(I,:);    % Wrench normal contact
+   Shapes.Log.Con.Wt = Wt(I,:);    % Wrench tangent contact
    Shapes.Log.Con.Node = Nds(I,:);
 end
 
@@ -681,7 +822,7 @@ end
 dx = [dQ; ...
      Minv*(Shapes.Log.EL.G*u - Shapes.Log.EL.C*dQ - ...
            Shapes.Log.EL.K*Q - Shapes.Log.EL.R*dQ - ...
-           Shapes.Log.EL.fg + Shapes.Log.EL.fc)];
+           Shapes.Log.EL.fg  + Shapes.Log.EL.fc)];
     
 end  
 %--------------------------------------------------------- compute jacobian
@@ -1338,6 +1479,30 @@ for ii = 1:n
 end
 
 end
+%--------------------------------------------- isomorphism from R3 to so(3)
+function [P,F] = computeMuscleGroups(Shapes,s)
+ 
+M = numel(Shapes.Muscle);
+P = zeros(numel(s),3,M);
+F = zeros(numel(s),3,M);
+r = Shapes.TubeRadiusA;
+if isempty(Shapes.TubeRamp)
+    R = @(x) r;
+else
+    R = @(x) r * (1 -  Shapes.TubeRamp * x);
+end
+
+Xi03 = Shapes.xia0(4:6);
+
+for ii = 1:M
+    fnc = Shapes.Muscle{ii};
+    P0  = R(s).*fnc(s);
+    P(:,:,ii) = P0.' + (s.*(Xi03(:))*Shapes.Length).';
+    F(:,:,ii) = P0.';
+end
+
+end
+
 end
 end
 

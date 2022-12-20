@@ -7,17 +7,18 @@ L = 120;
 
 %%
 rgb = RigidBody('Mtt',blkdiag(J,m));
-rgb = rgb.setInitialSE3(SE3(eye(3),[L,0,0]));
+rgb = rgb.setInitialSE3(SE3(eye(3),[0,0,L]));
 rgb = rgb.setGravity();
 
 rgb.Gmodel = Gmodel(sCylinder(0,0,-10,10,10).');
 
 %%
 Y   = chebyspace(50,1);
-shp = Shapes(Y,[0,1,0,0,0,0],'L0',L);
+shp = Shapes(Y,[0,1,0,0,0,0],'Length',L);
+%shp = shp.setBase(roty(pi/2));
 shp = shp.rebuild();
 
-mdl = Model(shp,'TimeEnd',3,'TimeStep',1/60);
+mdl = Model(shp,'TimeEnd',3,'TimeStep',1/250);
 mdl = mdl.addSystem(rgb);
 
 mdl.Controller = @(x) fnc(x);
@@ -47,7 +48,7 @@ end
 function u = fnc(mdl)
 t = mdl.t;
 u = zeros(mdl.NIn,1);
-u(1) = 300*sin(2*pi*t);
+u(1) = 500*sin(4*pi*t);
 
 m   = mdl.Systems{2}.getMass();
 ge  = mdl.Systems{1}.Log.FK.g(:,:,end);
@@ -56,7 +57,7 @@ gc  = mdl.Systems{2}.Log.g;
 etac = mdl.Systems{2}.Log.eta;
 R   = gc(1:3,1:3);
 
-eta(1:3) = eta(1:3);
+eta(1:3)  = eta(1:3);
 etac(1:3) = etac(1:3);
 
 Kp = kron(diag([10,20]),eye(3));

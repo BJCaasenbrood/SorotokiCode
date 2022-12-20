@@ -1,14 +1,15 @@
+
 %% mesh
 sdf = sCircle(18,25,5) - sCircle(18,25,3.5);
-msh = Mesh(sdf,'NElem',35);
+msh = Mesh(sdf,'NElem',55);
 msh = msh.generate();
 
 %% fem model
-fem = Fem(msh,'TimeStep',1/750);
+fem = Fem(msh,'TimeStep',1/1200);
 
 fem.Material = NeoHookeanMaterial(0.01,0.49);
 fem.Material.Rho = fem.Material.Rho;
-fem.Material.Cfr  = 0.15;
+fem.Material.Cfr  = 0.5;
 fem.Material.Rr   = 5;
 
 fem = fem.addGravity();

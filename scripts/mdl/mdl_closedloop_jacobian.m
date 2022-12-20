@@ -14,11 +14,12 @@ Xd = [10;10;30];
 %% shapes
 % generate nodal space
 Y   = chebyspace(N,M);
-shp = Shapes(Y,Modes,'L0',L,'xia0',[0,0,0,0,0,1]);
+shp = Shapes(Y,Modes,'Length',L,'xia0',[0,0,0,0,0,1]);
 
 %% set material properties
 shp = shp.setRadius(8);
 shp = shp.setRamp(0.75);
+shp = shp.addGravity();
 
 shp.Material.Zeta = 0.05;
 shp = shp.rebuild(); 
@@ -54,13 +55,14 @@ t = mdl.t;
 sys = mdl.Systems{1};
 q  = sys.Log.q;
 fe = sys.Log.EL.K*q;
+fg = sys.Log.EL.fg;
 J  = sys.Log.FK.J(:,:,end);
 x  = sys.Log.FK.g(1:3,4,end);
 
 kp = 1e-3;
 
 J = J(4:6,:);
-tau = fe + kp*J.'*(Xd - x);
+tau = fe + fg + kp*J.'*(Xd - x);
 
 end
 

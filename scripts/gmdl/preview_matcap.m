@@ -1,6 +1,7 @@
 clr; 
 %% preview
-obj = Gmodel(sSphere(1),'Quality',50);
+fig(101,[9,9])
+obj = Gmodel('Bunny.stl','TextureStretch',0.675);
 
 mat = {aniso, bluered, bump, chroma, chromium, ...
        clean, copper, egg, grey, hotmetal, jade, ...
@@ -15,7 +16,7 @@ obj.bake().render();
 for ii = 1:numel(mat)
    obj.Texture = mat{ii};
    obj.update;
-   view(10,20); drawnow;
+   view(10,10); drawnow;
    pause(0.2);
 end
 

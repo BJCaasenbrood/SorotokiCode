@@ -1,8 +1,8 @@
 clr; 
 %% 
 L = 120;   % length of robot
-M = 6;     % number of modes
-N = 30;   % number of discrete points on curve
+M = 12;     % number of modes
+N = 120;    % number of discrete points on curve
 H = 1/60;  % timesteps
 FPS = 30;  % animation speed
 
@@ -11,11 +11,13 @@ Modes = [0,M,M,0,0,0];  % pure-XY curvature
 %% shapes
 % generate nodal space
 Y = chebyspace(N,M);
-shp = Shapes(Y,Modes,'L0',L,'xia0',[0,0,0,1,0,0]);
+shp = Shapes(Y,Modes,'Length',L,...
+    'xia0',[0,0,0,1,0,0],...
+    'Texture',softmath);
 
 %% set material properties
-shp = shp.setRadius(8);
-shp = shp.setRamp(0.8);
+shp = shp.setRadius(10);
+shp = shp.setRamp(0.75);
 
 shp.Gravity = [0;0;-9810];
 shp = shp.rebuild(); 
@@ -30,7 +32,7 @@ mdl.Controller = @(M) Controller(M);
 mdl = mdl.simulate(); 
 
 %% animation
-sph = Gmodel(sSphere(5));
+sph = Gmodel(sSphere(4));
 sph.Texture = diffuse(0.925);
 sph.bake.render();
 
@@ -39,11 +41,11 @@ for ii = 1:fps(mdl.Log.t,FPS):length(mdl.Log.t)
     shp = shp.render(mdl.Log.x(ii,1:2*M));
     
     sph.reset();
-    sph = Blender(sph,'SE3',gref(mdl.Log.t(ii)));
+    sph = Blender(sph,'SE3',gref(mdl.Log.t(ii)*0));
     %sph = Blender(sph,'SE3',SE3(roty(pi/2),[0;0;0]));
     sph.update();
     
-    axis([-.1*L .25*L -.25*L .5*L -L 0.1*L]);
+    axis([-.1*L L -.1*L .5*L -0.25*L 0.1*L]);
     view(30,30);
     drawnow();
 end
@@ -61,7 +63,7 @@ JJ = mdl.Systems{1}.Log.FK.J;
 
 ge = gg(:,:,end);
 J  = admapinv(ge)*JJ(:,:,end);
-gd = gref(t);
+gd = gref(0);
 
 lam1 = 5e4;
 lam2 = 1e4;

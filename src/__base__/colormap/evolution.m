@@ -1,12 +1,12 @@
 function colmap = evolution(varargin)
 if isempty(varargin)
-    C = color_orange;
+    C = color_primary;
     n = 100;
 else
     if numel(varargin) == 1 && numel(varargin{1}) == 1
         if numel(varargin{1}) == 1
             n = varargin{1};
-            C = color_orange;
+            C = color_primary;
         elseif numel(varargin{1}) == 3
             C = varargin{1};
             n = 100;
@@ -25,6 +25,7 @@ end
 
 WW = [0.8929    0.8929    0.8929];
 colmap = linspacen(WW.',C.',n).';
+colmap = flipud(colmap);
 
 if nargin>0
     colmap = clrmapping(colmap,n);

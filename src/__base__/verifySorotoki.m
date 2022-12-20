@@ -185,7 +185,7 @@ sdf = sRectangle(0,2,0,1);
 cout('\t Fem(Mesh)'); bic; 
 msh = Mesh(sdf,'Quads',[8,3]);
 msh = msh.generate();
-fem = Fem(msh,'ShowProcess',false);
+fem = Fem(msh,'TimeStep',1/60,'ShowProcess',true);
 boc;
 
 cout('\t Fem.show()'); bic; 
@@ -207,7 +207,7 @@ cout('\t NeoHookean()'); bic;
 fem = fem.reset();
 fem.Material = NeoHookeanMaterial(); fem.solve();
 boc();
-
+% 
 cout('\t MooneyMaterial()'); bic(1); 
 fem = fem.reset();
 fem.Material = MooneyMaterial(); fem.solve();
@@ -316,7 +316,7 @@ Y = gsogpoly(Y,X);
 boc;
 
 cout('\t Shapes(Y,Modes)'); bic(1); 
-shp = Shapes(Y,[0,M,0,0,0,0],'L0',100);   
+shp = Shapes(Y,[0,M,0,0,0,0],'Length',100,'xia0',[0,0,0,1,0,0]);   
 boc;
 
 cout('\t Shapes.string()'); bic(1); 

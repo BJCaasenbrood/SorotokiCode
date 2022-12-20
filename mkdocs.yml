@@ -10,15 +10,21 @@ nav:
       - fem/sdf.md
       - fem/mesh.md
       - fem/fem.md
+      - beam/shapes.md
+      - beam/model.md
       - Visualization:
         - plotting/figure.md
         - plotting/rendering.md
+        - plotting/matcap.md
         - plotting/colors.md
         - plotting/colormaps.md
-  - Soft Robots:
+  - Open soft robots:
     - sorobots/softmanipulator.md
-  - Control Interface:
+    - sorobots/softhand.md
+  - Control interface:
     - control/controlboard.md
+    - control/i2chat.md
+    - control/orderveab.md
   - contact.md  
   - release.md
 

@@ -1,11 +1,11 @@
 clr;
 %% generate mesh from sdf
 t = 0.65;    % thickness
-f = 6;      % frequency
+f = 3;      % frequency
 
 Dist = @(X) SDF(X,t,f);
 obj = Gmodel(Dist,domain(-1.1,1.1,3),...
-    'Quality',90);
+    'Quality',40);
 
 %% set texture
 obj.Texture = softmath;

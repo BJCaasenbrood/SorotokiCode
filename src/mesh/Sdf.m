@@ -3,8 +3,10 @@ classdef Sdf
     properties
         sdf;
         BdBox;
+        Gmodel;
         cmap;
         eps = 1e-5;
+        
         
         Node;      
         Element;
@@ -391,6 +393,13 @@ function show(Sdf,varargin)
 
         colormap(Sdf.cmap);
     end
+end
+%--------------------------------------------------------------------- show
+function Sdf = render(Sdf,varargin)
+obj = Gmodel(Sdf,'Quality',80,varargin{:});
+obj.bake.render();    
+
+Sdf.Gmodel = obj;
 end
 %------------------------------------------------------------ show skeleton
 function skeleton(Sdf)

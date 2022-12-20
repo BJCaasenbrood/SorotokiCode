@@ -41,7 +41,7 @@ methods
 function obj = Model(Input,varargin) 
     
     obj.NSys = 1;
-    obj.MaxIteration = 10;
+    obj.MaxIteration = 20;
     obj.ResidualNorm = 1e-6;
     obj.TimeEnd  = 10;
     obj.TimeStep = 1/60;

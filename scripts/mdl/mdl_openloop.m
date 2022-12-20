@@ -8,7 +8,7 @@ FPS = 50;   % animation speed
 
 %% 
 Y = chebyspace(N,M);
-shp = Shapes(Y,[0,M,0,0,0,0],'L0',L);
+shp = Shapes(Y,[0,M,0,0,0,0],'Length',L);
 
 %%
 mdl = Model(shp,'TimeEnd',30);

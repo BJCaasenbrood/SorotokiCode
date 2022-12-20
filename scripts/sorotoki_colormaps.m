@@ -5,7 +5,7 @@ fig(102,[10.75,10.75]);
 
 name = {'blackwhite', 'bluesea', 'heatmap', 'inferno', 'metro', ...
         'noir','turbo','viridis','bounce','barney','evolution','rainbow',...
-        'polarmap','redgreen','soapbubble'};
+        'polarmap','redgreen','soapbubble','hsv'};
 
 N  = numel(name);
 Nx = ceil(sqrt(N));

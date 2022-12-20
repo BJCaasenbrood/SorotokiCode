@@ -1,6 +1,6 @@
 clr;
 %% model
-obj = Gmodel(SDF,'Quality',100);
+obj = Gmodel(SDF,'Quality',125);
 
 %% set texture
 obj.bake().render(); 

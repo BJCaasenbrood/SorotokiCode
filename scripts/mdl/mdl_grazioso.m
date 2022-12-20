@@ -12,7 +12,7 @@ R   = 1;         % mm
 shp = Shapes(Y,[0,M,M,0,0,0],'Length',L,'xia0',[0;0;0;1;0;0]);
 shp.Material = NeoHookeanMaterial(E0,Nu0);
 
-shp.Material.Zeta = 1e-6;
+shp.Material.Zeta = 5e-6;
 shp.Material.Rho  = Rho;
 
 shp = shp.setRadius(R);
