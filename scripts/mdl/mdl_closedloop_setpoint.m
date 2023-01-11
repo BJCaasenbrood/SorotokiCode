@@ -12,8 +12,7 @@ Modes = [0,M,M,0,0,0];  % pure-XY curvature
 % generate nodal space
 Y = chebyspace(N,M);
 shp = Shapes(Y,Modes,'Length',L,...
-    'xia0',[0,0,0,1,0,0],...
-    'Texture',softmath);
+    'xia0',[0,0,0,1,0,0]);
 
 %% set material properties
 shp = shp.setRadius(10);
@@ -42,7 +41,6 @@ for ii = 1:fps(mdl.Log.t,FPS):length(mdl.Log.t)
     
     sph.reset();
     sph = Blender(sph,'SE3',gref(mdl.Log.t(ii)*0));
-    %sph = Blender(sph,'SE3',SE3(roty(pi/2),[0;0;0]));
     sph.update();
     
     axis([-.1*L L -.1*L .5*L -0.25*L 0.1*L]);

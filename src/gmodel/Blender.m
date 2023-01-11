@@ -257,6 +257,7 @@ for ii = 1:length(Node0)
 end
 
 % fixes cosserat frame
+%V(:,1) = V(:,1);
 mesh.Node = V;
 
 end

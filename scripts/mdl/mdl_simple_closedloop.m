@@ -15,7 +15,7 @@ qd(1:3)  = [20,-10,-30]*kpa;
 %% shapes
 % generate nodal space
 Y   = chebyspace(N,M);
-shp = Shapes(Y,Modes,'L0',L,'xia0',[0,0,0,0,0,1]);
+shp = Shapes(Y,Modes,'Length',L,'xia0',[0,0,0,0,0,1]);
 
 pd = shp.FK(qd);
 

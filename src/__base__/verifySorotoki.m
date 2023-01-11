@@ -66,13 +66,20 @@ function checkPlot
 global dt
 figure(101);
 set(gcf,'Name','Checking Plotting tools');
-subplot(2,2,1);
 cout('\t color\t');
 bic;
-colorshow();
+subplot(2,2,1:2);
+N = 10; 
+X = linspace(0,pi*3,1e5);
+for ii=1:N
+    Y = cos(X+1*ii*pi/N);
+    plot(X,Y,'Color',col(ii));
+    hold on;
+    pause(dt)
+end
 boc;
 
-subplot(2,2,2);
+subplot(2,2,3);
 colorwheel();
 % [X,Y,Z] = peaks(40);
 % surf(X,Y,Z,'linestyle','none')
@@ -90,7 +97,7 @@ colormap(turbo); drawnow; pause(dt);
 colormap(viridis); drawnow; pause(dt); 
 boc;
 
-subplot(2,2,3);
+subplot(2,2,4);
 cout('\t cmapping()')
 bic;
 showColormap(turbo); drawnow; pause(dt);
@@ -100,11 +107,6 @@ showColormap(turbo(-100)); drawnow; pause(dt);
 showColormap(turbo(100)); drawnow; pause(dt);
 boc;
 
-subplot(2,2,4);
-cout('\t verify images')
-bic;
-imshow('Pneunet.png');
-boc;
 end
 %---------------------------------------------------------- check Sdf class
 function checkSDF
@@ -122,16 +124,19 @@ sdf2 = Sdf(f2,'BdBox',[-1,1,-1,1,-1,1]);
 sdf3 = Sdf(f3,'BdBox',[-1.5,1.5,-1,1,-1,1]);
 boc;
 
-figure(101);
+figure(101); clf; view(30,30);
 set(gcf,'Name','Checking Signed Distance Functions Sdf.m');
-subplot(2,2,1);
+%subplot(2,2,1);
+cla;
 cout('\t Sdf.show() 2D')
 bic; sdf1.show(); boc;  drawnow; pause(2*dt);
-subplot(2,2,2);
+%subplot(2,2,2);
+cla; view(30,30);
 cout('\t Sdf.show() 3D')
 bic; sdf2.show(); boc; drawnow; pause(2*dt);
 
-subplot(2,2,3);
+%subplot(2,2,3);
+cla;
 cout('\t sdf1 + sdf2 ');
 bic; 
 s = sdf2 + sdf3; 
@@ -144,7 +149,7 @@ s = sdf2 - sdf3; cla;
 s.show(); boc; 
 drawnow; pause(5*dt);
 
-subplot(2,2,4);
+cla;
 cout('\t sdf1/sdf2 ');
 bic; 
 s = sdf2/sdf3; cla;
@@ -183,9 +188,9 @@ function checkFem
 sdf = sRectangle(0,2,0,1);
 
 cout('\t Fem(Mesh)'); bic; 
-msh = Mesh(sdf,'Quads',[8,3]);
+msh = Mesh(sdf,'Quads',[8,2]);
 msh = msh.generate();
-fem = Fem(msh,'TimeStep',1/60,'ShowProcess',true);
+fem = Fem(msh,'TimeStep',1/11,'ShowProcess',false);
 boc;
 
 cout('\t Fem.show()'); bic; 
@@ -220,10 +225,10 @@ boc();
 
 cout('\t Fem.optimize()'); bic; 
 sdf = sRectangle(0,5,0,2);
-msh = Mesh(sdf,'NElem',600);
+msh = Mesh(sdf,'NElem',1200);
 msh = msh.generate();
 fem = Fem(msh,'ShowProcess',0,'Nonlinear',0,...
-    'ChangeMax',0.2,'MaxIterationMMA',30);
+    'ChangeMax',2,'MaxIterationMMA',10);
 
 fem = fem.set('FilterRadius',0.1,'VolumeInfill',0.2,...
               'Penal',3,'ReflectionPlane',[-1,0]);
@@ -316,7 +321,8 @@ Y = gsogpoly(Y,X);
 boc;
 
 cout('\t Shapes(Y,Modes)'); bic(1); 
-shp = Shapes(Y,[0,M,0,0,0,0],'Length',100,'xia0',[0,0,0,1,0,0]);   
+shp = Shapes(Y,[0,M,0,0,0,0],'Length',100,...
+             'xia0',[0,0,0,1,0,0]);   
 boc;
 
 cout('\t Shapes.string()'); bic(1); 
@@ -349,8 +355,10 @@ cout('\t Shapes.rebuild()'); bic(1);
 shp = shp.rebuild(); boc();
 
 cout('\t Model(shp) \t'); bic(1); 
-mdl = Model(shp,'TimeStep',1/120,'TimeEnd',1,'ShowProcess',false);
-mdl.X0(1) = 0.12;
+mdl = Model(shp,'TimeStep',1/120,'MaxIteration',2,...
+    'TimeEnd',1,'ShowProcess',false);
+
+mdl.X0(1) = 0.125;
 boc();
 
 cout('\t Model.simulate()'); bic(1); 

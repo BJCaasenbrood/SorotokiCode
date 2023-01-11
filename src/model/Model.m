@@ -123,9 +123,9 @@ function Model = rebuild(Model)
     Model.Log.t = [];
     Model.Log.u = [];
     
-    %if norm(Model.X0) == 0
+    if norm(Model.X0) == 0
       Model.X0   = Xini; 
-    %end
+    end
     
     [~, Model] = FlowEval(Model,Xini,0);
     

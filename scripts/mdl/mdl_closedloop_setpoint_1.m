@@ -51,10 +51,10 @@ mdl = mdl.simulate();
 
 %% animation
 sph = Gmodel(sSphere(4));
-sph.Texture = diffuse(0.925);
+
 %sph.bake.render();
 fig(101,[9.5,9]);
-set(gcf,'GraphicsSmoothing','off')
+%set(gcf,'GraphicsSmoothing','off')
 jj = 1;
 for ii = [1,38,55,90,150];
 
@@ -64,10 +64,10 @@ for ii = [1,38,55,90,150];
     axis([-.1*L L -.1*L .5*L -0.1*L 0.1*L]);
     zoom(1.5)
     drawnow();
-    
-    export_fig(gca,['img',num2str(jj),'.png'],'-nocrop','-q1200',...
-        '-painters','-a4')
-    jj = jj + 1;
+%     
+%     export_fig(gca,['img',num2str(jj),'.png'],'-nocrop','-q1200',...
+%         '-painters','-a4')
+%     jj = jj + 1;
 end
 
 

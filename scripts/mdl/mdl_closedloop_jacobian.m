@@ -14,11 +14,13 @@ Xd = [10;10;30];
 %% shapes
 % generate nodal space
 Y   = chebyspace(N,M);
-shp = Shapes(Y,Modes,'Length',L,'xia0',[0,0,0,0,0,1]);
+shp = Shapes(Y,Modes,'Length',L);
 
 %% set material properties
 shp = shp.setRadius(8);
 shp = shp.setRamp(0.75);
+shp = shp.setBase(roty(0));
+
 shp = shp.addGravity();
 
 shp.Material.Zeta = 0.05;

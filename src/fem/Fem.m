@@ -1519,55 +1519,18 @@ for ii = 1:size(PS1,1)
        
    end
    
-%    % compute shape function jacobian transformation
-%    for ii = 1:numel(Fem.ShapeFnc{numel(el)}.W)
-%        a = 5*360/5 + 1e-6;
-%        x = [cos(deg2pi*a),sin(deg2pi*a)];
-%        [N,dNdxi] = Fem.ShapeFnc{numel(el)}.fnc(x);
-%    end
-%    
-%    J0 = Vsp.'*Fem.ShapeFnc{numel(el)}.dNdxi(:,:,1);
-%    V1 = ((J0)\Vsp.').';     % transform elements to reference config.
-%    
-%    dv = mean(V1,1);
-%    V1 = V1 - dv;            % pull to origin
-%    V2 = ((J0)\Vin.').'- dv; % transform linepoint to reference config.
-% 
-%    % recover angle
-%    th = atan2(V2(2),-V2(1));
-%    r  = sqrt(dot(V2,V2));
-%    
-%    L = [0,0; r*cos(pi+th),-r*sin(pi+th)]; % draw line to point 
-%    P = [V1;V1(1,:)];   
-%    [xc, yc] = intersections(P(:,1),P(:,2),L(:,1),L(:,2)); 
-   
-%    if isempty(xc) % outside element
-%     N = Fem.ShapeFnc{numel(el)}.fnc(r*[cos(th),sin(th)]);
-%    else % inside element    
-%     % find line intersection on boundary of element
-%     N = Fem.ShapeFnc{numel(el)}.fnc([-xc,yc]);   
-%    end
-
-%     figure(103); subplot(1,2,1);
-%     fplot(Vsp); hold on; fplot(Vin,'bo');
-%     subplot(1,2,2);
-%     fplot(xi); hold on; fplot(XI,'bo');
-
    N = Fem.ShapeFnc{numel(el)}.fnc(XI);
-   %N.'*Vsp;
    
    % assemble distance filter matrix based on ShpFnc N(s)
    if numel(el) == 3
     d{ii} = [repmat(ii,numel(el),1),[el(2);el(1);el(3)],(N)];
    else
-    %d{ii} = [repmat(ii,numel(el),1),[el(end-1:-1:1).';el(end)],(N)];   
     d{ii} = [repmat(ii,numel(el),1),[(el(:))],(N)];   
    end
    
 end
 
 d = cell2mat(d); 
-
 P = sparse(d(:,1),d(:,2),d(:,3),size(PS1,1),Fem.NNode);
 P = spdiags(1./sum(P,2),0,size(P,1),size(P,1))*P;
  
@@ -1585,7 +1548,6 @@ Fem.SpatialFilter = GenerateRadialFilter(Fem,Fem.FilterRadius);
 
 if (~Fem.AssembledSystem && ~Fem.Nonlinear) || Fem.Nonlinear
 Fem.i = zeros(sum(Fem.ElemNDof.^2),1);
-%Fem.i = sparse(sum(Fem.ElemNDof.^2),1);
 Fem.j  = Fem.i; Fem.e  = Fem.i; Fem.fi = Fem.i; Fem.k  = Fem.i; 
 Fem.m  = Fem.i; Fem.c  = Fem.i; Fem.t  = Fem.i; Fem.fb = Fem.i; 
 Fem.ft = Fem.i; Fem.v  = Fem.l;
@@ -1616,11 +1578,9 @@ for ii = 1:3:length(varargin)
         
         if strcmp(varargin{ii},'PressureCell')
             Fem.VolumetricPressure = true;
-%             Fem.(varargin{ii}) = [varargin{ii+1},repmat(varargin{ii+2},...
-%                 [length(varargin{ii+1}),1])];
             if ~isa(varargin{ii+2},'function_handle')
                 Fem.(varargin{ii}) = [Fem.(varargin{ii}); ...
-                    varargin(ii+1),repmat(varargin{ii+2},[length(varargin{ii+1}),1])];
+                    varargin{ii+1},repmat(varargin{ii+2},[length(varargin{ii+1}),1])];
             else
                 f = varargin{ii+2};
                 Fem.(varargin{ii}) = [Fem.(varargin{ii}); {varargin{ii+1}},{f}];
@@ -2745,8 +2705,8 @@ if isempty(Fem.Log)
        %Fem.Log.Out.Eyy = [initVec,Fem.eyyNodal(idNodes)];
        %Fem.Log.Out.Exy = [initVec,Fem.exyNodal(idNodes)];
        %Fem.Log.Out.Exy = [initVec,Fem.exyNodal(idNodes)];
-       %Fem.Log.Out.Rot = [{R(idNodes)}, {R(idNodes)}];
-       %Fem.Log.Out.Str = [{Q(idNodes)}, {Q(idNodes)}];
+       Fem.Log.Out.Rot = [{R(idNodes)}, {R(idNodes)}];
+       Fem.Log.Out.Str = [{Q(idNodes)}, {Q(idNodes)}];
    end
    
 else

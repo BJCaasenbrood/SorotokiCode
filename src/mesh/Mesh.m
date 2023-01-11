@@ -629,14 +629,16 @@ n3 = (Mesh.SDF(P+repmat([0,0,Mesh.eps],Mesh.NElem,1))-d)/Mesh.eps;
 end
 
 % logical index of seeds near the boundary
+%I       = abs(d(:,1:NBdrySegs))<Alpha; 
 I       = abs(d(:,1:NBdrySegs))<Alpha; 
 P1      = repmat(P(:,1),1,NBdrySegs); 
 P2      = repmat(P(:,2),1,NBdrySegs); 
 Rp(:,1) = P1(I)-2*n1(I).*d(I);  
 Rp(:,2) = P2(I)-2*n2(I).*d(I);
+
 if Mesh.Dim == 3
-P3 = repmat(P(:,3),1,NBdrySegs); 
-Rp(:,3) = P3(I)-2*n3(I).*d(I);  
+    P3 = repmat(P(:,3),1,NBdrySegs); 
+    Rp(:,3) = P3(I)-2*n3(I).*d(I);  
 end
 
 d_R_P = Mesh.SDF(Rp);
@@ -644,7 +646,7 @@ if Mesh.NElem > 1 % temporary fix
     J  = abs(d_R_P(:,end))>=Mesh.eta*abs(d(I)) & d_R_P(:,end)>0;
     Rp = Rp(J,:); 
 end
-Rp   = unique(Rp,'rows');
+Rp = unique(Rp,'rows');
 end
 %------------------------------------------------ compute centroid polygons
 function Rb = boundingReflect(Mesh)
@@ -652,26 +654,27 @@ function Rb = boundingReflect(Mesh)
 tmp = Mesh.BdBox; 
 
 a = 0.5;
-tmp(1) = Mesh.BdBox(1)-a*( Mesh.BdBox(2) - Mesh.BdBox(1)); 
-tmp(2) = Mesh.BdBox(2)+a*( Mesh.BdBox(2) - Mesh.BdBox(1)); 
-tmp(3) = Mesh.BdBox(3)-a*( Mesh.BdBox(4) - Mesh.BdBox(3)); 
-tmp(4) = Mesh.BdBox(4)+a*( Mesh.BdBox(4) - Mesh.BdBox(3)); 
+tmp(1) = Mesh.BdBox(1)-a*( Mesh.BdBox(2) - Mesh.BdBox(1));
+tmp(2) = Mesh.BdBox(2)+a*( Mesh.BdBox(2) - Mesh.BdBox(1));
+tmp(3) = Mesh.BdBox(3)-a*( Mesh.BdBox(4) - Mesh.BdBox(3));
+tmp(4) = Mesh.BdBox(4)+a*( Mesh.BdBox(4) - Mesh.BdBox(3));
+
 if Mesh.Dim == 3
-tmp(5) = Mesh.BdBox(5)-a*( Mesh.BdBox(6) - Mesh.BdBox(5)); 
-tmp(6) = Mesh.BdBox(6)+a*( Mesh.BdBox(6) - Mesh.BdBox(5)); 
+    tmp(5) = Mesh.BdBox(5)-a*( Mesh.BdBox(6) - Mesh.BdBox(5));
+    tmp(6) = Mesh.BdBox(6)+a*( Mesh.BdBox(6) - Mesh.BdBox(5));
 end
 
 if Mesh.Dim == 2
-x = linspace(tmp(1),tmp(2),2);
-y = linspace(tmp(3),tmp(4),2);
-[X,Y] = meshgrid(x,y);
-Rb = [X(:),Y(:)];  
+    x = linspace(tmp(1),tmp(2),2);
+    y = linspace(tmp(3),tmp(4),2);
+    [X,Y] = meshgrid(x,y);
+    Rb = [X(:),Y(:)];
 else
-x = linspace(tmp(1),tmp(2),2);
-y = linspace(tmp(3),tmp(4),2);
-z = linspace(tmp(5),tmp(6),2);
-[X,Y,Z] = meshgrid(x,y,z);
-Rb = [X(:),Y(:),Z(:)];      
+    x = linspace(tmp(1),tmp(2),2);
+    y = linspace(tmp(3),tmp(4),2);
+    z = linspace(tmp(5),tmp(6),2);
+    [X,Y,Z] = meshgrid(x,y,z);
+    Rb = [X(:),Y(:),Z(:)];
 end
 
 end

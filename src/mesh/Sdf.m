@@ -47,7 +47,9 @@ classdef Sdf
             elseif norm(B2) == Inf
                 r.BdBox = B1;
             else
-                B = [box2node(obj1.BdBox); box2node(obj2.BdBox)];
+                B = [box2node(obj1.BdBox); 
+                     box2node(obj2.BdBox)];
+                 
                 r.BdBox = boxhull(B);
             end
             
@@ -84,17 +86,40 @@ classdef Sdf
                 N = varargin{1};
             end
                 
-            fnc = @(x) obj.sdf(pRepeat(x,dX));
-            r = Sdf(fnc);
             B = obj.BdBox;
-            DDX = B(2) - B(1); 
-            DDY = B(4) - B(3);
-            DDN = norm(dX);
-            if dX(2) == 0
-                r.BdBox = (obj.BdBox(:) + [0,(N-1)*(DDX),0,0].').';
-            elseif dX(1) == 0
-                r.BdBox = (obj.BdBox(:) + [0,0,0,(N-1)*(DDY)].').';
+            
+            if numel(B) == 4
+                if dX(2) == 0
+                    A = (obj.BdBox(:) + ...
+                        [0,(N-1)*dX(1),0,0].').';
+                else
+                    A = (obj.BdBox(:) + ...
+                        [0,0,0,(N-1)*dX(2)].').';
+                end
+                Si = sRectangle(A(1),A(2),...
+                           A(3),A(4));
+            else
+                if dX(2) == 0 && dX(3) == 0
+                    A = (obj.BdBox(:) + ...
+                        [0,(N-1)*dX(1),0,0,0,0].').';
+                elseif dX(1) == 0 && dX(3) == 0
+                    A = (obj.BdBox(:) + ...
+                        [0,0,0,(N-1)*dX(2),0,0].').';
+                else
+                    A = (obj.BdBox(:) + ...
+                        [0,0,0,0,0,(N-1)*dX(3)].').';
+                end
+                Si = sCube(A(1),A(2),...
+                           A(3),A(4),...
+                           A(5),A(6));
             end
+            
+            fnc = @(x) dIntersect(obj.sdf(pRepeat(x,dX)), ...
+                       Si.sdf(x));
+                   
+            r = Sdf(fnc);
+            r.BdBox = A;
+
         end
 %----------------------------------------------------------- rotate X <-> Y              
         function r = transpose(obj1)
@@ -187,7 +212,8 @@ classdef Sdf
             elseif norm(B2) == Inf
                 r.BdBox = B1;
             else
-                B = (1+k/5)*[B1;B2];
+                B = (1 + k/5)*[B1;B2];
+                %B = [B1;B2];
                 r.BdBox = boxhull(B);
             end
         end     
@@ -222,24 +248,43 @@ classdef Sdf
                 z2 = varargin{2};
             end
             
-            fnc = @(x) max([obj1.sdf(x(:,1:2)),...
+            fnc = @(x) max([obj1.eval(x(:,1:2)),...
                 z1-x(:,3)+1e-12, x(:,3)-z2],[],2);
+            
             r = Sdf(fnc);
-            r.BdBox = [obj1.BdBox,z1,z2];
+            r.BdBox  = [obj1.BdBox,z1,z2];
             r.Center = [obj1.Center;mean([z1;z2])];
         end
+%---------------------------------------------------------- revolve about Y  
+        function r = revolve(obj1,varargin)
+            fnc = @(x) obj1.sdf(dRevolve(x));
+            r   = Sdf(fnc);
+            r.BdBox = [-obj1.BdBox(2),obj1.BdBox(2),...
+                       -obj1.BdBox(2),obj1.BdBox(2),...
+                        obj1.BdBox(3),obj1.BdBox(4)];
+        end
+%------------------------------------------------------- mirror about plane  
+        function r = mirror(obj1,varargin)
+            c = varargin{1};
+            fnc = @(x) obj1.sdf(pMirror(x,c));
+            r   = Sdf(fnc);
+%             r.BdBox = [-obj1.BdBox(2),obj1.BdBox(2),...
+%                        -obj1.BdBox(2),obj1.BdBox(2),...
+%                         obj1.BdBox(3),obj1.BdBox(4)];
+        end        
 %----------------------------------------------------------- rotate X <-> Y    
         function r = shell(obj,T)
             fnc = @(x) abs(obj.sdf(x)) - T/2;
             r = Sdf(fnc);
+            
             B = obj.BdBox;
             if numel(obj.BdBox) == 6
-            r.BdBox = [B(1)-T/2,B(2)+T/2,...
-                       B(3)-T/2,B(4)+T/2,...
-                       B(5)-T/2,B(6)+T/2];
+                r.BdBox = [B(1) - T/2, B(2) + T/2,...
+                           B(3) - T/2, B(4) + T/2,...
+                           B(5) - T/2, B(6) + T/2];
             else
-            r.BdBox = [B(1)-T/2,B(2)+T/2,...
-                       B(3)-T/2,B(4)+T/2];
+                r.BdBox = [B(1) - T/2, B(2) + T/2,...
+                           B(3) - T/2, B(4) + T/2];
             end
         end
     end
@@ -401,16 +446,10 @@ obj.bake.render();
 
 Sdf.Gmodel = obj;
 end
-%------------------------------------------------------------ show skeleton
-function skeleton(Sdf)
-    patch('Vertices',Sdf.Node,'Faces',Sdf.Element,...
-                'LineW',2.5,'EdgeColor',col(1),'FaceColor','none');
-end
 %------------------------------------------------------------- show contour
 function showcontour(Sdf,varargin)
     
-    
-     for ii = 1:2:length(varargin)
+    for ii = 1:2:length(varargin)
         Sdf.(varargin{ii}) = varargin{ii+1};
     end
     
@@ -424,7 +463,6 @@ function showcontour(Sdf,varargin)
         D = Sdf.eval([X(:),Y(:)]);
         D = abs(D(:,end)).^(0.75).*sign(D(:,end));
         
-        %D(D<=0)   = 0;
         D(D>1e-6) = NaN;
         
         figure(101);
@@ -457,27 +495,27 @@ methods (Access = private)
 end
 end
 
-function [R] = rot2d(x)
-R = [cos(x),sin(x);-sin(x),cos(x)];
-end
-
-function BdBox = boxhull(Node,eps)
-if nargin < 2, eps = 1e-6; end
-
-if size(Node,2) == 2
-    BdBox = zeros(4,1);
-    BdBox(1) = min(Node(:,1));
-    BdBox(2) = max(Node(:,1));
-    BdBox(3) = min(Node(:,2));
-    BdBox(4) = max(Node(:,2));
-else
-    BdBox = zeros(6,1);
-    BdBox(1) = min(Node(:,1))-eps;
-    BdBox(2) = max(Node(:,1))+eps;
-    BdBox(3) = min(Node(:,2))-eps;
-    BdBox(4) = max(Node(:,2))+eps;
-    BdBox(5) = min(Node(:,3))-eps;
-    BdBox(6) = max(Node(:,3))+eps;
-end
-
-end
+% function [R] = rot2d(x)
+% R = [cos(x),sin(x);-sin(x),cos(x)];
+% end
+% 
+% function BdBox = boxhull(Node,eps)
+% if nargin < 2, eps = 1e-6; end
+% 
+% if size(Node,2) == 2
+%     BdBox = zeros(4,1);
+%     BdBox(1) = min(Node(:,1));
+%     BdBox(2) = max(Node(:,1));
+%     BdBox(3) = min(Node(:,2));
+%     BdBox(4) = max(Node(:,2));
+% else
+%     BdBox = zeros(6,1);
+%     BdBox(1) = min(Node(:,1))-eps;
+%     BdBox(2) = max(Node(:,1))+eps;
+%     BdBox(3) = min(Node(:,2))-eps;
+%     BdBox(4) = max(Node(:,2))+eps;
+%     BdBox(5) = min(Node(:,3))-eps;
+%     BdBox(6) = max(Node(:,3))+eps;
+% end
+% 
+% end

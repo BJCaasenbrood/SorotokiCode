@@ -77,7 +77,7 @@ J  = sys.Log.FK.J(:,:,end);
 x  = sys.Log.FK.g(1:3,4,end);
 
 
-kp  = 1e-4;
+kp  = 1e-7;
 
 J = J(4:6,:);
 

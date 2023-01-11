@@ -1,5 +1,3 @@
-clr;
-fig(101,[10,9]);
 N = 10; 
 X = linspace(0,pi*3,1e5);
 label = [];
