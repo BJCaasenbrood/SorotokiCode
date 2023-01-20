@@ -1,6 +1,26 @@
+%CPLOT3 - Plots 3D data points with color map
+%
+%   h = cplot3(x, y, c, map, varargin)  plots the data points with coordinates (x, y) 
+%   with colors specified by the c vector, and color map defined by the input map.
+%   The option varargin allows additional plotting parameters to be passed
+%   to the standard plot routine within Matlab.
+%
+%   Output h is a list of plot handles
+%
+%   Example:
+%       x = linspace(0, 6*pi,100);
+%       y = sin(x);
+%       c = cos(x);
+%       map = turbo;
+%       h = cplot(x, y, c, map, 'LineWidth', 2);
+%
+%   Note:
+%      Vectors X, Y and C must be the same size
+%
+%   See also CPLOT
+
 function h = cplot3(x,y,z,c,map,varargin)
-% orginal code by Michael Heidingsfeld 
-% Plot data:
+
 if ~(all(size(x) == size(y)) && all(size(x) == size(c)))
     error('Vectors X,Y,Z and C must be the same size');
 end
@@ -9,9 +29,8 @@ cmax = max(c);
 cmin = min(c);
 cint = (cmax-cmin)/N;
 indices = 1:length(c);
-status = ishold;                % save hold status
-%NRM = [];
-%V   = [];
+status = ishold;                
+
 for k = 1:N
     ii = logical(c >= cmin+k*cint) + logical(c <= cmin+(k-1)*cint);
     jj = ones(size(ii)); jj(1:end-1) = ii(2:end);
@@ -21,47 +40,10 @@ for k = 1:N
     Z = z; Z(indices(ii)) = NaN;
     h(k) = plot3(X,Y,Z,'Color',map(k,:),varargin{:});
     hold on;
-%     if mod(k,6) == 0 
-%         X_ = X(~isnan(X)); nX = diff(X_);
-%         Y_ = Y(~isnan(Y)); nY = diff(Y_);
-%         Z_ = Z(~isnan(Z)); nZ = diff(Z_);
-%         nrm = [nX(end),nY(end),nZ(end)];
-%         nrm = nrm./norm(nrm);
-%         %NRM = [NRM;nrm];
-%         V   = [X_(end),Y_(end),Z_(end)];
-%         
-%         R = vrrotvec2mat(vrrotvec([0,1,0].',nrm(:)));
-%         
-%         [V,F] = arrowhead(V,R);
-%         
-%         patch('Vertices',V,'Faces',F,'EdgeColor','None',...
-%             'FaceColor',map(k,:));
-%     end
-%     hold on;
 end
-if status == 0, hold off; end   % reset hold status
-end
-
-function [V,F] = arrowhead(X,R)
-a = 0.22;
-b = 0.77;
-V = 0.00375*[
-    -a,-0.2*b,0;
-     0,0,0;
-     a,-0.2*b,0;
-     0,b,0
-    0,-0.2*b,-a;
-     0,0,0;
-    0,-0.2*b,a;
-     0,b,0]; 
- 
-V = (R*V.').';
- 
-V(:,1) = V(:,1) + X(1);
-V(:,2) = V(:,2) + X(2);
-V(:,3) = V(:,3) + X(3);
- 
-F = [1,2,3,4;5,6,7,8];
+    if status == 0, 
+        hold off; 
+    end   % reset hold status
 end
 
 

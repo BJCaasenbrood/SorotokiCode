@@ -73,7 +73,7 @@ N = 10;
 X = linspace(0,pi*3,1e5);
 for ii=1:N
     Y = cos(X+1*ii*pi/N);
-    plot(X,Y,'Color',col(ii));
+    plot(X,Y,'Color',col(ii),'LineW',2);
     hold on;
     pause(dt)
 end
@@ -81,20 +81,18 @@ boc;
 
 subplot(2,2,3);
 colorwheel();
-% [X,Y,Z] = peaks(40);
-% surf(X,Y,Z,'linestyle','none')
 cout('\t colormap')
 bic;
-colormap(turbo); drawnow; pause(dt);
-colormap(barney); drawnow; pause(dt);
-colormap(blackwhite); drawnow; pause(dt);
-colormap(bluesea); drawnow; pause(dt);
-colormap(bounce); drawnow; pause(dt);
-colormap(inferno); drawnow; pause(dt);
-colormap(metro); drawnow; pause(dt);
-colormap(noir); drawnow; pause(dt);
-colormap(turbo); drawnow; pause(dt);
-colormap(viridis); drawnow; pause(dt); 
+colormap(cmap_turbo); drawnow; pause(dt);
+colormap(cmap_barney); drawnow; pause(dt);
+colormap(cmap_blackwhite); drawnow; pause(dt);
+colormap(cmap_bluesea); drawnow; pause(dt);
+colormap(cmap_bounce); drawnow; pause(dt);
+colormap(cmap_inferno); drawnow; pause(dt);
+colormap(cmap_metro); drawnow; pause(dt);
+colormap(cmap_noir); drawnow; pause(dt);
+colormap(cmap_turbo); drawnow; pause(dt);
+colormap(cmap_viridis); drawnow; pause(dt); 
 boc;
 
 subplot(2,2,4);
@@ -135,7 +133,6 @@ cla; view(30,30);
 cout('\t Sdf.show() 3D')
 bic; sdf2.show(); boc; drawnow; pause(2*dt);
 
-%subplot(2,2,3);
 cla;
 cout('\t sdf1 + sdf2 ');
 bic; 
@@ -210,37 +207,39 @@ boc;
 
 cout('\t NeoHookean()'); bic; 
 fem = fem.reset();
-fem.Material = NeoHookeanMaterial(); fem.solve();
+fem.Material = NeoHookeanMaterial(); 
+fem.solve();
 boc();
 % 
 cout('\t MooneyMaterial()'); bic(1); 
 fem = fem.reset();
-fem.Material = MooneyMaterial(); fem.solve();
+fem.Material = MooneyMaterial(); 
+fem.solve();
 boc();
 
 cout('\t Yeoh() '); bic; 
 fem = fem.reset();
-fem.Material = YeohMaterial(); fem.solve();
+fem.Material = YeohMaterial(); 
+fem.solve();
 boc();
 
 cout('\t Fem.optimize()'); bic; 
 sdf = sRectangle(0,5,0,2);
-msh = Mesh(sdf,'NElem',1200);
+msh = Mesh(sdf,'Quads',[150,20]);
 msh = msh.generate();
 fem = Fem(msh,'ShowProcess',0,'Nonlinear',0,...
-    'ChangeMax',2,'MaxIterationMMA',10);
+    'ChangeMax',Inf,'MaxIterationMMA',10);
 
 fem = fem.set('FilterRadius',0.1,'VolumeInfill',0.2,...
               'Penal',3,'ReflectionPlane',[-1,0]);
         
 fem = fem.addSupport(fem.FindNodes('SE'),[0,1]);
 fem = fem.addSupport(fem.FindNodes('Left'),[1,0]);
-fem = fem.addLoad(fem.FindNodes('Location',[0,2],1),[0,-1e-3]);
+fem = fem.addLoad(fem.FindNodes('Location',[0,2],1),[0,-1]);
 
 fem = fem.initialTopology('Hole',[1,1;3,1],0.5);
 fem.Material = NeoHookeanMaterial(1,0.33);
 fem.optimize();
-fem.show('ISO',0.25);
 boc;
 
 end

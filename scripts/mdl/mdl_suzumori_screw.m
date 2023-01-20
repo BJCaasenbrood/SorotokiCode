@@ -3,7 +3,7 @@ clr;
 M  = 0.012;        % Mass screw (kg)
 R  = 5;            % Radius screw (mm)
 I  = 0.5*M*R^2;    % Inertia screw
-mu = 1;            % Friction screw
+mu = 2;            % Friction screw
 E0 = 1;            % Young's modulus soft robot (MPa)
 Nu0 = 0.3;         % Poisson ratio (-)
 Rho = 2000e-12;    % Density (kg/mm2)
@@ -33,8 +33,8 @@ N = 30;
 M = 3;
 
 Y = chebyspace(N,M);
-shp = Shapes(Y,[0,M,M,0,0,0],...
-    'L0',80,'Texture',egg*0.85);
+shp = Shapes(Y,[0,M,M,0,0,0],'xia0',[0,0,0,1,0,0],...
+    'Length',80,'Texture',egg*0.85);
 
 shp    = shp.setRadius(9);
 shp.g0 = SE3(roty(pi/2),[0;37.5;5]);
@@ -55,7 +55,7 @@ for ii = 1:4
 end
 
 %%
-mdl = Model(SHP{1},'TimeEnd',15,'TimeStep',1/60);
+mdl = Model(SHP{1},'TimeEnd',15,'TimeStep',1/60,'MaxIteration',10);
 
 for ii = 2:4
     mdl = mdl.addSystem(SHP{ii});
@@ -124,12 +124,6 @@ for ii = 1:fps(t,9):numel(t)
    bkr.update; 
    num.update;
 
-   if ii == 1
-    gif('screw_motion_suzumori.gif','frame',gcf,'nodither');
-   else
-    gif;
-   end
-
    timetitle(t(ii));
    background('w');
    view(10,5);
@@ -141,7 +135,7 @@ end
 function u = Controller(mdl)
     W = 2*pi;
     A = 15*8;
-    B = 25*8;
+    B = 20*8;
 
     t = mdl.t;
     u = zeros(sum(vertcat(mdl.NInput{:})),1);    

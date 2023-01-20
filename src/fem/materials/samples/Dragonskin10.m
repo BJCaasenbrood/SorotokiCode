@@ -9,7 +9,6 @@ if nargin < 1, D = 3; end
 Material = YeohMaterial('C1',0.0245,'C2',-0.0001,'C3',0.0,...
       'D1',D,'D2',D,'D3',D);
 
-%  
 Material.Rho  = 1.00e-9;
 Material.Zeta = 0.5;
 Material.Cfr  = 0.5;

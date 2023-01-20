@@ -1,4 +1,4 @@
-function colmap = bluesea(n)
+function colmap = cmap_bluesea(n)
 colmap = ...
     [0.1020    0.1373    0.4941
     0.1075    0.1736    0.5041

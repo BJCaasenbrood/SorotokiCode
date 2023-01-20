@@ -1,4 +1,4 @@
-function colmap = barney(n)
+function colmap = cmap_barney(n)
 colmap = ...
     [0.4471    0.3255    0.9294
     0.4516    0.3312    0.9290

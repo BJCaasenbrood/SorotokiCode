@@ -1,4 +1,10 @@
-function [d] = dSmoothUnion(d1,d2,k) % min(d1,d2)
+function [d] = dSmoothUnion(d1,d2,varargin) % min(d1,d2)
+if isempty(varargin)
+   k = 1; 
+else
+   k = varargin{1};
+end
+
 d=[d1(:,1:(end-1)),d2(:,1:(end-1))];
 
 f1 = d1(:,end); %F1 = num2cell(f1); 

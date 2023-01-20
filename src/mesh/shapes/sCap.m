@@ -1,10 +1,25 @@
-function sdf = sCircleFlat(xc,yc,r,x)
+%SCAP - returns a 2D signed distance function for a capped circle
+%
+%   sdf = sCap(r, x) creates a 2D signed distance function for a capped circle 
+%   with radius r and height x. If x is negative, the shape is reversed.
+%
+%   Example: 
+%       sdf = sCap(1, 2)
+%    
+%   See also SDF, SCUP, SCIRCLE
 
-if nargin < 2
-    r = xc; 
-    xc = 0;
-    yc = 0;
+function sdf = sCap(varargin)
+r  = 1;
+xc = 0;
+yc = 0;
+x  = 1;
+
+if nargin == 1
+    r = varargin{1}; 
     x = r;
+elseif nargin == 2
+    r = varargin{1}; 
+    x = varargin{2}; 
 end
 
 eps = 1e-4*r;
@@ -20,15 +35,6 @@ else
 
     sdf.BdBox = [xc-r-eps,xc+r+eps,yc-r-eps,yc+abs(x)+eps];
 end
-
-% % generat sample points
-% N   = 50;
-% x   = linspace(-pi,pi,N).';
-% S   = [(r-0.5*eps)*cos(x)+xc,...
-%        (r-0.5*eps)*sin(x)+yc]; % sample set
-%    
-% sdf.Node    = S;
-% sdf.Element = [(1:N-1).',(2:N).'];
 
 end
 

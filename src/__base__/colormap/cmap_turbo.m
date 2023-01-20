@@ -1,4 +1,4 @@
-function colmap = turbo(n)
+function colmap = cmap_turbo(n)
 colmap = ...
     [0.2000    0.1059    0.2431
     0.2104    0.1627    0.3554

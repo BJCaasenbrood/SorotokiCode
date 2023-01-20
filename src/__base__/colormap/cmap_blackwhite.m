@@ -1,4 +1,4 @@
-function colmap = blackwhite(n)
+function colmap = cmap_blackwhite(n)
 
 if nargin>0
     if n < 1, colmap = gray(200);

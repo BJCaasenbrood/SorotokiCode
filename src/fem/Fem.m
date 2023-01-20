@@ -168,10 +168,10 @@ classdef Fem < handle
         AssembledSystem  = false;
         PressureLoad     = 0;
         
-        Linestyle  = '-';
-        Linestyle0 = '-';
-        Colormap    = turbo;
-        ColormapOpt = barney(-1); %evolution();
+        Linestyle   = '-';
+        Linestyle0  = '-';
+        Colormap    = cmap_turbo;
+        ColormapOpt = cmap_barney(-1);
         ColorAxis   = [];
         I3 = eye(3); 
         O3 = zeros(3);

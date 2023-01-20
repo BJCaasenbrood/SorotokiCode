@@ -5,7 +5,7 @@ classdef Sdf
         BdBox;
         Gmodel;
         cmap;
-        eps = 1e-5;
+        eps;
         
         
         Node;      
@@ -21,10 +21,12 @@ classdef Sdf
     methods        
 %---------------------------------------------------- Signed Distance Class     
         function obj = Sdf(fnc,varargin)
-            obj.sdf = @(x) [fnc(x),fnc(x)];
-            obj.cmap = viridis;
-            obj.Quality = 50;
+            obj.sdf      = @(x) [fnc(x),fnc(x)];
+            obj.cmap     = cmap_viridis;
+            obj.Quality  = 50;
+            obj.eps      = 1e-5;
             obj.Velocity = zeros(6,1);
+            
             for ii = 1:2:length(varargin)
                 obj.(varargin{ii}) = varargin{ii+1};
             end           
@@ -130,17 +132,11 @@ classdef Sdf
                 fnc = @(x) obj1.sdf([x(:,2),x(:,1)]);
                 r = Sdf(fnc);
                 r.BdBox = [B(3), B(4), B(1), B(2)];
-                r.Node = [obj1.Node(:,2), obj1.Node(:,1)];
-                r.Center = [C(2),C(1)];
-                r.Element = obj1.Element;
             else
                 fnc = @(x) obj1.sdf([x(:,2),x(:,3),x(:,1)]);
                 r = Sdf(fnc);
                 r.BdBox = [B(5), B(6), B(3), B(4), B(1), B(2)];
                 r.Center = [C(3),C(2),C(1)];
-%                 r.Node = [obj1.Node(:,2), obj1.Node(:,3), obj1.Node(:,1)];
-%                 r.BdBox = boxhull(r.Node);
-%                 r.Element = obj1.Element;
             end
             
         end
@@ -154,16 +150,14 @@ classdef Sdf
                fnc = @(x) obj1.sdf(y(x));
                r = Sdf(fnc);
                r.BdBox = [B(1)+move(1), B(2)+move(2),...
-                          B(3)+move(1), B(4)+move(2)];
-               %r.Center= [C(1)+move(1);C(2)+move(2)];       
+                          B(3)+move(1), B(4)+move(2)];    
            else
                y = @(x) x - repmat(move(:)',size(x,1),1);
                fnc = @(x) obj1.sdf(y(x));
                r = Sdf(fnc);
                r.BdBox = [B(1)+move(1), B(2)+move(1),...
                           B(3)+move(2), B(4)+move(2),...
-                          B(5)+move(3), B(6)+move(3)];
-               %r.Center= [C(1)+move(1);C(2)+move(2);C(3)+move(3)];       
+                          B(5)+move(3), B(6)+move(3)];     
            end
            
         end        
@@ -213,7 +207,6 @@ classdef Sdf
                 r.BdBox = B1;
             else
                 B = (1 + k/5)*[B1;B2];
-                %B = [B1;B2];
                 r.BdBox = boxhull(B);
             end
         end     
@@ -253,7 +246,6 @@ classdef Sdf
             
             r = Sdf(fnc);
             r.BdBox  = [obj1.BdBox,z1,z2];
-            r.Center = [obj1.Center;mean([z1;z2])];
         end
 %---------------------------------------------------------- revolve about Y  
         function r = revolve(obj1,varargin)
@@ -469,14 +461,13 @@ function showcontour(Sdf,varargin)
         cplane(X,Y,reshape(D,[Sdf.Quality Sdf.Quality])-1e-6);
         axis equal; hold on;
         
-        if isempty(Sdf.Element)
+        %if isempty(Sdf.Element)
             contour3(X,Y,reshape(D,[Sdf.Quality Sdf.Quality]),...
-                [0 0],'linewidth',...
-                2.5,'Color','w');
-        else
-            patch('Vertices',Sdf.Node,'Faces',Sdf.Element,...
-                'LineW',2.5,'EdgeColor','w');
-        end
+                [0 0]);
+%         else
+%             patch('Vertices',Sdf.Node,'Faces',Sdf.Element,...
+%                 'LineW',2.5,'EdgeColor','w');
+%         end
         
         axis(Sdf.BdBox);
         colormap(Sdf.cmap);
