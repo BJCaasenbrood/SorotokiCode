@@ -33,7 +33,9 @@ function sorotoki(varargin)
     fclose(FID);
 
     for ii = 1:numel(req)
-        if ~isempty(strfind(req{ii}, 'sorotoki'))
+        if ~isempty(strfind(req{ii}, '#'))
+            % skip commented 
+        elseif ~isempty(strfind(req{ii}, 'sorotoki'))
             soroPackages{end+1} = req{ii};
         elseif ~isempty(strfind(req{ii}, ' '))
             reqToolboxes{end+1} = req{ii};
@@ -150,7 +152,7 @@ function removeSorotoki(soroPackages)
     end
 
     try
-        rmdir('src');
+        rmdir('lib');
         rmdir('assets');
         delete sorotoki.log
     end
@@ -303,13 +305,13 @@ function installMissingPackgeMPM(package,varargin)
         case 'matlabgraphicalmodel'             
             mpm(action,'matlabgraphicalmodel','--all-paths');
         case 'sorotokisdf'                        
-            mpm(action,'sorotokisdf','install-dir','./src/','--all-paths','--force');
+            mpm(action,'sorotokisdf','install-dir','./lib/','--all-paths','--force');
         case 'sorotokimesh'                        
-            mpm(action,'sorotokimesh','install-dir','./src/','--all-paths','--force');     
+            mpm(action,'sorotokimesh','install-dir','./lib/','--all-paths','--force');     
         case 'sorotokifem'                      
-            mpm(action,'sorotokifem','install-dir','./src/','--all-paths','--force');            
+            mpm(action,'sorotokifem','install-dir','./lib/','--all-paths','--force');            
         case 'sorotokimodel'               
-            mpm(action,'sorotokimodel','install-dir','./src/','--all-paths','--force');         
+            mpm(action,'sorotokimodel','install-dir','./lib/','--all-paths','--force');         
         case 'sorotokibots'            
             if strcmpi(action,'uninstall')
                 try

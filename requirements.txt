@@ -9,7 +9,7 @@ distance2curve
 inpolyhedron
 matlabgraphicalmodel
 sorotokisdf
-sorotokimesh
-sorotokifem
-sorotokimodel
-sorotokibots
+# sorotokimesh
+# sorotokifem
+# sorotokimodel
+# sorotokibots

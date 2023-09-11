@@ -24,3 +24,5 @@ codegen/
 *.bin
 *.bin_genfig
 toolkit
+lib
+*.log

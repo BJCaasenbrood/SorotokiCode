@@ -7,7 +7,12 @@ nav:
     - index.md
   - install.md
   - Documentation:
-      - fem/sdf.md
+      - Signed Distance Function:
+        - sdf/sdf.md
+        - sdf/operations.md
+        - sdf/2d_primitives.md
+        - sdf/3d_primitives.md
+        - sdf/gradients.md
       - fem/mesh.md
       - fem/fem.md
       - beam/shapes.md
@@ -76,6 +81,7 @@ markdown_extensions:
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - pymdownx.superfences
+  - pymdownx.betterem
   - pymdownx.emoji:
       emoji_index: !!python/name:materialx.emoji.twemoji
       emoji_generator: !!python/name:materialx.emoji.to_svg
@@ -85,6 +91,8 @@ markdown_extensions:
 plugins:
   - search
   - glightbox
+  - bibtex:
+      bib_file: "./docs/refs.bib"
   - mkdocs-video:
       is_video: True
       css_style:
@@ -100,4 +108,4 @@ extra_javascript:
   - javascripts/sketchfab.js
 
 repo_url: https://github.com/BJCaasenbrood/SorotokiCode
-repo_name: SorotokiCode
+repo_name: Sorotoki
