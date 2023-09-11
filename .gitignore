@@ -21,3 +21,6 @@ bin
 */codegen/
 codegen/
 *.mexa64
+*.bin
+*.bin_genfig
+toolkit

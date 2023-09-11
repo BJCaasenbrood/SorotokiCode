@@ -1,9 +1,0 @@
-function isf = isflint(m)
-%ISF.m  checks if scalar is float, returns true 
-%       command-confusion#answer_78914   
-    assert( isa( m, 'double' ) && isvector( m )     ...
-        ,   'isflint:IllegalInput'                  ...
-        ,   'The input should be a double vector'   )
-    isf =   all( abs(   m ) <= flintmax ) ...
-        &&  all( floor( m ) == m        ) ; 
-end
