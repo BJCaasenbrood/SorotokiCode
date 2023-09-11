@@ -104,7 +104,7 @@
 <svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"></path></svg>
 </div>
 <div class="md-source__repository">
-    SorotokiCode
+    Sorotoki
   </div>
 </a>
 </div>
@@ -129,7 +129,7 @@
 <svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"></path></svg>
 </div>
 <div class="md-source__repository">
-    SorotokiCode
+    Sorotoki
   </div>
 </a>
 </div>
@@ -165,10 +165,45 @@
           Documentation
         </label>
 <ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_1" id="__nav_3_1" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3_1">
+          Signed Distance Function
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-label="Signed Distance Function" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_3_1">
+<span class="md-nav__icon md-icon"></span>
+          Signed Distance Function
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
-<a class="md-nav__link" href="../../fem/sdf/">
-        Implicit CAD
+<a class="md-nav__link" href="../../sdf/sdf/">
+        Signed Distance Functions
       </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../sdf/operations/">
+        SDF Operations
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../sdf/2d_primitives/">
+        2D Primitives
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../sdf/3d_primitives/">
+        3D Primitives
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../sdf/gradients/">
+        SDF Differentiability (normal and tangent operators)
+      </a>
+</li>
+</ul>
+</nav>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../fem/mesh/">
@@ -182,7 +217,7 @@
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../beam/shapes/">
-        Beam Shapes and Geometry
+        Beam models
       </a>
 </li>
 <li class="md-nav__item">
@@ -210,6 +245,11 @@
 <li class="md-nav__item">
 <a class="md-nav__link" href="../rendering/">
         Rendering
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../matcap/">
+        Textures
       </a>
 </li>
 <li class="md-nav__item">
@@ -352,23 +392,23 @@
 </a>
 <h1 id="colormaps">Colormaps</h1>
 <h5 id="overview">Overview</h5>
-<div class="highlight"><pre><span></span><code><span class="n">fig</span><span class="p">(</span><span class="mi">102</span><span class="p">,[</span><span class="mf">10.75</span><span class="p">,</span><span class="mf">10.75</span><span class="p">]);</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="n">fig</span><span class="p">(</span><span class="mi">102</span><span class="p">,[</span><span class="mf">10.75</span><span class="p">,</span><span class="mf">10.75</span><span class="p">]);</span>
 
-<span class="n">colormaplist</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">{</span><span class="s">'blackwhite'</span><span class="p">,</span><span class="w"> </span><span class="s">'bluesea'</span><span class="p">,</span><span class="w"> </span><span class="s">'heatmap'</span><span class="p">,</span><span class="w"> </span><span class="s">'inferno'</span><span class="p">,</span><span class="w"> </span><span class="s">'metro'</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="w"></span>
-<span class="w">                </span><span class="s">'noir'</span><span class="p">,</span><span class="s">'turbo'</span><span class="p">,</span><span class="s">'viridis'</span><span class="p">,</span><span class="s">'bounce'</span><span class="p">,</span><span class="s">'barney'</span><span class="p">,</span><span class="s">'evolution'</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="w"></span>
-<span class="w">                </span><span class="s">'rainbow'</span><span class="p">,</span><span class="s">'polarmap'</span><span class="p">,</span><span class="s">'redgreen'</span><span class="p">,</span><span class="s">'soapbubble'</span><span class="p">};</span><span class="w"></span>
+<span class="n">colormaplist</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">{</span><span class="s">'blackwhite'</span><span class="p">,</span><span class="w"> </span><span class="s">'bluesea'</span><span class="p">,</span><span class="w"> </span><span class="s">'heatmap'</span><span class="p">,</span><span class="w"> </span><span class="s">'inferno'</span><span class="p">,</span><span class="w"> </span><span class="s">'metro'</span><span class="p">,</span><span class="w"> </span><span class="k">...</span>
+<span class="w">                </span><span class="s">'noir'</span><span class="p">,</span><span class="s">'turbo'</span><span class="p">,</span><span class="s">'viridis'</span><span class="p">,</span><span class="s">'bounce'</span><span class="p">,</span><span class="s">'barney'</span><span class="p">,</span><span class="s">'evolution'</span><span class="p">,</span><span class="w"> </span><span class="k">...</span>
+<span class="w">                </span><span class="s">'rainbow'</span><span class="p">,</span><span class="s">'polarmap'</span><span class="p">,</span><span class="s">'redgreen'</span><span class="p">,</span><span class="s">'soapbubble'</span><span class="p">};</span>
 
-<span class="n">N</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="nb">numel</span><span class="p">(</span><span class="n">colormaplist</span><span class="p">);</span><span class="w"></span>
-<span class="n">Nx</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">ceil</span><span class="p">(</span><span class="nb">sqrt</span><span class="p">(</span><span class="n">N</span><span class="p">));</span><span class="w"></span>
-<span class="n">Ny</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">ceil</span><span class="p">(</span><span class="nb">sqrt</span><span class="p">(</span><span class="n">N</span><span class="p">));</span><span class="w"></span>
+<span class="n">N</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="nb">numel</span><span class="p">(</span><span class="n">colormaplist</span><span class="p">);</span>
+<span class="n">Nx</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">ceil</span><span class="p">(</span><span class="nb">sqrt</span><span class="p">(</span><span class="n">N</span><span class="p">));</span>
+<span class="n">Ny</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">ceil</span><span class="p">(</span><span class="nb">sqrt</span><span class="p">(</span><span class="n">N</span><span class="p">));</span>
 
-<span class="k">for</span><span class="w"> </span><span class="n">ii</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">1</span><span class="p">:</span><span class="n">N</span><span class="w"></span>
-<span class="w">   </span><span class="n">ax</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">subplot</span><span class="p">(</span><span class="n">Nx</span><span class="p">,</span><span class="n">Ny</span><span class="p">,</span><span class="n">ii</span><span class="p">)</span><span class="w"> </span><span class="p">;</span><span class="w"></span>
-<span class="w">   </span><span class="n">colorwheel</span><span class="p">();</span><span class="w"></span>
-<span class="w">   </span><span class="n">map</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">str2func</span><span class="p">([</span><span class="s">'@(x) '</span><span class="p">,</span><span class="n">colormaplist</span><span class="p">{</span><span class="n">ii</span><span class="p">}]);</span><span class="w"></span>
-<span class="w">   </span><span class="nb">colormap</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span><span class="n">map</span><span class="p">([]));</span><span class="w"></span>
-<span class="w">   </span><span class="n">axis</span><span class="w"> </span><span class="s">off</span><span class="w"> </span><span class="s">tight</span><span class="p">;</span><span class="w"></span>
-<span class="k">end</span><span class="w"></span>
+<span class="k">for</span><span class="w"> </span><span class="n">ii</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">1</span><span class="p">:</span><span class="n">N</span>
+<span class="w">   </span><span class="n">ax</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">subplot</span><span class="p">(</span><span class="n">Nx</span><span class="p">,</span><span class="n">Ny</span><span class="p">,</span><span class="n">ii</span><span class="p">)</span><span class="w"> </span><span class="p">;</span>
+<span class="w">   </span><span class="n">colorwheel</span><span class="p">();</span>
+<span class="w">   </span><span class="n">map</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">str2func</span><span class="p">([</span><span class="s">'@(x) '</span><span class="p">,</span><span class="n">colormaplist</span><span class="p">{</span><span class="n">ii</span><span class="p">}]);</span>
+<span class="w">   </span><span class="nb">colormap</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span><span class="n">map</span><span class="p">([]));</span>
+<span class="w">   </span><span class="n">axis</span><span class="w"> </span><span class="s">off</span><span class="w"> </span><span class="s">tight</span><span class="p">;</span>
+<span class="k">end</span>
 </code></pre></div>
 <details open="open">
 <summary>List of colormaps</summary>

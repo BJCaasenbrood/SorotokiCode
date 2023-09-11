@@ -104,7 +104,7 @@
 <svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"></path></svg>
 </div>
 <div class="md-source__repository">
-    SorotokiCode
+    Sorotoki
   </div>
 </a>
 </div>
@@ -129,7 +129,7 @@
 <svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"></path></svg>
 </div>
 <div class="md-source__repository">
-    SorotokiCode
+    Sorotoki
   </div>
 </a>
 </div>
@@ -165,10 +165,45 @@
           Documentation
         </label>
 <ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_1" id="__nav_3_1" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3_1">
+          Signed Distance Function
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-label="Signed Distance Function" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_3_1">
+<span class="md-nav__icon md-icon"></span>
+          Signed Distance Function
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
-<a class="md-nav__link" href="fem/sdf/">
-        Implicit CAD
+<a class="md-nav__link" href="sdf/sdf/">
+        Signed Distance Functions
       </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="sdf/operations/">
+        SDF Operations
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="sdf/2d_primitives/">
+        2D Primitives
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="sdf/3d_primitives/">
+        3D Primitives
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="sdf/gradients/">
+        SDF Differentiability (normal and tangent operators)
+      </a>
+</li>
+</ul>
+</nav>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="fem/mesh/">
@@ -182,7 +217,7 @@
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="beam/shapes/">
-        Beam Shapes and Geometry
+        Beam models
       </a>
 </li>
 <li class="md-nav__item">
@@ -210,6 +245,11 @@
 <li class="md-nav__item">
 <a class="md-nav__link" href="plotting/rendering/">
         Rendering
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="plotting/matcap/">
+        Textures
       </a>
 </li>
 <li class="md-nav__item">
@@ -348,10 +388,10 @@
 <p class="admonition-title">Github page is still under construction. Not all documentation is present at the this stage of development.</p>
 </div>
 <!-- ## About Sorotoki -->
-<p>Sorotoki is an open-source MATLAB toolkit for soft robotics that includes an array of tools for design, modeling, and control. Due to its scientific diversity, it can be challenging for new researchers to quickly familiarize themselves with multiple scientific areas. With the aim to lower this threshold, Sorotoki aims to incorporate multiple layers of soft robotics research into one compact toolkit. Examples include: continuum mechanics, dynamic systems and control theory, topology optimization, computer graphics, and much more to come! The combination provides a highly flexible programming environment and will hopefully aid the development of novel soft robotic research.</p>
+<p>Sorotoki is an open-source MATLAB toolkit for soft robotics that aims to facilitate the development of novel research in the field by providing a comprehensive set of tools for design, modeling, and control. The toolkit includes a diverse array of scientific disciplines relevant to soft robotics, such as continuum mechanics, dynamic systems and control theory, topology optimization, and computer graphics. The Sorotoki toolkit aims to make it easier for new researchers to learn about soft robotics by providing a range of tools that cover various important aspects of the field. This can significantly reduce the amount of time and effort required to get up to speed on the topic.</p>
 <h2 id="what-can-sorotoki-do">What can Sorotoki do?</h2>
-<p>Sorotoki started out small, but at its current state, it contains a vast collection of functionalities -- tailored towards many aspects of soft robotics. For example, suppose you are inspired by the multi-gait soft crawler developed by Shepard et al.<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup> -- <a href="https://www.youtube.com/watch?v=lUyuBOtsDu4">See video</a>. Or you want to simulate the incredibly dexterous soft gripper developed by Suzumori et al.<sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup> -- <a href="https://www.youtube.com/watch?v=kHGLYRUKWeM&amp;t=100s">See video</a>. Can we model such systems easily? Well.... Short answer: <strong>no</strong>. As matter of fact, simplifying the (infinite-dimensional) dynamics of soft robots is no easy feat. It has been an active topic of research for the better part of the last two decades. Ironically, studying <em>"soft"</em> robotics is incredibly <em>"hard"</em>.</p>
-<p>Sorotoki, however, can simplify the process of design, modeling and control for soft robots. Our aim is to make research into soft robotics more accessable by dividing the problem into smaller, more manageable steps. Multi-physics solvers are included into Sorotoki and can accesses with minimal programming complexity.  </p>
+<p>Sorotoki has grown significantly since its inception and now offers a wide range of functionalities tailored to various aspects of soft robotics. For example, suppose you are inspired by the multi-gait soft crawler developed by Shepard et al.<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup> -- <a href="https://www.youtube.com/watch?v=lUyuBOtsDu4">See video</a>. Or you want to simulate the incredibly dexterous soft gripper developed by Suzumori et al.<sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup> -- <a href="https://www.youtube.com/watch?v=kHGLYRUKWeM&amp;t=100s">See video</a>. Can we model such systems easily? Well.... Short answer: <strong>no</strong>. As matter of fact, simplifying the (infinite-dimensional) dynamics of soft robots is no easy feat. It has been an active topic of research for the better part of the last two decades. Ironically, studying <em>"soft"</em> robotics is incredibly <em>"hard"</em>.</p>
+<p>Sorotoki, however, can simplify the process of design, modeling and control for soft robots. Our aim is to make research into soft robotics more accessable by dividing the problem into smaller, more manageable steps. Multi-physics solvers are included into Sorotoki and can accessed with minimal programming complexity.  </p>
 <video autoplay="" controls="" height="310" loop="" width="800">
 <source src="./assets/fem_crawler.mp4" type="video/mp4"/>
 </video>
@@ -398,32 +438,32 @@
 <p>A classic example in soft robotics is the PneuNet soft bending actuator. The PneuNet (pneumatic network) belongs to a class of soft actuators that, due to a geometrically induced stiffness differential, undergoes bending when pressurized. The geometry of the PneuNet is developed (and popularized) by Mosadegh et al.<sup id="fnref:3"><a class="footnote-ref" href="#fn:3">3</a></sup> , but historically it is much older<sup id="fnref:4"><a class="footnote-ref" href="#fn:4">4</a></sup>. To model the PneuNet actuator, consider the following numerical example. Assuming <em>plane strain</em>, we can simulate the nonlinear bending characteristics of the Pneunet actuator using the super-short code below (only 10 lines of code!):</p>
 <details class="info" open="open">
 <summary>Code for simulation</summary>
-<div class="highlight"><pre><span></span><code><span class="c">% generate mesh from image</span><span class="w"></span>
-<span class="n">msh</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Mesh</span><span class="p">(</span><span class="s">'Pneunet.png'</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="w"></span>
-<span class="w">          </span><span class="s">'ElementSize'</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="w"></span>
-<span class="w">          </span><span class="s">'BdBox'</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">120</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">20</span><span class="p">]);</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="c">% generate mesh from image</span>
+<span class="n">msh</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Mesh</span><span class="p">(</span><span class="s">'Pneunet.png'</span><span class="p">,</span><span class="w"> </span><span class="k">...</span>
+<span class="w">          </span><span class="s">'ElementSize'</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="k">...</span>
+<span class="w">          </span><span class="s">'BdBox'</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">120</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">20</span><span class="p">]);</span>
 
-<span class="c">% finite element solver (FEM)</span><span class="w"></span>
-<span class="n">fem</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Fem</span><span class="p">(</span><span class="n">msh</span><span class="p">,</span><span class="s">'Material'</span><span class="p">,</span><span class="w"> </span><span class="n">NeoHookean</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.4</span><span class="p">),</span><span class="w"> </span><span class="k">...</span><span class="w"></span>
-<span class="w">              </span><span class="s">'TimeStep'</span><span class="p">,</span><span class="w"> </span><span class="mf">1e-2</span><span class="p">);</span><span class="w"></span>
+<span class="c">% finite element solver (FEM)</span>
+<span class="n">fem</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Fem</span><span class="p">(</span><span class="n">msh</span><span class="p">,</span><span class="s">'Material'</span><span class="p">,</span><span class="w"> </span><span class="n">NeoHookean</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.4</span><span class="p">),</span><span class="w"> </span><span class="k">...</span>
+<span class="w">              </span><span class="s">'TimeStep'</span><span class="p">,</span><span class="w"> </span><span class="mf">1e-2</span><span class="p">);</span>
 
-<span class="c">% boundary conditions</span><span class="w"></span>
-<span class="n">fem</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">fem</span><span class="p">.</span><span class="n">addGravity</span><span class="p">();</span><span class="w"></span>
-<span class="n">fem</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">fem</span><span class="p">.</span><span class="n">addPressure</span><span class="p">(</span><span class="s">'All'</span><span class="p">,</span><span class="w"> </span><span class="mi">30</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">kpa</span><span class="p">);</span><span class="w"></span>
-<span class="n">fem</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">fem</span><span class="p">.</span><span class="n">addConstraint</span><span class="p">(</span><span class="s">'Left'</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]);</span><span class="w"></span>
+<span class="c">% boundary conditions</span>
+<span class="n">fem</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">fem</span><span class="p">.</span><span class="n">addGravity</span><span class="p">();</span>
+<span class="n">fem</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">fem</span><span class="p">.</span><span class="n">addPressure</span><span class="p">(</span><span class="s">'All'</span><span class="p">,</span><span class="w"> </span><span class="mi">30</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">kpa</span><span class="p">);</span>
+<span class="n">fem</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">fem</span><span class="p">.</span><span class="n">addConstraint</span><span class="p">(</span><span class="s">'Left'</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]);</span>
 
-<span class="c">% magic</span><span class="w"></span>
-<span class="n">fem</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">fem</span><span class="p">.</span><span class="n">solve</span><span class="p">();</span><span class="w"></span>
+<span class="c">% magic</span>
+<span class="n">fem</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">fem</span><span class="p">.</span><span class="n">solve</span><span class="p">();</span>
 
-<span class="c">% take away message: simplicity &gt; complexity</span><span class="w"></span>
+<span class="c">% take away message: simplicity &gt; complexity</span>
 </code></pre></div>
 </details>
 <details class="info">
 <summary>Code for plotting</summary>
 <p>Once a simulation is completed, there exist simple command to export the simulation as a <code>.gif</code> file. We can simple use the command below. This sets the frames-per-second (FPS), the axis for the replay video, and <code>gif = true</code> to make a gif file.</p>
-<div class="highlight"><pre><span></span><code><span class="n">fem</span><span class="p">.</span><span class="n">replay</span><span class="p">(</span><span class="s">'fps'</span><span class="p">,</span><span class="mi">60</span><span class="p">,</span><span class="k">...</span><span class="w"></span>
-<span class="w">           </span><span class="s">'axis'</span><span class="p">,[</span><span class="o">-</span><span class="mi">33</span><span class="p">,</span><span class="w"> </span><span class="mi">120</span><span class="w"> </span><span class="o">-</span><span class="mi">86</span><span class="w"> </span><span class="mi">21</span><span class="p">],</span><span class="k">...</span><span class="w"></span>
-<span class="w">           </span><span class="s">'gif'</span><span class="p">,</span><span class="nb">true</span><span class="p">)</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="n">fem</span><span class="p">.</span><span class="n">replay</span><span class="p">(</span><span class="s">'fps'</span><span class="p">,</span><span class="mi">60</span><span class="p">,</span><span class="k">...</span>
+<span class="w">           </span><span class="s">'axis'</span><span class="p">,[</span><span class="o">-</span><span class="mi">33</span><span class="p">,</span><span class="w"> </span><span class="mi">120</span><span class="w"> </span><span class="o">-</span><span class="mi">86</span><span class="w"> </span><span class="mi">21</span><span class="p">],</span><span class="k">...</span>
+<span class="w">           </span><span class="s">'gif'</span><span class="p">,</span><span class="nb">true</span><span class="p">)</span>
 </code></pre></div>
 </details>
 </details>
@@ -439,36 +479,36 @@
 <p>where <span class="arithmatex">\(I_1 = {\lambda_1}^2 + {\lambda_2}^2 + {\lambda_3}^2\)</span> is the first strain invariant, and <span class="arithmatex">\(\pi\)</span> a vector of unknown material parameters. For uniaxial tension, we have that <span class="arithmatex">\(\lambda_1 = \lambda\)</span> and <span class="arithmatex">\(\lambda_2 = \lambda_3 = 1/{\lambda^2}\)</span>. Therefore, the stress along the uniaxial tension test is given by <span class="arithmatex">\( \sigma_{11} = 2 \left(\lambda^2 - \frac{1}{\lambda} \right)\Psi' \)</span> with <span class="arithmatex">\(\Psi'\)</span> the partial derivative of <span class="arithmatex">\(\Psi\)</span> with respect to <span class="arithmatex">\(I_1\)</span>. Luckily, these uniaxial stress-strain relations are included in every hyperelastic material model of Sorotoki. Simply call <code>S = material.uniaxial(x)</code>. The optimal material parameters <span class="arithmatex">\(\pi\)</span> can then be easily found using standard optimization routines such as <code>fmincon</code>. See the example below.</p>
 <details class="info" open="open">
 <summary>Code for simulation</summary>
-<div class="highlight"><pre><span></span><code><span class="c">% CODE: Example 2 -- Material fitting using fmincon</span><span class="w"></span>
-<span class="p">[</span><span class="n">lam</span><span class="p">,</span><span class="w"> </span><span class="n">str</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">materialDataBase</span><span class="p">(</span><span class="s">'DragonSkin10'</span><span class="p">);</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="c">% CODE: Example 2 -- Material fitting using fmincon</span>
+<span class="p">[</span><span class="n">lam</span><span class="p">,</span><span class="w"> </span><span class="n">str</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">materialDataBase</span><span class="p">(</span><span class="s">'DragonSkin10'</span><span class="p">);</span>
 
-<span class="c">% define objective (Yeoh model)</span><span class="w"></span>
-<span class="n">obj</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">@(</span><span class="n">Pi</span><span class="p">)</span><span class="w"> </span><span class="n">Objective</span><span class="p">(</span><span class="n">Pi</span><span class="p">,</span><span class="n">lam</span><span class="p">,</span><span class="n">str</span><span class="p">);</span><span class="w"></span>
+<span class="c">% define objective (Yeoh model)</span>
+<span class="n">obj</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">@(</span><span class="n">Pi</span><span class="p">)</span><span class="w"> </span><span class="n">Objective</span><span class="p">(</span><span class="n">Pi</span><span class="p">,</span><span class="n">lam</span><span class="p">,</span><span class="n">str</span><span class="p">);</span>
 
-<span class="n">Pi0</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">];</span><span class="w">  </span><span class="c">% initial guess</span><span class="w"></span>
-<span class="n">lb</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="mf">1e-6</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="w">  </span><span class="o">-</span><span class="mi">2</span><span class="p">];</span><span class="w">  </span><span class="c">% lower bounds</span><span class="w"></span>
-<span class="n">ub</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="nb">Inf</span><span class="p">,</span><span class="w"> </span><span class="nb">Inf</span><span class="p">,</span><span class="w"> </span><span class="nb">Inf</span><span class="p">];</span><span class="w">  </span><span class="c">% upper bounds</span><span class="w"></span>
+<span class="n">Pi0</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">];</span><span class="w">  </span><span class="c">% initial guess</span>
+<span class="n">lb</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="mf">1e-6</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="w">  </span><span class="o">-</span><span class="mi">2</span><span class="p">];</span><span class="w">  </span><span class="c">% lower bounds</span>
+<span class="n">ub</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="nb">Inf</span><span class="p">,</span><span class="w"> </span><span class="nb">Inf</span><span class="p">,</span><span class="w"> </span><span class="nb">Inf</span><span class="p">];</span><span class="w">  </span><span class="c">% upper bounds</span>
 
 <span class="n">opt</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">optimoptions</span><span class="p">(@</span><span class="n">fmincon</span><span class="p">,</span><span class="s">'FiniteDifferenceStepSize'</span><span class="p">,</span><span class="mf">1e-12</span><span class="p">,</span><span class="w">  </span>
-<span class="w">                            </span><span class="s">'Algorithm'</span><span class="p">,</span><span class="s">'sqp-legacy'</span><span class="p">);</span><span class="w"></span>
+<span class="w">                            </span><span class="s">'Algorithm'</span><span class="p">,</span><span class="s">'sqp-legacy'</span><span class="p">);</span>
 
-<span class="n">fig</span><span class="p">(</span><span class="mi">101</span><span class="p">,[</span><span class="mi">9</span><span class="p">,</span><span class="mi">9</span><span class="p">]);</span><span class="w"></span>
-<span class="n">Pi</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">fmincon</span><span class="p">(</span><span class="n">Obj</span><span class="p">,</span><span class="n">Pi0</span><span class="p">,[],[],[],[],</span><span class="n">lb</span><span class="p">,</span><span class="n">ub</span><span class="p">,[],</span><span class="n">opt</span><span class="p">);</span><span class="w"></span>
+<span class="n">fig</span><span class="p">(</span><span class="mi">101</span><span class="p">,[</span><span class="mi">9</span><span class="p">,</span><span class="mi">9</span><span class="p">]);</span>
+<span class="n">Pi</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">fmincon</span><span class="p">(</span><span class="n">Obj</span><span class="p">,</span><span class="n">Pi0</span><span class="p">,[],[],[],[],</span><span class="n">lb</span><span class="p">,</span><span class="n">ub</span><span class="p">,[],</span><span class="n">opt</span><span class="p">);</span>
 
-<span class="k">function</span><span class="w"> </span>obj<span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nf">Objective</span><span class="p">(</span>Pi,X,Y<span class="p">)</span><span class="w"></span>
-<span class="w">    </span><span class="n">Q</span><span class="w">   </span><span class="p">=</span><span class="w"> </span><span class="nb">diag</span><span class="p">(</span><span class="n">Y</span><span class="o">.^-</span><span class="mi">2</span><span class="p">);</span><span class="w">   </span><span class="c">% weighting - emphasis low strains  </span><span class="w"></span>
-<span class="w">    </span><span class="n">E</span><span class="w">   </span><span class="p">=</span><span class="w"> </span><span class="n">Y</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">YeohMaterial</span><span class="p">(</span><span class="n">Pi</span><span class="p">).</span><span class="n">uniaxial</span><span class="p">(</span><span class="n">X</span><span class="p">);</span><span class="w"> </span><span class="c">% stress resid.</span><span class="w"></span>
+<span class="k">function</span><span class="w"> </span>obj<span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nf">Objective</span><span class="p">(</span>Pi,X,Y<span class="p">)</span>
+<span class="w">    </span><span class="n">Q</span><span class="w">   </span><span class="p">=</span><span class="w"> </span><span class="nb">diag</span><span class="p">(</span><span class="n">Y</span><span class="o">.^-</span><span class="mi">2</span><span class="p">);</span><span class="w">   </span><span class="c">% weighting - emphasis low strains  </span>
+<span class="w">    </span><span class="n">E</span><span class="w">   </span><span class="p">=</span><span class="w"> </span><span class="n">Y</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">YeohMaterial</span><span class="p">(</span><span class="n">Pi</span><span class="p">).</span><span class="n">uniaxial</span><span class="p">(</span><span class="n">X</span><span class="p">);</span><span class="w"> </span><span class="c">% stress resid.</span>
 
-<span class="w">    </span><span class="c">% quadratic lost function</span><span class="w"></span>
-<span class="w">    </span><span class="n">obj</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">E</span><span class="p">(:).</span><span class="o">'</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Q</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">E</span><span class="p">(:);</span><span class="w"></span>
+<span class="w">    </span><span class="c">% quadratic lost function</span>
+<span class="w">    </span><span class="n">obj</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">E</span><span class="p">(:).</span><span class="o">'</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Q</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">E</span><span class="p">(:);</span>
 
-<span class="w">    </span><span class="nb">cla</span><span class="p">;</span><span class="w"></span>
-<span class="w">    </span><span class="nb">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="s">'Color'</span><span class="p">,</span><span class="w"> </span><span class="n">color_light_gray</span><span class="p">);</span><span class="w"> </span><span class="n">hold</span><span class="w"> </span><span class="s">on</span><span class="p">;</span><span class="w"></span>
-<span class="w">    </span><span class="nb">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">YeohMaterial</span><span class="p">(</span><span class="n">Pi</span><span class="p">).</span><span class="n">uniaxial</span><span class="p">(</span><span class="n">x</span><span class="p">),</span><span class="w"> </span><span class="k">...</span><span class="w"></span>
-<span class="w">            </span><span class="s">'Color'</span><span class="p">,</span><span class="w"> </span><span class="n">color_visited_alt</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="nb">cla</span><span class="p">;</span>
+<span class="w">    </span><span class="nb">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="s">'Color'</span><span class="p">,</span><span class="w"> </span><span class="n">color_light_gray</span><span class="p">);</span><span class="w"> </span><span class="n">hold</span><span class="w"> </span><span class="s">on</span><span class="p">;</span>
+<span class="w">    </span><span class="nb">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">YeohMaterial</span><span class="p">(</span><span class="n">Pi</span><span class="p">).</span><span class="n">uniaxial</span><span class="p">(</span><span class="n">x</span><span class="p">),</span><span class="w"> </span><span class="k">...</span>
+<span class="w">            </span><span class="s">'Color'</span><span class="p">,</span><span class="w"> </span><span class="n">color_visited_alt</span><span class="p">);</span>
 <span class="w">    </span><span class="nb">ylabel</span><span class="p">(</span><span class="s">'engineering stress $\sigma_{11}$'</span><span class="p">);</span><span class="w">    </span>
-<span class="w">    </span><span class="nb">xlabel</span><span class="p">(</span><span class="s">'stretch $\lambda$'</span><span class="p">);</span><span class="w"></span>
-<span class="k">end</span><span class="w"></span>
+<span class="w">    </span><span class="nb">xlabel</span><span class="p">(</span><span class="s">'stretch $\lambda$'</span><span class="p">);</span>
+<span class="k">end</span>
 </code></pre></div>
 </details>
 </details>
@@ -484,55 +524,55 @@
 <p>where <span class="arithmatex">\(J_v(q) := \lfloor J(q,L) \rfloor_3\)</span> is the linear velocity part of the manipulator Jacobian matrix at the tip (<span class="arithmatex">\(\sigma = L\)</span>), <span class="arithmatex">\(\nabla_q \mathcal{V}\)</span> is simply the gradient of the potential energy w.r.t to its states <span class="arithmatex">\(q\)</span>, <span class="arithmatex">\(X\)</span> and <span class="arithmatex">\(X_d\)</span> the end-effector position and the desired position, respectively. Note that we can compute the end-effector velocity by <span class="arithmatex">\(\dot{X} = J_v(q) \dot{q}\)</span>. </p>
 <details class="info" open="open">
 <summary>Code for simulation</summary>
-<div class="highlight"><pre><span></span><code><span class="c">% CODE: Example 2 -- Task-space controller</span><span class="w"></span>
-<span class="c">% assign desired setpoint</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="c">% CODE: Example 2 -- Task-space controller</span>
+<span class="c">% assign desired setpoint</span>
 <span class="n">Xd</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="mi">30</span><span class="p">;</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="w"> </span><span class="mi">10</span><span class="p">];</span><span class="w"> </span>
 
-<span class="c">% build continuum shape</span><span class="w"></span>
-<span class="n">POD</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">chebyspace</span><span class="p">(</span><span class="mi">60</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span><span class="w">            </span><span class="c">% POD basis</span><span class="w"></span>
-<span class="n">shp</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Shapes</span><span class="p">(</span><span class="n">POD</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="w"> </span><span class="k">...</span><span class="c"> % pure bending XY</span><span class="w"></span>
-<span class="w">                </span><span class="s">'Length'</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="w"></span>
-<span class="w">                </span><span class="s">'Material'</span><span class="p">,</span><span class="w"> </span><span class="n">Dragonskin10</span><span class="p">);</span><span class="w"></span>
+<span class="c">% build continuum shape</span>
+<span class="n">POD</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">chebyspace</span><span class="p">(</span><span class="mi">60</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span><span class="w">            </span><span class="c">% POD basis</span>
+<span class="n">shp</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Shapes</span><span class="p">(</span><span class="n">POD</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="w"> </span><span class="k">...</span><span class="c"> % pure bending XY</span>
+<span class="w">                </span><span class="s">'Length'</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="k">...</span>
+<span class="w">                </span><span class="s">'Material'</span><span class="p">,</span><span class="w"> </span><span class="n">Dragonskin10</span><span class="p">);</span>
 
-<span class="c">% geometry and boundary conditions</span><span class="w"></span>
-<span class="n">shp</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">shp</span><span class="p">.</span><span class="n">setRadius</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span><span class="w">   </span><span class="c">% R = 5 mm</span><span class="w"></span>
-<span class="n">shp</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">shp</span><span class="p">.</span><span class="n">setRamp</span><span class="p">(</span><span class="mf">0.75</span><span class="p">);</span><span class="w">  </span><span class="c">% R is reduced by 75% at s=L</span><span class="w"></span>
-<span class="n">shp</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">shp</span><span class="p">.</span><span class="n">addGravity</span><span class="p">();</span><span class="w"></span>
+<span class="c">% geometry and boundary conditions</span>
+<span class="n">shp</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">shp</span><span class="p">.</span><span class="n">setRadius</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span><span class="w">   </span><span class="c">% R = 5 mm</span>
+<span class="n">shp</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">shp</span><span class="p">.</span><span class="n">setRamp</span><span class="p">(</span><span class="mf">0.75</span><span class="p">);</span><span class="w">  </span><span class="c">% R is reduced by 75% at s=L</span>
+<span class="n">shp</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">shp</span><span class="p">.</span><span class="n">addGravity</span><span class="p">();</span>
 
-<span class="c">% model composer</span><span class="w"></span>
-<span class="n">mdl</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Model</span><span class="p">(</span><span class="n">shp</span><span class="p">,</span><span class="s">'TimeStep'</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">60</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="w"></span>
-<span class="w">                </span><span class="s">'Controller'</span><span class="p">,</span><span class="w"> </span><span class="p">@(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="n">tau</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">Xd</span><span class="p">)</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="c">% model composer</span>
+<span class="n">mdl</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Model</span><span class="p">(</span><span class="n">shp</span><span class="p">,</span><span class="s">'TimeStep'</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">60</span><span class="p">,</span><span class="w"> </span><span class="k">...</span>
+<span class="w">                </span><span class="s">'Controller'</span><span class="p">,</span><span class="w"> </span><span class="p">@(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="n">tau</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">Xd</span><span class="p">)</span><span class="w"> </span><span class="p">);</span>
 
-<span class="c">% magic ;)</span><span class="w"></span>
-<span class="n">mdl</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">mdl</span><span class="p">.</span><span class="n">simulate</span><span class="p">();</span><span class="w"></span>
+<span class="c">% magic ;)</span>
+<span class="n">mdl</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">mdl</span><span class="p">.</span><span class="n">simulate</span><span class="p">();</span>
 
-<span class="c">% task-space controller (called by solver)</span><span class="w"></span>
-<span class="k">function</span><span class="w"> </span>tau<span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nf">tau</span><span class="p">(</span>mdl,Xd<span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="nb">log</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">mdl</span><span class="p">.</span><span class="n">Systems</span><span class="p">{</span><span class="mi">1</span><span class="p">}.</span><span class="n">Log</span><span class="p">;</span><span class="w"></span>
-<span class="w">  </span><span class="n">X</span><span class="w">   </span><span class="p">=</span><span class="w"> </span><span class="nb">log</span><span class="p">.</span><span class="n">FK</span><span class="p">.</span><span class="n">g</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="k">end</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="n">Jv</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="nb">log</span><span class="p">.</span><span class="n">FK</span><span class="p">.</span><span class="n">J</span><span class="p">(</span><span class="mi">4</span><span class="p">:</span><span class="mi">6</span><span class="p">,:,</span><span class="k">end</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="n">Vq</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="nb">log</span><span class="p">.</span><span class="n">PH</span><span class="p">.</span><span class="n">dVdq</span><span class="p">;</span><span class="w"></span>
+<span class="c">% task-space controller (called by solver)</span>
+<span class="k">function</span><span class="w"> </span>tau<span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nf">tau</span><span class="p">(</span>mdl,Xd<span class="p">)</span>
+<span class="w">  </span><span class="nb">log</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">mdl</span><span class="p">.</span><span class="n">Systems</span><span class="p">{</span><span class="mi">1</span><span class="p">}.</span><span class="n">Log</span><span class="p">;</span>
+<span class="w">  </span><span class="n">X</span><span class="w">   </span><span class="p">=</span><span class="w"> </span><span class="nb">log</span><span class="p">.</span><span class="n">FK</span><span class="p">.</span><span class="n">g</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="k">end</span><span class="p">);</span>
+<span class="w">  </span><span class="n">Jv</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="nb">log</span><span class="p">.</span><span class="n">FK</span><span class="p">.</span><span class="n">J</span><span class="p">(</span><span class="mi">4</span><span class="p">:</span><span class="mi">6</span><span class="p">,:,</span><span class="k">end</span><span class="p">);</span>
+<span class="w">  </span><span class="n">Vq</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="nb">log</span><span class="p">.</span><span class="n">PH</span><span class="p">.</span><span class="n">dVdq</span><span class="p">;</span>
 
-<span class="w">  </span><span class="n">tau</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Jv</span><span class="p">.</span><span class="o">'*</span><span class="p">(</span><span class="mf">1e-3</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">Xd</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">X</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">1e-4</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Jv</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nb">log</span><span class="p">.</span><span class="n">dq</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Vq</span><span class="p">;</span><span class="w"></span>
-<span class="k">end</span><span class="w"></span>
+<span class="w">  </span><span class="n">tau</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Jv</span><span class="p">.</span><span class="o">'*</span><span class="p">(</span><span class="mf">1e-3</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">Xd</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">X</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">1e-4</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Jv</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nb">log</span><span class="p">.</span><span class="n">dq</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Vq</span><span class="p">;</span>
+<span class="k">end</span>
 </code></pre></div>
 </details>
 <details class="info">
 <summary>Code for plotting</summary>
-<div class="highlight"><pre><span></span><code><span class="c">% Example 2b: plotting Model data</span><span class="w"></span>
-<span class="c">% for loop over Model log files</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="c">% Example 2b: plotting Model data</span>
+<span class="c">% for loop over Model log files</span>
 <span class="k">for</span><span class="w"> </span><span class="n">ii</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">1</span><span class="p">:</span><span class="nb">numel</span><span class="p">(</span><span class="n">mdl</span><span class="p">.</span><span class="n">Log</span><span class="p">.</span><span class="n">t</span><span class="p">)</span><span class="w">  </span>
 
-<span class="w">    </span><span class="n">shp</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">shp</span><span class="p">.</span><span class="n">render</span><span class="p">(</span><span class="n">mdl</span><span class="p">.</span><span class="n">Log</span><span class="p">.</span><span class="n">x</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span><span class="mi">1</span><span class="p">:</span><span class="mi">6</span><span class="p">));</span><span class="w"> </span><span class="c">% render shape</span><span class="w"></span>
+<span class="w">    </span><span class="n">shp</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">shp</span><span class="p">.</span><span class="n">render</span><span class="p">(</span><span class="n">mdl</span><span class="p">.</span><span class="n">Log</span><span class="p">.</span><span class="n">x</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span><span class="mi">1</span><span class="p">:</span><span class="mi">6</span><span class="p">));</span><span class="w"> </span><span class="c">% render shape</span>
 
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">ii</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="c">% render setpoint Xd</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">ii</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="c">% render setpoint Xd</span>
 <span class="w">      </span><span class="n">plotpoint</span><span class="p">(</span><span class="n">Xd</span><span class="p">);</span><span class="w">  </span>
-<span class="w">    </span><span class="k">end</span><span class="w"></span>
+<span class="w">    </span><span class="k">end</span>
 
-<span class="w">    </span><span class="nb">axis</span><span class="p">([</span><span class="mi">0</span><span class="w"> </span><span class="mi">100</span><span class="w"> </span><span class="o">-</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">30</span><span class="p">]);</span><span class="w"></span>
-<span class="w">    </span><span class="nb">view</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span><span class="mi">30</span><span class="p">);</span><span class="w"></span>
-<span class="w">    </span><span class="nb">drawnow</span><span class="p">;</span><span class="w"></span>
-<span class="k">end</span><span class="w"></span>
+<span class="w">    </span><span class="nb">axis</span><span class="p">([</span><span class="mi">0</span><span class="w"> </span><span class="mi">100</span><span class="w"> </span><span class="o">-</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">30</span><span class="p">]);</span>
+<span class="w">    </span><span class="nb">view</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span><span class="mi">30</span><span class="p">);</span>
+<span class="w">    </span><span class="nb">drawnow</span><span class="p">;</span>
+<span class="k">end</span>
 </code></pre></div>
 </details>
 </details>
@@ -543,42 +583,42 @@
 <source src="./assets/soft_hand.mp4" type="video/mp4"/>
 </video>
 </div></p>
-<div class="highlight"><pre><span></span><code><span class="c">% CODE: Example 3 -- Open-loop controller</span><span class="w"></span>
-<span class="c">% connect to controller board</span><span class="w"></span>
-<span class="n">brd</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Bdog</span><span class="p">(</span><span class="s">'pi'</span><span class="p">,</span><span class="s">'192.168.0.2'</span><span class="p">,</span><span class="s">'pwd'</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="w"></span>
-<span class="w">           </span><span class="s">'NVeab'</span><span class="p">,</span><span class="mi">3</span><span class="p">);</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="c">% CODE: Example 3 -- Open-loop controller</span>
+<span class="c">% connect to controller board</span>
+<span class="n">brd</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Bdog</span><span class="p">(</span><span class="s">'pi'</span><span class="p">,</span><span class="s">'192.168.0.2'</span><span class="p">,</span><span class="s">'pwd'</span><span class="p">,</span><span class="w"> </span><span class="k">...</span>
+<span class="w">           </span><span class="s">'NVeab'</span><span class="p">,</span><span class="mi">3</span><span class="p">);</span>
 
-<span class="c">% set board update frequency</span><span class="w"></span>
-<span class="n">brd</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">brd</span><span class="p">.</span><span class="n">set</span><span class="p">(</span><span class="s">'Frequency'</span><span class="p">,</span><span class="mi">120</span><span class="p">);</span><span class="w"></span>
+<span class="c">% set board update frequency</span>
+<span class="n">brd</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">brd</span><span class="p">.</span><span class="n">set</span><span class="p">(</span><span class="s">'Frequency'</span><span class="p">,</span><span class="mi">120</span><span class="p">);</span>
 
-<span class="c">% phase offset per finger</span><span class="w"></span>
-<span class="n">phi</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">@(</span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="nb">pi</span><span class="o">/</span><span class="mi">6</span><span class="p">;</span><span class="w"></span>
+<span class="c">% phase offset per finger</span>
+<span class="n">phi</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">@(</span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="nb">pi</span><span class="o">/</span><span class="mi">6</span><span class="p">;</span>
 
-<span class="c">%% execute control loop for T=10s</span><span class="w"></span>
-<span class="k">while</span><span class="w"> </span><span class="n">brd</span><span class="p">.</span><span class="n">loop</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="w"></span>
-<span class="w">    </span><span class="n">T</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">ones</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">brd</span><span class="p">.</span><span class="n">t</span><span class="p">;</span><span class="w"></span>
+<span class="c">%% execute control loop for T=10s</span>
+<span class="k">while</span><span class="w"> </span><span class="n">brd</span><span class="p">.</span><span class="n">loop</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="w">    </span><span class="n">T</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">ones</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">brd</span><span class="p">.</span><span class="n">t</span><span class="p">;</span>
 
-<span class="w">    </span><span class="n">Pd</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">6</span><span class="p">);</span><span class="w"></span>
-<span class="w">    </span><span class="n">Pd</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mi">5</span><span class="p">)</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">80</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nb">sign</span><span class="p">(</span><span class="nb">sin</span><span class="p">(</span><span class="mi">4</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">phi</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mi">5</span><span class="p">).</span><span class="o">'</span><span class="p">))</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">...</span><span class="w"></span>
-<span class="w">              </span><span class="n">smoothstep</span><span class="p">(</span><span class="n">t</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">Pd</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">6</span><span class="p">);</span>
+<span class="w">    </span><span class="n">Pd</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mi">5</span><span class="p">)</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">80</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nb">sign</span><span class="p">(</span><span class="nb">sin</span><span class="p">(</span><span class="mi">4</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">phi</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mi">5</span><span class="p">).</span><span class="o">'</span><span class="p">))</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">...</span>
+<span class="w">              </span><span class="n">smoothstep</span><span class="p">(</span><span class="n">t</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
 
-<span class="w">    </span><span class="n">brd</span><span class="p">.</span><span class="n">setInput</span><span class="p">(</span><span class="n">Pd</span><span class="p">);</span><span class="w"></span>
-<span class="k">end</span><span class="w"></span>
+<span class="w">    </span><span class="n">brd</span><span class="p">.</span><span class="n">setInput</span><span class="p">(</span><span class="n">Pd</span><span class="p">);</span>
+<span class="k">end</span>
 
-<span class="c">% disconnect system</span><span class="w"></span>
-<span class="n">brd</span><span class="p">.</span><span class="n">disconnect</span><span class="p">();</span><span class="w"></span>
+<span class="c">% disconnect system</span>
+<span class="n">brd</span><span class="p">.</span><span class="n">disconnect</span><span class="p">();</span>
 </code></pre></div>
 </details>
 <h2 id="how-to-cite">How to cite?</h2>
 <p>If you are planning on using Sorotoki in your (academic) work, please consider citing the toolkit  </p>
-<div class="highlight"><pre><span></span><code><span class="nc">@misc</span><span class="p">{</span><span class="nl">Caasenbrood2020</span><span class="p">,</span><span class="w"></span>
-<span class="w">  </span><span class="na">author</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">{Caasenbrood, Brandon}</span><span class="p">,</span><span class="w"></span>
-<span class="w">  </span><span class="na">title</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">{Sorotoki - A Soft Robotics Toolkit for MATLAB}</span><span class="p">,</span><span class="w"></span>
-<span class="w">  </span><span class="na">year</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">{2020}</span><span class="p">,</span><span class="w"></span>
-<span class="w">  </span><span class="na">publisher</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">{GitHub}</span><span class="p">,</span><span class="w"></span>
-<span class="w">  </span><span class="na">journal</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">{GitHub repository}</span><span class="p">,</span><span class="w"></span>
-<span class="w">  </span><span class="na">howpublished</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">{\url{https://github.com/BJCaasenbrood/SorotokiCode}}</span><span class="p">,</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="nc">@misc</span><span class="p">{</span><span class="nl">Caasenbrood2020</span><span class="p">,</span>
+<span class="w">  </span><span class="na">author</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">{Caasenbrood, Brandon}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">title</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">{Sorotoki - A Soft Robotics Toolkit for MATLAB}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">year</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">{2020}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">publisher</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">{GitHub}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">journal</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">{GitHub repository}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">howpublished</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">{\url{https://github.com/BJCaasenbrood/SorotokiCode}}</span><span class="p">,</span>
+<span class="p">}</span>
 </code></pre></div>
 <div class="footnote">
 <hr/>

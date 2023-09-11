@@ -7,7 +7,7 @@
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
 <link href="../../images/favicon.png" rel="icon"/>
 <meta content="mkdocs-1.4.2, mkdocs-material-8.5.10" name="generator"/>
-<title>Colors - Sorotoki</title>
+<title>2D Primitives - Sorotoki</title>
 <link href="../../assets/stylesheets/main.975780f9.min.css" rel="stylesheet"/>
 <link href="../../assets/stylesheets/palette.2505c338.min.css" rel="stylesheet"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
@@ -33,7 +33,7 @@
 <input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
 <label class="md-overlay" for="__drawer"></label>
 <div data-md-component="skip">
-<a class="md-skip" href="#colors">
+<a class="md-skip" href="#2d-primitives">
           Skip to content
         </a>
 </div>
@@ -59,7 +59,7 @@
 <div class="md-header__topic" data-md-component="header-topic">
 <span class="md-ellipsis">
             
-              Colors
+              2D Primitives
             
           </span>
 </div>
@@ -165,8 +165,8 @@
           Documentation
         </label>
 <ul class="md-nav__list" data-md-scrollfix="">
-<li class="md-nav__item md-nav__item--nested">
-<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_1" id="__nav_3_1" type="checkbox"/>
+<li class="md-nav__item md-nav__item--active md-nav__item--nested">
+<input checked="" class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_1" id="__nav_3_1" type="checkbox"/>
 <label class="md-nav__link" for="__nav_3_1">
           Signed Distance Function
           <span class="md-nav__icon md-icon"></span>
@@ -178,27 +178,28 @@
         </label>
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
-<a class="md-nav__link" href="../../sdf/sdf/">
+<a class="md-nav__link" href="../sdf/">
         Signed Distance Functions
       </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../../sdf/operations/">
+<a class="md-nav__link" href="../operations/">
         SDF Operations
       </a>
 </li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="../../sdf/2d_primitives/">
+<li class="md-nav__item md-nav__item--active">
+<input class="md-nav__toggle md-toggle" data-md-toggle="toc" id="__toc" type="checkbox"/>
+<a class="md-nav__link md-nav__link--active" href="./">
         2D Primitives
       </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../../sdf/3d_primitives/">
+<a class="md-nav__link" href="../3d_primitives/">
         3D Primitives
       </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../../sdf/gradients/">
+<a class="md-nav__link" href="../gradients/">
         SDF Differentiability (normal and tangent operators)
       </a>
 </li>
@@ -225,8 +226,8 @@
         Model Composer
       </a>
 </li>
-<li class="md-nav__item md-nav__item--active md-nav__item--nested">
-<input checked="" class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_6" id="__nav_3_6" type="checkbox"/>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_6" id="__nav_3_6" type="checkbox"/>
 <label class="md-nav__link" for="__nav_3_6">
           Visualization
           <span class="md-nav__icon md-icon"></span>
@@ -238,45 +239,27 @@
         </label>
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
-<a class="md-nav__link" href="../figure/">
+<a class="md-nav__link" href="../../plotting/figure/">
         Figures
       </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../rendering/">
+<a class="md-nav__link" href="../../plotting/rendering/">
         Rendering
       </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../matcap/">
+<a class="md-nav__link" href="../../plotting/matcap/">
         Textures
       </a>
 </li>
-<li class="md-nav__item md-nav__item--active">
-<input class="md-nav__toggle md-toggle" data-md-toggle="toc" id="__toc" type="checkbox"/>
-<label class="md-nav__link md-nav__link--active" for="__toc">
-          Colors
-          <span class="md-nav__icon md-icon"></span>
-</label>
-<a class="md-nav__link md-nav__link--active" href="./">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../plotting/colors/">
         Colors
       </a>
-<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
-<label class="md-nav__title" for="__toc">
-<span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#improved-color-scheme">
-    Improved color scheme
-  </a>
-</li>
-</ul>
-</nav>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../colormaps/">
+<a class="md-nav__link" href="../../plotting/colormaps/">
         Colormaps
       </a>
 </li>
@@ -360,58 +343,55 @@
 <div class="md-sidebar__scrollwrap">
 <div class="md-sidebar__inner">
 <nav aria-label="Table of contents" class="md-nav md-nav--secondary">
-<label class="md-nav__title" for="__toc">
-<span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#improved-color-scheme">
-    Improved color scheme
-  </a>
-</li>
-</ul>
 </nav>
 </div>
 </div>
 </div>
 <div class="md-content" data-md-component="content">
 <article class="md-content__inner md-typeset">
-<a class="md-content__button md-icon" href="https://github.com/BJCaasenbrood/SorotokiCode/edit/master/docs/plotting/colors.md" title="Edit this page">
+<a class="md-content__button md-icon" href="https://github.com/BJCaasenbrood/SorotokiCode/edit/master/docs/sdf/2d_primitives.md" title="Edit this page">
 <svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"></path></svg>
 </a>
-<h1 id="colors">Colors</h1>
-<p>The standard color schemes are not optimized well (in my opinon). Especially when compared to the <a href="https://matplotlib.org/">MatplotLib</a> in Python. Therefore, Sorotoki comes equipped with a new color scheme.</p>
-<h5 id="improved-color-scheme">Improved color scheme</h5>
-<details class="example" open="open">
-<summary>Using Sorotoki color scheme(s)</summary>
-<p><div class="highlight"><pre><span></span><code><span class="n">fig</span><span class="p">(</span><span class="mi">101</span><span class="p">,[</span><span class="mi">10</span><span class="p">,</span><span class="mi">9</span><span class="p">]);</span>
+<h1 id="2d-primitives">2D Primitives</h1>
+<details open="open">
+<summary><code>sCircle.m</code></summary>
+<p><a class="glightbox" data-desc-position="bottom" data-height="auto" data-width="100%" href="../img/sCircle.png"><img align="right" alt="Image title" src="../img/sCircle.png" width="100"/></a>
+<div class="highlight"><pre><span></span><code><span class="n">sCircle</span><span class="p">();</span><span class="w"> </span><span class="c">% circle with radius R = 1 at (0,0)</span>
 
-<span class="k">for</span><span class="w"> </span><span class="n">ii</span><span class="p">=</span><span class="mi">1</span><span class="p">:</span><span class="mi">10</span>
-<span class="w">    </span><span class="n">X</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">pi</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span><span class="mf">1e5</span><span class="p">);</span>
-<span class="w">    </span><span class="n">Y</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">cos</span><span class="p">(</span><span class="n">X</span><span class="o">+</span><span class="mi">1</span><span class="o">*</span><span class="n">ii</span><span class="o">*</span><span class="nb">pi</span><span class="o">/</span><span class="n">N</span><span class="p">);</span>
-<span class="w">    </span><span class="nb">plot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">);</span>
-<span class="k">end</span>
+<span class="n">sCircle</span><span class="p">(</span><span class="n">R</span><span class="p">);</span><span class="w"> </span><span class="c">% circle with radius R at (0,0)</span>
 
-<span class="c">% magick color change</span>
-<span class="n">sorocolor</span><span class="p">;</span>
-</code></pre></div>
-<figure markdown="">
-<a class="glightbox" data-desc-position="bottom" data-height="auto" data-width="100%" href="../img/colors.png"><img alt="Image title" loading="lazy" src="../img/colors.png"/></a>
-<figcaption>Improved color scheme for plotting using Sorotoki</figcaption>
-</figure></p>
-<details class="info">
-<summary>Alternative option</summary>
-<p>An alternative option is to call the colors directly. We can use this using <code>col(i)</code> where <code>i</code> is the color index. The indexation is identical to the legend above.
-<div class="highlight"><pre><span></span><code><span class="n">fig</span><span class="p">(</span><span class="mi">101</span><span class="p">,[</span><span class="mi">10</span><span class="p">,</span><span class="mi">9</span><span class="p">]);</span>
-
-<span class="k">for</span><span class="w"> </span><span class="n">ii</span><span class="p">=</span><span class="mi">1</span><span class="p">:</span><span class="mi">10</span>
-<span class="w">    </span><span class="n">X</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">pi</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span><span class="mf">1e5</span><span class="p">);</span>
-<span class="w">    </span><span class="n">Y</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">cos</span><span class="p">(</span><span class="n">X</span><span class="o">+</span><span class="mi">1</span><span class="o">*</span><span class="n">ii</span><span class="o">*</span><span class="nb">pi</span><span class="o">/</span><span class="n">N</span><span class="p">);</span>
-<span class="w">    </span><span class="nb">plot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">,</span><span class="s">'Color'</span><span class="p">,</span><span class="n">col</span><span class="p">(</span><span class="n">ii</span><span class="p">));</span>
-<span class="k">end</span>
+<span class="n">sCircle</span><span class="p">(</span><span class="n">R</span><span class="p">,[</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">]);</span><span class="w"> </span><span class="c">% circle with radius R at (x,y)</span>
 </code></pre></div></p>
 </details>
+<details open="open">
+<summary><code>sRectangle.m</code></summary>
+<p><a class="glightbox" data-desc-position="bottom" data-height="auto" data-width="100%" href="../img/sRectangle.png"><img align="right" alt="Image title" src="../img/sRectangle.png" width="100"/></a>
+<div class="highlight"><pre><span></span><code><span class="n">sRectangle</span><span class="p">();</span><span class="w"> </span><span class="c">% square with width W = 1 at (0,0)</span>
+
+<span class="n">sRectangle</span><span class="p">(</span><span class="n">R</span><span class="p">);</span><span class="w"> </span><span class="c">% circle with radius R at (0,0)</span>
+
+<span class="n">sCircle</span><span class="p">(</span><span class="n">R</span><span class="p">,[</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">]);</span><span class="w"> </span><span class="c">% circle with radius R at (x,y)</span>
+</code></pre></div></p>
+</details>
+<details open="open">
+<summary><code>sSquircle.m</code></summary>
+<p><a class="glightbox" data-desc-position="bottom" data-height="auto" data-width="100%" href="../img/sRectangle.png"><img align="right" alt="Image title" src="../img/sRectangle.png" width="100"/></a>
+<div class="highlight"><pre><span></span><code><span class="n">sRectangle</span><span class="p">();</span><span class="w"> </span><span class="c">% square with width W = 1 at (0,0)</span>
+
+<span class="n">sRectangle</span><span class="p">(</span><span class="n">R</span><span class="p">);</span><span class="w"> </span><span class="c">% circle with radius R at (0,0)</span>
+
+<span class="n">sCircle</span><span class="p">(</span><span class="n">R</span><span class="p">,[</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">]);</span><span class="w"> </span><span class="c">% circle with radius R at (x,y)</span>
+</code></pre></div></p>
+</details>
+<details open="open">
+<summary><code>sCup.m</code></summary>
+<p><a class="glightbox" data-desc-position="bottom" data-height="auto" data-width="100%" href="../img/sCup.png"><img align="right" alt="Image title" src="../img/sCup.png" width="100"/></a>
+<div class="highlight"><pre><span></span><code><span class="n">sRectangle</span><span class="p">();</span><span class="w"> </span><span class="c">% square with width W = 1 at (0,0)</span>
+
+<span class="n">sRectangle</span><span class="p">(</span><span class="n">R</span><span class="p">);</span><span class="w"> </span><span class="c">% circle with radius R at (0,0)</span>
+
+<span class="n">sCircle</span><span class="p">(</span><span class="n">R</span><span class="p">,[</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">]);</span><span class="w"> </span><span class="c">% circle with radius R at (x,y)</span>
+</code></pre></div></p>
 </details>
 </article>
 </div>
@@ -419,7 +399,7 @@
 </main>
 <footer class="md-footer">
 <nav aria-label="Footer" class="md-footer__inner md-grid">
-<a aria-label="Previous: Textures" class="md-footer__link md-footer__link--prev" href="../matcap/" rel="prev">
+<a aria-label="Previous: SDF Operations" class="md-footer__link md-footer__link--prev" href="../operations/" rel="prev">
 <div class="md-footer__button md-icon">
 <svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"></path></svg>
 </div>
@@ -428,17 +408,17 @@
 <span class="md-footer__direction">
                 Previous
               </span>
-              Textures
+              SDF Operations
             </div>
 </div>
 </a>
-<a aria-label="Next: Colormaps" class="md-footer__link md-footer__link--next" href="../colormaps/" rel="next">
+<a aria-label="Next: 3D Primitives" class="md-footer__link md-footer__link--next" href="../3d_primitives/" rel="next">
 <div class="md-footer__title">
 <div class="md-ellipsis">
 <span class="md-footer__direction">
                 Next
               </span>
-              Colormaps
+              3D Primitives
             </div>
 </div>
 <div class="md-footer__button md-icon">

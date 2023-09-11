@@ -7,7 +7,7 @@
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
 <link href="../../images/favicon.png" rel="icon"/>
 <meta content="mkdocs-1.4.2, mkdocs-material-8.5.10" name="generator"/>
-<title>Implicit CAD - Sorotoki</title>
+<title>Signed Distance Functions - Sorotoki</title>
 <link href="../../assets/stylesheets/main.975780f9.min.css" rel="stylesheet"/>
 <link href="../../assets/stylesheets/palette.2505c338.min.css" rel="stylesheet"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
@@ -33,7 +33,7 @@
 <input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
 <label class="md-overlay" for="__drawer"></label>
 <div data-md-component="skip">
-<a class="md-skip" href="#implicit-cad">
+<a class="md-skip" href="#signed-distance-functions">
           Skip to content
         </a>
 </div>
@@ -59,7 +59,7 @@
 <div class="md-header__topic" data-md-component="header-topic">
 <span class="md-ellipsis">
             
-              Implicit CAD
+              Signed Distance Functions
             
           </span>
 </div>
@@ -104,7 +104,7 @@
 <svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"></path></svg>
 </div>
 <div class="md-source__repository">
-    SorotokiCode
+    Sorotoki
   </div>
 </a>
 </div>
@@ -129,7 +129,7 @@
 <svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"></path></svg>
 </div>
 <div class="md-source__repository">
-    SorotokiCode
+    Sorotoki
   </div>
 </a>
 </div>
@@ -165,42 +165,60 @@
           Documentation
         </label>
 <ul class="md-nav__list" data-md-scrollfix="">
-<li class="md-nav__item md-nav__item--active">
-<input class="md-nav__toggle md-toggle" data-md-toggle="toc" id="__toc" type="checkbox"/>
-<label class="md-nav__link md-nav__link--active" for="__toc">
-          Implicit CAD
+<li class="md-nav__item md-nav__item--active md-nav__item--nested">
+<input checked="" class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_1" id="__nav_3_1" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3_1">
+          Signed Distance Function
           <span class="md-nav__icon md-icon"></span>
 </label>
-<a class="md-nav__link md-nav__link--active" href="./">
-        Implicit CAD
-      </a>
-<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
-<label class="md-nav__title" for="__toc">
+<nav aria-label="Signed Distance Function" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_3_1">
 <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+          Signed Distance Function
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item md-nav__item--active">
+<input class="md-nav__toggle md-toggle" data-md-toggle="toc" id="__toc" type="checkbox"/>
+<a class="md-nav__link md-nav__link--active" href="./">
+        Signed Distance Functions
+      </a>
+</li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#list-of-3d-primitives">
-    List of 3D primitives
-  </a>
+<a class="md-nav__link" href="../operations/">
+        SDF Operations
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../2d_primitives/">
+        2D Primitives
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../3d_primitives/">
+        3D Primitives
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../gradients/">
+        SDF Differentiability (normal and tangent operators)
+      </a>
 </li>
 </ul>
 </nav>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../mesh/">
+<a class="md-nav__link" href="../../fem/mesh/">
         Mesh generation
       </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../fem/">
+<a class="md-nav__link" href="../../fem/fem/">
         Finite Elements
       </a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../beam/shapes/">
-        Beam Shapes and Geometry
+        Beam models
       </a>
 </li>
 <li class="md-nav__item">
@@ -228,6 +246,11 @@
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../plotting/rendering/">
         Rendering
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../plotting/matcap/">
+        Textures
       </a>
 </li>
 <li class="md-nav__item">
@@ -320,69 +343,69 @@
 <div class="md-sidebar__scrollwrap">
 <div class="md-sidebar__inner">
 <nav aria-label="Table of contents" class="md-nav md-nav--secondary">
-<label class="md-nav__title" for="__toc">
-<span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#list-of-3d-primitives">
-    List of 3D primitives
-  </a>
-</li>
-</ul>
 </nav>
 </div>
 </div>
 </div>
 <div class="md-content" data-md-component="content">
 <article class="md-content__inner md-typeset">
-<a class="md-content__button md-icon" href="https://github.com/BJCaasenbrood/SorotokiCode/edit/master/docs/fem/sdf.md" title="Edit this page">
+<a class="md-content__button md-icon" href="https://github.com/BJCaasenbrood/SorotokiCode/edit/master/docs/sdf/sdf.md" title="Edit this page">
 <svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"></path></svg>
 </a>
-<h1 id="implicit-cad">Implicit CAD</h1>
+<h1 id="signed-distance-functions">Signed Distance Functions</h1>
 <p><a class="glightbox" data-desc-position="bottom" data-height="auto" data-width="100%" href="../img/cad_example.mp4"><div class="video-container"><video autoplay="" controls="" style="width: 100%; height: 65%; position: center"><source src="../img/cad_example.mp4" type="video/mp4"/></video></div></a></p>
-<h2 id="list-of-3d-primitives">List of 3D primitives</h2>
+<p>Signed Distance Fields (SDFs) have been widely applied in various areas of computer graphics, including the representation of implicit surfaces<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup><sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup>, collision detection in robotics<sup id="fnref:3"><a class="footnote-ref" href="#fn:3">3</a></sup><sup id="fnref:4"><a class="footnote-ref" href="#fn:4">4</a></sup>. In particular, SDFs have gained attention for their use in implicit modeling<sup id="fnref:5"><a class="footnote-ref" href="#fn:5">5</a></sup>, a technique for representing 3D shapes as continuous functions, rather than discrete mesh descriptions. </p>
+<p>In Sorotoki, SDFs are implemented in the class <code>Sdf.m</code> and can be used to construct general 2D and 3D geometries. They can also be utilized to model static or dynamic contact environments, generate 3D models of soft actuators that are suitable for 3D printing, and compute inertia tensors for continuum bodies in <span class="arithmatex">\(\mathbb{R}^2\)</span> and <span class="arithmatex">\(\mathbb{R}^3\)</span>. </p>
+<h1 id="implicit-modeling-using-sdfs">Implicit modeling using SDFs.</h1>
+<p>We briefly outline the mathematical foundations underpinning the <code>Sdf</code> class. As the name suggests, signed distance functions are a type of function that encodes distance information relative to an object defined implicitly. Adopting the notation used in Reiner<sup id="fnref2:1"><a class="footnote-ref" href="#fn:1">1</a></sup>, given a domain <span class="arithmatex">\(\Omega \subset \mathbb{R}^n\)</span> and its boundary <span class="arithmatex">\(\partial \Omega\)</span>, these functions can be written in the following general form:</p>
+<div class="arithmatex">\[
+\renewcommand{\pB}{\textbf{p}}
+\renewcommand{\yB}{\textbf{y}}
+    \texttt{sdf}(\pB) = \begin{cases}
+        -d(\pB,\Omega) &amp; \textrm{if } \; \pB \in \Omega,                           \\
+        +d(\pB,\Omega)  &amp; \textrm{if } \; \pB \in \mathbb{R}^n\!\setminus\! \Omega,
+    \end{cases}
+    \label{eq:C5:sdf}
+\]</div>
+<p>where <span class="arithmatex">\(d(\pB,\Omega):= \inf_{\yB \in \Omega} ||\pB - \yB||_2\)</span> is a scalar function that returns the smallest Euclidean distance from a sample point <span class="arithmatex">\(\pB \in \mathbb{R}^n\)</span> to the boundary <span class="arithmatex">\(\partial \Omega\)</span>. </p>
+<p>SDFs provide a simple and efficient way of determining the location of a set of points relative to a domain <span class="arithmatex">\(\Omega\)</span> defined implicitly. The SDF is a scalar function that encodes the Euclidean distance of a sample point <span class="arithmatex">\(\pB \in \mathbb{R}^n\)</span> to the boundary <span class="arithmatex">\(\partial \Omega\)</span> of the domain. By evaluating the sign of the SDF, it is possible to classify the set of points as being within or outside the boundary of the domain. This enables set operations such as union, difference, and intersection to be performed. </p>
 <details open="open">
-<summary><code>sSphere.m</code></summary>
-<p><a class="glightbox" data-desc-position="bottom" data-height="auto" data-width="100%" href="../img/sSphere.png"><img align="right" alt="Image title" src="../img/sSphere.png" width="100"/></a>
-<div class="highlight"><pre><span></span><code><span class="n">sSphere</span><span class="p">(</span><span class="n">R</span><span class="p">);</span><span class="w"> </span><span class="c">% sphere with radius R at (0,0,0)</span><span class="w"></span>
+<summary>Example: Unit-circle and evaluation</summary>
+<p><a class="glightbox" data-desc-position="bottom" data-height="auto" data-width="100%" href="../img/test_eval.png"><img align="right" alt="Image title" src="../img/test_eval.png" width="225"/></a>
+<div class="highlight"><pre><span></span><code><span class="c">% distance function</span>
+<span class="n">f</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">@(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="nb">sqrt</span><span class="p">(</span><span class="w"> </span><span class="n">x</span><span class="p">(:,</span><span class="mi">1</span><span class="p">)</span><span class="o">.^</span><span class="mi">2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">x</span><span class="p">(:,</span><span class="mi">2</span><span class="p">)</span><span class="o">.^</span><span class="mi">2</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span>
 
-<span class="n">sSphere</span><span class="p">([</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">],</span><span class="n">R</span><span class="p">);</span><span class="w"> </span><span class="c">% sphere with radius R at (x,y,z)</span><span class="w"></span>
+<span class="c">% assigning @f to Sdf class</span>
+<span class="n">sdf</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Sdf</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="s">'BdBox'</span><span class="p">,[</span><span class="o">-</span><span class="mi">2</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">-</span><span class="mi">2</span><span class="w"> </span><span class="mi">2</span><span class="p">]);</span>
 
-<span class="n">sSphere</span><span class="p">([</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">],</span><span class="n">R</span><span class="p">,</span><span class="n">T</span><span class="p">);</span><span class="w"> </span><span class="c">% shell sphere with radius R at (x,y,z) with thickness T</span><span class="w"></span>
+<span class="n">X</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">linspacen</span><span class="p">([</span><span class="mi">0</span><span class="p">;</span><span class="mi">0</span><span class="p">],[</span><span class="mi">1</span><span class="p">;</span><span class="mi">1</span><span class="p">],</span><span class="mi">4</span><span class="p">);</span>
+
+<span class="nb">disp</span><span class="p">(</span><span class="w"> </span><span class="n">S</span><span class="p">.</span><span class="n">eval</span><span class="p">(</span><span class="n">X</span><span class="p">.</span><span class="o">'</span><span class="p">)</span><span class="w"> </span><span class="p">);</span>
+</code></pre></div>
+<div class="highlight"><span class="filename">output</span><pre><span></span><code><span class="p">[</span><span class="o">-</span><span class="mf">1.0000</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mf">0.6464</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mf">0.2929</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0607</span><span class="p">,</span><span class="w"> </span><span class="mf">0.4142</span><span class="p">].</span><span class="o">'</span>
 </code></pre></div></p>
 </details>
-<details open="open">
-<summary><code>sCube.m</code></summary>
-<p><a class="glightbox" data-desc-position="bottom" data-height="auto" data-width="100%" href="../img/sCube.png"><img align="right" alt="Image title" src="../img/sCube.png" width="100"/></a>
-<div class="highlight"><pre><span></span><code><span class="n">sCube</span><span class="p">(</span><span class="n">W</span><span class="p">);</span><span class="w"> </span>
-<span class="n">sCube</span><span class="p">(</span><span class="n">W</span><span class="p">,</span><span class="w"> </span><span class="n">L</span><span class="p">,</span><span class="w"> </span><span class="n">H</span><span class="p">);</span><span class="w"></span>
-
-<span class="n">sCube</span><span class="p">([</span><span class="n">x1</span><span class="p">,</span><span class="w"> </span><span class="n">y1</span><span class="p">,</span><span class="w"> </span><span class="n">z1</span><span class="p">],</span><span class="w"> </span><span class="n">W</span><span class="p">,</span><span class="w"> </span><span class="n">L</span><span class="p">,</span><span class="w"> </span><span class="n">H</span><span class="p">);</span><span class="w"></span>
-<span class="n">sCube</span><span class="p">([</span><span class="n">x1</span><span class="p">,</span><span class="w"> </span><span class="n">y1</span><span class="p">,</span><span class="w"> </span><span class="n">z1</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="n">x2</span><span class="p">,</span><span class="w"> </span><span class="n">y2</span><span class="p">,</span><span class="w"> </span><span class="n">z2</span><span class="p">]);</span><span class="w"></span>
-</code></pre></div></p>
-</details>
-<details open="open">
-<summary><code>sCylinder.m</code></summary>
-<p><a class="glightbox" data-desc-position="bottom" data-height="auto" data-width="100%" href="../img/sCylinder.png"><img align="right" alt="Image title" src="../img/sCylinder.png" width="90"/></a>
-<div class="highlight"><pre><span></span><code><span class="n">sCube</span><span class="p">(</span><span class="n">W</span><span class="p">);</span><span class="w"> </span>
-<span class="n">sCube</span><span class="p">(</span><span class="n">W</span><span class="p">,</span><span class="w"> </span><span class="n">L</span><span class="p">,</span><span class="w"> </span><span class="n">H</span><span class="p">);</span><span class="w"></span>
-
-<span class="n">sCube</span><span class="p">([</span><span class="n">x1</span><span class="p">,</span><span class="w"> </span><span class="n">y1</span><span class="p">,</span><span class="w"> </span><span class="n">z1</span><span class="p">],</span><span class="w"> </span><span class="n">W</span><span class="p">,</span><span class="w"> </span><span class="n">L</span><span class="p">,</span><span class="w"> </span><span class="n">H</span><span class="p">);</span><span class="w"></span>
-<span class="n">sCube</span><span class="p">([</span><span class="n">x1</span><span class="p">,</span><span class="w"> </span><span class="n">y1</span><span class="p">,</span><span class="w"> </span><span class="n">z1</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="n">x2</span><span class="p">,</span><span class="w"> </span><span class="n">y2</span><span class="p">,</span><span class="w"> </span><span class="n">z2</span><span class="p">]);</span><span class="w"></span>
-</code></pre></div></p>
-</details>
-<details open="open">
-<summary><code>sTorus.m</code></summary>
-<p><a class="glightbox" data-desc-position="bottom" data-height="auto" data-width="100%" href="../img/sTorus.png"><img align="right" alt="Image title" src="../img/sTorus.png" width="100"/></a>
-<div class="highlight"><pre><span></span><code><span class="n">sCube</span><span class="p">(</span><span class="n">W</span><span class="p">);</span><span class="w"> </span>
-<span class="n">sCube</span><span class="p">(</span><span class="n">W</span><span class="p">,</span><span class="w"> </span><span class="n">L</span><span class="p">,</span><span class="w"> </span><span class="n">H</span><span class="p">);</span><span class="w"></span>
-
-<span class="n">sCube</span><span class="p">([</span><span class="n">x1</span><span class="p">,</span><span class="w"> </span><span class="n">y1</span><span class="p">,</span><span class="w"> </span><span class="n">z1</span><span class="p">],</span><span class="w"> </span><span class="n">W</span><span class="p">,</span><span class="w"> </span><span class="n">L</span><span class="p">,</span><span class="w"> </span><span class="n">H</span><span class="p">);</span><span class="w"></span>
-<span class="n">sCube</span><span class="p">([</span><span class="n">x1</span><span class="p">,</span><span class="w"> </span><span class="n">y1</span><span class="p">,</span><span class="w"> </span><span class="n">z1</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="n">x2</span><span class="p">,</span><span class="w"> </span><span class="n">y2</span><span class="p">,</span><span class="w"> </span><span class="n">z2</span><span class="p">]);</span><span class="w"></span>
-</code></pre></div></p>
-</details>
+<h5 id="bibliography">Bibliography</h5>
+<div class="footnote">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>Tim Reiner, Gregor M\ifmmode \ddot u\else ü\fi ckl, and Carsten Dachsbacher. Interactive modeling of implicit surfaces using a direct visualization approach with signed distance functions. <em>Computers &amp; Graphics</em>, 35(3):596–603, 2011. <a href="https://doi.org/10.1016/j.cag.2011.03.010">doi:10.1016/j.cag.2011.03.010</a>. <a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">↩</a><a class="footnote-backref" href="#fnref2:1" title="Jump back to footnote 1 in the text">↩</a></p>
+</li>
+<li id="fn:2">
+<p>Zhiqin Chen and Hao Zhang. Learning Implicit Fields for Generative Shape Modeling. <em>ArXiv e-prints</em>, 2018. <a href="https://arxiv.org/abs/1812.02822">arXiv:1812.02822</a>, <a href="https://doi.org/10.48550/arXiv.1812.02822">doi:10.48550/arXiv.1812.02822</a>. <a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">↩</a></p>
+</li>
+<li id="fn:3">
+<p>Joseph Ortiz, Alexander Clegg, Jing Dong, Edgar Sucar, David Novotny, Michael Zollhoefer, and Mustafa Mukadam. iSDF: Real-Time Neural Signed Distance Fields for Robot Perception. <em>ArXiv e-prints</em>, 2022. <a href="https://arxiv.org/abs/2204.02296">arXiv:2204.02296</a>, <a href="https://doi.org/10.48550/arXiv.2204.02296">doi:10.48550/arXiv.2204.02296</a>. <a class="footnote-backref" href="#fnref:3" title="Jump back to footnote 3 in the text">↩</a></p>
+</li>
+<li id="fn:4">
+<p>Puze Liu, Kuo Zhang, Davide Tateo, Snehal Jauhri, Jan Peters, and Georgia Chalvatzaki. Regularized Deep Signed Distance Fields for Reactive Motion Generation. <em>ArXiv e-prints</em>, 2022. <a href="https://arxiv.org/abs/2203.04739">arXiv:2203.04739</a>, <a href="https://doi.org/10.48550/arXiv.2203.04739">doi:10.48550/arXiv.2203.04739</a>. <a class="footnote-backref" href="#fnref:4" title="Jump back to footnote 4 in the text">↩</a></p>
+</li>
+<li id="fn:5">
+<p>Lawrence Smith and Robert MacCurdy. SoRoForge: End-to-End Soft Actuator Design. <em>IEEE Transactions on Automation Science and Engineering</em>, pages 1–12, 2023. <a href="https://doi.org/10.1109/TASE.2023.3241866">doi:10.1109/TASE.2023.3241866</a>. <a class="footnote-backref" href="#fnref:5" title="Jump back to footnote 5 in the text">↩</a></p>
+</li>
+</ol>
+</div>
 </article>
 </div>
 </div>
@@ -402,13 +425,13 @@
             </div>
 </div>
 </a>
-<a aria-label="Next: Mesh generation" class="md-footer__link md-footer__link--next" href="../mesh/" rel="next">
+<a aria-label="Next: SDF Operations" class="md-footer__link md-footer__link--next" href="../operations/" rel="next">
 <div class="md-footer__title">
 <div class="md-ellipsis">
 <span class="md-footer__direction">
                 Next
               </span>
-              Mesh generation
+              SDF Operations
             </div>
 </div>
 <div class="md-footer__button md-icon">
