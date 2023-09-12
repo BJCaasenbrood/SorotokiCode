@@ -9,6 +9,7 @@ function sorotoki(varargin)
 %   sorotoki install            % installer
 %   sorotoki remove             % remove
 %   sorotoki disable            % disables toolkit, but keeps source files
+%   sorotoki cd                 % go to toolkit
 %%
 %   Also, some additional toolboxes are required:
 %
@@ -44,7 +45,7 @@ function sorotoki(varargin)
         end
     end
 
-    action = '-i';
+    action = '-h';
     prompt = [];
     mpmPath = which('mpm');
     assert(~strcmpi(mpmPath(1:5),'build'), msg('mpm_not_installed'));
@@ -120,10 +121,9 @@ function installSorotoki(reqPackages,soroPackages)
         diary sorotoki.log
         disp(['Installation dir: ', installDir]);
         disp(['Directory MPM found: ', mpmPath(1:end-6)]);
-
-        checkPackagesMPM(reqPackages,mpmPackages);
     end
     
+    checkPackagesMPM(reqPackages,mpmPackages);
     checkSoroPackages(soroPackages,mpmPackages);
     
     diary off;
