@@ -66,7 +66,14 @@
 </div>
 </div>
 <form class="md-header__option" data-md-component="palette">
-<input aria-hidden="true" class="md-option" data-md-color-accent="" data-md-color-media="(prefers-color-scheme: light)" data-md-color-primary="deep-purple" data-md-color-scheme="default" id="__palette_1" name="__palette" type="radio"/>
+<input aria-label="Switch to dark mode" class="md-option" data-md-color-accent="" data-md-color-media="(prefers-color-scheme: light)" data-md-color-primary="deep-purple" data-md-color-scheme="default" id="__palette_1" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_2" hidden="" title="Switch to dark mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"></path></svg>
+</label>
+<input aria-label="Switch to light mode" class="md-option" data-md-color-accent="" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-primary="deep-purple" data-md-color-scheme="slate" id="__palette_2" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_1" hidden="" title="Switch to light mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12c0-2.42-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"></path></svg>
+</label>
 </form>
 <label class="md-header__button md-icon" for="__search">
 <svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"></path></svg>
@@ -169,52 +176,82 @@
 <li class="md-nav__item md-nav__item--nested">
 <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_1" id="__nav_3_1" type="checkbox"/>
 <label class="md-nav__link" for="__nav_3_1">
-          Signed Distance Function
+          Sdf.m
           <span class="md-nav__icon md-icon"></span>
 </label>
-<nav aria-label="Signed Distance Function" class="md-nav" data-md-level="2">
+<nav aria-label="Sdf.m" class="md-nav" data-md-level="2">
 <label class="md-nav__title" for="__nav_3_1">
 <span class="md-nav__icon md-icon"></span>
-          Signed Distance Function
+          Sdf.m
         </label>
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
 <a class="md-nav__link" href="../sdf/sdf/">
-        Signed Distance Functions
+        Signed Distance Functions (`Sdf.m`)
       </a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../sdf/operations/">
-        SDF Operations
+        SDF boolean operations
       </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../sdf/2d_primitives/">
-        2D Primitives
-      </a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="../sdf/3d_primitives/">
-        3D Primitives
+<a class="md-nav__link" href="../sdf/primitives/">
+        SDF primitive library
       </a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../sdf/gradients/">
-        SDF Differentiability (normal and tangent operators)
+        SDF differentiability (normal and tangent operators)
       </a>
 </li>
 </ul>
 </nav>
 </li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_2" id="__nav_3_2" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3_2">
+          Mesh.m
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-label="Mesh.m" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_3_2">
+<span class="md-nav__icon md-icon"></span>
+          Mesh.m
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
-<a class="md-nav__link" href="../fem/mesh/">
-        Mesh generation
+<a class="md-nav__link" href="../mesh/mesh/">
+        Mesh generation (`Mesh.m`)
       </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../fem/fem/">
-        Finite Elements
+<a class="md-nav__link" href="../mesh/meshsdf/">
+        Meshing with SDF
       </a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_3" id="__nav_3_3" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3_3">
+          Fem.m
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-label="Fem.m" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_3_3">
+<span class="md-nav__icon md-icon"></span>
+          Fem.m
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../fem/fem/">
+        Finite Element Models (`Fem.m`)
+      </a>
+</li>
+</ul>
+</nav>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../beam/shapes/">
@@ -364,19 +401,34 @@
 <li><a href="https://www.mathworks.com/products/matlab-coder.html">Matlab Coder</a></li>
 </ul>
 </details>
+<details class="into">
+<summary>Prerequisite software for Sorotoki (upon install of Sorotoki with MPM)</summary>
+<p>To use Sorotoki, following community packages are required:</p>
+<ul>
+<li><a href="https://nl.mathworks.com/products/optimization.html">Matlab Essentials Kit</a> </li>
+<li><a href="https://nl.mathworks.com/products/pde.html">Matlab Progressbar</a></li>
+<li><a href="https://nl.mathworks.com/products/pde.html">Matlab Graphical Model</a></li>
+<li><a href="https://www.mathworks.com/products/matlab-coder.html">interparc</a></li>
+<li><a href="https://www.mathworks.com/products/matlab-coder.html">distance2curve</a></li>
+<li><a href="https://www.mathworks.com/products/matlab-coder.html">inpolyhedron</a></li>
+</ul>
+</details>
 <h1 id="installation-via-matlab-package-manager-mpm">Installation via Matlab Package Manager (MPM)</h1>
 <p>The toolkit is easy to install. The fastest and easiest way to acquire the toolkit is through <a href="https://github.com/mobeets/mpm">mpm</a> (Matlab Package Manager). <a href="https://git-scm.com/downloads">mpm</a> is a simple package manager for Matlab (inspired by <a href="https://pypi.org/project/pip/">pip</a>) and downloads packages from Matlab Central's File Exchange, GitHub repositories, or any other url pointing to a .zip file.</p>
 <details class="info" open="open">
 <summary>Step 1: Downloading Sorotoki using MPM</summary>
-<p>You can directly clone the repository using the MPM command:</p>
-<div class="highlight"><pre><span></span><code><span class="o">&gt;</span><span class="w"> </span><span class="n">mpm</span><span class="w"> </span><span class="n">install</span><span class="w"> </span><span class="n">sorotokicode</span><span class="w"> </span><span class="o">-</span><span class="n">u</span><span class="w"> </span><span class="nb">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">package</span><span class="w"> </span><span class="o">--</span><span class="n">local</span>
+<p><strong>Install on mpm-package:</strong> You can directly clone the repository using the MPM command:</p>
+<div class="highlight"><pre><span></span><code><span class="n">mpm</span><span class="w"> </span><span class="s">install</span><span class="w"> </span><span class="s">sorotokicode</span>
 </code></pre></div>
-<p>This command will download SorotokiCode directly from the GitHub repository and create the SorotokiCode folder at the specified location, <code>path/to/package</code>. We highly recommend setting the installation folder to <code>path/to/package</code> = <code>\Documents\Matlab\</code>, particularly for Windows and Linux operating systems.</p>
+<p>This command will download SorotokiCode directly from the GitHub repository and create the SorotokiCode folder in the <code>./mpm-package</code> folder. </p>
+<p><strong>Install on desired location:</strong> Alternatively, the installation folder can be set to <code>~./Documents/MATLAB/</code>. This is done by running the following line:</p>
+<div class="highlight"><pre><span></span><code><span class="n">mpm</span><span class="w"> </span><span class="s">install</span><span class="w"> </span><span class="s">sorotokicode</span><span class="w"> </span><span class="o">-</span><span class="n">d</span><span class="w"> </span><span class="o">~./</span><span class="n">Documents</span><span class="o">/</span><span class="n">MATLAB</span><span class="o">/</span>
+</code></pre></div>
 </details>
 <details class="info" open="open">
 <summary>Step 2: Running the installer</summary>
 <p>After ensuring that all the necessary prerequisites are correctly installed, the next step involves configuring the toolkit with MATLAB's search paths. This process is relatively straightforward and can be accomplished by executing the following command:</p>
-<div class="highlight"><pre><span></span><code><span class="o">&gt;</span><span class="w"> </span><span class="n">sorotoki</span><span class="w"> </span><span class="o">-</span><span class="nb">i</span>
+<div class="highlight"><pre><span></span><code><span class="n">sorotoki</span><span class="w"> </span><span class="o">-</span><span class="nb">i</span>
 </code></pre></div>
 <p>The toolkit will proceed with the installation by building search paths in Matlab. The toolkit will request the installation of the prerequisite toolboxes if they are not already installed. These include: Optimization Toolbox, Partial Differential Equation Toolbox, Image Processing Toolbox, and Matlab Coder. Especially the latter ensures that embedded Sorotoki functions can be converted to <code>c</code> or <code>c++</code> equivalent code in the form of mex files, which greatly enhances computational performance. Finally, a verification routine is performed to check if the toolkit is installed correctly.</p>
 </details>
@@ -397,9 +449,22 @@
 <p>Alternatively, you can download the latest version of the toolkit below, and unpack the compressed folder at any desired working directory. We do not recommend this procedure, as MPM can help maintain the Sorotoki toolkit if future updates may appear.</p>
 <p><a class="md-button md-button--primary" href="#">Sorotoki v.2.19.stable (code)</a></p>
 <h1 id="faq-and-installation-issues">FAQ and installation issues</h1>
-<details class="error" open="open">
+<details class="error">
 <summary>Error using mpm: This command is not supported when the mpm feature is not enabled. Start MATLAB with the -mpm command line switch.</summary>
-<p>The mpm tools written by <a href="https://github.com/mobeets">mobeets</a> has the same name as Matlab's MPM. </p>
+<p>The mpm tools written by <a href="https://github.com/mobeets">mobeets</a> has the same name as Matlab's MPM. 
+<div class="highlight"><span class="filename">./Documents/MATLAB/startup.m</span><pre><span></span><code><span class="nb">warning</span><span class="w"> </span><span class="n">off</span>
+
+<span class="c">% change USER to your username!</span>
+<span class="n">USER</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">'johndoe'</span><span class="p">;</span>
+<span class="k">if</span><span class="w"> </span><span class="nb">ispc</span>
+<span class="w">    </span><span class="nb">addpath</span><span class="p">([</span><span class="n">USER</span><span class="p">,</span><span class="s">'/MATLAB Add-Ons/Collections/mpm/mobeets-mpm-c626429'</span><span class="p">]);</span>
+<span class="k">elseif</span><span class="w"> </span><span class="nb">isunix</span>
+<span class="w">    </span><span class="nb">addpath</span><span class="p">([</span><span class="s">'/home/'</span><span class="p">,</span><span class="n">USER</span><span class="p">,</span><span class="s">'/MATLAB Add-Ons/Collections/mpm/mobeets-mpm-c626429'</span><span class="p">]);</span>
+<span class="k">end</span>
+
+<span class="n">mpm</span><span class="w"> </span><span class="s">init</span>
+<span class="nb">clc</span><span class="p">;</span><span class="w"> </span><span class="n">warning</span><span class="w"> </span><span class="s">on</span>
+</code></pre></div></p>
 </details>
 <p>Darn', other problems during installation Please let me know by:</p>
 <ol>
@@ -425,13 +490,13 @@
             </div>
 </div>
 </a>
-<a aria-label="Next: Signed Distance Functions" class="md-footer__link md-footer__link--next" href="../sdf/sdf/" rel="next">
+<a aria-label="Next: Signed Distance Functions (`Sdf.m`)" class="md-footer__link md-footer__link--next" href="../sdf/sdf/" rel="next">
 <div class="md-footer__title">
 <div class="md-ellipsis">
 <span class="md-footer__direction">
                 Next
               </span>
-              Signed Distance Functions
+              Signed Distance Functions (`Sdf.m`)
             </div>
 </div>
 <div class="md-footer__button md-icon">

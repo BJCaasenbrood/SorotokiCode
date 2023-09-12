@@ -66,7 +66,14 @@
 </div>
 </div>
 <form class="md-header__option" data-md-component="palette">
-<input aria-hidden="true" class="md-option" data-md-color-accent="" data-md-color-media="(prefers-color-scheme: light)" data-md-color-primary="deep-purple" data-md-color-scheme="default" id="__palette_1" name="__palette" type="radio"/>
+<input aria-label="Switch to dark mode" class="md-option" data-md-color-accent="" data-md-color-media="(prefers-color-scheme: light)" data-md-color-primary="deep-purple" data-md-color-scheme="default" id="__palette_1" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_2" hidden="" title="Switch to dark mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"></path></svg>
+</label>
+<input aria-label="Switch to light mode" class="md-option" data-md-color-accent="" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-primary="deep-purple" data-md-color-scheme="slate" id="__palette_2" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_1" hidden="" title="Switch to light mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12c0-2.42-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"></path></svg>
+</label>
 </form>
 <label class="md-header__button md-icon" for="__search">
 <svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"></path></svg>
@@ -168,52 +175,82 @@
 <li class="md-nav__item md-nav__item--nested">
 <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_1" id="__nav_3_1" type="checkbox"/>
 <label class="md-nav__link" for="__nav_3_1">
-          Signed Distance Function
+          Sdf.m
           <span class="md-nav__icon md-icon"></span>
 </label>
-<nav aria-label="Signed Distance Function" class="md-nav" data-md-level="2">
+<nav aria-label="Sdf.m" class="md-nav" data-md-level="2">
 <label class="md-nav__title" for="__nav_3_1">
 <span class="md-nav__icon md-icon"></span>
-          Signed Distance Function
+          Sdf.m
         </label>
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../sdf/sdf/">
-        Signed Distance Functions
+        Signed Distance Functions (`Sdf.m`)
       </a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../sdf/operations/">
-        SDF Operations
+        SDF boolean operations
       </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../../sdf/2d_primitives/">
-        2D Primitives
-      </a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="../../sdf/3d_primitives/">
-        3D Primitives
+<a class="md-nav__link" href="../../sdf/primitives/">
+        SDF primitive library
       </a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../sdf/gradients/">
-        SDF Differentiability (normal and tangent operators)
+        SDF differentiability (normal and tangent operators)
       </a>
 </li>
 </ul>
 </nav>
 </li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_2" id="__nav_3_2" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3_2">
+          Mesh.m
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-label="Mesh.m" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_3_2">
+<span class="md-nav__icon md-icon"></span>
+          Mesh.m
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
-<a class="md-nav__link" href="../../fem/mesh/">
-        Mesh generation
+<a class="md-nav__link" href="../../mesh/mesh/">
+        Mesh generation (`Mesh.m`)
       </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../../fem/fem/">
-        Finite Elements
+<a class="md-nav__link" href="../../mesh/meshsdf/">
+        Meshing with SDF
       </a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_3" id="__nav_3_3" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3_3">
+          Fem.m
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-label="Fem.m" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_3_3">
+<span class="md-nav__icon md-icon"></span>
+          Fem.m
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../fem/fem/">
+        Finite Element Models (`Fem.m`)
+      </a>
+</li>
+</ul>
+</nav>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../beam/shapes/">
@@ -320,6 +357,11 @@
     3D Visualization
   </a>
 </li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bibliography">
+    Bibliography
+  </a>
+</li>
 </ul>
 </nav>
 </li>
@@ -400,6 +442,11 @@
     3D Visualization
   </a>
 </li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bibliography">
+    Bibliography
+  </a>
+</li>
 </ul>
 </nav>
 </div>
@@ -412,7 +459,8 @@
 </a>
 <h1 id="soft-robotic-hand">Soft Robotic Hand</h1>
 <h2 id="about">About</h2>
-<p><a class="glightbox" data-desc-position="bottom" data-height="auto" data-width="100%" href="../img/soft_hand_swing.mp4"><div class="video-container"><video autoplay="" controls="" style="width: 100%; height: 65%; position: center"><source src="../img/soft_hand_swing.mp4" type="video/mp4"/></video></div></a></p>
+<p><a class="glightbox" data-desc-position="bottom" data-height="auto" data-width="100%" href="../img/soft_hand_swing.mp4"><div class="video-container"><video autoplay="" controls="" style="width: 100%; height: 65%; position: center"><source src="../img/soft_hand_swing.mp4" type="video/mp4"/></video></div></a>
+The <code>Sorotoki</code> toolkit provides a soft robotic hand with a higher level of complexity compared to the previous soft robots (see above). This design is inspired by the work of Laake et al. <sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup> and Fras et al. <sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup>. The soft robotic hand consists of five independently controlled soft fingers that can be actuated using pneumatics or fluidics. Each finger is fabricated using a SLS technique with Elastic 80A, while the base is fabricated using FDM with PLA. The dimensions and scale of the soft robotic hand are similar to those of a human hand, with approximate dimensions of 190 <span class="arithmatex">\(\times\)</span> 100 <span class="arithmatex">\(\times\)</span> 40 mm. All fingers have a length of 90 mm except for the thumb, which is slightly shorter at 80 mm. The soft robotic hand has five independent inputs that accept pressures of <span class="arithmatex">\(-10 \le u \le 60\)</span> kPa. </p>
 <h2 id="fabrication-details">Fabrication details</h2>
 <p>The soft hand is fully printable. Below, we provided a list of the printer materials. </p>
 <ul>
@@ -428,7 +476,7 @@
 </details>
 <details class="warning" open="open">
 <summary>Cleaning and closing of Soft Actuators</summary>
-<p>A crucial step is cleaning of the elastic resin parts. If residual resin is not properly removed/cleaned, it will greatly affect the quality and performance of the soft actuator. We recommend following the cleaning procedures proposed in Proper et al. [^1], see <a href="https://github.com/ReshapeTUe/Peristaltic-Pump-Documentation">Git documentation</a>. The paper draft can be found here: <a href="https://raw.githubusercontent.com/ReshapeTUe/Peristaltic-Pump-Documentation/main/paper/%5BB.W.B.%20Proper%20et%20al.%2C%202023%5D%20Easy%20Cleaning%20of%203D%20SLADLP%20Printed%20Soft%20Fluidic%20Actuators%20with%20Complex%20Internal%20Geometry.pdf">Paper.pdf</a>. In their approach, a perastaltic pump is used to pump cleaning fluid through the soft actuator prior to curing. 
+<p>A crucial step is cleaning of the elastic resin parts. If residual resin is not properly removed/cleaned, it will greatly affect the quality and performance of the soft actuator. We recommend following the cleaning procedures proposed in Proper et al. <sup id="fnref2:1"><a class="footnote-ref" href="#fn:1">1</a></sup>, see <a href="https://github.com/ReshapeTUe/Peristaltic-Pump-Documentation">Git documentation</a>. The paper draft can be found here: <a href="https://raw.githubusercontent.com/ReshapeTUe/Peristaltic-Pump-Documentation/main/paper/%5BB.W.B.%20Proper%20et%20al.%2C%202023%5D%20Easy%20Cleaning%20of%203D%20SLADLP%20Printed%20Soft%20Fluidic%20Actuators%20with%20Complex%20Internal%20Geometry.pdf">Paper.pdf</a>. In their approach, a perastaltic pump is used to pump cleaning fluid through the soft actuator prior to curing. 
 <strong>To allow fluid to flow, both sides of the soft actuator are open!</strong> They must be closed using 3 mm plug printed from the same material! The plug can be glued in place using uncured resin, and then placed in an UV chamber for a short duration.</p>
 </details>
 <details class="tip" open="open">
@@ -476,6 +524,18 @@
     } );
     </script>
 </body>
+</div>
+<h2 id="bibliography">Bibliography</h2>
+<div class="footnote">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>Lucas C. van Laake, Jelle de Vries, Sevda Malek Kani, and Johannes T. B. Overvelde. A fluidic relaxation oscillator for reprogrammable sequential actuation in soft robots. <em>Matter</em>, 5(9):2898–2917, 2022. <a href="https://doi.org/10.1016/j.matt.2022.06.002">doi:10.1016/j.matt.2022.06.002</a>. <a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">↩</a><a class="footnote-backref" href="#fnref2:1" title="Jump back to footnote 1 in the text">↩</a></p>
+</li>
+<li id="fn:2">
+<p>Jan Fras and Kaspar Althoefer. Soft Biomimetic Prosthetic Hand: Design, Manufacturing and Preliminary Examination. In <em>2018 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)</em>, pages 1–6. IEEE, 2018. <a href="https://doi.org/10.1109/IROS.2018.8593666">doi:10.1109/IROS.2018.8593666</a>. <a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">↩</a></p>
+</li>
+</ol>
 </div>
 </article>
 </div>

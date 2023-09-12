@@ -7,7 +7,7 @@
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
 <link href="../../images/favicon.png" rel="icon"/>
 <meta content="mkdocs-1.4.2, mkdocs-material-8.5.10" name="generator"/>
-<title>Finite Elements - Sorotoki</title>
+<title>Finite Element Models (`Fem.m`) - Sorotoki</title>
 <link href="../../assets/stylesheets/main.975780f9.min.css" rel="stylesheet"/>
 <link href="../../assets/stylesheets/palette.2505c338.min.css" rel="stylesheet"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
@@ -33,7 +33,7 @@
 <input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
 <label class="md-overlay" for="__drawer"></label>
 <div data-md-component="skip">
-<a class="md-skip" href="#finite-elements">
+<a class="md-skip" href="#finite-element-models-femm">
           Skip to content
         </a>
 </div>
@@ -59,14 +59,21 @@
 <div class="md-header__topic" data-md-component="header-topic">
 <span class="md-ellipsis">
             
-              Finite Elements
+              Finite Element Models (`Fem.m`)
             
           </span>
 </div>
 </div>
 </div>
 <form class="md-header__option" data-md-component="palette">
-<input aria-hidden="true" class="md-option" data-md-color-accent="" data-md-color-media="(prefers-color-scheme: light)" data-md-color-primary="deep-purple" data-md-color-scheme="default" id="__palette_1" name="__palette" type="radio"/>
+<input aria-label="Switch to dark mode" class="md-option" data-md-color-accent="" data-md-color-media="(prefers-color-scheme: light)" data-md-color-primary="deep-purple" data-md-color-scheme="default" id="__palette_1" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_2" hidden="" title="Switch to dark mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"></path></svg>
+</label>
+<input aria-label="Switch to light mode" class="md-option" data-md-color-accent="" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-primary="deep-purple" data-md-color-scheme="slate" id="__palette_2" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_1" hidden="" title="Switch to light mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12c0-2.42-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"></path></svg>
+</label>
 </form>
 <label class="md-header__button md-icon" for="__search">
 <svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"></path></svg>
@@ -168,53 +175,100 @@
 <li class="md-nav__item md-nav__item--nested">
 <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_1" id="__nav_3_1" type="checkbox"/>
 <label class="md-nav__link" for="__nav_3_1">
-          Signed Distance Function
+          Sdf.m
           <span class="md-nav__icon md-icon"></span>
 </label>
-<nav aria-label="Signed Distance Function" class="md-nav" data-md-level="2">
+<nav aria-label="Sdf.m" class="md-nav" data-md-level="2">
 <label class="md-nav__title" for="__nav_3_1">
 <span class="md-nav__icon md-icon"></span>
-          Signed Distance Function
+          Sdf.m
         </label>
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../sdf/sdf/">
-        Signed Distance Functions
+        Signed Distance Functions (`Sdf.m`)
       </a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../sdf/operations/">
-        SDF Operations
+        SDF boolean operations
       </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../../sdf/2d_primitives/">
-        2D Primitives
-      </a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="../../sdf/3d_primitives/">
-        3D Primitives
+<a class="md-nav__link" href="../../sdf/primitives/">
+        SDF primitive library
       </a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../sdf/gradients/">
-        SDF Differentiability (normal and tangent operators)
+        SDF differentiability (normal and tangent operators)
       </a>
 </li>
 </ul>
 </nav>
 </li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_2" id="__nav_3_2" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3_2">
+          Mesh.m
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-label="Mesh.m" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_3_2">
+<span class="md-nav__icon md-icon"></span>
+          Mesh.m
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
-<a class="md-nav__link" href="../mesh/">
-        Mesh generation
+<a class="md-nav__link" href="../../mesh/mesh/">
+        Mesh generation (`Mesh.m`)
       </a>
 </li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../mesh/meshsdf/">
+        Meshing with SDF
+      </a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--active md-nav__item--nested">
+<input checked="" class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_3" id="__nav_3_3" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3_3">
+          Fem.m
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-label="Fem.m" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_3_3">
+<span class="md-nav__icon md-icon"></span>
+          Fem.m
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item md-nav__item--active">
 <input class="md-nav__toggle md-toggle" data-md-toggle="toc" id="__toc" type="checkbox"/>
+<label class="md-nav__link md-nav__link--active" for="__toc">
+          Finite Element Models (`Fem.m`)
+          <span class="md-nav__icon md-icon"></span>
+</label>
 <a class="md-nav__link md-nav__link--active" href="./">
-        Finite Elements
+        Finite Element Models (`Fem.m`)
       </a>
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#high-detail-finite-element-model">
+    High-detail finite element model
+  </a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../beam/shapes/">
@@ -343,6 +397,17 @@
 <div class="md-sidebar__scrollwrap">
 <div class="md-sidebar__inner">
 <nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#high-detail-finite-element-model">
+    High-detail finite element model
+  </a>
+</li>
+</ul>
 </nav>
 </div>
 </div>
@@ -352,15 +417,22 @@
 <a class="md-content__button md-icon" href="https://github.com/BJCaasenbrood/SorotokiCode/edit/master/docs/fem/fem.md" title="Edit this page">
 <svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"></path></svg>
 </a>
-<h1 id="finite-elements">Finite Elements</h1>
+<h1 id="finite-element-models-femm">Finite Element Models (<code>Fem.m</code>)</h1>
 <p><a class="glightbox" data-desc-position="bottom" data-height="auto" data-width="100%" href="../img/fem_example.mp4"><div class="video-container"><video autoplay="" controls="" style="width: 100%; height: 65%; position: center"><source src="../img/fem_example.mp4" type="video/mp4"/></video></div></a></p>
+<p>The <code>Sorotoki</code> toolkit offers a nonlinear finite element solver for both quasi-static and fully dynamic simulations. FEM-based tools are crucial when describing large deformations in soft robots, which also accounts for hyperelastic materials and geometric nonlinearities. The FEM package is provided in a class called \class{Fem.m} and can be instantiated using <code>fem = Fem(Mesh)</code>. This class serves two main purposes: (<span class="arithmatex">\(i\)</span>) to solve static or dynamic continuum problems with high accuracy, and (<span class="arithmatex">\(ii\)</span>) to solve gradient-based optimization problems, also known as inverse design problems. It is important to note that, unlike <code>SOFA</code>, the focus of <code>Sorotoki</code> is on high-detail simulations rather than real-time implementation for control. The presented FEM simulation models are not intended for real-time applications, but rather for system identification and analysis.</p>
+<h2 id="high-detail-finite-element-model">High-detail finite element model</h2>
+<p>The nonlinear dynamics of the finite element model in \texttt{Sorotoki}, similar to \texttt{SOFA} and \texttt{Gibbon}, can be described by the general Newton-Euler equation of motion:</p>
+<div class="arithmatex">\[\mathbf{M} \ddot{\mathbf{x}} + \mathbf{f}_{\textrm{mat}}(\mathbf{x},\dot{\mathbf{x}}) + \mathbf{f}_{\textrm{g}} = \mathbf{f}_{\textrm{u}}(\mathbf{x},\mathbf{u},t) + \mathbf{f}_{\Omega_{\textrm{env}}}(\mathbf{x},\dot{\mathbf{x}},t),
+\]</div>
+<p>where <span class="arithmatex">\(\mathbf{x}\)</span>, <span class="arithmatex">\(\dot{\mathbf{x}}\)</span>, and <span class="arithmatex">\(\ddot{\mathbf{x}}\)</span> are the global nodal displacement, velocities and accelerations of the mesh tesselation, respectively; <span class="arithmatex">\(\mathbf{M}\)</span> the constant generalized mass matrix, <span class="arithmatex">\(\mathbf{f}_\textrm{mat}\)</span> the internal soft material forces, <span class="arithmatex">\(\mathbf{f}_\textrm{g}\)</span> the constant gravitational forces, <span class="arithmatex">\(\mathbf{f}_u\)</span> a user-defined input, and <span class="arithmatex">\(\mathbf{f}_{\Omega_{\textrm{env}}}\)</span> the normal reaction forces and tangent friction forces imposed by the dynamic contact with a (possibly time-dependent) environment <span class="arithmatex">\(\Omega_{\textrm{env}}\)</span>. The environment <span class="arithmatex">\(\Omega_{\textrm{env}}\)</span> can be described using the SDF functionality (see Section \ref{sec:C5:sdf}) using the syntax \code{fem.addContact(sdf)}. A broad collection of generalized external inputs can be added using: \code{fem.addLoad}, \code{fem.addDisplace}, \code{fem.addGravity}, and \code{fem.addTendon}. Alternatively, time-varying pressure inputs can be added using the command \code{fem.addPressure}. </p>
+<p>Without loss of generality, the material force can be decomposed into a position-dependent and velocity-dependent part: <span class="arithmatex">\(\mathbf{f}_{\textrm{mat}}(\mathbf{x},\dot{\mathbf{x}}) = \mathbf{f}_{\textrm{e}}(\mathbf{x}) + \mathbf{f}_{\textrm{d}}(\dot{\mathbf{x}})\)</span>, \ie, an elastic and dissipation contribution, respectively. We assume that the dissipation is given by <span class="arithmatex">\(\mathbf{f}_{\textrm{d}} = \zeta \mathbf{M} \dot{\mathbf{x}}\)</span> with damping coefficient <span class="arithmatex">\(\zeta &gt; 0\)</span>. Materials can be assigned using \code{fem.addMaterial}. Note that the conservative elastic material forces <span class="arithmatex">\(\mathbf{f}_{\textrm{e}}\)</span> require more involved computation. Since this computation is not straightforward, we briefly explain the derivation of the nonlinear hyper-elastic material forces in \eqref{eq:C5:femmodel}, which follows standard nonlinear finite element procedures \cite{Kim2018,Holzapfel2002,Smith2018}. </p>
 </article>
 </div>
 </div>
 </main>
 <footer class="md-footer">
 <nav aria-label="Footer" class="md-footer__inner md-grid">
-<a aria-label="Previous: Mesh generation" class="md-footer__link md-footer__link--prev" href="../mesh/" rel="prev">
+<a aria-label="Previous: Meshing with SDF" class="md-footer__link md-footer__link--prev" href="../../mesh/meshsdf/" rel="prev">
 <div class="md-footer__button md-icon">
 <svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"></path></svg>
 </div>
@@ -369,7 +441,7 @@
 <span class="md-footer__direction">
                 Previous
               </span>
-              Mesh generation
+              Meshing with SDF
             </div>
 </div>
 </a>
