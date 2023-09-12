@@ -231,7 +231,8 @@ function checkPackagesMPM(reqPackages,mpmPackages)
         disp(msg('mpm_complete'));
     else
         disp(msg('mpm_incomplete'));
-        for i = find(~tf).'
+        I = find(~tf).';
+        for i = I(:).'
             disp([' - ', reqPackages{i}]);
         end
     
@@ -261,7 +262,8 @@ function checkSoroPackages(soroPackages,mpmPackages)
         disp(msg('soro_complete'));
     else
         disp(msg('soro_incomplete'));
-        for i = find(~tf).'
+        I = find(~tf).';
+        for i = I(:).'
             disp([' - ', soroPackages{i}]);
         end
     

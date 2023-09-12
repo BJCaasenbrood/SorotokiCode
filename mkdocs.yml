@@ -15,6 +15,7 @@ nav:
       - Mesh.m:
         - mesh/mesh.md
         - mesh/meshsdf.md
+        - mesh/meshstl.md
       - Fem.m:
         - fem/fem.md
       - beam/shapes.md
