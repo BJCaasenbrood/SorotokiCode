@@ -7,14 +7,16 @@ nav:
     - index.md
   - install.md
   - Documentation:
-      - Signed Distance Function:
+      - Sdf.m:
         - sdf/sdf.md
         - sdf/operations.md
-        - sdf/2d_primitives.md
-        - sdf/3d_primitives.md
+        - sdf/primitives.md
         - sdf/gradients.md
-      - fem/mesh.md
-      - fem/fem.md
+      - Mesh.m:
+        - mesh/mesh.md
+        - mesh/meshsdf.md
+      - Fem.m:
+        - fem/fem.md
       - beam/shapes.md
       - beam/model.md
       - Visualization:
