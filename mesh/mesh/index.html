@@ -7,7 +7,7 @@
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
 <link href="../../images/favicon.png" rel="icon"/>
 <meta content="mkdocs-1.4.2, mkdocs-material-8.5.10" name="generator"/>
-<title>Mesh generation (`Mesh.m`) - Sorotoki</title>
+<title>Meshing (`Mesh.m`) - Sorotoki</title>
 <link href="../../assets/stylesheets/main.975780f9.min.css" rel="stylesheet"/>
 <link href="../../assets/stylesheets/palette.2505c338.min.css" rel="stylesheet"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
@@ -33,7 +33,7 @@
 <input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
 <label class="md-overlay" for="__drawer"></label>
 <div data-md-component="skip">
-<a class="md-skip" href="#mesh-generation-meshm">
+<a class="md-skip" href="#meshing-meshm">
           Skip to content
         </a>
 </div>
@@ -59,7 +59,7 @@
 <div class="md-header__topic" data-md-component="header-topic">
 <span class="md-ellipsis">
             
-              Mesh generation (`Mesh.m`)
+              Meshing (`Mesh.m`)
             
           </span>
 </div>
@@ -222,12 +222,17 @@
 <li class="md-nav__item md-nav__item--active">
 <input class="md-nav__toggle md-toggle" data-md-toggle="toc" id="__toc" type="checkbox"/>
 <a class="md-nav__link md-nav__link--active" href="./">
-        Mesh generation (`Mesh.m`)
+        Meshing (`Mesh.m`)
       </a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../meshsdf/">
-        Meshing with SDF
+        Mesh from SDFs
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../meshstl/">
+        Mesh from common files
       </a>
 </li>
 </ul>
@@ -389,8 +394,16 @@
 <a class="md-content__button md-icon" href="https://github.com/BJCaasenbrood/SorotokiCode/edit/master/docs/mesh/mesh.md" title="Edit this page">
 <svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"></path></svg>
 </a>
-<h1 id="mesh-generation-meshm">Mesh generation (<code>Mesh.m</code>)</h1>
-<p>In finite elements and computer graphics, mesh tessellation is a common language used to describe the structural geometry through a finite collection of vertices and edges. In \texttt{Sorotoki}, meshes and mesh generation features are packaged into the class \texttt{Mesh.m}. In general, a mesh defines a discrete representation of a continuum body that is subdivided into smaller convex sub-volumes, referred to as "\textit{elements}". The nodal and elemental information are stored in data structures that can be accessed using \texttt{msh.Node} and \texttt{msh.Element}, respectively. For two-dimensional FEM problems, it is common to use linear elements such as <span class="arithmatex">\(\texttt{Tri3}\)</span> and <span class="arithmatex">\(\texttt{Quad4}\)</span> or quadratic elements like <span class="arithmatex">\(\texttt{Tri6}\)</span> and <span class="arithmatex">\(\texttt{Quad8}\)</span>. For three-dimensional FEM problems, the common practice is to use hexahedron elements (\textit{i.e.}, \texttt{Hex8}) or tetrahedral elements (\textit{i.e.}, \texttt{Tet4} and \texttt{Tet12}). There are also polygonal tessellations, often denotes as \texttt{PolyN} finite elements \cite{Talischi2012Mar}. \texttt{Sorotoki} supports all these types.</p>
+<h1 id="meshing-meshm">Meshing (<code>Mesh.m</code>)</h1>
+<p>In finite elements and computer graphics, mesh tessellation is a common language used to describe the structural geometry through a finite collection of vertices and edges. In <code>Sorotoki</code>, meshes and mesh generation features are packaged into the class \texttt{Mesh.m}. In general, a mesh defines a discrete representation of a continuum body that is subdivided into smaller convex sub-volumes, referred to as "elements". The nodal and elemental information are stored in data structures that can be accessed using <code>msh.Node</code> and <code>msh.Element</code>, respectively. For two-dimensional FEM problems, it is common to use linear elements such as <code>Tri3</code> and <code>Quad4</code> or quadratic elements like <code>Tri6</code> and <code>Quad8</code>$. For three-dimensional FEM problems, the common practice is to use hexahedron elements (i.e. <code>Hex8</code>) or tetrahedral elements (i.e., <code>Tet4</code> and <code>Tet12</code>). There are also polygonal tessellations, often denotes as <code>PolyN</code> finite elements<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup>. <code>Sorotoki</code> supports all these types.</p>
+<div class="footnote">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>Cameron Talischi, Glaucio H. Paulino, Anderson Pereira, and Ivan F. M. Menezes. PolyTop: a Matlab implementation of a general topology optimization framework using unstructured polygonal finite element meshes. <em>Structural and Multidisciplinary Optimization</em>, 45(3):329–357, 2012. <a href="https://doi.org/10.1007/s00158-011-0696-x">doi:10.1007/s00158-011-0696-x</a>. <a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">↩</a></p>
+</li>
+</ol>
+</div>
 </article>
 </div>
 </div>
@@ -410,13 +423,13 @@
             </div>
 </div>
 </a>
-<a aria-label="Next: Meshing with SDF" class="md-footer__link md-footer__link--next" href="../meshsdf/" rel="next">
+<a aria-label="Next: Mesh from SDFs" class="md-footer__link md-footer__link--next" href="../meshsdf/" rel="next">
 <div class="md-footer__title">
 <div class="md-ellipsis">
 <span class="md-footer__direction">
                 Next
               </span>
-              Meshing with SDF
+              Mesh from SDFs
             </div>
 </div>
 <div class="md-footer__button md-icon">

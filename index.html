@@ -221,12 +221,17 @@
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
 <a class="md-nav__link" href="mesh/mesh/">
-        Mesh generation (`Mesh.m`)
+        Meshing (`Mesh.m`)
       </a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="mesh/meshsdf/">
-        Meshing with SDF
+        Mesh from SDFs
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="mesh/meshstl/">
+        Mesh from common files
       </a>
 </li>
 </ul>
@@ -476,18 +481,16 @@
 <details class="info" open="open">
 <summary>Code for simulation</summary>
 <div class="highlight"><pre><span></span><code><span class="c">% generate mesh from image</span>
-<span class="n">msh</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Mesh</span><span class="p">(</span><span class="s">'Pneunet.png'</span><span class="p">,</span><span class="w"> </span><span class="k">...</span>
-<span class="w">          </span><span class="s">'ElementSize'</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="k">...</span>
-<span class="w">          </span><span class="s">'BdBox'</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">120</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">20</span><span class="p">]);</span>
+<span class="n">msh</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">preset</span><span class="p">.</span><span class="n">mesh</span><span class="p">.</span><span class="n">pneunet</span><span class="p">;</span>
 
 <span class="c">% finite element solver (FEM)</span>
-<span class="n">fem</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Fem</span><span class="p">(</span><span class="n">msh</span><span class="p">,</span><span class="s">'Material'</span><span class="p">,</span><span class="w"> </span><span class="n">NeoHookean</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.4</span><span class="p">),</span><span class="w"> </span><span class="k">...</span>
-<span class="w">              </span><span class="s">'TimeStep'</span><span class="p">,</span><span class="w"> </span><span class="mf">1e-2</span><span class="p">);</span>
+<span class="n">fem</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Fem</span><span class="p">(</span><span class="n">msh</span><span class="p">,</span><span class="s">'TimeStep'</span><span class="p">,</span><span class="w"> </span><span class="mf">1e-2</span><span class="p">);</span>
 
 <span class="c">% boundary conditions</span>
+<span class="n">fem</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">fem</span><span class="p">.</span><span class="n">addMaterial</span><span class="p">(</span><span class="n">NeoHookean</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mf">0.4</span><span class="p">));</span>
 <span class="n">fem</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">fem</span><span class="p">.</span><span class="n">addGravity</span><span class="p">();</span>
-<span class="n">fem</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">fem</span><span class="p">.</span><span class="n">addPressure</span><span class="p">(</span><span class="s">'All'</span><span class="p">,</span><span class="w"> </span><span class="mi">30</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">kpa</span><span class="p">);</span>
-<span class="n">fem</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">fem</span><span class="p">.</span><span class="n">addConstraint</span><span class="p">(</span><span class="s">'Left'</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]);</span>
+<span class="n">fem</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">fem</span><span class="p">.</span><span class="n">addPressure</span><span class="p">(</span><span class="s">'AllHole'</span><span class="p">,</span><span class="w"> </span><span class="mi">30</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">1e-3</span><span class="p">);</span>
+<span class="n">fem</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">fem</span><span class="p">.</span><span class="n">addSupport</span><span class="p">(</span><span class="s">'Left'</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]);</span>
 
 <span class="c">% magic</span>
 <span class="n">fem</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">fem</span><span class="p">.</span><span class="n">solve</span><span class="p">();</span>
