@@ -272,7 +272,7 @@
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../fem/inverse/">
-        Gradient-based inverse design
+        Computational design
       </a>
 </li>
 </ul>
@@ -445,7 +445,66 @@
 <svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"></path></svg>
 </a>
 <h1 id="mesh-from-common-files">Mesh from common files</h1>
-<p>An alternative option is to use the mesh generation tools provided by the \texttt{Partial Differential Toolbox} in Matlab. Such function is also included in \code{Mesh.generate}. SDFs can also be used in this process, although an intermediate step is required. For two-dimensional domains, SDFs are first converted into binary images and then the image boundary detection is used to convert them to either a linear mesh (\texttt{Tri3}) or a quadratic mesh (\texttt{Tri6}). Direct input of black-and-white \file{.jpg} or \file{.png} images is also supported. For three-dimensional domains, SDF functions are converted to an \file{.stl} file using the Marching Cube algorithm \cite{Lorensen1987Aug} and then provided to the Matlab PDE toolbox to generate the tessellation. Importing and exporting \file{.stl} or \file{.obj} files directly is also possible. </p>
+<p>An alternative option is to use the mesh generation tools provided by the <code>Partial Differential Toolbox</code> in Matlab. Such function is also included in <code>Mesh.generate</code>. SDFs can also be used in this process, although an intermediate step is required. For two-dimensional domains, SDFs are first converted into binary images and then the image boundary detection is used to convert them to either a linear mesh <code>Tri3</code> or a quadratic mesh <code>Tri6</code>. Direct input of black-and-white <code>.jpg</code> or <code>.png</code> images is also supported. For three-dimensional domains, SDF functions are converted to an <code>.stl</code> file using the Marching Cube algorithm<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup> and then provided to the Matlab PDE toolbox to generate the tessellation. Importing and exporting <code>.stl</code> or <code>.obj</code> files directly is also possible. </p>
+<details open="open">
+<summary>Example: Mesh from image file</summary>
+<p><a class="glightbox" data-desc-position="bottom" data-height="auto" data-width="100%" href="../img/soro_logo_mesh.png"><img align="right" alt="Image title" src="../img/soro_logo_mesh.png" width="175"/></a>
+<a class="glightbox" data-desc-position="bottom" data-height="auto" data-width="100%" href="../img/soro_logo.png"><img align="right" alt="Image title" src="../img/soro_logo.png" width="175"/></a>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span>
+<span class="normal">9</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c">% distance function</span>
+<span class="n">file</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">'../+preset/assets/img/soro_logo.png'</span>
+
+<span class="c">% generate mesh</span>
+<span class="n">msh</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Mesh</span><span class="p">(</span><span class="n">file</span><span class="p">,</span><span class="s">'ElementSize'</span><span class="p">,</span><span class="mi">5</span><span class="p">);</span>
+<span class="n">msh</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">msh</span><span class="p">.</span><span class="n">generate</span><span class="p">;</span>
+
+<span class="c">% show mesh</span>
+<span class="n">msh</span><span class="p">.</span><span class="n">show</span><span class="p">();</span>
+</code></pre></div></td></tr></table></div></p>
+<details class="help" open="open">
+<summary>For <code>Sorotoki</code> to use <code>.png</code>/<code>.jpg</code>, the background must be white and foreground black!</summary>
+</details>
+</details>
+<details open="open">
+<summary>Example: Mesh from STL file</summary>
+<p><a class="glightbox" data-desc-position="bottom" data-height="auto" data-width="100%" href="../img/bunny_stl_mesh.png"><img align="right" alt="Image title" src="../img/bunny_stl_mesh.png" width="175"/></a>
+<a class="glightbox" data-desc-position="bottom" data-height="auto" data-width="100%" href="../img/bunny_stl_gmodel.png"><img align="right" alt="Image title" src="../img/bunny_stl_gmodel.png" width="175"/></a>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c">% distance function</span>
+<span class="n">file</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">'../+preset/assets/stl/Bunny.stl'</span>
+
+<span class="c">% generate mesh</span>
+<span class="n">msh</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Mesh</span><span class="p">(</span><span class="n">file</span><span class="p">,</span><span class="s">'ElementSize'</span><span class="p">,</span><span class="mi">5</span><span class="p">);</span>
+<span class="n">msh</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">msh</span><span class="p">.</span><span class="n">generate</span><span class="p">;</span>
+
+<span class="c">% show mesh</span>
+<span class="n">msh</span><span class="p">.</span><span class="n">show</span><span class="p">();</span>
+<span class="nb">view</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">);</span>
+</code></pre></div></td></tr></table></div></p>
+</details>
+<div class="footnote">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>William E. Lorensen and Harvey E. Cline. Marching cubes: A high resolution 3D surface construction algorithm. In <em>ACM SIGGRAPH Computer Graphics</em>, volume 21, pages 163–169. Association for Computing Machinery, New York, NY, USA, 1987. <a href="https://doi.org/10.1145/37401.37422">doi:10.1145/37401.37422</a>. <a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">↩</a></p>
+</li>
+</ol>
+</div>
 </article>
 </div>
 </div>
