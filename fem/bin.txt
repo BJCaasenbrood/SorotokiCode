@@ -1,0 +1,25 @@
+    The Newmark-$\beta$ method is an implicit numerical integration scheme extensively used to solve high-dimensional structural dynamic problem [@Newmark1959Jul,@Holzapfel2002]. We briefly explain the algorithm implemented in the function `Fem.simulate`. First, let us subdivide the time domain such that $(0,...,T)$ with uniform timesteps $\dt = t_{i+1} - t_i$. Then, given the initial conditions, we wish to compute the state evolution $\xB(t_i)$ and $\dot{\x}(t_i)$. For conciseness, let us write the discrete states of the FEM model as $\xB(t_i) = \xB^{(i)}$. Through the extended mean value theorem, we can formulate the general Newmark-$\beta$ scheme as
+
+    $$
+    \begin{align}
+        {\dxB}^{(i+1)} & = {\dxB}^{(i)} + \dt \left[(1-\beta_1)\ddxB^{(i)} + \dt \beta_1 \ddxB^{(i+1)} \right],                        \\[0.2em]
+        %
+        {\xB}^{(i+1)}  & = {\vec{x}}^{(i)} + \dt\left[ \dxB^{(i)} + (\tfrac{1}{2}-\beta_2)\ddxB^{(i)} + \beta_2 \ddxB^{(i+1)} \right],
+    \end{align}
+    $$
+
+    where $\beta_1,\beta_2 \ge \frac{1}{2}$. Now, in the expressions above only the forward-time acceleration $\ddxB^{(i+1)}$ is the unknown partial solution, hence we conveniently write $\vec{w} := \ddot{\xB}^{(i+1)}$. Substitution into the flow \eqref{eq:C5:femmodel}, we find:
+    
+    $$
+    \mat{r}(\vec{w}): = \vec{w} +\nabla_{\xB}\Hm(\vec{w}) + \mat{R}\nabla_{\dot{\x}}\Hm(\vec{w}) -  \vec{G}\vec{u}^{(i+1)},
+    \label{app:C3:residual_newmark}
+    $$
+
+    where $\Hm$ is the Hamiltonian. Following, the residual vector \eqref{app:C3:residual_newmark} forms an optimization problem in the form $\text{argmin}_{\vec{w}} \lVert \vec{r}(\vec{w}) \rVert_2$ for unknown accelerations $\vec{w}$. This implicit relation can be solved numerically using a recursive Newton Raphson method. Given the $n$-th iteration, the recursive solver reads
+
+    $$
+        \vec{w}^{(n+1)} = \vec{w}^{(n)} + \alpha_+ \left[ \mat{A}(\vec{w}^{(n)}) \right]^{-1}\! \vec{r}(\vec{w}^{(n)}),
+        \label{eq:C3:newmark_newtonsolver}
+    $$
+
+    where $\AB := \left[\mat{I} + \beta_1 \dt \mat{R}  + \beta_2 \dt^2 \mat{K}_{T}\mat{M}\right]$ is the hessian matrix, and $0< \alpha_+ \le 1$ an update coefficient. The matrix $\mat{K}_T$ denotes the tangent stiffness related to the local gradient of the elasticity force, given by $\mat{K}_T := \nabla_{\xB} \fB\elastic$.

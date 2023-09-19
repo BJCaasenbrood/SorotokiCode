@@ -7,7 +7,7 @@
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
 <link href="../../images/favicon.png" rel="icon"/>
 <meta content="mkdocs-1.4.2, mkdocs-material-8.5.10" name="generator"/>
-<title>Signed Distance Functions (`Sdf.m`) - Sorotoki</title>
+<title>Signed Distance (`Sdf.m`) - Sorotoki</title>
 <link href="../../assets/stylesheets/main.975780f9.min.css" rel="stylesheet"/>
 <link href="../../assets/stylesheets/palette.2505c338.min.css" rel="stylesheet"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
@@ -33,7 +33,7 @@
 <input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
 <label class="md-overlay" for="__drawer"></label>
 <div data-md-component="skip">
-<a class="md-skip" href="#signed-distance-functions-sdfm">
+<a class="md-skip" href="#signed-distance-sdfm">
           Skip to content
         </a>
 </div>
@@ -59,7 +59,7 @@
 <div class="md-header__topic" data-md-component="header-topic">
 <span class="md-ellipsis">
             
-              Signed Distance Functions (`Sdf.m`)
+              Signed Distance (`Sdf.m`)
             
           </span>
 </div>
@@ -187,7 +187,7 @@
 <li class="md-nav__item md-nav__item--active">
 <input class="md-nav__toggle md-toggle" data-md-toggle="toc" id="__toc" type="checkbox"/>
 <a class="md-nav__link md-nav__link--active" href="./">
-        Signed Distance Functions (`Sdf.m`)
+        Signed Distance (`Sdf.m`)
       </a>
 </li>
 <li class="md-nav__item">
@@ -252,21 +252,71 @@
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../fem/fem/">
-        Finite Element Models (`Fem.m`)
+        Finite Elements (`Fem.m`)
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../fem/solid/">
+        Continuum deformation
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../fem/hyperelast/">
+        Hyper-elastic materials
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../fem/solvers/">
+        Solvers and eigen value decomposition
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../fem/inverse/">
+        Gradient-based inverse design
       </a>
 </li>
 </ul>
 </nav>
 </li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_4" id="__nav_3_4" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3_4">
+          Shapes.m
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-label="Shapes.m" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_3_4">
+<span class="md-nav__icon md-icon"></span>
+          Shapes.m
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
-<a class="md-nav__link" href="../../beam/shapes/">
+<a class="md-nav__link" href="../../shapes/shapes/">
         Beam models
       </a>
 </li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_5" id="__nav_3_5" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3_5">
+          Model.m
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-label="Model.m" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_3_5">
+<span class="md-nav__icon md-icon"></span>
+          Model.m
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
-<a class="md-nav__link" href="../../beam/model/">
+<a class="md-nav__link" href="../../model/model/">
         Model Composer
       </a>
+</li>
+</ul>
+</nav>
 </li>
 <li class="md-nav__item md-nav__item--nested">
 <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_6" id="__nav_3_6" type="checkbox"/>
@@ -394,7 +444,7 @@
 <a class="md-content__button md-icon" href="https://github.com/BJCaasenbrood/SorotokiCode/edit/master/docs/sdf/sdf.md" title="Edit this page">
 <svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"></path></svg>
 </a>
-<h1 id="signed-distance-functions-sdfm">Signed Distance Functions (<code>Sdf.m</code>)</h1>
+<h1 id="signed-distance-sdfm">Signed Distance (<code>Sdf.m</code>)</h1>
 <p><a class="glightbox" data-desc-position="bottom" data-height="auto" data-width="100%" href="../img/cad_example.mp4"><div class="video-container"><video autoplay="" controls="" style="width: 100%; height: 65%; position: center"><source src="../img/cad_example.mp4" type="video/mp4"/></video></div></a></p>
 <p>Signed Distance Fields (SDFs) have been widely applied in various areas of computer graphics, including the representation of implicit surfaces<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup><sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup>, collision detection in robotics<sup id="fnref:3"><a class="footnote-ref" href="#fn:3">3</a></sup><sup id="fnref:4"><a class="footnote-ref" href="#fn:4">4</a></sup>. In particular, SDFs have gained attention for their use in implicit modeling<sup id="fnref:5"><a class="footnote-ref" href="#fn:5">5</a></sup>, a technique for representing 3D shapes as continuous functions, rather than discrete mesh descriptions. </p>
 <p>In Sorotoki, SDFs are implemented in the class <code>Sdf.m</code> and can be used to construct general 2D and 3D geometries. They can also be utilized to model static or dynamic contact environments, generate 3D models of soft actuators that are suitable for 3D printing, and compute inertia tensors for continuum bodies in <span class="arithmatex">\(\mathbb{R}^2\)</span> and <span class="arithmatex">\(\mathbb{R}^3\)</span>. </p>
@@ -413,8 +463,22 @@
 <p>SDFs provide a simple and efficient way of determining the location of a set of points relative to a domain <span class="arithmatex">\(\Omega\)</span> defined implicitly. The SDF is a scalar function that encodes the Euclidean distance of a sample point <span class="arithmatex">\(\pB \in \mathbb{R}^n\)</span> to the boundary <span class="arithmatex">\(\partial \Omega\)</span> of the domain. By evaluating the sign of the SDF, it is possible to classify the set of points as being within or outside the boundary of the domain. This enables set operations such as union, difference, and intersection to be performed. </p>
 <details open="open">
 <summary>Example: Unit-circle and evaluation</summary>
-<p><a class="glightbox" data-desc-position="bottom" data-height="auto" data-width="100%" href="../img/test_eval.png"><img align="right" alt="Image title" src="../img/test_eval.png" width="225"/></a>
-<div class="highlight"><pre><span></span><code><span class="c">% distance function</span>
+<p><a class="glightbox" data-desc-position="bottom" data-height="auto" data-width="100%" href="../img/test_eval.png"><img align="right" alt="Image title" src="../img/test_eval.png" width="235"/></a>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c">% distance function</span>
 <span class="n">f</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">@(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="nb">sqrt</span><span class="p">(</span><span class="w"> </span><span class="n">x</span><span class="p">(:,</span><span class="mi">1</span><span class="p">)</span><span class="o">.^</span><span class="mi">2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">x</span><span class="p">(:,</span><span class="mi">2</span><span class="p">)</span><span class="o">.^</span><span class="mi">2</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span>
 
 <span class="c">% assigning @f to Sdf class</span>
@@ -425,31 +489,47 @@
 
 <span class="c">% eval SDF</span>
 <span class="n">D</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">S</span><span class="p">.</span><span class="n">eval</span><span class="p">(</span><span class="n">X</span><span class="p">);</span>
-
-<span class="c">% print</span>
 <span class="nb">disp</span><span class="p">(</span><span class="w"> </span><span class="n">D</span><span class="p">(:,</span><span class="k">end</span><span class="p">).</span><span class="o">'</span><span class="w"> </span><span class="p">);</span>
-</code></pre></div>
+
+<span class="n">sdf</span><span class="p">.</span><span class="n">show</span><span class="p">();</span><span class="w"> </span>
+<span class="nb">fplot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="s">'k.'</span><span class="p">,</span><span class="s">'MarkerSize'</span><span class="p">,</span><span class="mi">30</span><span class="p">);</span>
+</code></pre></div></td></tr></table></div>
 <div class="highlight"><span class="filename">output</span><pre><span></span><code><span class="o">-</span><span class="mf">1.0000</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mf">0.6464</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mf">0.2929</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0607</span><span class="p">,</span><span class="w"> </span><span class="mf">0.4142</span>
 </code></pre></div></p>
 </details>
 <details open="open">
 <summary>Example: Unit-circle intersect</summary>
-<p><a class="glightbox" data-desc-position="bottom" data-height="auto" data-width="100%" href="../img/test_intersect.png"><img align="right" alt="Image title" src="../img/test_intersect.png" width="225"/></a>
-<div class="highlight"><pre><span></span><code><span class="c">% distance function</span>
+<p><a class="glightbox" data-desc-position="bottom" data-height="auto" data-width="100%" href="../img/test_intersect.png"><img align="right" alt="Image title" src="../img/test_intersect.png" width="235"/></a>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c">% distance function</span>
 <span class="n">f</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">@(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="nb">sqrt</span><span class="p">(</span><span class="w"> </span><span class="n">x</span><span class="p">(:,</span><span class="mi">1</span><span class="p">)</span><span class="o">.^</span><span class="mi">2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">x</span><span class="p">(:,</span><span class="mi">2</span><span class="p">)</span><span class="o">.^</span><span class="mi">2</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span>
 
 <span class="c">% assigning @f to Sdf class</span>
 <span class="n">sdf</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Sdf</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="s">'BdBox'</span><span class="p">,[</span><span class="o">-</span><span class="mi">2</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">-</span><span class="mi">2</span><span class="w"> </span><span class="mi">2</span><span class="p">]);</span>
 
 <span class="c">% generate samples</span>
-<span class="n">X</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">linspacen</span><span class="p">([</span><span class="mi">0</span><span class="p">;</span><span class="mi">0</span><span class="p">],[</span><span class="mi">1</span><span class="p">;</span><span class="mi">1</span><span class="p">],</span><span class="mi">5</span><span class="p">);</span>
+<span class="n">X</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">linspacen</span><span class="p">([</span><span class="mi">0</span><span class="p">;</span><span class="mi">0</span><span class="p">],[</span><span class="mi">1</span><span class="p">;</span><span class="mi">1</span><span class="p">],</span><span class="mi">5</span><span class="p">).</span><span class="o">'</span><span class="p">;</span>
 
 <span class="c">% eval SDF</span>
-<span class="n">I</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">S</span><span class="p">.</span><span class="n">intersect</span><span class="p">(</span><span class="n">X</span><span class="p">.</span><span class="o">'</span><span class="p">);</span>
+<span class="n">I</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">sdf</span><span class="p">.</span><span class="n">intersect</span><span class="p">(</span><span class="n">X</span><span class="p">);</span>
 
+<span class="n">sdf</span><span class="p">.</span><span class="n">show</span><span class="p">();</span><span class="w"> </span>
 <span class="nb">fplot</span><span class="p">(</span><span class="n">X</span><span class="p">(</span><span class="n">I</span><span class="p">,:),</span><span class="s">'m.'</span><span class="p">,</span><span class="s">'MarkerSize'</span><span class="p">,</span><span class="mi">30</span><span class="p">);</span>
 <span class="nb">fplot</span><span class="p">(</span><span class="n">X</span><span class="p">(</span><span class="o">~</span><span class="n">I</span><span class="p">,:),</span><span class="s">'k.'</span><span class="p">,</span><span class="s">'MarkerSize'</span><span class="p">,</span><span class="mi">30</span><span class="p">);</span>
-</code></pre></div></p>
+</code></pre></div></td></tr></table></div></p>
 </details>
 <div class="footnote">
 <hr/>
