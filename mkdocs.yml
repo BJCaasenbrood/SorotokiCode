@@ -18,8 +18,14 @@ nav:
         - mesh/meshstl.md
       - Fem.m:
         - fem/fem.md
-      - beam/shapes.md
-      - beam/model.md
+        - fem/solid.md
+        - fem/hyperelast.md
+        - fem/solvers.md
+        - fem/inverse.md
+      - Shapes.m:
+        - shapes/shapes.md
+      - Model.m:
+        - model/model.md
       - Visualization:
         - plotting/figure.md
         - plotting/rendering.md
@@ -98,6 +104,8 @@ plugins:
       bib_file: "./docs/refs.bib"
   - mkdocs-video:
       is_video: True
+      video_muted: True
+      video_controls: True
       css_style:
         width: "100%"
         height: "65%"

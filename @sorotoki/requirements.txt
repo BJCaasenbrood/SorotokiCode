@@ -11,5 +11,5 @@ matlabgraphicalmodel
 sorotokisdf
 sorotokimesh
 sorotokifem
-# sorotokimodel
+sorotokimodel
 # sorotokibots
