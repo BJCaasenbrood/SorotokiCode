@@ -305,7 +305,7 @@ function installMissingPackgeMPM(package,varargin)
         case 'distance2curve'
             mpm(action,'distance2curve','--all-paths');
         case 'matlabgraphicalmodel'             
-            mpm(action,'matlabgraphicalmodel','--all-paths');
+            mpm(action,'matlabgraphicalmodel','--all-paths','--github-first');
         case 'sorotokisdf'                        
             mpm(action,'sorotokisdf','install-dir','./lib/','--all-paths','--force');
         case 'sorotokimesh'                        
