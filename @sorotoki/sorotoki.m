@@ -1,7 +1,7 @@
 function sorotoki(varargin)
 %SOROTOKI is the installer function of SOROTOKI.
 %   SOROTOKI can be executed in the command window and it will start the
-%   installation aumatically. Make sure you have an active internet
+%   installation automatically. Make sure you have an active internet
 %   connection to start the installation, which will be compared to the
 %   most current (stable) version of the toolkit. Some embedded functions
 %   for the SOROTOKI installer are:
@@ -10,7 +10,7 @@ function sorotoki(varargin)
 %   sorotoki remove             % remove
 %   sorotoki disable            % disables toolkit, but keeps source files
 %   sorotoki cd                 % go to toolkit
-%%
+%
 %   Also, some additional toolboxes are required:
 %
 %   - Image Processing Toolbox
