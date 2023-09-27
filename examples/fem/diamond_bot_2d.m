@@ -1,7 +1,6 @@
 clr;
 % generate fem model from diamond bot
 msh = preset.mesh.diamond_bot('n',250);
-
 fem = Fem(msh);
 fem = fem.addSupport('bottom',[1,1]);
 
@@ -12,20 +11,14 @@ fem.system.InputMap = @(x) B;
 % assigning materials
 mat = NeoHookean(2.0, 0.45);
 mat.params.Zeta = 0.01;
-
 fem = fem.addMaterial(mat);
-fem = fem.compute();
-fem.solver.MaxIteration = 10;
+
+fem = fem.compute();    % precompute
+fem = fem.set('MaxIteration',10);
 
 % control  loop
-U = [0;0];
-w = 2*pi;
-ki = 10 * mat.getModulus;
-dt = 1/120;
-
-uout = [];
-pout = [];
-pdout = [];
+[U, w, kt, dt] = deal([0;0], 2*pi, 10 * mat.getModulus, 1/120);
+[uout, pout, pdout] = deal([]);
 
 while fem.solver.Time < 2
 
@@ -46,7 +39,7 @@ while fem.solver.Time < 2
     fem.system.fControl = U;
     fem = fem.update(dt);
 
-    plt(fem, Pd, e);
+    plt(fem, Pd);
 end
 
 figure(102);
@@ -61,7 +54,7 @@ subplot(2,1,2);
 plot(pout(:,2),'LineW',2); hold on;
 plot(pdout(:,2),'LineW',2); 
 
-% input and output function
+%% input and output function
 function [B,G,C,Ia] = buildInputOutput(fem)
     B = zeros(fem.Mesh.NNode*fem.Dim,2);
     C = zeros(fem.Mesh.NNode*fem.Dim,2);
@@ -80,8 +73,8 @@ function [B,G,C,Ia] = buildInputOutput(fem)
     C = C(Ia,:);  
 end
 
-% plotting function
-function plt(fem, Pd, e)
+%% plotting function
+function plt(fem, Pd)
     cla;
     fem.showVonMises;
     clim([-1e7,1e7]);
@@ -92,9 +85,6 @@ function plt(fem, Pd, e)
     
     if fem.solver.Time < 1/120
          axis([-40 200 0 160]);
-    %     gif('test.gif','nodither','frame',gca,'delay',1/120);
-    else
-    %     gif;
     end
 
     drawnow;

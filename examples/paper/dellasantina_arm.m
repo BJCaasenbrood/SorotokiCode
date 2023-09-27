@@ -15,7 +15,7 @@ while shp.solver.Time < shp.solver.TimeHorizon
     % contact enabler
     if norm(shp.system.fContact) < eps && ~madeContact
         Xd = [-140.6;353.7;0];
-    else
+    else % if contact, then interp to new position
         madeContact = true;
         Xd1 = [-140.6;353.7;0];
         Xd2 = [-257.6;240.7;0];
@@ -42,7 +42,7 @@ function tau = Control(shp, Xd)
     C  = shp.system.Coriolis;
     fe = shp.system.fElastic;
     J  = shp.system.Jacobian(4:6,:,end);
-    dJ = shp.system.dJacobian(4:6,:);
+    dJ = shp.system.dJacobian(4:6,:,end);
     x  = shp.system.Backbone(1:3,4,end);
 
     q  = shp.solver.sol.x;
@@ -50,12 +50,12 @@ function tau = Control(shp, Xd)
     nq = numel(q);
     
     Kc = 1e-3 * smoothstep(2.5*t);
-    Dc = 0.3 * Kc;
+    Dc = 0.1  * Kc;
     
     % compute lambda
     Mi  = inv(M);
     JT  = J.';
-    A   = J*Mi*JT + eye(3)*1e-2;
+    A   = J*Mi*JT + 1e-4 * eye(3);
     lam = A\(eye(3));
     
     % compute JB+
@@ -63,7 +63,7 @@ function tau = Control(shp, Xd)
     Jbp = W*lam;
     
     % compute eta
-    eta = lam*(J*Mi*C - dJ);
+    eta = lam*(J*Mi*C - 0*dJ);
     
     % impedance controller
     tau = J.'*Jbp.'*(fe) + J.'*eta*(eye(nq) ...

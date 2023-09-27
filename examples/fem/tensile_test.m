@@ -1,5 +1,4 @@
 clr;
-
 % generate mesh from sdf
 sdf = Sdf( @(x) TensileBone(x,10,2,3,1,1), 'BdBox', [0,10,0,10]);
 
@@ -17,8 +16,9 @@ fem = fem.addDisplace('top',[0,25]);
 fem = fem.addMaterial( NeoHookean(0.1,0.3) );
 
 % solving
-fem.solve('MaxIteration',20);
+fem.solve('MaxIteration',200,'isLog',false);
 
+%% Tensile bone SDF
 function D = TensileBone(P,H,W,T,D,R)
 dD = 0.5*(W-D);
 dT = 0.5*(H-T);

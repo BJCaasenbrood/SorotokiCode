@@ -27,4 +27,5 @@ toolkit
 lib
 *.log
 .vscode
+.cover
 src

@@ -13,6 +13,7 @@ fem = fem.addPressure(fem.findEdges('BoxHole',[100 150 0 15]),...
 % solve dynamic simulation
 fem = fem.simulate();
 
+%% pressure activation controller
 function y = pset(t,id)
     w  = 2*pi;
     P0 = 15 * 1e-3;
