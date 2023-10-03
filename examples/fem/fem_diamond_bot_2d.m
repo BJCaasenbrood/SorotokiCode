@@ -9,15 +9,15 @@ fem = fem.addSupport('bottom',[1,1]);
 fem.system.InputMap = @(x) B;
 
 % assigning materials
-mat = NeoHookean(2.0, 0.45);
-mat.params.Zeta = 0.01;
+mat = NeoHookean(2.5, 0.45);
+mat.params.Zeta = 0.1;
 fem = fem.addMaterial(mat);
 
-fem = fem.compute();    % precompute
+fem = fem.compute(); 
 fem = fem.set('MaxIteration',10);
 
 % control  loop
-[U, w, kt, dt] = deal([0;0], 2*pi, 10 * mat.getModulus, 1/120);
+[U, w, ki, dt] = deal([0;0], 2*pi, 10 * mat.getModulus, 1/120);
 [uout, pout, pdout] = deal([]);
 
 while fem.solver.Time < 2
