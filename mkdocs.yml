@@ -32,6 +32,9 @@ nav:
         - plotting/matcap.md
         - plotting/colors.md
         - plotting/colormaps.md
+  - Reference:
+    - Lie groups:
+        - mfiles/interpolateSE3.md
   - Open soft robots:
     - sorobots/softmanipulator.md
     - sorobots/softhand.md
