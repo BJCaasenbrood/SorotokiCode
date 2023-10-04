@@ -3,20 +3,19 @@ sdf = sRectangle(0, 100, 0, 5);
 msh = Mesh(sdf,'Quads',[50,3]);
 msh = msh.generate();
 
-fem = Fem(msh,'TimeStep',1/1e3);
-fem = fem.addMaterial(NeoHookean(.1,0.3));
+fem = Fem(msh,'TimeStep',1/500);
+fem = fem.addMaterial(NeoHookean(.01,0.45));
 fem = fem.addSupport('left', [1, 1]);
 fem = fem.addContact(sCircle(7,[40,-25]));
 fem = fem.addGravity();
 
-fem.options.LineStyle = 'none';
-% fem.options.ColorMap  = cmap_redblue;
 fem.options.Display = @plt;
+fem.BdBox = [-2, 120, -80, 10];
 
-fem = fem.simulate('MaxIteration',30);
+fem = fem.simulate('MaxIteration',4);
 
 function plt(Fem)
     clf;
-    showVonMisesFem(Fem);
+    Fem.show;
     showContactFem(Fem);
 end

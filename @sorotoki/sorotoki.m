@@ -101,6 +101,7 @@ function sorotoki(varargin)
         return
     end
 
+    % 
     if strcmpi(action,'build') || strcmpi(action,'-b') || ...
        strcmpi(action,'mex')
         installPath = whereis('sorotoki.log');
@@ -108,4 +109,9 @@ function sorotoki(varargin)
         return
     end
 
+    if strcmpi(action,'test') || strcmpi(action,'-t') || ...
+        strcmpi(action,'testsuite')
+        runSorotokiTest(prompt);
+        return
+     end
 end

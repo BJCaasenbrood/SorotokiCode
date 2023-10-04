@@ -1,4 +1,5 @@
 function gotoSorotokiFolder
+    log = Log;
     log.debug('Finding installation log file: sorotoki.log');
     installPath = whereis('sorotoki.log');
     log.debug(['Found: ',installPath,'/sorotoki.log']);

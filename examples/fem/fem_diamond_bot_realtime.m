@@ -1,7 +1,7 @@
 clr;
 % generate fem model from diamond bot
-msh = preset.mesh.diamond_bot('n',250);
-fem = Fem(msh);
+msh = preset.mesh.diamond_bot('n',1e3);
+fem = Fem(msh,'isNonlinear',false);
 fem = fem.addSupport('bottom',[1,1]);
 
 % build input and output matrices
@@ -9,50 +9,33 @@ fem = fem.addSupport('bottom',[1,1]);
 fem.system.InputMap = @(x) B;
 
 % assigning materials
-mat = NeoHookean(2.5, 0.45);
-mat.params.Zeta = 0.1;
+mat = NeoHookean(2.5, 0.35);
+mat.params.Zeta = 2;
 fem = fem.addMaterial(mat);
 
 fem = fem.compute(); 
-fem = fem.set('MaxIteration',10);
+fem.BdBox = [-40 200 0 160];
 
 % control  loop
-[U, w, ki, dt] = deal([0;0], 2*pi, 10 * mat.getModulus, 1/120);
+[U, w, ki, dt] = deal([0;0], 2*pi, 7.5 * mat.getModulus, 1/120);
 [uout, pout, pdout] = deal([]);
 
-while fem.solver.Time < 2
+while fem.solver.Time < Inf
 
     t = fem.solver.Time;
-    Pd = [25 * cos(2 * w * t); 25 * sin(w * t)];
 
     % compute error;
-    p = C.' * fem.solver.sol.x(Ia);
-    e = p - Pd;
+    e = C.' * fem.solver.sol.x(Ia) - Pd();
     H = C.' * (fem.system.Tangent \ G);
 
     % I-action controller
     U = U - dt * ki * (H \ e);
-    uout  = [uout; U.'];
-    pout  = [pout; p.'];
-    pdout = [pdout; Pd.'];
 
     fem.system.fControl = U;
     fem = fem.update(dt);
 
-    plt(fem, Pd);
+    plt(fem, Pd());
 end
-
-figure(102);
-plot(uout(:,1),'LineW',2); hold on;
-plot(uout(:,2),'LineW',2); 
-
-figure(103);
-subplot(2,1,1);
-plot(pout(:,1),'LineW',2); hold on;
-plot(pdout(:,1),'LineW',2); 
-subplot(2,1,2);
-plot(pout(:,2),'LineW',2); hold on;
-plot(pdout(:,2),'LineW',2); 
 
 %% input and output function
 function [B,G,C,Ia] = buildInputOutput(fem)
@@ -75,17 +58,35 @@ end
 
 %% plotting function
 function plt(fem, Pd)
-    cla;
-    fem.showVonMises;
-    clim([-1e7,1e7]);
-    Nds = fem.Mesh.Node + meshfield(fem, fem.solver.sol.x);
-    id = fem.findNodes('location',[85,95]);
-    fplot(Nds(id,:),'.','MarkerSize',60,'Color',col(1));
-    fplot(Pd' + [85,95],'k.','MarkerSize',30,'Color',col(2));
-    
-    if fem.solver.Time < 1/120
-         axis([-40 200 0 160]);
-    end
 
+    cla;
+    xmin = 30; xmax = 140;
+    ymin = 70; ymax = 140;
+
+    patch('Vertices',[xmin,ymin; xmax,ymin; xmax,ymax; xmin,ymax; xmin,ymin],...
+        'Faces',[1,2,3,4,5],'FaceColor',[1,1,1] * 0.875,'LineStyle','none'); 
+
+    fem.show();
+    fplot(Pd' + [85,95],'k.','MarkerSize',45,'Color',col(2),'LineW',2);
+
+    if fem.solver.Time < 1/120
+        axis equal;
+    end
+    
+    axis( [-40 200 0 160] );
     drawnow;
+end
+
+function out = Pd
+    xmin = 30; xmax = 140;
+    ymin = 70; ymax = 140;
+    x = get(gca, 'CurrentPoint');
+    if (x(1,1) < -abs(2*xmin))
+        out = [0; 10];
+    else
+        out = [0;0];
+        out(1) = clamp(x(1,1)-85,xmin-85, xmax-85);
+        out(2) = clamp(x(1,2)-95,ymin-95, ymax-95);
+        %out = [x(1,1); x(1,2)] - [85; 95];
+    end
 end
