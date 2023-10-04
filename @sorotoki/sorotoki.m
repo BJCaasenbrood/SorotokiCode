@@ -25,7 +25,6 @@ function vargout = sorotoki(varargin)
    
     global log auto_approve
     auto_approve = false;
-    log = Log();
     % log.options.isDebug = true;
 
     soroPackages = {};

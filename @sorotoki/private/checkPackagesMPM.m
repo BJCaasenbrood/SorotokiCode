@@ -1,18 +1,20 @@
 function checkPackagesMPM(reqPackages,mpmPackages)
 
-    global log auto_approve;
-    log.info('Checking for updates: MPM package library'); 
+    global auto_approve;
+    disp('Checking for updates: MPM package library'); 
     tf = ismember(reqPackages,mpmPackages);
 
     if all(tf)
-        log.info(msg('mpm_complete'));
+        disp(msg('mpm_complete'));
     else
-        log.info(msg('mpm_incomplete'));
+        disp(msg('mpm_incomplete'));
         I = find(~tf).';
-        log.list('',reqPackages(I(:)));
+        for i = 1:numel(I)
+            disp(['- ', reqPackages{I(i)}]);
+        end
 
         if ~auto_approve
-            log.help('Install missing MPM packages?');
+            disp('Install missing MPM packages?');
             reply = input(i18n('confirm'), 's');
             if isempty(reply)
                 reply = i18n('confirm_yes');
@@ -23,15 +25,13 @@ function checkPackagesMPM(reqPackages,mpmPackages)
             end
         end
     
+        lineStr = repmat('━', 1, 40);
         misPackages = reqPackages(find(~tf).');
-        log.info('Calling MPM installer -- installing req. packages');
-        log.hline();
-        log.setHide(true);
+        disp('Calling MPM installer -- installing req. packages');
+        disp(lineStr);
         for i = 1:numel(misPackages)
             installMissingPackageMPM(misPackages{i}); 
-            log.setHide(false);
-            log.hline();
-            log.setHide(true);
+            disp(lineStr);
         end
     end
 end
