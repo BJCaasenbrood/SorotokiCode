@@ -1,6 +1,5 @@
-function runSorotokiTest(prompt)
+function out = runSorotokiTest(prompt)
 flag = [];
-
 base = 'src/Sorotoki';
 testsuite = {'Sdf'; 'Mesh'; 'Fem'};
 
@@ -15,10 +14,11 @@ for ii = 1:numel(testsuite)
     flag = navigateAndTest(base, testsuite{ii}, flag);
 end
 
-if isempty(find(flag == 0, 1))
+if all(flag == 1)
     fprintf('All tests passed!\n ');
+    out = true;
 else
-
+    out = false;
 end
 
 end
@@ -47,6 +47,7 @@ function isPassed = showTestResults(test)
     end
     log.hline();
 
+    % assertSuccess(test);
     isPassed = logical(cumprod(flag));
     isPassed = isPassed(end);
 end

@@ -1,6 +1,6 @@
 function checkSoroPackages(soroPackages,mpmPackages)
 
-    global log
+    global log auto_approve
 
     log.info('Checking for updates: Sorotoki library'); 
     tf = ismember(soroPackages,mpmPackages);
@@ -12,14 +12,16 @@ function checkSoroPackages(soroPackages,mpmPackages)
         I = find(~tf).';
         log.list('',soroPackages(I(:)));
 
-        log.help('Install missing MPM packages?');
-        reply = input(i18n('confirm'), 's');
-        if isempty(reply)
-            reply = i18n('confirm_yes');
-        end
-        if ~strcmpi(reply(1), i18n('confirm_yes'))
-            log.info(i18n('confirm_nvm'));
-            return;
+        if ~auto_approve
+            log.help('Install missing MPM packages?');
+            reply = input(i18n('confirm'), 's');
+            if isempty(reply)
+                reply = i18n('confirm_yes');
+            end
+            if ~strcmpi(reply(1), i18n('confirm_yes'))
+                log.info(i18n('confirm_nvm'));
+                return;
+            end
         end
     
         misPackages = soroPackages(find(~tf).');

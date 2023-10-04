@@ -1,4 +1,4 @@
-function sorotoki(varargin)
+function vargout = sorotoki(varargin)
 %SOROTOKI is the installer function of SOROTOKI.
 %   SOROTOKI can be executed in the command window and it will start the
 %   installation automatically. Make sure you have an active internet
@@ -23,7 +23,8 @@ function sorotoki(varargin)
 %   sorotoki is also loaded when opening MATLAB, and can be found under
 %   .../MATLAB/startup.m in the MATLAB's main folder on your desktop.
    
-    global log
+    global log auto_approve
+    auto_approve = false;
     log = Log();
     % log.options.isDebug = true;
 
@@ -73,9 +74,14 @@ function sorotoki(varargin)
     end
     
     if strcmpi(action,'install') || strcmpi(action,'-i')
-         installSorotoki(reqPackages,soroPackages);
-         addfolder('src');
-         return
+
+        if sum(ismember(prompt,'--approve'))
+            auto_approve = true;
+        end
+
+        installSorotoki(reqPackages,soroPackages);
+        addfolder('lib');
+        return
     end
 
     if strcmpi(action,'remove') || strcmpi(action,'-r')
@@ -111,7 +117,11 @@ function sorotoki(varargin)
 
     if strcmpi(action,'test') || strcmpi(action,'-t') || ...
         strcmpi(action,'testsuite')
-        runSorotokiTest(prompt);
+        out = runSorotokiTest(prompt);
+        if nargout > 0
+            vargout{1} = out;
+            assert(vargout{1}, 'One or more tests have failed...');
+        end
         return
      end
 end
