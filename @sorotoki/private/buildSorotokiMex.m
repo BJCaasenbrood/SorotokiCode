@@ -51,7 +51,7 @@ fprintf(repmat('\b',1,60));
 log.bool('./sorotokifem/mex/localsYH build:',flag,{'Build succesfull','Failed'});
 
 %% return to main folder
-sorotoki cd;
+cd path
 end
 
 
