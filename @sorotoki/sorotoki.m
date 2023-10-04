@@ -52,8 +52,8 @@ function vargout = sorotoki(varargin)
     action = '-h';
     prompt = [];
     mpmPath = which('mpm');
-    installFile = whereis('sorotoki.m');
-    installPath = installFile(1:end-10);
+    installFile = which('sorotoki.m');
+    installPath = installFile(1:end-21);
 
     assert(~strcmpi(mpmPath(1:5),'build'), msg('mpm_not_installed'));
     checkToolboxes(reqToolboxes);
