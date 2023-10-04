@@ -12,5 +12,5 @@ jobs:
       - run: rm -rf temp
       - matlab/install
       - matlab/run-command:
-          command: sorotoki -i --approve; sorotoki -b; y = sorotoki('-t');
+          command: sorotoki -i --approve; sorotoki -b --approve; y = sorotoki('-t');
           
