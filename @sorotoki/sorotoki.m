@@ -109,6 +109,11 @@ function vargout = sorotoki(varargin)
     % 
     if strcmpi(action,'build') || strcmpi(action,'-b') || ...
        strcmpi(action,'mex')
+
+        if sum(ismember(prompt,'--approve'))
+            auto_approve = true;
+        end
+
         installPath = whereis('sorotoki.log');
         buildSorotokiMex(installPath);
         return
