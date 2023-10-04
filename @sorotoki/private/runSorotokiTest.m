@@ -1,7 +1,8 @@
 function out = runSorotokiTest(prompt)
 flag = [];
-base = 'src/Sorotoki';
-testsuite = {'Sdf'; 'Mesh'; 'Fem'};
+% base = 'src/Sorotoki';
+base = 'lib/sorotoki';
+testsuite = {'sdf'; 'mesh'; 'fem'};
 
 % eliminate suites not in prompt
 if ~isempty( prompt )

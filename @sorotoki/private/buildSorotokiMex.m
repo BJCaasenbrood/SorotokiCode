@@ -1,10 +1,13 @@
 function buildSorotokiMex(installPath)
 
-    log = Log();
-    log.options.isDebug = true;
-    library = '/src/';
-    path = installPath(1:end-10);
+global auto_approve
 
+log = Log();
+log.options.isDebug = true;
+library = '/lib/';
+path = installPath(1:end-10);
+
+if ~auto_approve
     disp('Build Sorotoki .mex executables?');
     reply = input(i18n('confirm'), 's');
     if isempty(reply)
@@ -15,6 +18,7 @@ function buildSorotokiMex(installPath)
         disp(i18n('confirm_nvm'));
         return;
     end
+end
 
 log.info('Starting Sorotoki Mex Compiler');
 log.info('Please be patient, this make take a while...');
@@ -25,27 +29,29 @@ log.debug('Nagivating towards libary directory');
 cd([path, library]);
 
 log.debug('Nagivating towards ..mex/localsNH/');
-cd('SorotokiFem/mex/localsNH/');
+cd('sorotokifem/mex/localsNH/');
 
 log.debug('Building mex localsNH');
-fprintf('./SorotokiFem/mex/localsNH build: ...');
+fprintf('./sorotokifem/mex/localsNH build: ...');
 flag = buildMexLNH;
 fprintf(repmat('\b',1,60));
-log.bool('./SorotokiFem/mex/localsNH build:',flag,{'Build succesfull','Failed'});
+log.bool('./sorotokifem/mex/localsNH build:',flag,{'Build succesfull','Failed'});
 
 %% buildMexLNH
 log.debug('Nagivating towards libary directory');
 cd([path, library]);
 
 log.debug('Nagivating towards ..mex/localsYH/');
-cd('SorotokiFem/mex/localsYH/');
+cd('sorotokifem/mex/localsYH/');
 
 log.debug('Building mex localsYH');
-fprintf('./SorotokiFem/mex/localsYH build: ...');
+fprintf('./sorotokifem/mex/localsYH build: ...');
 flag = buildMexLYH;
 fprintf(repmat('\b',1,60));
-log.bool('./SorotokiFem/mex/localsYH build:',flag,{'Build succesfull','Failed'});
+log.bool('./sorotokifem/mex/localsYH build:',flag,{'Build succesfull','Failed'});
 
+%% return to main folder
+sorotoki cd;
 end
 
 
