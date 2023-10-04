@@ -1,4 +1,4 @@
-function out = runSorotokiTest(prompt)
+function out = runSorotokiTest(prompt, installPath)
 flag = [];
 % base = 'src/Sorotoki';
 base = 'lib/sorotoki';
@@ -12,6 +12,7 @@ end
 
 % loop over testsuites
 for ii = 1:numel(testsuite)
+    cd(installPath);
     flag = navigateAndTest(base, testsuite{ii}, flag);
 end
 
@@ -26,7 +27,6 @@ end
 
 %% nagivates to library and tests
 function flag = navigateAndTest(base, lib, flag)
-    sorotoki cd; 
     cd([base,lib]);
     fprintf(['Running ', lib, 'Test ']);
     test = runtests(pwd, 'OutputDetail',1);

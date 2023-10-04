@@ -5,7 +5,6 @@ global auto_approve
 log = Log();
 log.options.isDebug = true;
 library = '/lib/';
-path = installPath;
 
 if ~auto_approve
     disp('Build Sorotoki .mex executables?');
@@ -26,7 +25,7 @@ log.hline()
 
 %% buildMexLNH
 log.debug('Nagivating towards libary directory');
-cd([path, library]);
+cd([installPath, library]);
 
 log.debug('Nagivating towards ..mex/localsNH/');
 cd('sorotokifem/mex/localsNH/');
@@ -39,7 +38,7 @@ log.bool('./sorotokifem/mex/localsNH build:',flag,{'Build succesfull','Failed'})
 
 %% buildMexLNH
 log.debug('Nagivating towards libary directory');
-cd([path, library]);
+cd([installPath, library]);
 
 log.debug('Nagivating towards ..mex/localsYH/');
 cd('sorotokifem/mex/localsYH/');
@@ -51,7 +50,7 @@ fprintf(repmat('\b',1,60));
 log.bool('./sorotokifem/mex/localsYH build:',flag,{'Build succesfull','Failed'});
 
 %% return to main folder
-cd(path);
+cd(installPath);
 end
 
 

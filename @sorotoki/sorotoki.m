@@ -122,7 +122,7 @@ function vargout = sorotoki(varargin)
 
     if strcmpi(action,'test') || strcmpi(action,'-t') || ...
         strcmpi(action,'testsuite')
-        out = runSorotokiTest(prompt);
+        out = runSorotokiTest(prompt, installPath);
         if nargout > 0
             vargout{1} = out;
             assert(vargout{1}, 'One or more tests have failed...');
