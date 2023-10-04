@@ -3,7 +3,7 @@ function installSorotoki(reqPackages,soroPackages)
 
     installDir = pwd;
     mpmPath    = which('mpm');
-    [mpmPackages, mpmPackagedate] = getPackagesInformationMPM();
+    [mpmPackages, ~] = getPackagesInformationMPM();
 
     if ~isfile('sorotoki.log')
         % log.debug('Deleting sorotoki.log');
