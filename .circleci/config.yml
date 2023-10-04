@@ -12,5 +12,5 @@ jobs:
       - run: rm -rf temp
       - matlab/install
       - matlab/run-command:
-          command: clc;
+          command: sorotoki -i --approve;
           
