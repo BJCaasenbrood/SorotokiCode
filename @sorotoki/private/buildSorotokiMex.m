@@ -5,7 +5,7 @@ global auto_approve
 log = Log();
 log.options.isDebug = true;
 library = '/lib/';
-path = installPath(1:end-10);
+path = installPath;
 
 if ~auto_approve
     disp('Build Sorotoki .mex executables?');
