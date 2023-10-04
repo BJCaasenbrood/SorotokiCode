@@ -6,7 +6,7 @@ function [name, date] = getPackagesInformationMPM()
         name = {MPM.packages.name};
         date = {MPM.packages.downloadDate};
     catch
-        name = [];
-        date = [];
+        name = {''};
+        date = {''};
     end
 end
