@@ -7,7 +7,7 @@
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
 <link href="../../images/favicon.png" rel="icon"/>
 <meta content="mkdocs-1.4.2, mkdocs-material-8.5.10" name="generator"/>
-<title>Beam models - Sorotoki</title>
+<title>interpolateSE3 - Sorotoki</title>
 <link href="../../assets/stylesheets/main.975780f9.min.css" rel="stylesheet"/>
 <link href="../../assets/stylesheets/palette.2505c338.min.css" rel="stylesheet"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
@@ -33,7 +33,7 @@
 <input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
 <label class="md-overlay" for="__drawer"></label>
 <div data-md-component="skip">
-<a class="md-skip" href="#beam-models">
+<a class="md-skip" href="#interpolatese3-interpolates-between-two-se3-transformations">
           Skip to content
         </a>
 </div>
@@ -59,7 +59,7 @@
 <div class="md-header__topic" data-md-component="header-topic">
 <span class="md-ellipsis">
             
-              Beam models
+              interpolateSE3
             
           </span>
 </div>
@@ -160,8 +160,8 @@
         Installation
       </a>
 </li>
-<li class="md-nav__item md-nav__item--active md-nav__item--nested">
-<input checked="" class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" id="__nav_3" type="checkbox"/>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" id="__nav_3" type="checkbox"/>
 <label class="md-nav__link" for="__nav_3">
           Documentation
           <span class="md-nav__icon md-icon"></span>
@@ -277,8 +277,8 @@
 </ul>
 </nav>
 </li>
-<li class="md-nav__item md-nav__item--active md-nav__item--nested">
-<input checked="" class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_4" id="__nav_3_4" type="checkbox"/>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_4" id="__nav_3_4" type="checkbox"/>
 <label class="md-nav__link" for="__nav_3_4">
           Shapes.m
           <span class="md-nav__icon md-icon"></span>
@@ -289,9 +289,8 @@
           Shapes.m
         </label>
 <ul class="md-nav__list" data-md-scrollfix="">
-<li class="md-nav__item md-nav__item--active">
-<input class="md-nav__toggle md-toggle" data-md-toggle="toc" id="__toc" type="checkbox"/>
-<a class="md-nav__link md-nav__link--active" href="./">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../shapes/shapes/">
         Beam models
       </a>
 </li>
@@ -361,8 +360,8 @@
 </ul>
 </nav>
 </li>
-<li class="md-nav__item md-nav__item--nested">
-<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" id="__nav_4" type="checkbox"/>
+<li class="md-nav__item md-nav__item--active md-nav__item--nested">
+<input checked="" class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" id="__nav_4" type="checkbox"/>
 <label class="md-nav__link" for="__nav_4">
           Reference
           <span class="md-nav__icon md-icon"></span>
@@ -373,8 +372,8 @@
           Reference
         </label>
 <ul class="md-nav__list" data-md-scrollfix="">
-<li class="md-nav__item md-nav__item--nested">
-<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_1" id="__nav_4_1" type="checkbox"/>
+<li class="md-nav__item md-nav__item--active md-nav__item--nested">
+<input checked="" class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_1" id="__nav_4_1" type="checkbox"/>
 <label class="md-nav__link" for="__nav_4_1">
           Lie groups
           <span class="md-nav__icon md-icon"></span>
@@ -385,8 +384,9 @@
           Lie groups
         </label>
 <ul class="md-nav__list" data-md-scrollfix="">
-<li class="md-nav__item">
-<a class="md-nav__link" href="../../mfiles/interpolateSE3/">
+<li class="md-nav__item md-nav__item--active">
+<input class="md-nav__toggle md-toggle" data-md-toggle="toc" id="__toc" type="checkbox"/>
+<a class="md-nav__link md-nav__link--active" href="./">
         interpolateSE3
       </a>
 </li>
@@ -476,18 +476,63 @@
 </div>
 <div class="md-content" data-md-component="content">
 <article class="md-content__inner md-typeset">
-<a class="md-content__button md-icon" href="https://github.com/BJCaasenbrood/SorotokiCode/edit/master/docs/shapes/shapes.md" title="Edit this page">
+<a class="md-content__button md-icon" href="https://github.com/BJCaasenbrood/SorotokiCode/edit/master/docs/mfiles/interpolateSE3.md" title="Edit this page">
 <svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"></path></svg>
 </a>
-<h1 id="beam-models">Beam models</h1>
-<p><a class="glightbox" data-desc-position="bottom" data-height="auto" data-width="100%" href="../img/model_example.mp4"><div class="video-container"><video autoplay="" controls="" style="width: 100%; height: 65%; position: center"><source src="../img/model_example.mp4" type="video/mp4"/></video></div></a></p>
+<p><a name="title"></a></p>
+<h1 id="interpolatese3-interpolates-between-two-se3-transformations"><code>INTERPOLATESE3</code> - Interpolates between two SE(3) transformations.</h1>
+<p>Z = interpolateSE3(X,Y,t) interpolates between two SE(3) transformations X and Y
+using a parameter t. The resulting transformation is returned in Z.</p>
+<p>Z = interpolateSE3(X,Y,t,varargin) allows additional options to be specified
+through varargin. Currently supported options are:</p>
+<div class="highlight"><pre><span></span><code>  - 'equal': Sets the velocity twist equal between X and Y.
+  - 'zero': Sets the velocity and acceleration twist zero for X.
+</code></pre></div>
+<p>Input:</p>
+<div class="highlight"><pre><span></span><code>  X - The initial SE(3) transformation.
+  Y - The final SE(3) transformation.
+  t - The interpolation parameter (between 0 and 1).
+  varargin - Additional options for interpolation (optional).
+</code></pre></div>
+<p>Output:</p>
+<div class="highlight"><pre><span></span><code>  Z - The interpolated SE(3) transformation.
+</code></pre></div>
+<p>Example: </p>
+<div class="highlight"><pre><span></span><code>  H1 = SE3(rotx(0),[0,0,0]);
+  H2 = SE3(rotx(pi/3) * roty(pi),[1,0,1])
+
+  [p1,ux1,uy1,uz1] = backbone(H1);
+  fquiver(p1,ux1,.25,'b','LineW',3); hold on;
+  fquiver(p1,uy1,.25,'r','LineW',3); 
+  fquiver(p1,uz1,.25,'g','LineW',3);
+
+  [p2,ux2,uy2,uz2] = backbone(H2);
+  fquiver(p2,ux2,.25,'b','LineW',3); hold on;
+  fquiver(p2,uy2,.25,'r','LineW',3); 
+  fquiver(p2,uz2,.25,'g','LineW',3);
+
+  axis equal;
+  t = linspace(0,1,10);
+
+  for ii = 2:numel(t)-1
+      G = interpolateSE3(H1,H2,t(ii),'zeros');
+      [p2,ux2,uy2,uz2] = backbone(G);
+      fquiver(p2,ux2,.15,'b','LineW',2); hold on;
+      fquiver(p2,uy2,.15,'r','LineW',2); 
+      fquiver(p2,uz2,.15,'g','LineW',2); 
+  end
+
+  view(30,30);
+</code></pre></div>
+<p>See also logmapSO3, expmapSO3</p>
+<p>Reference: F.C. Park, Smooth Invariant Interpolation of Rotations.</p>
 </article>
 </div>
 </div>
 </main>
 <footer class="md-footer">
 <nav aria-label="Footer" class="md-footer__inner md-grid">
-<a aria-label="Previous: Computational design" class="md-footer__link md-footer__link--prev" href="../../fem/inverse/" rel="prev">
+<a aria-label="Previous: Colormaps" class="md-footer__link md-footer__link--prev" href="../../plotting/colormaps/" rel="prev">
 <div class="md-footer__button md-icon">
 <svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"></path></svg>
 </div>
@@ -496,17 +541,17 @@
 <span class="md-footer__direction">
                 Previous
               </span>
-              Computational design
+              Colormaps
             </div>
 </div>
 </a>
-<a aria-label="Next: Model Composer" class="md-footer__link md-footer__link--next" href="../../model/model/" rel="next">
+<a aria-label="Next: Soft Manipulator" class="md-footer__link md-footer__link--next" href="../../sorobots/softmanipulator/" rel="next">
 <div class="md-footer__title">
 <div class="md-ellipsis">
 <span class="md-footer__direction">
                 Next
               </span>
-              Model Composer
+              Soft Manipulator
             </div>
 </div>
 <div class="md-footer__button md-icon">

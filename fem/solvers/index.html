@@ -364,11 +364,46 @@
 <li class="md-nav__item md-nav__item--nested">
 <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" id="__nav_4" type="checkbox"/>
 <label class="md-nav__link" for="__nav_4">
+          Reference
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-label="Reference" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_4">
+<span class="md-nav__icon md-icon"></span>
+          Reference
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_1" id="__nav_4_1" type="checkbox"/>
+<label class="md-nav__link" for="__nav_4_1">
+          Lie groups
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-label="Lie groups" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_4_1">
+<span class="md-nav__icon md-icon"></span>
+          Lie groups
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../mfiles/interpolateSE3/">
+        interpolateSE3
+      </a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" id="__nav_5" type="checkbox"/>
+<label class="md-nav__link" for="__nav_5">
           Open soft robots
           <span class="md-nav__icon md-icon"></span>
 </label>
 <nav aria-label="Open soft robots" class="md-nav" data-md-level="1">
-<label class="md-nav__title" for="__nav_4">
+<label class="md-nav__title" for="__nav_5">
 <span class="md-nav__icon md-icon"></span>
           Open soft robots
         </label>
@@ -387,13 +422,13 @@
 </nav>
 </li>
 <li class="md-nav__item md-nav__item--nested">
-<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" id="__nav_5" type="checkbox"/>
-<label class="md-nav__link" for="__nav_5">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_6" id="__nav_6" type="checkbox"/>
+<label class="md-nav__link" for="__nav_6">
           Control interface
           <span class="md-nav__icon md-icon"></span>
 </label>
 <nav aria-label="Control interface" class="md-nav" data-md-level="1">
-<label class="md-nav__title" for="__nav_5">
+<label class="md-nav__title" for="__nav_6">
 <span class="md-nav__icon md-icon"></span>
           Control interface
         </label>
@@ -484,6 +519,34 @@
 <p>where <span class="arithmatex">\(\AB := \left[\mat{M} + \beta_1 \dt \mat{R}  + \beta_2 \dt^2 \mat{K}_{T}\right]\)</span> is the hessian matrix, and <span class="arithmatex">\(0&lt; \alpha_+ \le 1\)</span> an update coefficient. The matrix <span class="arithmatex">\(\mat{K}_T\)</span> denotes the tangent stiffness related to the local gradient of the elasticity force, given by <span class="arithmatex">\(\mat{K}_T := \nabla_{\xB} \fB\elastic\)</span>.</p>
 </details>
 <p>Implicit solvers offer improved stability compared to explicit methods, such as the Runge-Kutta solver (\texttt{ode45}), particularly when larger time steps are employed. However, the cost of larger time steps is a decreased numerical precision.  Alternatively, for quasi-static problems when <span class="arithmatex">\(\ddxB = \dxB = \vec{0}_n\)</span>, we aim to seek the solutions to the static force equilibrium <span class="arithmatex">\(\vec{r}(\x) = \vec{0}_n\)</span> where <span class="arithmatex">\(\vec{r} := -\fB_{\textrm{mat}} + \fB\grav + \fB_\textrm{u} + \fB_{\Omega_{\textrm{env}}}\)</span> is the force residual vector. The nonlinear equality for nodal displacements <span class="arithmatex">\(\x\)</span> is solved using an iterative Newton-Raphson solver. To call these solvers, dynamic simulations are executed with \code{fem.simulate()} and quasi-static simulations with fem.solve(). Upon completion of a simulation, all displacements, velocities, forces, and stress information are stored in the \code{fem.Log} data structure. This log file can be accessed for data analysis or during simulation to facilitate state feedback control.</p>
+<details open="open">
+<summary>Example: basic pull test</summary>
+<p><a class="glightbox" data-desc-position="bottom" data-height="auto" data-width="100%" href="../img/fem_pull2.png"><img align="center" alt="Image title" src="../img/fem_pull2.png" width="735"/></a>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c">% generate mesh</span>
+<span class="n">msh</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Mesh</span><span class="p">(</span><span class="n">sRectangle</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span><span class="w"> </span><span class="s">'Quads'</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mi">25</span><span class="p">,</span><span class="mi">10</span><span class="p">]);</span>
+<span class="n">msh</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">msh</span><span class="p">.</span><span class="n">generate</span><span class="p">();</span>
+
+<span class="c">% generate fem model and boundary cond.</span>
+<span class="n">fem</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Fem</span><span class="p">(</span><span class="n">msh</span><span class="p">,</span><span class="w"> </span><span class="s">'TimeStep'</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="o">/</span><span class="mi">100</span><span class="p">);</span>
+<span class="n">fem</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">fem</span><span class="p">.</span><span class="n">addSupport</span><span class="p">(</span><span class="s">'left'</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">]);</span>
+<span class="n">fem</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">fem</span><span class="p">.</span><span class="n">addDisplace</span><span class="p">(</span><span class="s">'right'</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">]);</span>
+<span class="n">fem</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">fem</span><span class="p">.</span><span class="n">addMaterial</span><span class="p">(</span><span class="n">NeoHookean</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mf">0.33</span><span class="p">));</span>
+
+<span class="c">% solve :)</span>
+<span class="n">fem</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">fem</span><span class="p">.</span><span class="n">solve</span><span class="p">();</span>
+</code></pre></div></td></tr></table></div></p>
+</details>
 <p>Alternatively, we can explore nonlinear modal analysis at any quasi-static equilibrium configuration <span class="arithmatex">\(\x^* \in \mathcal{X}\)</span> of the system. Let <span class="arithmatex">\(\mat{K}_T:= \left[\frac{\p \fB\elastic}{\p x_1} \;...\; \frac{\p \fB\elastic}{\p x_2} \right]\)</span> be the Jacobian matrix of the (nonlinear) elastic potential forces, also referred to as the tangent stiffness. Then, the local eigenvalue problem for the linearized FEM model around the point <span class="arithmatex">\(\x^*\)</span> is given by </p>
 <div class="arithmatex">\[
 \Big[\mat{K}_T(\x^*)- \lambda_i \mat{M} \Big] \vec{\theta}_i = \vec{0}_n,
