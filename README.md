@@ -1,17 +1,19 @@
 <div align="center"> <img src="https://raw.githubusercontent.com/BJCaasenbrood/SorotokiCode/gh-pages/img/softrobot.svg" width="850"> </div> <br/>
 
-![Static Badge](https://img.shields.io/badge/Sorotoki-docs-blue) [![MATLAB](https://github.com/BJCaasenbrood/SorotokiCode/actions/workflows/ci.yml/badge.svg)](https://github.com/BJCaasenbrood/SorotokiCode/actions/workflows/ci.yml) [![CircleCI](https://circleci.com/gh/BJCaasenbrood/SorotokiCode.svg?style=svg)](https://circleci.com/gh/BJCaasenbrood/SorotokiCode) ![GitHub](https://img.shields.io/github/license/BJCaasenbrood/SorotokiCode) 
+[![CircleCI](https://circleci.com/gh/BJCaasenbrood/SorotokiCode.svg?style=svg)](https://circleci.com/gh/BJCaasenbrood/SorotokiCode) [![MATLAB](https://github.com/BJCaasenbrood/SorotokiCode/actions/workflows/ci.yml/badge.svg)](https://github.com/BJCaasenbrood/SorotokiCode/actions/workflows/ci.yml) [![Static Badge](https://img.shields.io/badge/Sorotoki-documentation-blue)](https://bjcaasenbrood.github.io/SorotokiCode/) ![GitHub](https://img.shields.io/github/license/BJCaasenbrood/SorotokiCode) 
 
 [**Sorotoki**](https://bjcaasenbrood.github.io/SorotokiPage/) is an open-source MATLAB toolkit for soft robotics that includes an array of tools for design, modeling, and control. Due to its scientific diversity, it can be challenging for new researchers to quickly familiarize themselves with multiple scientific areas. With the aim to lower this threshold, Sorotoki aims to incorporate multiple layers of soft robotics research into one compact toolkit. Examples include: continuum mechanics, dynamic systems and control theory, topology optimization, computer graphics, and much more to come! The combination provides a highly flexible programming environment and will hopefully aid the development of novel soft robotic research.
 
-#### Download the latest stable version:
+#### Installation via Matlab Package Manager (MPM)
+The toolkit is easy to install. The fastest and easiest way to acquire the toolkit is through [mpm](https://github.com/mobeets/mpm) (Matlab Package Manager). [mpm](https://github.com/mobeets/mpm) is a simple package manager for Matlab (inspired by [pip](https://pypi.org/project/pip/)). You can directly clone the repository using the MPM command in the MATLAB command window:
 
-```bash
-git clone --depth 1  https://github.com/BJCaasenbrood/SorotokiCode.git
+``` matlab
+mpm install sorotokicode   % pulls sorotoki from Github
 ```
-
-## Installation
-Please visit [**Sorotoki**](https://bjcaasenbrood.github.io/SorotokiPage/) for the installation intruction. If any future updates may occur, just simply run *sorotoki.m*, and the toolkit will automatically tell you which files are out-of-date.
+Then, to install, execute the following in the MATLAB command window:
+```matlab
+sorotoki -i  % call sorotoki installer 
+``````
 
 ## Applications highlights
 

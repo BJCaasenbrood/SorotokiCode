@@ -1,0 +1,37 @@
+name: MATLAB Build
+
+# Controls when the action will run. 
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Get mpm.m via git
+        run: git clone https://github.com/mobeets/mpm.git temp
+
+      - name: Unpack mpm folder
+        run: mv temp/mpm.m . & mv temp/mpm_config.m . & mv temp/mpm_nls.mat . & mkdir mpm-packages
+
+      - name: Remove redundant folders
+        run: rm -rf temp
+      
+      - name: Setup MATLAB
+        uses: matlab-actions/setup-matlab@v1
+
+      - name: Print current folder structure
+        run: ls        
+
+      - name: Run all tests
+        uses: matlab-actions/run-command@v1
+        with:
+          command: sorotoki -i --approve; sorotoki -b --approve; y = sorotoki('-t');
