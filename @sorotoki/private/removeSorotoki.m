@@ -1,15 +1,11 @@
 function removeSorotoki(soroPackages)
     
-    global log;
-    
     warning off;
 
-    log.info('Calling MPM installer -- removing Sorotoki');
-    log.hline();
+    disp('Calling MPM installer -- removing Sorotoki');
     for i = 1:numel(soroPackages)
         installMissingPackageMPM(soroPackages{i},'uninstall'); 
     end
-    log.hline();
 
     try
         rmdir('lib');

@@ -71,22 +71,24 @@ function vargout = sorotoki(varargin)
     end
 
     if strcmpi(action,'cd') 
-        gotoSorotokiFolder(installPath);
+        cd(installPath);
         return
     end
     
     if strcmpi(action,'install') || strcmpi(action,'-i')
-
+        cd(installPath);
         if sum(ismember(prompt,'--approve'))
             auto_approve = true;
         end
 
         installSorotoki(reqPackages,soroPackages);
         addfolder('lib');
+        cd(installPath);
         return
     end
 
     if strcmpi(action,'remove') || strcmpi(action,'-r')
+        cd(installPath);
         if isempty(prompt)
             removeSorotoki(soroPackages);
         else
@@ -96,6 +98,7 @@ function vargout = sorotoki(varargin)
    end
 
     if strcmpi(action,'update') || strcmpi(action,'-u')
+        cd(installPath);
         if isempty(prompt)
             forceSorotokiUpdate(soroPackages);
         else
@@ -112,16 +115,19 @@ function vargout = sorotoki(varargin)
     % 
     if strcmpi(action,'build') || strcmpi(action,'-b') || ...
        strcmpi(action,'mex')
-
+       
+        cd(installPath);
         if sum(ismember(prompt,'--approve'))
             auto_approve = true;
         end
         buildSorotokiMex(installPath);
+        cd(installPath);
         return
     end
 
     if strcmpi(action,'test') || strcmpi(action,'-t') || ...
         strcmpi(action,'testsuite')
+        cd(installPath);
         out = runSorotokiTest(prompt, installPath);
         if nargout > 0
             vargout{1} = out;
