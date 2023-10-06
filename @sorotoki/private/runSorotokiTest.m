@@ -1,8 +1,9 @@
 function out = runSorotokiTest(prompt, installPath)
 flag = [];
-% base = 'src/Sorotoki';
-base = 'lib/sorotoki';
-testsuite = {'sdf'; 'mesh'; 'fem'};
+base = 'src/Sorotoki';
+testsuite = {'Sdf'; 'Mesh'; 'Fem'};
+% base = 'lib/sorotoki';
+% testsuite = {'sdf'; 'mesh'; 'fem'};
 
 % eliminate suites not in prompt
 if ~isempty( prompt )

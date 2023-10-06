@@ -23,9 +23,8 @@ function vargout = sorotoki(varargin)
 %   sorotoki is also loaded when opening MATLAB, and can be found under
 %   .../MATLAB/startup.m in the MATLAB's main folder on your desktop.
    
-    global log auto_approve
+    global auto_approve
     auto_approve = false;
-    % log.options.isDebug = true;
 
     soroPackages = {};
     reqToolboxes = {};
@@ -133,6 +132,7 @@ function vargout = sorotoki(varargin)
             vargout{1} = out;
             assert(vargout{1}, 'One or more tests have failed...');
         end
+        cd(installPath);
         return
      end
 end

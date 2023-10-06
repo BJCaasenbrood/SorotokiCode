@@ -3,7 +3,6 @@ function fem = pneunet(varargin)
     p = inputParser;
     % Add optional inputs and default values
     addOptional(p,'dt',1/25);
-    addOptional(p,'n',750);
     addOptional(p,'gravity',0);
     addOptional(p,'contact',0);
 
@@ -11,7 +10,7 @@ function fem = pneunet(varargin)
     parse(p,varargin{:});
     
     % Create a mesh object
-    msh = preset.mesh.pneunet('n',p.Results.n);
+    msh = preset.mesh.pneunet;
     
     % Create a Fem object
     fem = Fem(msh,'TimeStep',p.Results.dt);
