@@ -11,4 +11,5 @@ sorotokisdf
 sorotokimesh
 sorotokifem
 sorotokimodel
-# sorotokibots
+sorotokicontrol
+sorotokibots
