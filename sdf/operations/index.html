@@ -111,7 +111,7 @@
 <svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"></path></svg>
 </div>
 <div class="md-source__repository">
-    Sorotoki
+    SorotokiCode
   </div>
 </a>
 </div>
@@ -136,7 +136,7 @@
 <svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"></path></svg>
 </div>
 <div class="md-source__repository">
-    Sorotoki
+    SorotokiCode
   </div>
 </a>
 </div>
@@ -480,8 +480,65 @@
 <svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"></path></svg>
 </a>
 <h1 id="sdf-boolean-operations">SDF boolean operations</h1>
+<script src="https://static.sketchfab.com/api/sketchfab-viewer-1.12.1.js" type="text/javascript"></script>
 <p>By evaluating the sign of the SDF, it is possible to classify the set of points as being within or outside the boundary of the domain. This enables set operations such as union, difference, and intersection to be performed. </p>
-<p>In the signed distance package, these operations are implemented using Matlab's arithmetic operators between two or more instances of the \texttt{Sdf} class, including <code>+</code> (union), <code>-</code> (difference), <code>/</code> (intersection), <code>*</code> (scaling), and <code>.*</code> (repeating). By utilizing these set operations and a library of basic SDF primitives, it is possible to construct a wide range of complex geometries with relative ease. Subsequently, the SDFs can be transformed into a \file{.stl} file using the Marching Cube algorithm by Lorensen<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup>, enabling 3D printing. This functionality is implemented in the command <code>sdf.export</code>. </p>
+<p>In the signed distance package, these operations are implemented using Matlab's arithmetic operators between two or more instances of the <code>Sdf</code> class, including <code>+</code> (union), <code>-</code> (difference), <code>/</code> (intersection), <code>*</code> (scaling), and <code>.*</code> (repeating). By utilizing these set operations and a library of basic SDF primitives, it is possible to construct a wide range of complex geometries with relative ease. Subsequently, the SDFs can be transformed into a <code>.stl</code> file using the Marching Cube algorithm by Lorensen<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup>, enabling 3D printing. This functionality is implemented in the command <code>sdf.export</code>. </p>
+<details open="open">
+<summary>Example: 2D Bellow shape Sdf</summary>
+<p><a class="glightbox" data-desc-position="bottom" data-height="auto" data-width="100%" href="../img/bellow_2d.png"><img align="right" alt="Image title" src="../img/bellow_2d.png" width="255"/></a>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">R1</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">sRectangle</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">],[</span><span class="mi">20</span><span class="p">,</span><span class="mi">15</span><span class="p">]);</span>
+<span class="n">R2</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">sRectangle</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">5</span><span class="p">,</span><span class="mi">20</span><span class="p">]);</span>
+<span class="n">C1</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">sCircle</span><span class="p">(</span><span class="mi">5</span><span class="p">,[</span><span class="mi">20</span><span class="p">,</span><span class="mi">10</span><span class="p">]);</span>
+
+<span class="c">% adding shapes via union</span>
+<span class="n">s</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">R1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">C1</span><span class="p">;</span>
+
+<span class="c">% smoothly adding straight part</span>
+<span class="n">S2</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">smoothunion</span><span class="p">(</span><span class="n">R2</span><span class="p">,</span><span class="mi">10</span><span class="p">);</span>
+
+<span class="c">% show</span>
+<span class="n">S2</span><span class="p">.</span><span class="n">showContour</span><span class="p">(</span><span class="s">'Quality'</span><span class="p">,</span><span class="mi">200</span><span class="p">);</span>
+</code></pre></div></td></tr></table></div></p>
+</details>
+<details open="open">
+<summary>Example: Revolve and repeat Sdf shapes</summary>
+<p><a class="glightbox" data-desc-position="bottom" data-height="auto" data-width="100%" href="../img/bellow_3d.png"><img align="right" alt="Image title" src="../img/bellow_3d.png" width="255"/></a>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c">% repeat 2D Sdf twice with spacing [0,20];</span>
+<span class="n">S2</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">S2</span><span class="p">.</span><span class="n">repeat</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">20</span><span class="p">],</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span>
+
+<span class="c">% revolve 2D Sdf into 3D Sdf</span>
+<span class="n">S2</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">S2</span><span class="p">.</span><span class="n">revolve</span><span class="p">();</span>
+
+<span class="c">% generate a shell of thickness T=1.5 mm</span>
+<span class="n">S3</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">S3</span><span class="p">.</span><span class="n">shell</span><span class="p">(</span><span class="mf">1.5</span><span class="p">);</span>
+
+<span class="c">% render and export Sdf shape</span>
+<span class="n">S3</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">S3</span><span class="p">.</span><span class="n">render</span><span class="p">(</span><span class="s">'Quality'</span><span class="p">,</span><span class="mi">50</span><span class="p">);</span>
+<span class="n">S3</span><span class="p">.</span><span class="n">export</span><span class="p">(</span><span class="s">'Double_Bellow.stl'</span><span class="p">);</span>
+</code></pre></div></td></tr></table></div></p>
+</details>
 <div class="footnote">
 <hr/>
 <ol>
