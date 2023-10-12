@@ -33,3 +33,13 @@ jobs:
       - matlab/run-command:
           command: sorotoki -i --approve; sorotoki -b --approve; y = sorotoki('-t');
           
+workflows:
+  matrix-tests:
+    jobs:
+      - test:
+          name: test-<<matrix.version>>
+          matrix:
+            parameters:
+              version:
+                - R2023a
+                - R2023b          
