@@ -1,16 +1,35 @@
 version: '2.1'
 orbs:
-  matlab: mathworks/matlab@0.11.0
+  matlab: mathworks/matlab@dev:v1-beta
+  
 jobs:
-  build:
+  test:
+    parameters:
+      version:
+        description: "MATLAB version"
+        default: "latest"
+        type: string
     machine:
-      image: ubuntu-2204:2022.07.1
+      image: ubuntu-2204:current
     steps:
       - checkout
       - run: git clone https://github.com/mobeets/mpm.git temp
       - run: mv temp/mpm.m . & mv temp/mpm_config.m . & mv temp/mpm_nls.mat . & mkdir mpm-packages
       - run: rm -rf temp
-      - matlab/install
+      - matlab/install:
+          release: <<parameters.version>>
+          products: |
+            MATLAB
+            Simulink
+            Image_Processing_Toolbox
+            Instrument_Control_Toolbox
+            MATLAB_Coder
+            Mapping_Toolbox
+            Optimization_Toolbox
+            Partial_Differential_Equation_Toolbox
+            Statistics_and_Machine_Learning_Toolbox
+      - matlab/run-command:
+          command: ver
       - matlab/run-command:
           command: sorotoki -i --approve; sorotoki -b --approve; y = sorotoki('-t');
           
