@@ -31,5 +31,4 @@ while true
     base = base.show();
     dt = toc;
     drawnow;
-    
 end

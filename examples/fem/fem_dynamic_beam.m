@@ -4,7 +4,7 @@ msh = Mesh(sdf,'Quads',[50,3]);
 msh = msh.generate();
 
 fem = Fem(msh,'TimeStep',1/500);
-fem = fem.addMaterial(NeoHookean(.01,0.45));
+fem = fem.addMaterial(NeoHookean(.05,0.45));
 fem = fem.addSupport('left', [1, 1]);
 fem = fem.addContact(sCircle(7,[40,-25]));
 fem = fem.addGravity();
@@ -17,5 +17,7 @@ fem = fem.simulate('MaxIteration',4);
 function plt(Fem)
     clf;
     Fem.show;
-    showContactFem(Fem);
+    if isfield(Fem.system,'Contact')
+        showContactFem(Fem);
+    end
 end

@@ -20,7 +20,7 @@ function [obj1, obj2, varargout] = threebellow_connector(varargin)
 
         if nargout > 2
             for ii = 1:(nargout-2)
-                obj = Gmodel(file2Path,'Texture',matcap_egg,'Shading','Face');
+                obj = Gmodel(stlPath2,'Texture',matcap_egg,'Shading','Face');
                 obj = obj.render;
                 varargout(ii) = {obj};
                 % 1
