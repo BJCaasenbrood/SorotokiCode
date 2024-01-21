@@ -1,7 +1,8 @@
 clr;
 % generate fem model from diamond bot
-msh = preset.mesh.diamond_bot('n',1e3);
+msh = preset.mesh.diamond_bot('n',8);
 fem = Fem(msh,'isNonlinear',false);
+% fem = Fem(msh,'isNonlinear',true); % works but is slower!
 fem = fem.addSupport('bottom',[1,1]);
 
 % build input and output matrices
@@ -17,7 +18,7 @@ fem = fem.compute();
 fem.BdBox = [-40 200 0 160];
 
 % control  loop
-[U, w, ki, dt] = deal([0;0], 2*pi, 7.5 * mat.getModulus, 1/120);
+[U, w, ki, dt] = deal([0;0], 2*pi, 7.5 * mat.getModulus, 1/100);
 [uout, pout, pdout] = deal([]);
 
 while fem.solver.Time < Inf
@@ -87,6 +88,5 @@ function out = Pd
         out = [0;0];
         out(1) = clamp(x(1,1)-85,xmin-85, xmax-85);
         out(2) = clamp(x(1,2)-95,ymin-95, ymax-95);
-        %out = [x(1,1); x(1,2)] - [85; 95];
     end
 end

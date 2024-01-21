@@ -43,9 +43,9 @@ function [SHAPES, GRIPPER] = suzumori_gripper(varargin)
 
             shp.Material.params.Zeta = 0.35;
             shp.Material.params.Rho  = 850e-12;
-            shp.Material.contact.ContactFriction = 0;
-            shp.Material.contact.NormalReaction  = 0.1;
-            shp.Material.contact.TangentReaction = 0;
+            shp.Material.contact.ContactFriction = 0.5;
+            shp.Material.contact.NormalReaction  = .1;
+            shp.Material.contact.TangentReaction = .1;
 
             shp = shp.rebuild();
 

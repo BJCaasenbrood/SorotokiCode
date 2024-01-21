@@ -1,9 +1,9 @@
 function shp = threebellow(varargin)
 
     p = inputParser;
-    addOptional(p,'n',30);
+    addOptional(p,'n',10);
     addOptional(p,'m',1);
-    addOptional(p,'Texture',matcap_diffuse(0.75));
+    addOptional(p,'Texture',matcap_bluebase);
     addOptional(p,'isHQ',false);
     parse(p,varargin{:});
 

@@ -6,7 +6,7 @@ function shp = threebellow_finger(varargin)
     addOptional(p,'phi',0);
     addOptional(p,'q0',1e-2);
     addOptional(p,'isHQ',false);
-    addOptional(p,'Texture',matcap_diffuse(0.75));
+    addOptional(p,'Texture',matcap_bluebase);
     
     parse(p,varargin{:});
     

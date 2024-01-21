@@ -4,7 +4,7 @@ Xd1 = [-140.6; 353.7; 0];
 Xd2 = [-230.7; 257.6; 0];
 
 % load preset shapes
-shp = preset.shapes.dellasantina_arm;
+shp = preset.shapes.katzschmann;
 fig = figure(101);
 
 madeContact = false;
@@ -50,7 +50,7 @@ function tau = Control(shp, Xd)
     nq = numel(q);
     
     Kc = 1e-3 * smoothstep(2.5*t);
-    Dc = 0.1  * Kc;
+    Dc = 0.1 * Kc;
     
     % compute lambda
     Mi  = inv(M);
@@ -63,7 +63,7 @@ function tau = Control(shp, Xd)
     Jbp = W*lam;
     
     % compute eta
-    eta = lam*(J*Mi*C - 0*dJ);
+    eta = lam*(J*Mi*C);
     
     % impedance controller
     tau = J.'*Jbp.'*(fe) + J.'*eta*(eye(nq) ...

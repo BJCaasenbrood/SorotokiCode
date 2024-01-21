@@ -10,14 +10,13 @@ parse(p,varargin{:});
 currentDir = fileparts(mfilename('fullpath'));
 stlPath =fullfile(currentDir, '..', 'assets', 'stl', 'softhand_mount.stl');    
 
-
 % try
     obj = Gmodel(stlPath,'Shading','Face','Texture',matcap_egg);
     figure(101);
     view(105,20);
     obj.render();
 
-    L = [90;90;90;90;50];
+    L = [90;90;90;90;65];
     
     GRIPPER = obj;
     clearvars obj
@@ -28,7 +27,7 @@ stlPath =fullfile(currentDir, '..', 'assets', 'stl', 'softhand_mount.stl');
 
     for ii = 1:5
         shp = Shapes(Y,[0,2,0,0,0,0],'Length',L(ii),...
-          'Texture',matcap_diffuse(0.475));
+          'Texture',matcap_bluebase );
         
         shp = shp.setInputMap( @(x) [1; 0] );
         shp.Material = NeoHookean(1.5, 0.3);
@@ -67,5 +66,5 @@ function u  = Control(shp, phi)
     omega = pi;
     Pset  = 350;
     u = sign(sin(omega*t - phi(1)));   
-    u = smoothstep(t)*clamp(u*Pset,-5,Pset);
+    u = smoothstep(t)*clamp(u*Pset,5,Pset);
 end

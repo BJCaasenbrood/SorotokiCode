@@ -1,6 +1,6 @@
 clr;
 % generate fem model from diamond bot
-msh = preset.mesh.diamond_bot('n',1e3);
+msh = preset.mesh.diamond_bot;
 fem = Fem(msh,'isNonlinear',false);
 fem = fem.addSupport('bottom',[1,1]);
 
@@ -10,7 +10,6 @@ fem = fem.addMaterial(mat);
 
 fem.options.LineStyle = 'none';
 fem = fem.eigen(); 
-
 Ia = fem.system.Ia;
 
 figure(101);

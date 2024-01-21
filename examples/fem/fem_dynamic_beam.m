@@ -12,7 +12,7 @@ fem = fem.addGravity();
 fem.options.Display = @plt;
 fem.BdBox = [-2, 120, -80, 10];
 
-fem = fem.simulate('MaxIteration',4);
+fem = fem.simulate;
 
 function plt(Fem)
     clf;

@@ -5,7 +5,7 @@ msh = Mesh(sdf,'NElem',55);
 msh = msh.generate();
 
 % create a Fem object
-fem = Fem(msh,'TimeStep',1/1000,'TimeHorizon',0.1);
+fem = Fem(msh,'TimeStep',1/750,'TimeHorizon',3);
 
 % add a Neo-Hookean material
 mat = NeoHookean(0.01,0.45);

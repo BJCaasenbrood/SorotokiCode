@@ -3,7 +3,7 @@ function fem = diamond_bot(varargin)
     p = inputParser;
     % Add optional inputs and default values
     addOptional(p,'dt',1/25);
-    addOptional(p,'n',550);
+    addOptional(p,'n',5);
     addOptional(p,'gravity',0);
     addOptional(p,'contact',0);
 

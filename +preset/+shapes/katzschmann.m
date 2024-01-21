@@ -1,4 +1,4 @@
-function shp = dellasantina_arm(varargin)
+function shp = katzschmann(varargin)
 
     p = inputParser;
     addOptional(p,'n',50);

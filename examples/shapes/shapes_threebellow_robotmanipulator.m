@@ -27,8 +27,8 @@ while true
 
     % update system and render
     tic;
-    base = base.update(dt);
+    base = base.update();
     base = base.show();
-    dt = toc;
+    % dt = toc;
     drawnow;
 end

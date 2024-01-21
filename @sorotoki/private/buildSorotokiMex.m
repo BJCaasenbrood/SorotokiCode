@@ -34,7 +34,7 @@ log.debug('Building mex localsNH');
 fprintf('./sorotokifem/mex/localsNH build: ...');
 flag = buildMexLNH;
 fprintf(repmat('\b',1,60));
-log.bool('./sorotokifem/mex/localsNH build:',flag,{'Build succesfull','Failed'});
+log.bool('./sorotokifem/mex/localsNH build:',flag,{'Build successful','Failed'});
 
 %% buildMexLNH
 log.debug('Nagivating towards libary directory');
@@ -47,7 +47,7 @@ log.debug('Building mex localsYH');
 fprintf('./sorotokifem/mex/localsYH build: ...');
 flag = buildMexLYH;
 fprintf(repmat('\b',1,60));
-log.bool('./sorotokifem/mex/localsYH build:',flag,{'Build succesfull','Failed'});
+log.bool('./sorotokifem/mex/localsYH build:',flag,{'Build successful','Failed'});
 
 %% buildCurveSweep
 log.debug('Nagivating towards libary directory');
@@ -60,7 +60,7 @@ log.debug('Building mex buildCurveSweep');
 fprintf('./sorotokimodel/mex/curvesweep build: ...');
 flag = buildCurveSweep;
 fprintf(repmat('\b',1,60));
-log.bool('./sorotokimodel/mex/curvesweep build:',flag,{'Build succesfull','Failed'});
+log.bool('./sorotokimodel/mex/curvesweep build:',flag,{'Build successful','Failed'});
 
 %% buildForwardKin
 log.debug('Nagivating towards libary directory');
@@ -73,7 +73,7 @@ log.debug('Building mex buildForwardKin');
 fprintf('./sorotokimodel/mex/forwardkin build: ...');
 flag = buildForwardKin;
 fprintf(repmat('\b',1,60));
-log.bool('./sorotokimodel/mex/forwardkin build:',flag,{'Build succesfull','Failed'});
+log.bool('./sorotokimodel/mex/forwardkin build:',flag,{'Build successful','Failed'});
 
 %% buildLagrangian
 log.debug('Nagivating towards libary directory');
@@ -86,7 +86,7 @@ log.debug('Building mex buildLagrangian');
 fprintf('./sorotokimodel/mex/lagrangian build: ...');
 flag = buildLagrangian;
 fprintf(repmat('\b',1,60));
-log.bool('./sorotokimodel/mex/lagrangian build:',flag,{'Build succesfull','Failed'});
+log.bool('./sorotokimodel/mex/lagrangian build:',flag,{'Build successful','Failed'});
 
 %% return to main folder
 cd(installPath);
@@ -168,7 +168,7 @@ function flag = buildForwardKin
     cfg.ResponsivenessChecks = false;
     cfg.NumberOfCpuThreads = 16;
     
-    codegen -config cfg computeForwardKinematicsGaussFast ...
+    codegen -config cfg computeForwardKinematicsGaussFast -silent ...
         -args {coder.typeof(10,[inf,1]), coder.typeof(10,[inf,1]), coder.typeof(10,[3,1]), coder.typeof(10,[3,3]), coder.typeof(10,[6,1,inf,inf]), coder.typeof(10,[inf,inf,inf,inf]), coder.typeof(10,[6,inf]), coder.typeof(10,[inf,inf]), coder.typeof(10,[inf,inf])}
         
     warning on    
@@ -188,7 +188,7 @@ function flag = buildLagrangian
     cfg.ResponsivenessChecks = false;
     cfg.NumberOfCpuThreads = 16;
     
-    codegen -config cfg computeLagrangianGaussFast ...
+    codegen -config cfg computeLagrangianGaussFast -silent ...
         -args {coder.typeof(10,[inf,1]), coder.typeof(10,[inf,1]), coder.typeof(10,[4,4,inf,inf]), coder.typeof(10,[6,inf,inf,inf]), coder.typeof(10,[6,inf,inf,inf]), coder.typeof(10,[inf,inf,inf,inf]), coder.typeof(10,[6,inf]), coder.typeof(10,[6,6,inf,inf]), coder.typeof(10,[6,6,inf,inf]), coder.typeof(10,[6,6,inf,inf]), coder.typeof(10,[3,1]), coder.typeof(10,[inf,inf]), coder.typeof(10,[inf,inf])}
     
     warning on    

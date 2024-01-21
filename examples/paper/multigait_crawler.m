@@ -1,7 +1,7 @@
 clr;
 
 % load preset fem
-fem = preset.fem.multigait_crawler('n',1250);
+fem = preset.fem.multigait_crawler('n',1.5);
 
 fem = fem.addPressure(fem.findEdges('BoxHole',[0 50 0 15]),...
    @(t) pset(t,1));

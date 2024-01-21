@@ -23,8 +23,9 @@ function vargout = sorotoki(varargin)
 %   sorotoki is also loaded when opening MATLAB, and can be found under
 %   .../MATLAB/startup.m in the MATLAB's main folder on your desktop.
    
-    global auto_approve
+    global auto_approve developer_mode
     auto_approve = false;
+    developer_mode = false;
 
     soroPackages = {};
     reqToolboxes = {};
@@ -127,7 +128,22 @@ function vargout = sorotoki(varargin)
     if strcmpi(action,'test') || strcmpi(action,'-t') || ...
         strcmpi(action,'testsuite')
         cd(installPath);
-        out = runSorotokiTest(prompt, installPath);
+
+        if sum(ismember(prompt,'--developer'))
+            developer_mode = true;
+            prompt = strrep(prompt,'--developer'); % remove developer prompt
+        end
+
+        testsuite = {'sdf'; 'mesh'; 'fem'};
+
+        if developer_mode
+            base = 'src/sorotoki';
+        else
+            base = 'lib/sorotoki';
+        end
+
+        out = runSorotokiTest(prompt, installPath, base, testsuite);
+
         if nargout > 0
             vargout{1} = out;
             assert(vargout{1}, 'One or more tests have failed...');

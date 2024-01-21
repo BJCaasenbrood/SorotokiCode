@@ -8,7 +8,7 @@ fem = fem.simulate;
 
 % preset build of shapes
 Y = chebyspace(100,3);
-shp = Shapes(Y,[0,3,0,0,0,0],'Length',100);
+shp = Shapes(Y,[0,3,0,0,0,0],'length',100);
 shp = shp.setBase(SE3(eye(3),[0;0;3]));
 
 shp = shp.reconstruct(fem);

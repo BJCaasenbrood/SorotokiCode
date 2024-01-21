@@ -12,7 +12,7 @@ fem = fem.setMaterial(bottomlayer,2);
 fem = fem.addPressure('allhole', 10 * 1e-3);
 fem = fem.addSupport('left',[1,1]);
 
-% fem = fem.addContact(sCircle(20,[25,-30]));
+fem = fem.addContact(sCircle(20,[25,-30]));
 
 fem.options.LineStyle = '-';
 fem.options.isNonlinear = 1;
@@ -24,5 +24,5 @@ function plt(Fem)
     cla;
     showMaterialsFem(Fem);
     colorbar off;
-    % showContactFem(Fem);
+    showContactFem(Fem);
 end

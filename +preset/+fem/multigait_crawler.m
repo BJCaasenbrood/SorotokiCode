@@ -2,7 +2,7 @@ function fem = multigait_crawler(varargin)
 % Create a parser for user inputs
 p = inputParser;
 % Add optional inputs and default values
-addOptional(p,'n',1750);
+addOptional(p,'n',0.75);
 addOptional(p,'d',250);
 addOptional(p,'dt',1/750);
 addOptional(p,'control',0);
@@ -32,7 +32,7 @@ fem = fem.addContact(flr);
 
 % Set the display function
 fem.options.Display = @plt;
-fem.solver.MaxIteration = 6;
+% fem.solver.MaxIteration = 6;
 
 if p.Results.control
     fem = fem.addPressure(fem.findEdges('BoxHole',[0 50 0 15]),...
@@ -42,6 +42,8 @@ if p.Results.control
     fem = fem.addPressure(fem.findEdges('BoxHole',[100 150 0 15]),...
         @(t) pset(t,3));
 end
+
+fem.BdBox = [-5,250,-5, 50];
 
 end
 
@@ -57,4 +59,5 @@ function plt(fem)
 cla;
 fem.showVonMises;
 fem.showContact;
+axis equal;
 end

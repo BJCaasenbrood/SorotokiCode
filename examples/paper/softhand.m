@@ -3,12 +3,13 @@ clr;
 [shp, obj] = preset.shapes.softhand;
 f = figure(101);
 
-dt = 1/30; % set initial timestep
+dt = 1/40; 
+t = 0;
 
 % simulation loop
-while true
+while t <= 11.0
     t = shp{1}.solver.Time;
-    for ii = 1:5, 
+    for ii = 1:5
       shp{ii}.system.fControl = [500; 0] * smoothstep(0.15 * t ); 
     end
 
@@ -16,8 +17,5 @@ while true
     shp = cellfun(@(x) x.update(dt), shp, 'UniformOutput', false);
     shp = cellfun(@(x) x.show, shp, 'UniformOutput', false);
     drawnow
-    dt = toc; % get current timecost
-
-    f.set('Name',['Time=', num2str(t,3), ' (s); ('...
-      , 'FPS=',num2str(1/dt,3),')']); % 
+    dt = toc;
 end

@@ -1,8 +1,6 @@
 clr; 
-cd ..
-cd ..
 % assign parameters and build tensor
-obj = preset.assets.tennis_racket;
+obj = preset.gmodel.tennis_racket;
 
 [I1,I2,I3,m] = deal(18.36,40.32,44.517,0.1);
 Mtt = blkdiag(diag([I1,I2,I3]),m * eye(3));
