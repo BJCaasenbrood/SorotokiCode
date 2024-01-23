@@ -1,4 +1,5 @@
 clr;
+%% Example: inverse kinematics solver for soft manipulator
 % set parameters
 [N,M] = deal(54,2);
 

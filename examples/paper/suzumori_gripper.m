@@ -21,5 +21,4 @@ while true
     shp = cellfun(@(x) x.update(dt/2), shp, 'UniformOutput', false);
     shp = cellfun(@showRenderShapes, shp, 'UniformOutput', false);
     dt = toc;
-    drawnow;
 end

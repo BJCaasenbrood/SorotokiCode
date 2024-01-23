@@ -1,5 +1,5 @@
 clr;
-msh = Mesh(sRectangle(10, 2),'Quads',[60,10]);
+msh = Mesh(sRectangle(10, 2),'Quads',[12,3]);
 msh = msh.generate();
 
 fem = Fem(msh,'SpatialFilterRadius',0.3);
@@ -10,13 +10,14 @@ fem = fem.addSupport('sw',[1, 1]);
 fem = fem.addLoad('bottommid',[0,1]);
 
 fem.options.isNonlinear = false;
-fem.options.LineStyle = 'none';
-fem.options.Display = @plt;
+fem.options.LineStyle   = 'none';
+fem.options.Display     = @plt;
 
-fem = fem.optimize;
+fem = fem.optimize();
 
 function plt(Fem)
     cla;
+    figure(101);
     showInfillFem(Fem);
 end
 

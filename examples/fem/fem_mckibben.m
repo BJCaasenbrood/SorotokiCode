@@ -7,9 +7,9 @@ E = msh.findElements('Box',[-3,3,4,36]);
 
 fem = Fem(msh,'TimeStep',1/150);
 fem = fem.addMaterial(NeoHookean);
-fem = fem.addMaterial(NeoHookean(0.01,0.45));
+fem = fem.addMaterial(NeoHookean(0.01,0.4));
 fem = fem.setMaterial(E,2);
 fem = fem.addSupport('top',[1,1]);
-fem = fem.addDilation(E,0.49);
+fem = fem.addDilation(E,1e-1);
 
 fem = fem.solve;

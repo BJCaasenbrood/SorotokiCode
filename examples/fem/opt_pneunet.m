@@ -10,6 +10,25 @@ sdf = Sdf(f,'BdBox',[0,W,0,H]);
 msh = Mesh(sdf,'NElem',1200);
 msh = msh.generate();
 
+%%
+fem = Fem(msh,'SpatialFilterRadius',H/10);
+
+fem = fem.addMaterial(NeoHookean);
+fem = fem.addSupport('left',[1, 1]);
+% fem = fem.addSupport('right',[1, 1]);
+fem = fem.addLoad('bottommid',[0,1]);
+
+fem.options.isNonlinear = false;
+fem.options.LineStyle = 'none';
+fem.options.Display = @plt;
+
+fem = fem.optimize;
+
+function plt(Fem)
+    cla;
+    showInfillFem(Fem);
+end
+
 function Dist = PneuNet(P,W,H,E,T)
     R1 = dRectangle(P,0,W,0,H);
     R2 = dRectangle(P,-W/2,E,T,H+H/2);

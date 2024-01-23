@@ -53,9 +53,9 @@ function tau = Control(shp, Xd)
     Dc = 0.1 * Kc;
     
     % compute lambda
-    Mi  = inv(M);
-    JT  = J.';
-    A   = J*Mi*JT + 1e-4 * eye(3);
+    Mi = inv(M);
+    JT = J.';
+    A  = J*Mi*JT + 1e-4 * eye(3);
     lam = A\(eye(3));
     
     % compute JB+

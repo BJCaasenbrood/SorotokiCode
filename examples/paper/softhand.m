@@ -16,6 +16,5 @@ while t <= 11.0
     tic;
     shp = cellfun(@(x) x.update(dt), shp, 'UniformOutput', false);
     shp = cellfun(@(x) x.show, shp, 'UniformOutput', false);
-    drawnow
     dt = toc;
 end

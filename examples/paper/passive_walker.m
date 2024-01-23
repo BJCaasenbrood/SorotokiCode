@@ -26,7 +26,7 @@ fem = fem.addContact(flr);
 
 % Set the display function
 fem.options.Display = @(x) plt(x);
-fem.solver.MaxIteration = 2;
+fem.solver.MaxIteration = 20;
 
 % solve dynamic simulation
 fem = fem.simulate();
@@ -35,7 +35,7 @@ function plt(fem)
     clf;
     fem.showVonMises;
     fem.showContact;
-    view(30,90)
+    % view(30,90)
 end
 
 

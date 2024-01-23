@@ -1,4 +1,5 @@
 clr;
+%% Example: rendering of backbone curve in 3D
 % set parameters
 [N,M] = deal(54,2);
 
