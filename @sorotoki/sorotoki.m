@@ -131,7 +131,10 @@ function vargout = sorotoki(varargin)
 
         if sum(ismember(prompt,'--developer'))
             developer_mode = true;
-            prompt = strrep(prompt,'--developer'); % remove developer prompt
+            prompt = strrep(prompt,'--developer',''); % remove developer prompt
+        elseif sum(ismember(prompt,'--dev'))
+            developer_mode = true;
+            prompt = strrep(prompt,'--dev',''); % remove developer prompt
         end
 
         testsuite = {'sdf'; 'mesh'; 'fem'};
