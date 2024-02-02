@@ -508,22 +508,50 @@
 <details class="info" open="open">
 <summary>Step 1: Downloading Sorotoki using MPM</summary>
 <p><strong>Install on mpm-package:</strong> You can directly clone the repository using the MPM command:</p>
-<div class="highlight"><pre><span></span><code><span class="n">mpm</span><span class="w"> </span><span class="s">install</span><span class="w"> </span><span class="s">sorotokicode</span>
+<div class="highlight"><pre><span></span><code><span class="n">mpm</span><span class="w"> </span><span class="s">install</span><span class="w"> </span><span class="s">sorotokicode</span><span class="w"> </span><span class="o">--</span><span class="nb">all</span><span class="o">-</span><span class="n">paths</span>
 </code></pre></div>
 <p>This command will download SorotokiCode directly from the GitHub repository and create the SorotokiCode folder in the <code>./mpm-package</code> folder. </p>
-<p><strong>Install on desired location:</strong> Alternatively, the installation folder can be set to <code>~./Documents/MATLAB/</code>. This is done by running the following line:</p>
-<div class="highlight"><pre><span></span><code><span class="n">mpm</span><span class="w"> </span><span class="s">install</span><span class="w"> </span><span class="s">sorotokicode</span><span class="w"> </span><span class="o">-</span><span class="n">d</span><span class="w"> </span><span class="o">~./</span><span class="n">Documents</span><span class="o">/</span><span class="n">MATLAB</span><span class="o">/</span>
-</code></pre></div>
+<details class="into">
+<summary>Installing in specified folder</summary>
+<p><strong>Install on desired location:</strong> Alternatively, the installation folder can be set to <code>~./Documents/MATLAB/</code>. This is done by running the following line:
+<div class="highlight"><pre><span></span><code><span class="n">mpm</span><span class="w"> </span><span class="s">install</span><span class="w"> </span><span class="s">sorotokicode</span><span class="w"> </span><span class="o">-</span><span class="n">d</span><span class="w"> </span><span class="o">~./</span><span class="n">Documents</span><span class="o">/</span><span class="n">MATLAB</span><span class="o">/</span><span class="w"> </span><span class="o">--</span><span class="nb">all</span><span class="o">-</span><span class="n">paths</span>
+</code></pre></div></p>
+</details>
+<details class="error">
+<summary>Error using mpm: This command is not supported when the mpm feature is not enabled. </summary>
+<p>This error is due to the fact that MATLAB has its own function called <code>mpm</code>, which is in conflict with the mpm tools written by <a href="https://github.com/mobeets">mobeets</a>. To solve the issue, we can generate a file under <code>~./Documents/MATLAB</code> called <code>startup.m</code>. This file is called during the startup of MATLAB, and will addpath of the <code>mobeets-mpm</code> folder. 
+<div class="highlight"><span class="filename">./Documents/MATLAB/startup.m</span><pre><span></span><code><span class="nb">warning</span><span class="w"> </span><span class="n">off</span>
+
+<span class="c">% change USER to your username!</span>
+<span class="n">USER</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">'johndoe'</span><span class="p">;</span>
+<span class="k">if</span><span class="w"> </span><span class="nb">ispc</span>
+<span class="w">    </span><span class="nb">addpath</span><span class="p">([</span><span class="s">'C:\Users\'</span><span class="p">,</span><span class="n">USER</span><span class="p">,</span><span class="s">'\AppData\Roaming\MathWorks\,...</span>
+<span class="s">            '</span><span class="o">\</span><span class="n">MATLAB</span><span class="w"> </span><span class="n">Add</span><span class="o">-</span><span class="n">Ons</span><span class="o">\</span><span class="n">Collections</span><span class="o">/</span><span class="n">mpm</span><span class="o">/</span><span class="n">mobeets</span><span class="o">-</span><span class="n">mpm</span><span class="o">-</span><span class="n">c626429</span><span class="o">'</span><span class="p">]);</span>
+<span class="k">elseif</span><span class="w"> </span><span class="nb">isunix</span>
+<span class="w">    </span><span class="nb">addpath</span><span class="p">([</span><span class="s">'/home/'</span><span class="p">,</span><span class="n">USER</span><span class="p">,</span><span class="s">'/MATLAB Add-Ons/Collections/mpm/mobeets-mpm-c626429'</span><span class="p">]);</span>
+<span class="k">end</span>
+
+<span class="n">mpm</span><span class="w"> </span><span class="s">init</span>
+<span class="nb">clc</span><span class="p">;</span><span class="w"> </span><span class="n">warning</span><span class="w"> </span><span class="s">on</span>
+</code></pre></div></p>
+</details>
 </details>
 <details class="info" open="open">
 <summary>Step 2: Running the installer</summary>
 <p>After ensuring that all the necessary prerequisites are correctly installed, the next step involves configuring the toolkit with MATLAB's search paths. This process is relatively straightforward and can be accomplished by executing the following command:</p>
-<div class="highlight"><pre><span></span><code><span class="n">sorotoki</span><span class="w"> </span><span class="o">-</span><span class="nb">i</span>
+<p><div class="highlight"><pre><span></span><code><span class="n">sorotoki</span><span class="w"> </span><span class="s">cd</span><span class="w">                 </span><span class="s">%</span><span class="w"> </span><span class="s">navigate</span><span class="w"> </span><span class="s">to</span><span class="w"> </span><span class="s">install</span><span class="w"> </span><span class="s">folder</span>
+<span class="n">sorotoki</span><span class="w"> </span><span class="s">install</span><span class="w"> </span><span class="o">--</span><span class="n">approve</span><span class="w">  </span><span class="c">% run installer (with auto approve)</span>
 </code></pre></div>
-<p>The toolkit will proceed with the installation by building search paths in Matlab. The toolkit will request the installation of the prerequisite toolboxes if they are not already installed. These include: Optimization Toolbox, Partial Differential Equation Toolbox, Image Processing Toolbox, and Matlab Coder. Especially the latter ensures that embedded Sorotoki functions can be converted to <code>c</code> or <code>c++</code> equivalent code in the form of mex files, which greatly enhances computational performance. Finally, a verification routine is performed to check if the toolkit is installed correctly.</p>
+The toolkit will proceed with the installation by building search paths in Matlab. The toolkit will request the installation of the prerequisite toolboxes if they are not already installed. These include: Optimization Toolbox, Partial Differential Equation Toolbox, Image Processing Toolbox, and Matlab Coder. Especially the latter ensures that embedded Sorotoki functions can be converted to <code>c</code> or <code>c++</code> equivalent code in the form of mex files, which greatly enhances computational performance. Finally, a verification routine is performed to check if the toolkit is installed correctly.</p>
 </details>
 <details class="info" open="open">
-<summary>Step 3: That's it folks</summary>
+<summary>Step 3: Building the toolkit</summary>
+<p>Since Sorotoki uses the MATLAB Coder toolbox to speed-up computation, the toolkit still needs to be build. Here, MATLAB functions are converted to <code>c++</code> executables that can be called from MATLAB as <code>.mex</code> files. To build these <code>.mex</code> files, we can simply call
+<div class="highlight"><pre><span></span><code><span class="n">sorotoki</span><span class="w"> </span><span class="s">build</span><span class="w"> </span><span class="o">--</span><span class="n">approve</span><span class="w">   </span><span class="c">% build sorotoki executables</span>
+</code></pre></div></p>
+</details>
+<details class="info" open="open">
+<summary>Step 4: That's it folks</summary>
 <p>And that's it, Sorotoki is now ready to use. The <code>sorotoki</code> installation command can also be used to run demo, check updates, see version number, and find the documentation file. You can do these by running the following commands:</p>
 <div class="highlight"><pre><span></span><code><span class="n">sorotoki</span><span class="w"> </span><span class="s">demo</span><span class="w">       </span><span class="s">%</span><span class="w"> </span><span class="s">list</span><span class="w"> </span><span class="s">demos</span>
 <span class="n">sorotoki</span><span class="w"> </span><span class="s">d</span><span class="w">          </span><span class="s">%</span><span class="w"> </span><span class="s">...</span>
@@ -537,25 +565,8 @@
 </details>
 <h1 id="manual-installation">Manual installation</h1>
 <p>Alternatively, you can download the latest version of the toolkit below, and unpack the compressed folder at any desired working directory. We do not recommend this procedure, as MPM can help maintain the Sorotoki toolkit if future updates may appear.</p>
-<p><a class="md-button md-button--primary" href="#">Sorotoki v.2.19.stable (code)</a></p>
+<p><a class="md-button md-button--primary" href="#">Sorotoki v.3.0.0.stable (code)</a></p>
 <h1 id="faq-and-installation-issues">FAQ and installation issues</h1>
-<details class="error">
-<summary>Error using mpm: This command is not supported when the mpm feature is not enabled. Start MATLAB with the -mpm command line switch.</summary>
-<p>The mpm tools written by <a href="https://github.com/mobeets">mobeets</a> has the same name as Matlab's MPM. 
-<div class="highlight"><span class="filename">./Documents/MATLAB/startup.m</span><pre><span></span><code><span class="nb">warning</span><span class="w"> </span><span class="n">off</span>
-
-<span class="c">% change USER to your username!</span>
-<span class="n">USER</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">'johndoe'</span><span class="p">;</span>
-<span class="k">if</span><span class="w"> </span><span class="nb">ispc</span>
-<span class="w">    </span><span class="nb">addpath</span><span class="p">([</span><span class="n">USER</span><span class="p">,</span><span class="s">'/MATLAB Add-Ons/Collections/mpm/mobeets-mpm-c626429'</span><span class="p">]);</span>
-<span class="k">elseif</span><span class="w"> </span><span class="nb">isunix</span>
-<span class="w">    </span><span class="nb">addpath</span><span class="p">([</span><span class="s">'/home/'</span><span class="p">,</span><span class="n">USER</span><span class="p">,</span><span class="s">'/MATLAB Add-Ons/Collections/mpm/mobeets-mpm-c626429'</span><span class="p">]);</span>
-<span class="k">end</span>
-
-<span class="n">mpm</span><span class="w"> </span><span class="s">init</span>
-<span class="nb">clc</span><span class="p">;</span><span class="w"> </span><span class="n">warning</span><span class="w"> </span><span class="s">on</span>
-</code></pre></div></p>
-</details>
 <p>Darn', other problems during installation Please let me know by:</p>
 <ol>
 <li>Post an issue at: <a href="https://github.com/BJCaasenbrood/SorotokiCode/issues">https://github.com/BJCaasenbrood/SorotokiCode/issues</a></li>
