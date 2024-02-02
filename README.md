@@ -8,13 +8,18 @@
 The toolkit is easy to install. The fastest and easiest way to acquire the toolkit is through [mpm](https://github.com/mobeets/mpm) (Matlab Package Manager). [mpm](https://github.com/mobeets/mpm) is a simple package manager for Matlab (inspired by [pip](https://pypi.org/project/pip/)). You can directly clone the repository using the MPM command in the MATLAB command window:
 
 ``` matlab
-mpm install sorotokicode   % pulls sorotoki from Github
+mpm install sorotokicode --all-paths  % pulls sorotoki from Github
 ```
 Then, to install, execute the following in the MATLAB command window:
 ```matlab
-sorotoki -i  % call sorotoki installer 
+sorotoki cd       % changes dir to installer
+sorotoki install  % call sorotoki installer 
+sorotoki build    % calls the c++ compiler
 ``````
-
+To check if sorotoki is properly installed, you can call the following command to run the testsuite:
+```
+sorotoki test    % calls testsuite 
+```
 ## Applications highlights
 
 - [x] Implicit modeling with Signed Distance Functions (SDFs),

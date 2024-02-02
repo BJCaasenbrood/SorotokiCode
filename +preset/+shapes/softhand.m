@@ -10,7 +10,6 @@ parse(p,varargin{:});
 currentDir = fileparts(mfilename('fullpath'));
 stlPath =fullfile(currentDir, '..', 'assets', 'stl', 'softhand_mount.stl');    
 
-% try
     obj = Gmodel(stlPath,'Shading','Face','Texture',matcap_egg);
     figure(101);
     view(105,20);
@@ -27,7 +26,7 @@ stlPath =fullfile(currentDir, '..', 'assets', 'stl', 'softhand_mount.stl');
 
     for ii = 1:5
         shp = Shapes(Y,[0,2,0,0,0,0],'Length',L(ii),...
-          'Texture',matcap_bluebase );
+          'Texture', matcap_diffuse(0.45) );
         
         shp = shp.setInputMap( @(x) [1; 0] );
         shp.Material = NeoHookean(1.5, 0.3);
@@ -49,6 +48,7 @@ stlPath =fullfile(currentDir, '..', 'assets', 'stl', 'softhand_mount.stl');
         SHAPES{ii} = showRenderShapes(shp);
     end
     axis([-20 20 -10 130 -100 100]);
+
 end
 
 % cell function containing SE(3) bases for soft fingers
