@@ -14,10 +14,13 @@ Then, to install, execute the following in the MATLAB command window:
 ```matlab
 sorotoki cd       % changes dir to installer
 sorotoki install  % call sorotoki installer 
-sorotoki build    % calls the c++ compiler
+```
+Since Sorotoki uses the MATLAB coder toolbox to speed-up computation, you need to build the necessary executables yourself. Simply call the following command to build the toolkit (this might take a while):
+```matlab
+sorotoki build    % run c++ compiler
 ``````
 To check if sorotoki is properly installed, you can call the following command to run the testsuite:
-```
+```matlab
 sorotoki test    % calls testsuite 
 ```
 ## Applications highlights
