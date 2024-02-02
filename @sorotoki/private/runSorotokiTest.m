@@ -17,10 +17,12 @@ if ~isempty( prompt )
 end
 
 % loop over testsuites
+warning off;
 for ii = 1:numel(testsuite)
     cd(installPath);
     flag = navigateAndTest(base, testsuite{ii}, flag);
 end
+warning on;
 
 if all(flag == 1)
     fprintf('All tests passed!\n ');
