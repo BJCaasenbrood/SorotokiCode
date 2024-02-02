@@ -511,13 +511,13 @@
 <div class="highlight"><pre><span></span><code><span class="n">mpm</span><span class="w"> </span><span class="s">install</span><span class="w"> </span><span class="s">sorotokicode</span><span class="w"> </span><span class="o">--</span><span class="nb">all</span><span class="o">-</span><span class="n">paths</span>
 </code></pre></div>
 <p>This command will download SorotokiCode directly from the GitHub repository and create the SorotokiCode folder in the <code>./mpm-package</code> folder. </p>
-<details class="into">
+<details class="help">
 <summary>Installing in specified folder</summary>
 <p><strong>Install on desired location:</strong> Alternatively, the installation folder can be set to <code>~./Documents/MATLAB/</code>. This is done by running the following line:
 <div class="highlight"><pre><span></span><code><span class="n">mpm</span><span class="w"> </span><span class="s">install</span><span class="w"> </span><span class="s">sorotokicode</span><span class="w"> </span><span class="o">-</span><span class="n">d</span><span class="w"> </span><span class="o">~./</span><span class="n">Documents</span><span class="o">/</span><span class="n">MATLAB</span><span class="o">/</span><span class="w"> </span><span class="o">--</span><span class="nb">all</span><span class="o">-</span><span class="n">paths</span>
 </code></pre></div></p>
 </details>
-<details class="error">
+<details class="help">
 <summary>Error using mpm: This command is not supported when the mpm feature is not enabled. </summary>
 <p>This error is due to the fact that MATLAB has its own function called <code>mpm</code>, which is in conflict with the mpm tools written by <a href="https://github.com/mobeets">mobeets</a>. To solve the issue, we can generate a file under <code>~./Documents/MATLAB</code> called <code>startup.m</code>. This file is called during the startup of MATLAB, and will addpath of the <code>mobeets-mpm</code> folder. 
 <div class="highlight"><span class="filename">./Documents/MATLAB/startup.m</span><pre><span></span><code><span class="nb">warning</span><span class="w"> </span><span class="n">off</span>
@@ -533,7 +533,11 @@
 
 <span class="n">mpm</span><span class="w"> </span><span class="s">init</span>
 <span class="nb">clc</span><span class="p">;</span><span class="w"> </span><span class="n">warning</span><span class="w"> </span><span class="s">on</span>
-</code></pre></div></p>
+</code></pre></div>
+You can check if MATLAB is using the correct path for <code>mpm</code> by calling
+<div class="highlight"><pre><span></span><code>which mpm
+</code></pre></div>
+If the correct path is still not used, call <code>startup</code> again in the command window.</p>
 </details>
 </details>
 <details class="info" open="open">
@@ -563,6 +567,10 @@ The toolkit will proceed with the installation by building search paths in Matla
 <span class="n">sorotoki</span><span class="w"> </span><span class="s">i</span><span class="w">          </span><span class="s">%</span><span class="w"> </span><span class="s">...</span>
 </code></pre></div>
 </details>
+<h1 id="updating-sorotoki">Updating Sorotoki</h1>
+<p>Updating Sorotoki is done via <code>mpm</code>. We can simply call:
+<div class="highlight"><pre><span></span><code>
+</code></pre></div></p>
 <h1 id="manual-installation">Manual installation</h1>
 <p>Alternatively, you can download the latest version of the toolkit below, and unpack the compressed folder at any desired working directory. We do not recommend this procedure, as MPM can help maintain the Sorotoki toolkit if future updates may appear.</p>
 <p><a class="md-button md-button--primary" href="#">Sorotoki v.3.0.0.stable (code)</a></p>
