@@ -24,7 +24,10 @@ function installMissingPackageMPM(package,varargin)
         case 'sorotokifem'                      
             mpm(action,'sorotokifem','install-dir','./lib/','--all-paths','--force');            
         case 'sorotokimodel'               
-            mpm(action,'sorotokimodel','install-dir','./lib/','--all-paths','--force');         
+            mpm(action,'sorotokimodel','install-dir','./lib/','--all-paths','--force');       
+        case 'sorotokicontrol'               
+                mpm(action,'sorotokicontrol','-u','https://github.com/BJCaasenbrood/SorotokiControl.git',...
+                'install-dir','./lib/','--all-paths','--force');                   
         case 'sorotokibots'            
             if strcmpi(action,'uninstall')
                 try
