@@ -567,11 +567,19 @@ The toolkit will proceed with the installation by building search paths in Matla
 <span class="n">sorotoki</span><span class="w"> </span><span class="s">i</span><span class="w">          </span><span class="s">%</span><span class="w"> </span><span class="s">...</span>
 </code></pre></div>
 </details>
-<h1 id="updating-sorotoki-via-matlab-package-manager-mpm">Updating Sorotoki via Matlab Package Manager (MPM)</h1>
-<p>Updating Sorotoki is done via <code>mpm</code>. We can simply call:
-<div class="highlight"><pre><span></span><code><span class="n">mpm</span><span class="w"> </span><span class="s">install</span><span class="w"> </span><span class="s">sorotokicode</span><span class="w"> </span><span class="o">--</span><span class="nb">all</span><span class="o">-</span><span class="n">paths</span><span class="w"> </span><span class="o">--</span><span class="n">force</span>
+<h1 id="updating-via-matlab-package-manager-mpm">Updating via Matlab Package Manager (MPM)</h1>
+<p>Updating Sorotoki is done via <code>mpm</code>. </p>
+<details class="info" open="open">
+<summary>Step 1: Pulling recent version</summary>
+<p>You can overwrite your current version of Sorotoki by calling:
+<div class="highlight"><pre><span></span><code><span class="n">mpm</span><span class="w"> </span><span class="s">install</span><span class="w"> </span><span class="s">sorotokicode</span><span class="w"> </span><span class="o">--</span><span class="n">force</span><span class="w"> </span><span class="o">--</span><span class="nb">all</span><span class="o">-</span><span class="n">paths</span>
 </code></pre></div>
-This will </p>
+This will pull the latest version of sorotoki git repo, and replace it with you current version. </p>
+</details>
+<details class="info" open="open">
+<summary>(Optional) Step 2: Reinstallation and rebuild</summary>
+<p>Although sometimes not required, it is wise to reinstall and rebuild. Simply follow the installation steps above from <strong>Step 3</strong>.</p>
+</details>
 <h1 id="manual-installation">Manual installation</h1>
 <p>Alternatively, you can download the latest version of the toolkit below, and unpack the compressed folder at any desired working directory. We do not recommend this procedure, as MPM can help maintain the Sorotoki toolkit if future updates may appear.</p>
 <p><a class="md-button md-button--primary" href="#">Sorotoki v.3.0.0.stable (code)</a></p>
