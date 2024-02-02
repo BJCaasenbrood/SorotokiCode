@@ -42,6 +42,7 @@ end
 %% processes test results
 function isPassed = showTestResults(test)
     log = Log;
+    log.info('');
     log.hline();
     name = {test.Name};
 
@@ -52,6 +53,7 @@ function isPassed = showTestResults(test)
         log.bool(name{i},flag(i),{'Passed','Failed'});
         pause(1e-2);
     end
+    log.info('');
     log.hline();
 
     % assertSuccess(test);

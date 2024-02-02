@@ -1,5 +1,5 @@
 clr;
-msh = Mesh(sRectangle(10, 2),'Quads',[12,3]);
+msh = Mesh(sRectangle(10, 2),'Quads',[30,10]);
 msh = msh.generate();
 
 fem = Fem(msh,'SpatialFilterRadius',0.3);
