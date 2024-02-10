@@ -28,4 +28,5 @@ lib
 .vscode
 .cover
 src
+dev
 matlabInVSCodeVariableInfo.csv
