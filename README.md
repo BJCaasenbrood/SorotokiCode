@@ -4,25 +4,10 @@
 
 [**Sorotoki**](https://bjcaasenbrood.github.io/SorotokiPage/) is an open-source MATLAB toolkit for soft robotics that includes an array of tools for design, modeling, and control. Due to its scientific diversity, it can be challenging for new researchers to quickly familiarize themselves with multiple scientific areas. With the aim to lower this threshold, Sorotoki aims to incorporate multiple layers of soft robotics research into one compact toolkit. Examples include: continuum mechanics, dynamic systems and control theory, topology optimization, computer graphics, and much more to come! The combination provides a highly flexible programming environment and will hopefully aid the development of novel soft robotic research.
 
-#### Installation via Matlab Package Manager (MPM)
-The toolkit is easy to install. The fastest and easiest way to acquire the toolkit is through [mpm](https://github.com/mobeets/mpm) (Matlab Package Manager). [mpm](https://github.com/mobeets/mpm) is a simple package manager for Matlab (inspired by [pip](https://pypi.org/project/pip/)). You can directly clone the repository using the MPM command in the MATLAB command window:
+#### Installation via Matlab Package Installer (MPI)
+The toolkit is easy to install using the Matlab Package Installer ([mpi](https://github.com/mobeets/mpm)). Please follow the [**Installation Guide**](https://bjcaasenbrood.github.io/SorotokiCode/install/).
 
-``` matlab
-mpm install sorotokicode --all-paths  % pulls sorotoki from Github
-```
-Then, to install, execute the following in the MATLAB command window:
-```matlab
-sorotoki cd       % changes dir to installer
-sorotoki install  % call sorotoki installer 
-```
-Since Sorotoki uses the MATLAB coder toolbox to speed-up computation, you need to build the necessary executables yourself. Simply call the following command to build the toolkit (this might take a while):
-```matlab
-sorotoki build    % run c++ compiler
-``````
-To check if sorotoki is properly installed, you can call the following command to run the testsuite:
-```matlab
-sorotoki test    % calls testsuite 
-```
+
 ## Applications highlights
 
 - [x] Implicit modeling with Signed Distance Functions (SDFs),
