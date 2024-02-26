@@ -14,7 +14,7 @@ jobs:
     steps:
       - checkout
       - run: git clone https://github.com/mobeets/mpm.git temp
-      - run: mv temp/mpm.m . & mv temp/mpm_config.m . & mv temp/mpm_nls.mat . & mkdir mpm-packages
+      - run: mv temp/mpi.m . & mv temp/mpi_config.m . & mv temp/mpi_nls.mat . & mkdir mpi-packages
       - run: rm -rf temp
       - matlab/install:
           release: <<parameters.version>>

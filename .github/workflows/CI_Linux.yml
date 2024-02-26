@@ -19,8 +19,8 @@ jobs:
       - name: Get mpm.m via git
         run: git clone https://github.com/mobeets/mpm.git temp
 
-      - name: Unpack mpm folder
-        run: mv temp/mpm.m . & mv temp/mpm_config.m . & mv temp/mpm_nls.mat . & mkdir mpm-packages
+      - name: Unpack mpi folder
+        run: mv temp/mpi.m . & mv temp/mpi_config.m . & mv temp/mpi_nls.mat . & mkdir mpi-packages
 
       - name: Remove redundant folders
         run: rm -rf temp
