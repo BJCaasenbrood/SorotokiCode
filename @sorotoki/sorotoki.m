@@ -53,8 +53,9 @@ function vargout = sorotoki(varargin)
     prompt = [];
 
     mpiPath = which('mpi');
+    
     if ~isempty(which('mpm'))
-       error('MPM has been renamed to MPI, make sure to run the MPI version of the package installer');% ensures users are using MPI instead of MPM.
+       warning('MPM has been renamed to MPI, make sure to run the MPI version of the package installer');% ensures users are using MPI instead of MPM.
     end
 
     installFile = which('sorotoki.m');
