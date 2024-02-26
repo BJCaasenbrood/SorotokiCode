@@ -2,9 +2,9 @@ function removeSorotoki(soroPackages)
     
     warning off;
 
-    disp('Calling MPM installer -- removing Sorotoki');
+    disp('Calling MPI installer -- removing Sorotoki');
     for i = 1:numel(soroPackages)
-        installMissingPackageMPM(soroPackages{i},'uninstall'); 
+        installMissingPackageMPI(soroPackages{i},'uninstall'); 
     end
 
     try

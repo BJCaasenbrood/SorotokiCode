@@ -1,8 +1,8 @@
-function checkPackagesMPM(reqPackages,mpmPackages)
+function checkPackagesMPI(reqPackages,mpiPackages)
 
     global auto_approve;
-    disp('Checking for updates: MPM package library'); 
-    tf = ismember(reqPackages,mpmPackages);
+    disp('Checking for updates: MPI package library'); 
+    tf = ismember(reqPackages,mpiPackages);
 
     if all(tf)
         disp(msg('mpm_complete'));
@@ -14,7 +14,7 @@ function checkPackagesMPM(reqPackages,mpmPackages)
         end
 
         if ~auto_approve
-            disp('Install missing MPM packages?');
+            disp('Install missing MPI packages?');
             reply = input(i18n('confirm'), 's');
             if isempty(reply)
                 reply = i18n('confirm_yes');
@@ -27,10 +27,10 @@ function checkPackagesMPM(reqPackages,mpmPackages)
     
         lineStr = repmat('━', 1, 40);
         misPackages = reqPackages(find(~tf).');
-        disp('Calling MPM installer -- installing req. packages');
+        disp('Calling MPI installer -- installing req. packages');
         disp(lineStr);
         for i = 1:numel(misPackages)
-            installMissingPackageMPM(misPackages{i}); 
+            installMissingPackageMPI(misPackages{i}); 
             disp(lineStr);
         end
     end

@@ -1,9 +1,9 @@
-function checkSoroPackages(soroPackages,mpmPackages)
+function checkSoroPackages(soroPackages,mpiPackages)
 
     global auto_approve
 
     disp('Checking for updates: Sorotoki library'); 
-    tf = ismember(soroPackages,mpmPackages);
+    tf = ismember(soroPackages,mpiPackages);
     
     if all(tf)
         disp(msg('soro_complete'));
@@ -28,10 +28,10 @@ function checkSoroPackages(soroPackages,mpmPackages)
     
         lineStr = repmat('━', 1, 40);
         misPackages = soroPackages(find(~tf).');
-        disp('Calling MPM installer -- installing Sorotoki packages');
+        disp('Calling MPI installer -- installing Sorotoki packages');
         disp(lineStr);
         for i = 1:numel(misPackages)
-            installMissingPackageMPM(misPackages{i}); 
+            installMissingPackageMPI(misPackages{i}); 
             disp(lineStr);
         end
     end

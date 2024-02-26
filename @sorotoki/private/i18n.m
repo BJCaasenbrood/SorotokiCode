@@ -2,7 +2,7 @@ function str = i18n(key, varargin)
     persistent locale nls
     if ~isstruct(nls)
         locale = char(regexp(get(0, 'Language'), '^[a-zA-Z]+', 'match'));
-        nls = load('mpm_nls.mat');
+        nls = load('mpi_nls.mat');
     end
 
     %% Check if message key exists.
