@@ -21,7 +21,7 @@ function checkSoroPackages(soroPackages,mpiPackages)
                 reply = i18n('confirm_yes');
             end
             if ~strcmpi(reply(1), i18n('confirm_yes'))
-                log.info(i18n('confirm_nvm'));
+                disp(i18n('confirm_nvm'));
                 return;
             end
         end
