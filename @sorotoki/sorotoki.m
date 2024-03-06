@@ -121,8 +121,21 @@ function vargout = sorotoki(varargin)
         cd(installPath);
         if sum(ismember(prompt,'--approve'))
             auto_approve = true;
+        elseif sum(ismember(prompt,'--developer'))
+            developer_mode = true;
+            prompt = strrep(prompt,'--developer',''); % remove developer prompt
+        elseif sum(ismember(prompt,'--dev'))
+            developer_mode = true;
+            prompt = strrep(prompt,'--dev',''); % remove developer prompt
         end
-        buildSorotokiMex(installPath);
+
+        if developer_mode
+            base = '/src/';
+        else
+            base = '/lib/';
+        end
+
+        buildSorotokiMex(installPath, base);
         cd(installPath);
         return
     end
@@ -139,7 +152,7 @@ function vargout = sorotoki(varargin)
             prompt = strrep(prompt,'--dev',''); % remove developer prompt
         end
 
-        testsuite = {'sdf'; 'mesh'; 'fem'};
+        testsuite = {'sdf'; 'mesh'; 'fem'; 'shapes'; 'model'; 'control'};
 
         if developer_mode
             base = 'src/sorotoki';

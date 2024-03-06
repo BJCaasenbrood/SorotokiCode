@@ -1,14 +1,5 @@
 function out = runSorotokiTest(prompt, installPath, base, testsuite)
 flag = [];
-% base = 'src/Sorotoki';
-% testsuite = {'Sdf'; 'Mesh'; 'Fem'};
-% if isempty(base)
-%     base = 'lib/sorotoki';
-% end
-
-% if isempty(testsuite)
-%     testsuite = {'sdf'; 'mesh'; 'fem'};
-% end
 
 % eliminate suites not in prompt
 if ~isempty( prompt )
@@ -25,7 +16,7 @@ end
 warning on;
 
 if all(flag == 1)
-    fprintf('All tests passed!\n ');
+    fprintf('All tests passed!\n');
     out = true;
 else
     out = false;

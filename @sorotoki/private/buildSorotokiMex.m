@@ -1,10 +1,10 @@
-function buildSorotokiMex(installPath)
+function buildSorotokiMex(installPath, base)
 
 global auto_approve
 
 log = Log();
 log.options.isDebug = true;
-library = '/lib/';
+library = base;
 
 if ~auto_approve
     disp('Build Sorotoki .mex executables?');
