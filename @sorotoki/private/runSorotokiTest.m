@@ -2,7 +2,7 @@ function out = runSorotokiTest(prompt, installPath, base, testsuite)
 flag = [];
 
 % eliminate suites not in prompt
-if ~isempty( prompt )
+if ~isempty( prompt{1} )
     redux = ismember(lower(testsuite), prompt);
     testsuite = testsuite(redux);
 end

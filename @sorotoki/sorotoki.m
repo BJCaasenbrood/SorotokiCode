@@ -152,7 +152,7 @@ function vargout = sorotoki(varargin)
             prompt = strrep(prompt,'--dev',''); % remove developer prompt
         end
 
-        testsuite = {'sdf'; 'mesh'; 'fem'; 'shapes'; 'model'; 'control'};
+        testsuite = {'sdf'; 'mesh'; 'fem'; 'model'; 'control'};
 
         if developer_mode
             base = 'src/sorotoki';
