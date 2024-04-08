@@ -1,9 +1,72 @@
-cff-version: 1.0.0
-message: "If you are using SOROTOKI for your academic research, please consider citing us."
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: >-
+  Sorotoki: A Matlab Toolkit for Design, Modeling, and
+  Control of Soft Robots
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
 authors:
-  - family-names: Caasenbrood
-    given-names: Brandon
-    orcid:  https://orcid.org/0000-0002-6299-1730
-title: "Sorotoki - A Soft Robotics Toolkit for MATLAB"
-version: 1.0.0
-url: https://github.com/BJCaasenbrood/SorotokiCode
+  - given-names: Brandon
+    family-names: Caasenbrood
+    email: b.j.caasenbrood@gmail.com
+    affiliation: Eindhoven University of Technology
+    orcid: 'https://orcid.org/0000-0002-6299-1730'
+  - given-names: 'Henk '
+    family-names: Nijmeijer
+    email: h.nijmeijer@tue.nl
+    affiliation: Eindhoven University of Technology
+  - given-names: Alexander
+    family-names: Pogromsky
+    email: a.porgromski@tue.nl
+    affiliation: Eindhoven University of Technology
+identifiers:
+  - type: doi
+    value: 10.1109/ACCESS.2024.3357351
+    description: DOI to article
+repository-code: 'https://github.com/BJCaasenbrood/SorotokiCode'
+url: 'https://bjcaasenbrood.github.io/SorotokiCode'
+abstract: >-
+  In this paper, we present Sorotoki, an open-source
+  toolkit in MATLAB that offers a comprehensive suite of
+  tools for the design, modeling, and control of soft
+  robots. The complexity involved in researching and
+  building soft robots often stems from the
+  interconnectedness of design and control aspects, which
+  are rarely addressed together as a unified problem. To
+  address such complex interdependencies in soft robotics,
+  the Sorotoki toolkit provides a comprehensive and
+  modular programming environment composed of seven
+  Object-Oriented classes. These classes are designed to
+  work together to solve a wide range of soft robotic
+  problems, offering versatility and flexibility for its
+  users. We provide here a comprehensive overview of the
+  Sorotoki software architecture to highlight its usage
+  and applications. The details and interconnections of each
+  module are thoroughly described, collectively explaining
+  how to gradually introduce modeling complexity for various
+  soft robotic scenarios. The effectiveness of Sorotoki is
+  also demonstrated through a range of case studies,
+  including novel problem scenarios and established works
+  widely recognized in the soft robotics community. These
+  case studies cover a broad range of research problems,
+  including: inverse design of soft actuators, passive and
+  active soft locomotion, object manipulation with soft
+  grippers, meta-materials, model reduction, model-based
+  control of soft robots, and online shape estimation.
+  Additionally, the toolkit provides access to four
+  open-hardware soft robotic systems that can be fabricated
+  using commercially available 3D printers. For more
+  information about Sorotoki, readers are encouraged to
+  visit: https://bjcaasenbrood.github.io/SorotokiCode
+keywords:
+  - soft robotics
+  - software
+  - design
+  - modeling
+  - control
+  - matlab
+license: MIT
