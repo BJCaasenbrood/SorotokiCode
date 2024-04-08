@@ -97,12 +97,13 @@ function vargout = sorotoki(varargin)
             removeSorotoki(prompt);
         end
         return
-   end
+    end
 
     if strcmpi(action,'update') || strcmpi(action,'-u')
         cd(installPath);
         if isempty(prompt)
-            forceSorotokiUpdate(soroPackages);
+            % forceSorotokiUpdate(soroPackages);
+            sorotoki install
         else
             forceSorotokiUpdate(prompt);
         end
