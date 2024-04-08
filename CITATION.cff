@@ -2,14 +2,12 @@
 # Visit https://bit.ly/cffinit to generate yours today!
 
 cff-version: 1.2.0
-title: >-
-  Sorotoki: A Matlab Toolkit for Design, Modeling, and
-  Control of Soft Robots
 message: >-
   If you use this software, please cite it using the
   metadata from this file.
-type: software
-authors:
+preferred-citation: 
+  type: article
+  authors:
   - given-names: Brandon
     family-names: Caasenbrood
     email: b.j.caasenbrood@gmail.com
@@ -23,10 +21,13 @@ authors:
     family-names: Pogromsky
     email: a.porgromski@tue.nl
     affiliation: Eindhoven University of Technology
-identifiers:
-  - type: doi
-    value: 10.1109/ACCESS.2024.3357351
-    description: DOI to article
+  doi: "10.1109/ACCESS.2024.3357351"
+  journal: "IEEE Access"
+  title: "Sorotoki: A Matlab Toolkit for Design, Modeling, and Control of Soft Robots"
+  volume: 12
+  start: 17604
+  end: 17638
+  year: 2024
 repository-code: 'https://github.com/BJCaasenbrood/SorotokiCode'
 url: 'https://bjcaasenbrood.github.io/SorotokiCode'
 abstract: >-
@@ -70,4 +71,4 @@ keywords:
   - control
   - matlab
 license: MIT
-preferred-citation: article
+
