@@ -34,12 +34,14 @@ The toolkit is easy to install using the Matlab Package Installer ([mpi](https:/
 If you are planning on using Sorotoki in your (academic) work, please consider citing the toolkit  
 
 ```bibtex
-@misc{Caasenbrood2020,
-  author = {Caasenbrood, Brandon},
-  title = {Sorotoki - A Soft Robotics Toolkit for MATLAB},
-  year = {2020},
-  publisher = {GitHub},
-  journal = {GitHub repository},
-  howpublished = {\url{https://github.com/BJCaasenbrood/SorotokiCode}},
+@article{Caasenbrood2024,
+	author = {Caasenbrood, Brandon J. and Pogromsky, Alexander Y. and Nijmeijer, Henk},
+	title = {{Sorotoki: A Matlab Toolkit for Design, Modeling, and Control of Soft Robots}},
+	journal = {IEEE Access},
+	volume = {12},
+	pages = {17604--17638},
+	year = {2024},
+	publisher = {IEEE},
+	doi = {10.1109/ACCESS.2024.3357351}
 }
 ```
