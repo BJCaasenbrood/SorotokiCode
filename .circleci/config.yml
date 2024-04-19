@@ -41,5 +41,10 @@ workflows:
           matrix:
             parameters:
               version:
-                - R2023a
-                - R2023b          
+                - R2019b
+                - R2020b
+                - R2021b
+                - R2022b
+                - R2023b
+                - R2024a          
+
