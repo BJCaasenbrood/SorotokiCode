@@ -1,7 +1,7 @@
 function msh = diamond_bot(varargin)
 
     p = inputParser;
-    addOptional(p,'n',5);
+    addOptional(p,'n',3.5);
     parse(p,varargin{:});
     
     currentDir = fileparts(mfilename('fullpath'));

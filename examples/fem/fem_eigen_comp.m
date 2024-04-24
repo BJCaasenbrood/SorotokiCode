@@ -1,7 +1,7 @@
 clr;
 % generate fem model from diamond bot
 msh = preset.mesh.diamond_bot;
-fem = Fem(msh,'isNonlinear',false);
+fem = Fem(msh,'isNonlinear',true);
 fem = fem.addSupport('bottom',[1,1]);
 
 % assigning materials
@@ -13,9 +13,14 @@ fem = fem.eigen();
 Ia = fem.system.Ia;
 
 figure(101);
-for ii = 1:3
-    subplot(1,3,ii);
-    fem.solver.sol.x = fem.solver.pod.V(:,ii) * 250;
-    fem.show('Linestyle','none');
+for ii = 1:6
+    subplot(2,3,ii);
+
+    % overwrite (exaggerated) solutions
+    fem.solver.sol.x = fem.solver.sol.pod.V(:,ii) * (350 / sqrt(ii) );
+    fem = fem.compute(); % compute internal stresses
+
+    showVonMisesFem(fem);
     axis( [-20 185 0 120] );
+    box on; axis on;
 end
