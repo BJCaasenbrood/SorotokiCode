@@ -16,7 +16,8 @@ function checkSoroPackages(soroPackages,mpiPackages)
             [~, lastestDate] = getCommitInformationGIT(soroPackages{i})
             I = find(ismember(mpiPackages,soroPackages{i}));
 
-            installDate = datetime(mpiDates{I}, 'InputFormat', 'dd-MMM-yyyy HH:mm:ss')
+            % installDate = datetime(mpiDates{I}, 'InputFormat', 'dd-MMM-yyyy HH:mm:ss')
+            installDate = datetime(mpiDates{I}, 'InputFormat', 'dd-MMM-yyyy HH:mm:ss','Locale','en_US') % thanks @Beta-y for fix
             if installDate >= lastestDate
                 outdated = [outdated; false];
             else
