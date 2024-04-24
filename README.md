@@ -10,15 +10,14 @@ The toolkit is easy to install using the Matlab Package Installer ([mpi](https:/
 
 ## Applications highlights
 
-- [x] Implicit modeling with Signed Distance Functions (SDFs),
-- [x] Finite element method (FEM) using hyper-elastic materials,
-- [x] Topology optimization of (pressure-driven) soft robots,
-- [x] Dynamical modeling through geometric theory,
-- [x] (NEW!) Real-time control of soft robots via Raspi-interface,
-- [x] Fast graphics rendering with responsive textures.
+- [x] [Sdf](https://github.com/BJCaasenbrood/SorotokiSdf) - Implicit modeling with Signed Distance Functions (SDFs),
+- [x] [Fem](https://github.com/BJCaasenbrood/SorotokiFem) - Finite element method (FEM) using hyper-elastic materials,
+- [x] [Topo](https://github.com/BJCaasenbrood/SorotokiFem) - Topology optimization of (pressure-driven) soft robots,
+- [x] [Model](https://github.com/BJCaasenbrood/SorotokiModel) - Dynamical modeling through geometric theory,
+- [x] [Control](https://github.com/BJCaasenbrood/SorotokiCode) - Real-time control of soft robots via Raspi-interface,
+- [x] [GModel](https://github.com/BJCaasenbrood/MatlabGraphicalModel) - Fast graphics rendering with responsive textures.
 
 ## What can it do?
-
 
 <img src="https://github.com/BJCaasenbrood/SorotokiPage/blob/master/docs/documentation/img/mckibben.gif" height="150">  <img src="https://github.com/BJCaasenbrood/SorotokiPage/blob/master/docs/documentation/img/twist.gif" height="140"> <img src="https://github.com/BJCaasenbrood/SorotokiPage/blob/master/docs/documentation/img/buckling.png" height="140"> <img src="https://github.com/BJCaasenbrood/SorotokiPage/blob/master/docs/documentation/img/diamondbot.png" height="120"> <img src="https://github.com/BJCaasenbrood/SorotokiPage/blob/master/docs/documentation/img/opt_bellow.gif" height="150"> <img src="https://github.com/BJCaasenbrood/SorotokiPage/blob/master/docs/documentation/img/opt_pneunet_90.gif" height="160">
 
