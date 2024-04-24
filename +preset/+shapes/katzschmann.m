@@ -46,7 +46,7 @@ end
 
 function [sdf, V] = environmentSdf
     currentDir = fileparts(mfilename('fullpath'));
-    functionPath = fullfile(currentDir,'assets');
+    functionPath = fullfile(fileparts(currentDir),'assets'); % thanks @Beta-y
     addpath(functionPath);
 
     V = wavy_wall;
