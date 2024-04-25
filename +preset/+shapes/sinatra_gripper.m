@@ -4,8 +4,8 @@ function [SHAPES, GRIPPER] = sinatra_gripper(varargin)
     [Y,~] = chebyspace(80,3);
 
     currentDir = fileparts(mfilename('fullpath'));
-    stlPath1 =fullfile(currentDir, '..', 'assets', 'stl', 'sinatra_gripper_base.stl');
-    stlPath2 =fullfile(currentDir, '..', 'assets', 'stl', 'sinatra_gripper_holder.stl');    
+    stlPath1 = fullfile(currentDir, '..', 'assets', 'stl', 'sinatra_gripper_base.stl');
+    stlPath2 = fullfile(currentDir, '..', 'assets', 'stl', 'sinatra_gripper_holder.stl');    
 
     obj1 = Gmodel(stlPath1,'Shading','Face');
     obj1.Texture = matcap_grey * 1.25;
@@ -34,7 +34,7 @@ function [SHAPES, GRIPPER] = sinatra_gripper(varargin)
         shp = shp.setMaterial(mat);
         shp = shp.setRadius([6,0.85,0,1]);
         shp = shp.setBase(G{ii});
-        shp.system.Drag = 100e-12;
+        shp = shp.addDrag(100e-12);
         shp = shp.rebuild();
 
         shp = shp.addContact(sdf);
