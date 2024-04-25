@@ -4,7 +4,7 @@ Xd1 = [-140.6; 353.7; 0];
 Xd2 = [-230.7; 257.6; 0];
 
 % load preset shapes
-shp = preset.shapes.katzschmann;
+shp = preset.shapes.katzschmann; 
 fig = figure(101);
 
 madeContact = false;
@@ -14,7 +14,7 @@ while shp.solver.Time < shp.solver.TimeHorizon
     
     % contact enabler
     if norm(shp.system.fContact) < eps && ~madeContact
-        Xd = [-140.6;353.7;0];
+        Xd = [-140.6; 323.7; 0];
     else % if contact, then interp to new position
         madeContact = true;
         Xd1 = [-140.6;353.7;0];
@@ -49,13 +49,13 @@ function tau = Control(shp, Xd)
     dq = shp.solver.sol.dx;
     nq = numel(q);
     
-    Kc = 1e-3 * smoothstep(2.5*t);
-    Dc = 0.1 * Kc;
+    Kc = 0.825 * 1e-3 * smoothstep(120*t);
+    Dc = 0.25 * 1e-3;
     
     % compute lambda
     Mi = inv(M);
     JT = J.';
-    A  = J*Mi*JT + 1e-4 * eye(3);
+    A  = J*Mi*JT + 1e-6 * eye(3);
     lam = A\(eye(3));
     
     % compute JB+
@@ -63,7 +63,7 @@ function tau = Control(shp, Xd)
     Jbp = W*lam;
     
     % compute eta
-    eta = lam*(J*Mi*C);
+    eta = lam*(J*Mi*C - dJ);
     
     % impedance controller
     tau = J.'*Jbp.'*(fe) + J.'*eta*(eye(nq) ...
