@@ -43,7 +43,6 @@ workflows:
               version:
                 - R2022a
                 - R2022b
-                - R2023a
                 - R2023b
                 - R2024a          
 
